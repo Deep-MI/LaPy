@@ -3,7 +3,8 @@
 LaPy is a package to compute spectral features (Laplace-Beltrami operator) on
 tetrahedral and triangle meshes. It is written purely in python 3 without
 sacrificing speed as almost all loops are vectorized, drawing upon efficient
-and sparse mesh datastructures. 
+and sparse mesh datastructures. It is a basically a port of the C++ ShapeDNA
+project with extended differential geometry capabilities.
 
 ## Contents:
 
@@ -47,5 +48,16 @@ If you use this software for a publication please cite both these papers:
 
 [1] introduces the FEM methods and the Laplace spectra for shape analysis, while [2] focusses on medical applications.
 
-Also see our Lab webpage at https://deep-mi.org 
+For Geodesics please cite:
+
+[3] Crane K, Weischedel C, Wardetzky M. Geodesics in heat: A new approach to computing distance based on heat flow. Acm Transactions on Graphics.https://doi.org/10.1145/2516971.2516977
+
+For non-singular mean curvature flow please cite:
+
+[4] Kazhdan M, Solomon J, Ben-Chen M. 2012. Can Mean-Curvature Flow be Modified to be Non-singular? Comput. Graph. Forum 31, 5, 1745–1754.
+https://doi.org/10.1111/j.1467-8659.2012.03179.x
+
+We also invite you to check out our lab webpage at https://deep-mi.org 
+
+Martin Reuter
 

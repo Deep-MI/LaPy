@@ -435,6 +435,12 @@ class TriaMesh:
     def curvature(self, smoothit=3):
         """
         Compute various curvature values at vertices.
+
+        For the algorithm see e.g.
+        Pierre Alliez, David Cohen-Steiner, Olivier Devillers, Bruno Levy, and Mathieu Desbrun.
+        Anisotropic Polygonal Remeshing.
+        ACM Transactions on Graphics, 2003.
+
         :param      smoothit  smoothing iterations on vertex functions
         :return:    u_min     minimal curvature directions (vnum x 3)
                     u_max     maximal curvature directions (vnum x 3)
@@ -442,7 +448,7 @@ class TriaMesh:
                     c_max     maximal curvature
                     c_mean    mean curvature: (c_min + c_max) / 2.0
                     c_gauss   Gauss curvature: c_min * c_max
-                    normals   normals orth. to u directions (vnum x 3)
+                    normals   normals (vnum x 3)
         """
         import sys
         # get edge information for inner edges (vertex ids and tria ids):

@@ -439,7 +439,7 @@ class Solver:
     def eigs(self, k=10, use_cholmod=True):
         """
         Compute linear finite-element method Laplace-Beltrami spectrum
-        
+
         :return:    eigenvalues     array: k Laplace eigenvalues, sorted.
                                     For closed meshes, or Neumann boundary condition
                                     0 will be first eigenvalue (with constant eigenfunction)
@@ -561,8 +561,8 @@ class Solver:
             print("Package scikit-sparse not found (Cholesky decomp)")
             print("Solver: spsolve (LU decomp) - performance not optimal ...")
             lu = splu(a)
-            x = lu.solve(b)
-        x = np.squeeze(x)
+            x = lu.solve(b.astype(np.float32))
+        x = np.squeeze(np.array(x))
         # pad Dirichlet nodes
         if len(didx) > 0:
             xfull = np.zeros(dim)

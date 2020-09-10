@@ -143,7 +143,7 @@ def import_gmsh(infile):
     """
     Load GMSH tetra mesh ASCII Format
     http://geuz.org/gmsh/doc/texinfo/gmsh.html#MSH-ASCII-file-format
-    .. moduleauthor:: Nico Schlömer <nico.schloemer@gmail.com>
+    .. moduleauthor:: Nico Schloemer <nico.schloemer@gmail.com>
     LICENSE MIT
     https://github.com/nschloe/meshio
     """

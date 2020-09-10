@@ -222,7 +222,7 @@ class TriaMesh:
     def tria_normals(self):
         """
         Computes triangle normals
-        Ordering of trias is important: counterclockwise when looking 
+        Ordering of trias is important: counterclockwise when looking
         :return:  n - normals (num triangles X 3 )
         """
         import sys
@@ -232,7 +232,7 @@ class TriaMesh:
         v2 = self.v[self.t[:, 2], :]
         v1mv0 = v1 - v0
         v2mv0 = v2 - v0
-        # Compute cross product 
+        # Compute cross product
         n = np.cross(v1mv0, v2mv0)
         ln = np.sqrt(np.sum(n * n, axis=1))
         ln[ln < sys.float_info.epsilon] = 1  # avoid division by zero

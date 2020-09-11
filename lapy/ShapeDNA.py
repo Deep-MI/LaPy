@@ -1,7 +1,7 @@
-astring#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-pyshapeDNA - a script to compute ShapeDNA of FreeSurfer structures
+shapeDNA - a script to compute ShapeDNA of FreeSurfer structures
 
 """
 

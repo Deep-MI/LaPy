@@ -1,142 +1,119 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
+
 shapeDNA - a script to compute ShapeDNA of FreeSurfer structures
 
-"""
+SUMMARY
+=======
 
+Computes surface (and volume) models of FreeSurfer's subcortical and cortical
+structures and computes a spectral shape descriptor (ShapeDNA [1]).
+
+Required arguments are:
+
+'sid'     : subject ID
+'sdir'    : subjects directory
+
+Input can be (exactly) one of the following:
+
+'asegid'  : an aseg label id to construct a surface of that ROI
+'hsfid'   : a hippocampal subfields id to construct a surface of that ROI (also pass 'hemi')
+'surf'    : a surface, e.g. lh.white
+
+Information about optional arguments can be optained with:
+
+'help'    : display help message and usage info
+
+Note that FreeSurfer needs to be sourced for this program to run.
+
+
+ARGUMENTS
+=========
+
+REQUIRED ARGUMENTS
+
+'sid' <name>      Subject ID
+
+'sdir' <name>     Subjects directory
+
+One of the following:
+
+'asegid' <int>    Segmentation ID of structure in aseg.mgz (e.g. 17 is
+                  Left-Hippocampus), for ID's check <sid>/stats/aseg.stats
+                  or $FREESURFER_HOME/FreeSurferColorLUT.txt.
+
+'hsfid' <int>     Segmentation ID of structure in
+                  [lr]h.<segmentation>Labels-<label>.<version><suffix>
+                  For ID's (e.g. 206 is CA1) check compressionLookupTable.txt
+                  in $FREESURFER_HOME/average/HippoSF/atlas. Also specify
+                  'hemi' if using this argument.
+
+'surf' <name>     lh.pial, rh.pial, lh.white, rh.white etc. to select a
+                  surface from the <sid>/surfs directory.
+
+OPTIONAL ARGUMENT
+
+'outdir' <name>   Output directory (default: <sdir>/<sid>/shapedna/)
+
+REQUIRED ARGUMENT if using 'hsfid'
+
+'hemi' <name>     'lh' or 'rh' hemisphere
+
+OPTIONAL ARGUMENTS if using 'hsfid'
+
+'hsflabel' <name> Label of hippocampal subfield segmentation, e.g. T1 or
+                  T1-T1T2_HC_segmentation (default: T1)
+
+'hsfver' <name>   Version of hippocampal subfield segmentation, e.g v10 or
+                  v20 (default: v10)
+
+'hsfseg' <name>   Name of segmentation, e.g. hippoSf or hippoAmyg (default:
+                  hippoSf)
+
+'hsfsfx' <name>   Suffix of segmenation, e.g. FSvoxelSpace or none (specify
+                  as '') (default: FSvoxelSpace)
+
+ShapeDNA parameters:
+
+'num' <int>       Number of eigenvalues/vectors to compute (default: 50)
+
+'bcond' <int>     Boundary condition (0=Dirichlet, 1=Neumann default)
+
+'evec'            Additionally compute eigenvectors
+
+
+REFERENCES
+==========
+
+Always cite [1] as it describes the method. If you use topological features of
+eigenfunctions, also cite [2]. [3] compares different discretizations of
+Laplace-Beltrami operators and shows that the used FEM appraoch performs best.
+If you do statistical shape analysis you may also want to cite [4] as it
+discusses medical applications.
+
+[1] M. Reuter, F.-E. Wolter and N. Peinecke.
+Laplace-Beltrami spectra as "Shape-DNA" of surfaces and solids.
+Computer-Aided Design 38 (4), pp.342-366, 2006.
+http://dx.doi.org/10.1016/j.cad.2005.10.011
+
+[2] M. Reuter. Hierarchical Shape Segmentation and Registration
+via Topological Features of Laplace-Beltrami Eigenfunctions.
+International Journal of Computer Vision, 2009.
+http://dx.doi.org/10.1007/s11263-009-0278-1
+
+[3] M. Reuter, S. Biasotti, D. Giorgi, G. Patane, M. Spagnuolo.
+Discrete Laplace-Beltrami operators for shape analysis and
+segmentation. Computers & Graphics 33 (3), pp.381-390, 2009.
+http://dx.doi.org/10.1016/j.cag.2009.03.005
+
+[4] M. Reuter, F.-E. Wolter, M. Shenton, M. Niethammer.
+Laplace-Beltrami Eigenvalues and Topological Features of
+Eigenfunctions for Statistical Shape Analysis.
+Computer-Aided Design 41 (10), pp.739-755, 2009.
+http://dx.doi.org/10.1016/j.cad.2009.02.007
+
+"""
 # ==============================================================================
 # FUNCTIONS
-
-# ------------------------------------------------------------------------------
-# help functions
-
-# print_help
-def print_help():
-    """
-    a function that prints a help message
-    """
-
-    HELPTEXT = """
-    ARGUMENTS
-    =========
-
-    REQUIRED ARGUMENTS
-
-    --sid <name>      Subject ID
-
-    --sdir <name>     Subjects directory
-
-    One of the following:
-
-    --asegid <int>    Segmentation ID of structure in aseg.mgz (e.g. 17 is
-                      Left-Hippocampus), for ID's check <sid>/stats/aseg.stats
-                      or $FREESURFER_HOME/FreeSurferColorLUT.txt.
-
-    --hsfid <int>     Segmentation ID of structure in
-                      [lr]h.<segmentation>Labels-<label>.<version><suffix>
-                      For ID's (e.g. 206 is CA1) check compressionLookupTable.txt
-                      in $FREESURFER_HOME/average/HippoSF/atlas. Also specify
-                      --hemi if using this argument.
-
-    --surf <name>     lh.pial, rh.pial, lh.white, rh.white etc. to select a
-                      surface from the <sid>/surfs directory.
-
-    OPTIONAL ARGUMENT
-
-    --outdir <name>   Output directory (default: <sdir>/<sid>/shapedna/)
-
-    REQUIRED ARGUMENT if using --hsfid
-
-    --hemi <name>     'lh' or 'rh' hemisphere
-
-    OPTIONAL ARGUMENTS if using --hsfid
-
-    --hsflabel <name> Label of hippocampal subfield segmentation, e.g. T1 or
-                      T1-T1T2_HC_segmentation (default: T1)
-
-    --hsfver <name>   Version of hippocampal subfield segmentation, e.g v10 or
-                      v20 (default: v10)
-
-    --hsfseg <name>   Name of segmentation, e.g. hippoSf or hippoAmyg (default:
-                      hippoSf)
-
-    --hsfsfx <name>   Suffix of segmenation, e.g. FSvoxelSpace or none (specify
-                      as '') (default: FSvoxelSpace)
-
-    ShapeDNA parameters:
-
-    --num <int>       Number of eigenvalues/vectors to compute (default: 50)
-
-    --bcond <int>     Boundary condition (0=Dirichlet, 1=Neumann default)
-
-    --evec            Additionally compute eigenvectors
-
-    """
-
-# return_help
-def return_help():
-    """
-    a function to return a help text
-    """
-
-    HELPTEXT = """
-
-    SUMMARY
-    =======
-
-    Computes surface (and volume) models of FreeSurfer's subcortical and cortical
-    structures and computes a spectral shape descriptor (ShapeDNA [1]).
-
-    Required arguments are:
-
-    --sid     : subject ID
-    --sdir    : subjects directory
-
-    Input can be (exactly) one of the following:
-
-    --asegid  : an aseg label id to construct a surface of that ROI
-    --hsfid   : a hippocampal subfields id to construct a surface of that ROI (also pass --hemi)
-    --surf    : a surface, e.g. lh.white
-
-    Information about optional arguments can be optained with:
-
-    --help    : display help message and usage info
-
-    Note that FreeSurfer needs to be sourced for this program to run.
-
-    REFERENCES
-    ==========
-
-    Always cite [1] as it describes the method. If you use topological features of
-    eigenfunctions, also cite [2]. [3] compares different discretizations of
-    Laplace-Beltrami operators and shows that the used FEM appraoch performs best.
-    If you do statistical shape analysis you may also want to cite [4] as it
-    discusses medical applications.
-
-    [1] M. Reuter, F.-E. Wolter and N. Peinecke.
-    Laplace-Beltrami spectra as "Shape-DNA" of surfaces and solids.
-    Computer-Aided Design 38 (4), pp.342-366, 2006.
-    http://dx.doi.org/10.1016/j.cad.2005.10.011
-
-    [2] M. Reuter. Hierarchical Shape Segmentation and Registration
-    via Topological Features of Laplace-Beltrami Eigenfunctions.
-    International Journal of Computer Vision, 2009.
-    http://dx.doi.org/10.1007/s11263-009-0278-1
-
-    [3] M. Reuter, S. Biasotti, D. Giorgi, G. Patane, M. Spagnuolo.
-    Discrete Laplace-Beltrami operators for shape analysis and
-    segmentation. Computers & Graphics 33 (3), pp.381-390, 2009.
-    http://dx.doi.org/10.1016/j.cag.2009.03.005
-
-    [4] M. Reuter, F.-E. Wolter, M. Shenton, M. Niethammer.
-    Laplace-Beltrami Eigenvalues and Topological Features of
-    Eigenfunctions for Statistical Shape Analysis.
-    Computer-Aided Design 41 (10), pp.739-755, 2009.
-    http://dx.doi.org/10.1016/j.cad.2009.02.007
-    """
-
-    return HELPTEXT
 
 # ------------------------------------------------------------------------------
 # auxiliary functions

@@ -72,7 +72,8 @@ def _map_z2color(zval, colormap, vmin, vmax):
 
 
 def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None, edge_color='rgb(50,50,50)',
-                   tic_color='rgb(50,200,10)', html_output=False, width=800, height=800, flatshading=False):
+                   tic_color='rgb(50,200,10)', html_output=False, width=800, height=800, flatshading=False,
+                   xrange=None, yrange=None, zrange=None, showcaxis=False, caxis=None):
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
     #
@@ -176,15 +177,27 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
                   title='')
 
     layout = go.Layout(
-        # title='',
         width=width,
         height=height,
         scene=dict(
-            xaxis=dict(noaxis),
-            yaxis=dict(noaxis),
-            zaxis=dict(noaxis)
+            xaxis=noaxis,
+            yaxis=noaxis,
+            zaxis=noaxis
+            )
         )
-    )
+
+    if xrange is not None:
+        layout.scene.xaxis.update(range=xrange)
+    if yrange is not None:
+        layout.scene.yaxis.update(range=yrange)
+    if zrange is not None:
+        layout.scene.zaxis.update(range=zrange)
+
+    data[0].update(showscale=showcaxis)
+
+    if caxis is not None:
+        data[0].update(cmin=caxis[0])
+        data[0].update(cmax=caxis[1])
 
     fig = go.Figure(data=data, layout=layout)
 
@@ -195,7 +208,9 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
 
 
 def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None, cutting=None,
-                  edge_color='rgb(50,50,50)', html_output=False, width=800, height=800, flatshading=None):
+                  edge_color='rgb(50,50,50)', html_output=False, width=800, height=800, flatshading=False,
+                  xrange=None, yrange=None, zrange=None, showcaxis=False, caxis=None):
+
     """
     this is a function to plot tetra meshes
 
@@ -206,7 +221,7 @@ def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
     to view the 'interior' of the tetra mesh, one or more cutting
     criteria can be defined as input arguments to this function:
 
-    e.g. cutting=('x<-10','z>=5','f>4')
+    e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
 
     where x,y,z represent dimensions 0,1,2 of the vertex array,
     and f represents the vfunc (which cannot be None if f is used
@@ -275,4 +290,5 @@ def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
 
     # run plot_tria_mesh on boundary tria
     plot_tria_mesh(tria_bnd, vfunc=vfunc, plot_edges=plot_edges, plot_levels=plot_levels, tfunc=tfunc_tria,
-                   edge_color=edge_color, html_output=html_output, width=width, height=height, flatshading=flatshading)
+                   edge_color=edge_color, html_output=html_output, width=width, height=height, flatshading=flatshading,
+                   xrange=xrange, yrange=yrange, zrange=zrange, showcaxis=showcaxis, caxis=caxis)

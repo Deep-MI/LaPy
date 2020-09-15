@@ -3,20 +3,22 @@
 LaPy is a package to compute spectral features (Laplace-Beltrami operator) on
 tetrahedral and triangle meshes. It is written purely in python 3 without
 sacrificing speed as almost all loops are vectorized, drawing upon efficient
-and sparse mesh datastructures. It is a basically a port of the C++ ShapeDNA
+and sparse mesh data structures. It is a basically a port of the C++ ShapeDNA
 project with extended differential geometry capabilities.
 
 ## Contents:
 
-- TriaMesh: a class for triangle meshes offering various operations, such as 
-  fixing orientation, smoothing, curvature, boundary, quality, normals, and 
+- TriaMesh: a class for triangle meshes offering various operations, such as
+  fixing orientation, smoothing, curvature, boundary, quality, normals, and
   various efficient mesh datastructure (edges, adjacency matrices)
 - TetMesh: a class for tetrahedral meshes (orientation, boundary ...)
-- IO: for both tets and trias from off, vtk ..., as well as functions
+- TriaIO, TetIO: for both tets and trias from off, vtk, etc. formats
+- FuncIO: import/export vertex functions and eigenvector files
 - Solver: a class for linear FEM computation (Laplace stiffness and mass
-  matrix, fast and sparse eigenvalue solver, anisotropic Laplace, Poission)
-- DiffGeo: compute gradients, divergence, mean curvature flow, etc. 
+  matrix, fast and sparse eigenvalue solver, anisotropic Laplace, Poisson)
+- DiffGeo: compute gradients, divergence, mean curvature flow, etc.
 - Heat: for heat kernel and diffusion
+- ShapeDNA: compute the ShapeDNA descriptor of surfaces and solids
 - Plot: functions for interactive visualization (wrapping plotly)
 
 ## ToDo
@@ -24,11 +26,25 @@ project with extended differential geometry capabilities.
 - Add and improve documentation
 - Add unit tests and automated testing (e.g. travis)
 - Add command line scripts for various functions
-- Integrate ShapeDNA and BrainPrint
+
+## Usage
+
+The LaPy package is a comprehensive collection of scripts, so we refer to the
+'help' function and docstring of each module / function / class for usage info.
+For example:
+
+```
+import lapy as lp
+help(lp.TriaMesh)
+help(lp.Solver)
+```
+
+In the `examples` subdirectory, we provide several Jupyter notebooks that
+illustrate prototypical use cases of the toolboxes.
 
 ## Installation
 
-Use the following code to download, build and install a package from this 
+Use the following code to download, build and install a package from this
 repository into your local Python package directory:
 
 `pip3 install --user git+https://github.com/Deep-MI/LaPy.git#egg=lapy`
@@ -50,14 +66,13 @@ If you use this software for a publication please cite both these papers:
 
 For Geodesics please cite:
 
-[3] Crane K, Weischedel C, Wardetzky M. Geodesics in heat: A new approach to computing distance based on heat flow. Acm Transactions on Graphics.https://doi.org/10.1145/2516971.2516977
+[3] Crane K, Weischedel C, Wardetzky M. Geodesics in heat: A new approach to computing distance based on heat flow. ACM Transactions on Graphics. https://doi.org/10.1145/2516971.2516977
 
 For non-singular mean curvature flow please cite:
 
 [4] Kazhdan M, Solomon J, Ben-Chen M. 2012. Can Mean-Curvature Flow be Modified to be Non-singular? Comput. Graph. Forum 31, 5, 1745–1754.
 https://doi.org/10.1111/j.1467-8659.2012.03179.x
 
-We also invite you to check out our lab webpage at https://deep-mi.org 
+We also invite you to check out our lab webpage at https://deep-mi.org
 
 Martin Reuter
-

@@ -8,6 +8,8 @@ SUMMARY
 Computes surface (and volume) models of FreeSurfer's subcortical and cortical
 structures and computes a spectral shape descriptor (ShapeDNA [1]).
 
+Use the 'compute_ShapeDNA' function to compute the shapeDNA descriptor.
+
 Required arguments are:
 
 'sid'     : subject ID
@@ -19,12 +21,12 @@ Input can be (exactly) one of the following:
 'hsfid'   : a hippocampal subfields id to construct a surface of that ROI (also pass 'hemi')
 'surf'    : a surface, e.g. lh.white
 
-Information about optional arguments can be optained with:
-
-'help'    : display help message and usage info
-
 Note that FreeSurfer needs to be sourced for this program to run.
 
+EXAMPLE
+=======
+
+ShapeDNA.compute_ShapeDNA(sid="mySubjectID", sdir="/my/subjects/directory", outdir="/my/output/directory", asegid=["17"])
 
 ARGUMENTS
 =========
@@ -220,6 +222,26 @@ def check_options(options):
         print('\nERROR: Specify either --asegid or --hsfid or --surf (not more than one of them)\n', flush=True)
         sys.exit(1)
 
+    # check format of asegid
+    if type(options["asegid"]) is str:
+        options["asegid"] = [ options["asegid"] ]
+    elif type(options["asegid"]) is int:
+        options["asegid"] = [ str(options["asegid"]) ]
+    elif type(options["asegid"]) is list:
+        options["asegid"] = [ str(x) for x in options["asegid"] ]
+    elif type(options["asegid"]) is tuple:
+        options["asegid"] = [ str(x) for x in options["asegid"] ]
+
+    # check format of hsfid
+    if type(options["hsfid"]) is str:
+        options["hsfid"] = [ options["hsfid"] ]
+    elif type(options["hsfid"]) is int:
+        options["hsfid"] = [ str(options["hsfid"]) ]
+    elif type(options["hsfid"]) is list:
+        options["hsfid"] = [ str(x) for x in options["hsfid"] ]
+    elif type(options["hsfid"]) is tuple:
+        options["hsfid"] = [ str(x) for x in options["hsfid"] ]
+
     # if --hsfid is used, then also --hemi needs to be specified
     if options["hsfid"] is not None and options["hemi"] is None:
         print('\nERROR: Specify --hemi\n', flush=True)
@@ -397,7 +419,7 @@ def get_surf_surf(options):
 # run shapeDNA-tria
 def compute_shapeDNA_tria(surf, options):
     """
-    a function to run the shapeDNA / laplaceTria script
+    a function to compute the shapeDNA descriptor for triangle meshes
     """
 
     # imports
@@ -438,7 +460,11 @@ def compute_shapeDNA_tria(surf, options):
 # main function
 
 # compute_ShapeDNA
-def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, hsfid=None, surf=None, hemi=None, hsflabel=None, hsfver=None, hsfseg=None, hsfsfx=None, num=50, bcond=1, evec=False):
+def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, surf=None, hemi=None, hsfid=None, hsflabel=None, hsfver=None, hsfseg=None, hsfsfx=None, num=50, bcond=1, evec=False):
+    """
+    the main function to compute the ShapeDNA descriptor
+    
+    """
 
     # imports
     import os

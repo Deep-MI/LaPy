@@ -21,13 +21,12 @@ project with extended differential geometry capabilities.
 - ShapeDNA: compute the ShapeDNA descriptor of surfaces and solids
 - Plot: functions for interactive visualization (wrapping plotly)
 
-## ToDo
+## ToDo:
 
-- Add and improve documentation
 - Add unit tests and automated testing (e.g. travis)
 - Add command line scripts for various functions
 
-## Usage
+## Usage:
 
 The LaPy package is a comprehensive collection of scripts, so we refer to the
 'help' function and docstring of each module / function / class for usage info.
@@ -40,9 +39,9 @@ help(lp.Solver)
 ```
 
 In the `examples` subdirectory, we provide several Jupyter notebooks that
-illustrate prototypical use cases of the toolboxes.
+illustrate prototypical use cases of the toolbox.
 
-## Installation
+## Installation:
 
 Use the following code to download, build and install a package from this
 repository into your local Python package directory:
@@ -54,7 +53,7 @@ your choice:
 
 `pip3 install --user --src /my/preferred/location --editable git+https://github.com/Deep-MI/Lapy.git#egg=lapy`
 
-## References
+## References:
 
 If you use this software for a publication please cite both these papers:
 

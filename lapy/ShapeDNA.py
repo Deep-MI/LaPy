@@ -430,7 +430,7 @@ def compute_shapeDNA_tria(surf, options):
 
     # get fem, evals, evecs
     fem = Solver(tria)
-    evals, evecs = fem.eigs(k=3)
+    evals, evecs = fem.eigs(k=options['num'])
 
     # write ev
 
@@ -463,7 +463,7 @@ def compute_shapeDNA_tria(surf, options):
 def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, surf=None, hemi=None, hsfid=None, hsflabel=None, hsfver=None, hsfseg=None, hsfsfx=None, num=50, bcond=1, evec=False):
     """
     the main function to compute the ShapeDNA descriptor
-    
+
     """
 
     # imports

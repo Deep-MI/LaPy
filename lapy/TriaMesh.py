@@ -466,7 +466,7 @@ class TriaMesh:
         edgelen = np.sqrt(np.sum(edgevecs**2, axis=1))
         # get sign (if normals face towards each other or away, across each edge)
         cp = np.cross(tnormals[tids[:, 0], :], tnormals[tids[:, 1], :])
-        si = np.sign(np.sum(cp*edgevecs, axis=1))
+        si = -np.sign(np.sum(cp*edgevecs, axis=1))
         angle = angle * si
         # normalized edges
         edgelen[edgelen < sys.float_info.epsilon] = 1  # avoid division by zero

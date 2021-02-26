@@ -77,7 +77,7 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
     #
-    if type(tria).__name__ is not "TriaMesh":
+    if type(tria).__name__ != "TriaMesh":
         raise ValueError('plot_tria_mesh works only on TriaMesh class')
 
     x, y, z = zip(*tria.v)
@@ -231,7 +231,7 @@ def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
     for plotting
 
     """
-    if type(tetra).__name__ is not "TetMesh":
+    if type(tetra).__name__ != "TetMesh":
         raise ValueError('plot_tet_mesh works only on TetMesh class')
 
     # from plotTriaMesh import plotTriaMesh

@@ -5,25 +5,25 @@ from .Solver import Solver
 
 
 def compute_gradient(geom, vfunc):
-    if type(geom).__name__ is "TriaMesh":
+    if type(geom).__name__ == "TriaMesh":
         return tria_compute_gradient(geom, vfunc)
-    elif type(geom).__name__ is "TetMesh":
+    elif type(geom).__name__ == "TetMesh":
         return tet_compute_gradient(geom, vfunc)
     else:
         raise ValueError('Geometry type "' + type(geom).__name__ + '" unknown')
 
 
 def compute_divergence(geom, vfunc):
-    if type(geom).__name__ is "TriaMesh":
+    if type(geom).__name__ == "TriaMesh":
         return tria_compute_divergence(geom, vfunc)
-    elif type(geom).__name__ is "TetMesh":
+    elif type(geom).__name__ == "TetMesh":
         return tet_compute_divergence(geom, vfunc)
     else:
         raise ValueError('Geometry type "' + type(geom).__name__ + '" unknown')
 
 
 def compute_rotated_f(geom, vfunc):
-    if type(geom).__name__ is "TriaMesh":
+    if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
     else:
         raise ValueError('Geometry type "' + type(geom).__name__ + '" not implemented')
@@ -253,10 +253,12 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012)
 
-    Inputs:   v - vertices : list of lists of 3 floats (x,y,z coords)
-              t - triangles: list of lists of 3 int of indices (>=0) into v array
+    Inputs:   tria        TriaMesh object (vertices and triangles)
+              max_iter    maximal number of steps
+              stops_eps   stopping threshold
+              step        Euler step size
 
-    Outputs:  v - numpy array of new vertex positions after flow 
+    Outputs:  TriaMesh - TriaMesh object (vertices and triangles)
 
     This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
     made non-singular" which uses the Laplace-Beltrami operator but keeps the 
@@ -271,7 +273,7 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
         use_cholmod = False
         from scipy.sparse.linalg import spsolve
         # Note, it would be better to do sparse Cholesky (CHOLMOD)
-        # as it an be 5-6 times faster
+        # as it can be 5-6 times faster
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -307,7 +309,7 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
     return trianorm
 
 
-def tria_spherical_project(tria, debug=False):
+def tria_spherical_project(tria, flow_iter=3, debug=False):
     """
     spherical(tria) computes the first three non-constant eigenfunctions
            and then projects the spectral embedding onto a sphere. This works
@@ -318,6 +320,7 @@ def tria_spherical_project(tria, debug=False):
            case of brain surfaces in FreeSurfer coordinates.
 
     Inputs:   tria      : TriaMesh
+              flow_iter : mean curv flow iterations (3 should be enough)
 
     Outputs:  tria      : TriaMesh
     """
@@ -449,15 +452,24 @@ def tria_spherical_project(tria, debug=False):
     ev3max = np.amax(ev3)
     ev3[ev3 < 0] /= - ev3min
     ev3[ev3 > 0] /= ev3max
+    
+    # set evec as new coordinates (spectral embedding)
+    vn = np.empty(tria.v.shape)
+    vn[:, 0] = ev3
+    vn[:, 1] = ev1
+    vn[:, 2] = ev2
 
+    # do a few mean curvature flow euler steps to make more convex
+    # three should be sufficient
+    if (flow_iter > 0):
+        tflow = tria_mean_curvature_flow(TriaMesh(vn,tria.t),max_iter=flow_iter)
+        vn = tflow.v
+            
     # project to sphere and scaled to have the same scale/origin as FS:
-    dist = np.sqrt(np.square(ev1) + np.square(ev2) + np.square(ev3))
-    v = tria.v
-    v[:, 0] = 100 * (ev3 / dist)
-    v[:, 1] = 100 * (ev1 / dist)
-    v[:, 2] = 100 * (ev2 / dist)
-
-    trianew = TriaMesh(v, tria.t)
+    dist = np.sqrt(np.sum(vn * vn, axis=1))
+    vn = 100 * (vn / dist[:, np.newaxis])
+    
+    trianew = TriaMesh(vn, tria.t)
     svol = trianew.area() / (4.0 * math.pi * 10000)
     print("sphere area fraction: {} ".format(svol))
 

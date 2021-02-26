@@ -27,7 +27,7 @@ class Solver:
             aniso     : float, anisotropy for curvature based anisotopic Laplace
             lump      : whether to lump the mass matrix (diagonal), default False
         """
-        if type(geometry).__name__ is "TriaMesh":
+        if type(geometry).__name__ == "TriaMesh":
             if aniso is not None:
                 # anisotropic Laplace
                 print("TriaMesh with anisotropic Laplace-Beltrami")
@@ -40,7 +40,7 @@ class Solver:
             else:
                 print("TriaMesh with regular Laplace-Beltrami")
                 a, b = self._fem_tria(geometry, lump)
-        elif type(geometry).__name__ is "TetMesh":
+        elif type(geometry).__name__ == "TetMesh":
             print("TetMesh with regular Laplace")
             a, b = self._fem_tetra(geometry, lump)
         else:

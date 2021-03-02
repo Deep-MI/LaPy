@@ -6,6 +6,26 @@ import numpy as np
 from .TriaMesh import TriaMesh
 
 
+def import_fssurf(infile):
+    """
+    Load triangle mesh from FreeSurfer surface geometry file
+    :return:    TriaMesh
+    """
+    verbose = 1
+    if verbose > 0:
+        print("--> FS Surf format     ... ")
+    try:
+        # here we use our copy to also support surfaces from dev (and maybe v7*?)
+        # these have an empty line and mess up Nibabel
+        # once this is fixed in nibabel we can switch back
+        from read_geometry import read_geometry
+        surf = read_geometry(insurf, read_metadata=True)
+    except IOError:
+        print("[file not found or not readable]\n")
+        return
+    return TriaMesh(surf[0],surf[1])
+    
+
 def import_off(infile):
     """
     Load triangle mesh from OFF txt file

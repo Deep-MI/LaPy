@@ -486,10 +486,10 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         # sys.exit(1)
         raise ValueError('sphere area fraction should be above .99')
 
-    if flippedarea > 0.004:
-        print("ERROR: flipped area fraction should be below .0004, exiting ..")
+    if flippedarea > 0.0008:
+        print("ERROR: flipped area fraction should be below .0008, exiting ..")
         # sys.exit(1)
-        raise ValueError('flipped area fraction should be below .0004')
+        raise ValueError('flipped area fraction should be below .0008')
 
     # here we finally check also the spat vol (orthogonality of direction vectors)
     # we could stop earlier, but most failure cases will be covered by the svol and

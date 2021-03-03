@@ -19,11 +19,11 @@ def import_fssurf(infile):
         # these have an empty line and mess up Nibabel
         # once this is fixed in nibabel we can switch back
         from read_geometry import read_geometry
-        surf = read_geometry(insurf, read_metadata=True)
+        surf = read_geometry(infile, read_metadata=True)
     except IOError:
         print("[file not found or not readable]\n")
         return
-    return TriaMesh(surf[0],surf[1])
+    return TriaMesh(surf[0],surf[1],fsinfo=surf[2])
     
 
 def import_off(infile):
@@ -439,3 +439,18 @@ def export_vtk(tria, outfile):
         f.write(' '.join(map(str, np.append(3, tria.t[i, :]))))
         f.write('\n')
     f.close()
+
+    
+def export_fssurf(tria, outfile):
+    """
+    Save Freesurfer Surface Geometry file (wrap Nibabel)
+    """
+    # open file
+    try:
+        from nibabel.freesurfer.io import write_geometry
+        write_geometry(outfile, tria.v, tria.t, volume_info=tria.fsinfo)
+    except IOError:
+        print("[File " + outfile + " not writable]")
+        return
+
+    

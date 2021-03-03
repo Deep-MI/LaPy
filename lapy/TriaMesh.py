@@ -14,13 +14,14 @@ Date: Feb-01-2019
 class TriaMesh:
     """A class representing a triangle mesh"""
 
-    def __init__(self, v, t):
+    def __init__(self, v, t, fsinfo=None):
         """
         :param    v - vertices   List of lists of 3 float coordinates
                   t - triangles  List of lists of 3 int of indices (>=0) into v array
                                  Ordering is important: All triangles should be
                                  oriented the same way (counter-clockwise, when
                                  looking from above)
+                  fsinfo         optional, FreeSurfer Surface Header Info
         """
         self.v = np.array(v)
         self.t = np.array(t)
@@ -40,6 +41,7 @@ class TriaMesh:
         # Compute adjacency matrices
         self.adj_sym = self._construct_adj_sym()
         self.adj_dir = self._construct_adj_dir()
+        self.fsinfo = fsinfo # place for Freesurfer Header info
 
     def _construct_adj_sym(self):
         """
@@ -831,10 +833,12 @@ class TriaMesh:
         rowsum = np.sum(adj2, axis=1)
         # normalize rows to sum = 1
         adj2 = adj2.multiply(1.0 / rowsum)
-        # apply multiple times
-        adj2 = adj2.__pow__(n)
-        # and avearge values
-        return adj2 * vfunc
+        # apply sparse matrix n times (fast in spite of loop)
+        vout = adj2.dot(vfunc)
+        for i in range(n-1):
+            vout = adj2.dot(vout)
+        return vout
+            
 
     def smooth_(self, n=1):
         '''

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import sparse
+
 """
 
 Dependency:
@@ -147,21 +148,25 @@ class TriaMesh:
 
     def tria_areas(self):
         """
-        Computes the surface area of triangles using cross product of edges.
+        Computes the area of triangles using Heron's formula
         :return:   areas          ndarray with areas of each triangle
         """
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
         v2 = self.v[self.t[:, 2], :]
         v1mv0 = v1 - v0
-        v2mv0 = v2 - v0
-        cr = np.cross(v1mv0, v2mv0)
-        areas = 0.5 * np.sqrt(np.sum(cr * cr, axis=1))
+        v2mv1 = v2 - v1
+        v0mv2 = v0 - v2
+        a = np.sqrt(np.sum(v1mv0 * v1mv0, axis=1))
+        b = np.sqrt(np.sum(v2mv1 * v2mv1, axis=1))
+        c = np.sqrt(np.sum(v0mv2 * v0mv2, axis=1))
+        ph = 0.5 * (a+b+c)
+        areas = np.sqrt(ph * (ph-a) * (ph-b) * (ph-c))
         return areas
 
     def area(self):
         """
-        Computes the total surface area of triangle mesh using cross product of edges.
+        Computes the total surface area of triangle mesh
         :return:   area           Total surface area
         """
         areas = self.tria_areas()
@@ -409,15 +414,14 @@ class TriaMesh:
         """
         if not self.is_oriented():
             raise ValueError('Error: Can only compute edge information for oriented meshes!')
-        adjtria = self.construct_adj_dir_tidx()
+        adjtria = self.construct_adj_dir_tidx().tolil()
         # for boundary edges, we can just remove those edges (implicitly a zero angle)
         bdredges = []
         bdrtrias = []
         if 1 in self.adj_sym.data:
             bdredges = (self.adj_sym == 1)
-            bdrtrias = np.array(adjtria[bdredges] - 1).ravel()
-            adjtria[bdredges] = 0
-            adjtria.eliminate_zeros()
+            bdrtrias = adjtria[bdredges].toarray().ravel() - 1
+            adjtria[bdredges] = 0  
         # get transpose adjTria matrix and keep only upper triangular matrices
         adjtria2 = adjtria.transpose()
         adjtriu1 = sparse.triu(adjtria, 0, format='csr')
@@ -426,7 +430,7 @@ class TriaMesh:
         tids = np.empty(vids.shape, dtype=np.int32)
         tids[:, 0] = adjtriu1.data - 1
         tids[:, 1] = adjtriu2.data - 1
-        if not with_boundary or not bdredges:
+        if not with_boundary or bdredges.size == 0:
             return vids, tids
         bdrv = np.array(np.nonzero(bdredges)).T
         nzids = bdrtrias > -1
@@ -452,6 +456,8 @@ class TriaMesh:
                     c_gauss   Gauss curvature: c_min * c_max
                     normals   normals (vnum x 3)
         """
+        #import warnings
+        #warnings.filterwarnings('error')
         import sys
         # get edge information for inner edges (vertex ids and tria ids):
         vids, tids = self.edges()
@@ -512,7 +518,14 @@ class TriaMesh:
         evals = np.real(evals)
         evecs = np.real(evecs)
         # sort evals ascending
-        i = np.argsort(np.abs(evals), axis=1)
+        # this is instable in perfectly planar regions
+        #  (normal can lie in tangential plane)
+        #i = np.argsort(np.abs(evals), axis=1)
+        # instead we find direction that aligns with vertex normals as first
+        # the other two will be sorted later anyway
+        vnormals = self.vertex_normals()
+        dprod = - np.abs(np.squeeze(np.sum(evecs * vnormals[:,:, np.newaxis], axis=1)))
+        i = np.argsort(dprod, axis=1)
         evals = np.take_along_axis(evals, i, axis=1)
         it = np.tile(i.reshape((vnum, 1, 3)), (1, 3, 1))
         evecs = np.take_along_axis(evecs, it, axis=2)
@@ -529,9 +542,10 @@ class TriaMesh:
         c_min[i], c_max[i] = c_max[i], c_min[i]
         u_min[i, :], u_max[i, :] = u_max[i, :], u_min[i, :]
         # flip normals to point towards vertex normals
-        vnormals = self.vertex_normals()
         s = np.sign(np.sum(normals * vnormals, axis=1)).reshape(-1, 1)
         normals = normals * s
+        # (here we could also project to tangent plane at vertex (using v_normals)
+        # as the normals above are not really good v_normals)
         # flip u_max so that cross(u_min , u_max) aligns with normals
         u_cross = np.cross(u_min, u_max)
         d = np.sum(np.multiply(u_cross, normals), axis=1)

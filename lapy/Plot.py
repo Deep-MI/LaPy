@@ -11,6 +11,8 @@ In jupyter notebook do this:
 import numpy as np
 import plotly
 import plotly.graph_objs as go
+from bisect import bisect
+import re
 import matplotlib.cm as cm
 from .TetMesh import TetMesh
 
@@ -58,22 +60,98 @@ def _get_color_levels():
                   [1, color1]]
     return colorscale
 
-
-def _map_z2color(zval, colormap, vmin, vmax):
-    # map the normalized value zval to a corresponding color in the colormap
+def _get_colorscale(vmin, vmax):
+    # put together a colorscale map depending on the range of v-values
     if vmin > vmax:
-        raise ValueError('incorrect relation between vmin and vmax')
+        raise ValueError('incorrect relation between vmin and vmax')  
+    # color definitions
+    posstart = 'rgb(255, 0, 0)'
+    posstop  = 'rgb(255, 255, 51)'
+    negstart = 'rgb(51, 255, 255)'
+    negstop  = 'rgb(0, 0, 255)'
+    zcolor   = 'rgb(190, 210, 220)'
+    if vmin > 0:
+        # only positive values
+        colorscale = [[0, posstart],
+                      [1, posstop]]
+    elif vmax < 0:
+        # only negative values
+        colorscale = [[0, negstart],
+                      [1, negstop]]
+    else:
+        # both pos and negative (here extra color for values around zero)
+        zz = -vmin / (vmax - vmin)
+        eps = 0.000000001
+        zero = 0.001
+        if zz < (eps + zero):
+            # only very few negative values (map to zero color)
+            colorscale = [[0, zcolor],
+                          [zero, zcolor],
+                          [zero + eps, posstart],
+                          [1, posstop]]
+        elif zz > (1.0 - eps - zero):
+            # only very few positive values (map to zero color)
+            colorscale = [[0, negstart],
+                          [1 - zero - eps, negstop],
+                          [1 - zero, zcolor],
+                          [1, zcolor]]
+        else:
+            # sufficient negative and positive values
+            colorscale = [[0, negstart],
+                          [zz - zero - eps, negstop],
+                          [zz - zero, zcolor],
+                          [zz + zero, zcolor],
+                          [zz + zero + eps, posstart],
+                          [1, posstop]]
+    return colorscale
 
-    t = (zval - vmin) / float((vmax - vmin))  # normalize val
-    r, g, b, alpha = colormap(t)
+def _get_colorval(t, colormap):
+    # t must be 0...1 and 
+    # colormap is a list of values and color code strings
+    #     (should have entries at least for 0 and 1)
+    # we return the interpolated color for this value of t
+    if t == 0:
+        return colormap[0][1]
+    if t == 1:
+        return colormap[-1][1]
+    # ok here we need to interpolate
+    # first find two colors before and after
+    columns = list(zip(*colormap))
+    pos = bisect(columns[0], t)
+    # compute param between pos-1 and pos values
+    tt = (t-columns[0][pos-1])/(columns[0][pos]-columns[0][pos-1])
+    # get color before and after as array of 3 ints
+    rv1 = np.array(list(map(int, re.findall('[0-9]+', columns[1][pos-1]))))
+    rv2 = np.array(list(map(int, re.findall('[0-9]+', columns[1][pos]))))
+    # compute new color via linear interpolation
+    cval = np.rint(rv1 + tt * (rv2-rv1)).astype(int)
+    # format as string again
+    cstr="rgb(%d, %d, %d)" % (cval[0],cval[1],cval[2])
+    return cstr
 
-    return 'rgb(' + '{:d}'.format(int(r * 255 + 0.5)) + ',' + '{:d}'.format(int(g * 255 + 0.5)) + ',' + \
-           '{:d}'.format(int(b * 255 + 0.5)) + ')'
+
+def _map_z2color(zval, colormap, zmin, zmax):
+    # map the normalized value zval to a corresponding color in the colormap
+    if zmin > zmax:
+        raise ValueError('incorrect relation between zmin and zmax')
+
+    t = (zval - zmin) / float((zmax - zmin))  # normalize val
+    if type(colormap) == "matplotlib.colors.LinearSegmentedColormap":
+        r, g, b, alpha = colormap(t)
+        rgb = 'rgb(' + '{:d}'.format(int(r * 255 + 0.5)) + ',' \
+                  + '{:d}'.format(int(g * 255 + 0.5)) + ',' \
+                  + '{:d}'.format(int(b * 255 + 0.5)) + ')'
+    else:
+        rgb = _get_colorval(t,colormap)
+
+    return rgb
 
 
-def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None, edge_color='rgb(50,50,50)',
-                   tic_color='rgb(50,200,10)', html_output=False, width=800, height=800, flatshading=False,
-                   xrange=None, yrange=None, zrange=None, showcaxis=False, caxis=None):
+def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None,
+                   edge_color='rgb(50,50,50)', tic_color='rgb(50,200,10)', html_output=False,
+                   width=800, height=800, flatshading=False,
+                   xrange=None, yrange=None, zrange=None, 
+                   showcaxis=False, caxis=None):
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
     #
@@ -88,51 +166,62 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
         if tfunc is None:
             triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading)
         elif tfunc.ndim == 1 or (tfunc.ndim == 2 and np.min(tfunc.shape) == 1):
+            # scalar tfunc
             min_fcol = np.min(tfunc)
             max_fcol = np.max(tfunc)
-            if min_fcol >= 0 and max_fcol <= 1:
-                min_fcol = 0
-                max_fcol = 1
-            colormap = cm.RdBu
+            #if min_fcol >= 0 and max_fcol <= 1:
+            #    min_fcol = 0
+            #    max_fcol = 1
+            #colormap = cm.RdBu
+            colormap = _get_colorscale(min_fcol,max_fcol)
             facecolor = [_map_z2color(zz, colormap, min_fcol, max_fcol) for zz in tfunc]
             # for tria colors overwrite flatshading to be true:
-            triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, facecolor=facecolor, flatshading=True)
+            triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
+                                  facecolor=facecolor,
+                                  flatshading=True)
         elif tfunc.ndim == 2 and np.min(tfunc.shape) == 3:
+            # vector tfunc
             s = 0.7 * tria.avg_edge_length()
-            centroids = (1.0/3.0) * (tria.v[tria.t[:, 0], :] + tria.v[tria.t[:, 1], :] + tria.v[tria.t[:, 2], :])
+            centroids = (1.0/3.0) * (tria.v[tria.t[:, 0], :] + tria.v[tria.t[:, 1], :] \
+                                     + tria.v[tria.t[:, 2], :])
             xv = np.column_stack(
-                (centroids[:, 0], centroids[:, 0] + s * tfunc[:, 0], np.full(tria.t.shape[0], np.nan))).reshape(-1)
+                (centroids[:, 0], centroids[:, 0] + s * tfunc[:, 0],
+                 np.full(tria.t.shape[0], np.nan))).reshape(-1)
             yv = np.column_stack(
-                (centroids[:, 1], centroids[:, 1] + s * tfunc[:, 1], np.full(tria.t.shape[0], np.nan))).reshape(-1)
+                (centroids[:, 1], centroids[:, 1] + s * tfunc[:, 1],
+                 np.full(tria.t.shape[0], np.nan))).reshape(-1)
             zv = np.column_stack(
-                (centroids[:, 2], centroids[:, 2] + s * tfunc[:, 2], np.full(tria.t.shape[0], np.nan))).reshape(-1)
-            vlines = go.Scatter3d(x=xv, y=yv, z=zv, mode='lines', line=dict(color=tic_color, width=2))
+                (centroids[:, 2], centroids[:, 2] + s * tfunc[:, 2],
+                 np.full(tria.t.shape[0], np.nan))).reshape(-1)
+            vlines = go.Scatter3d(x=xv, y=yv, z=zv, mode='lines',
+                                  line=dict(color=tic_color, width=2))
             triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading)
         else:
             raise ValueError('tfunc should be scalar (face color) or 3d for each triangle')
 
     elif vfunc.ndim == 1 or (vfunc.ndim == 2 and np.min(vfunc.shape) == 1):
-        if min(vfunc) >= 0 or max(vfunc) <= 0:
-            colorscale = [[0, 'rgb(255, 0, 0)'],
-                          [1, 'rgb(255, 255, 51)']]
-        else:
-            zz = -min(vfunc) / (max(vfunc) - min(vfunc))
-            colorscale = [[0, 'rgb(51, 255, 255)'],
-                          [zz - 0.00000001, 'rgb(0, 0, 255)'],
-                          [zz, 'rgb(255, 0, 0)'],
-                          [1, 'rgb(255, 255, 51)']]
+        # scalar vfunc
         if plot_levels:
             colorscale = _get_color_levels()
-        triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, intensity=vfunc, colorscale=colorscale,
+        else: 
+            colorscale = _get_colorscale(min(vfunc),max(vfunc))
+            
+        triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
+                              intensity=vfunc,
+                              colorscale=colorscale,
                               flatshading=flatshading)
     elif vfunc.ndim == 2 and np.min(vfunc.shape) == 3:
+        # vector vfunc
         s = 0.7 * tria.avg_edge_length()
         xv = np.column_stack(
-            (tria.v[:, 0], tria.v[:, 0] + s * vfunc[:, 0], np.full(tria.v.shape[0], np.nan))).reshape(-1)
+            (tria.v[:, 0], tria.v[:, 0] + s * vfunc[:, 0],
+             np.full(tria.v.shape[0], np.nan))).reshape(-1)
         yv = np.column_stack(
-            (tria.v[:, 1], tria.v[:, 1] + s * vfunc[:, 1], np.full(tria.v.shape[0], np.nan))).reshape(-1)
+            (tria.v[:, 1], tria.v[:, 1] + s * vfunc[:, 1],
+             np.full(tria.v.shape[0], np.nan))).reshape(-1)
         zv = np.column_stack(
-            (tria.v[:, 2], tria.v[:, 2] + s * vfunc[:, 2], np.full(tria.v.shape[0], np.nan))).reshape(-1)
+            (tria.v[:, 2], tria.v[:, 2] + s * vfunc[:, 2],
+             np.full(tria.v.shape[0], np.nan))).reshape(-1)
         vlines = go.Scatter3d(x=xv, y=yv, z=zv, mode='lines', line=dict(color=tic_color, width=2))
         triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading)
     else:
@@ -207,8 +296,9 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
         plotly.offline.plot(fig)
 
 
-def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None, cutting=None,
-                  edge_color='rgb(50,50,50)', html_output=False, width=800, height=800, flatshading=False,
+def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=None,
+                  cutting=None, edge_color='rgb(50,50,50)', html_output=False,
+                  width=800, height=800, flatshading=False,
                   xrange=None, yrange=None, zrange=None, showcaxis=False, caxis=None):
 
     """
@@ -289,6 +379,7 @@ def plot_tet_mesh(tetra, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
         tria_bnd.orient_()  # should not get here!
 
     # run plot_tria_mesh on boundary tria
-    plot_tria_mesh(tria_bnd, vfunc=vfunc, plot_edges=plot_edges, plot_levels=plot_levels, tfunc=tfunc_tria,
-                   edge_color=edge_color, html_output=html_output, width=width, height=height, flatshading=flatshading,
+    plot_tria_mesh(tria_bnd, vfunc=vfunc, plot_edges=plot_edges, plot_levels=plot_levels,
+                   tfunc=tfunc_tria, edge_color=edge_color, html_output=html_output,
+                   width=width, height=height, flatshading=flatshading,
                    xrange=xrange, yrange=yrange, zrange=zrange, showcaxis=showcaxis, caxis=caxis)

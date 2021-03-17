@@ -25,6 +25,11 @@ class Solver:
         Inputs:
             geometry  : is a geometry class, currently either TriaMesh or TetMesh
             aniso     : float, anisotropy for curvature based anisotopic Laplace
+                        can also be tuple (a_min, a_max) to differentially affect
+                        the min and max curvature directions. E.g. (0,50) will set
+                        scaling to 1 into min curv direction even if the max curvature
+                        is large in those regions (= isotropic in regions with 
+                        large max curv and min curv close to zero= concave cylinder)
             lump      : whether to lump the mass matrix (diagonal), default False
         """
         if type(geometry).__name__ == "TriaMesh":
@@ -33,9 +38,17 @@ class Solver:
                 print("TriaMesh with anisotropic Laplace-Beltrami")
                 u1, u2, c1, c2 = geometry.curvature_tria(smoothit=aniso_smooth)
                 # Diag mat to specify anisotropy strength
+                if isinstance(aniso, (list, tuple, set, np.ndarray)):
+                    if len(aniso) != 2: 
+                        raise ValueError('aniso should be scalar or tuple/array of length 2!')
+                    aniso0 = aniso[0]
+                    aniso1 = aniso[1]
+                else:
+                    aniso0 = aniso
+                    aniso1 = aniso
                 aniso_mat = np.empty((geometry.t.shape[0], 2))
-                aniso_mat[:, 1] = np.exp(-aniso * np.abs(c1))
-                aniso_mat[:, 0] = np.exp(-aniso * np.abs(c2))
+                aniso_mat[:, 1] = np.exp(-aniso1 * np.abs(c1))
+                aniso_mat[:, 0] = np.exp(-aniso0 * np.abs(c2))
                 a, b = self._fem_tria_aniso(geometry, u1, u2, aniso_mat, lump)
             else:
                 print("TriaMesh with regular Laplace-Beltrami")
@@ -107,7 +120,8 @@ class Solver:
             # create b matrix data (account for that vol is 4 times area)
             b_ii = vol / 24
             b_ij = vol / 48
-            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij,
+                                       b_ii, b_ii, b_ii)).reshape(-1)
             b = sparse.csc_matrix((local_b, (i, j)))
         else:
             # when lumping put all onto diagonal  (area/3 for each vertex)
@@ -184,7 +198,8 @@ class Solver:
             # create b matrix data (account for that vol is 4 times area)
             b_ii = vol / 24
             b_ij = vol / 48
-            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij,
+                                       b_ii, b_ii, b_ii)).reshape(-1)
             b = sparse.csc_matrix((local_b, (i, j)), dtype=np.float32)
         else:
             # when lumping put all onto diagonal  (area/3 for each vertex)
@@ -234,7 +249,8 @@ class Solver:
         if not lump:
             b_ii = vol / 6
             b_ij = vol / 12
-            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ij, b_ij, b_ij, b_ij, b_ij, b_ij,
+                                       b_ii, b_ii, b_ii)).reshape(-1)
             # stack edge and diag coords for matrix indices
             i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(-1)
             j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(-1)
@@ -326,9 +342,12 @@ class Solver:
         a44 = -a14 - a24 - a34
         # stack columns to assemble data
         local_a = np.column_stack(
-            (a12, a12, a23, a23, a13, a13, a14, a14, a24, a24, a34, a34, a11, a22, a33, a44)).reshape(-1)
-        i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t4, t2, t4, t3, t4, t1, t2, t3, t4)).reshape(-1)
-        j = np.column_stack((t2, t1, t3, t2, t1, t3, t4, t1, t4, t2, t4, t3, t1, t2, t3, t4)).reshape(-1)
+            (a12, a12, a23, a23, a13, a13, a14, a14, a24, a24, a34, a34,
+             a11, a22, a33, a44)).reshape(-1)
+        i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t4, t2, t4, t3, t4,
+                             t1, t2, t3, t4)).reshape(-1)
+        j = np.column_stack((t2, t1, t3, t2, t1, t3, t4, t1, t4, t2, t4, t3,
+                             t1, t2, t3, t4)).reshape(-1)
         local_a = local_a / 6.0
         # Construct sparse matrix:
         # a = sparse.csr_matrix((local_a, (i, j)))
@@ -338,7 +357,8 @@ class Solver:
             bii = vol / 60.0
             bij = vol / 120.0
             local_b = np.column_stack(
-                (bij, bij, bij, bij, bij, bij, bij, bij, bij, bij, bij, bij, bii, bii, bii, bii)).reshape(-1)
+                (bij, bij, bij, bij, bij, bij, bij, bij, bij, bij, bij, bij,
+                 bii, bii, bii, bii)).reshape(-1)
             b = sparse.csc_matrix((local_b, (i, j)))
         else:
             # when lumping put all onto diagonal (volume/4 for each vertex)
@@ -459,10 +479,12 @@ class Solver:
         sigma = -0.01
         if use_cholmod:
             chol = cholesky(self.stiffness - sigma * self.mass)
-            op_inv = LinearOperator(matvec=chol, shape=self.stiffness.shape, dtype=self.stiffness.dtype)
+            op_inv = LinearOperator(matvec=chol, shape=self.stiffness.shape,
+                                    dtype=self.stiffness.dtype)
         else:
             lu = splu(self.stiffness - sigma * self.mass)
-            op_inv = LinearOperator(matvec=lu.solve, shape=self.stiffness.shape, dtype=self.stiffness.dtype)
+            op_inv = LinearOperator(matvec=lu.solve, shape=self.stiffness.shape,
+                                    dtype=self.stiffness.dtype)
         eigenvalues, eigenvectors = eigsh(self.stiffness, k, self.mass, sigma=sigma, OPinv=op_inv)
         return eigenvalues, eigenvectors
 

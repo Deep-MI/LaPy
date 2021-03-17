@@ -119,6 +119,11 @@ def _get_colorval(t, colormap):
     columns = list(zip(*colormap))
     pos = bisect(columns[0], t)
     # compute param between pos-1 and pos values
+    if len(columns[0]) < pos+1 or pos == 0:
+        print("pos: {}".format(pos))
+        print("t: {}".format(t))
+        print(columns[0])
+        raise ValueError('t not in range?')
     tt = (t-columns[0][pos-1])/(columns[0][pos]-columns[0][pos-1])
     # get color before and after as array of 3 ints
     rv1 = np.array(list(map(int, re.findall('[0-9]+', columns[1][pos-1]))))
@@ -169,6 +174,14 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
             # scalar tfunc
             min_fcol = np.min(tfunc)
             max_fcol = np.max(tfunc)
+            # special treatment for constant functions
+            if np.abs(min_fcol - max_fcol) < 0.0001:
+                if np.abs(max_fcol) > 0.0001:
+                    min_fcol = -np.abs(min_fcol)
+                    max_fcol = np.abs(max_fcol)
+                else: # both are zero 
+                    min_fcol = -1
+                    max_fcol = 1
             #if min_fcol >= 0 and max_fcol <= 1:
             #    min_fcol = 0
             #    max_fcol = 1

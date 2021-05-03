@@ -253,7 +253,7 @@ def check_options(options):
         sys.exit(1)
 
     # check suffix to start with a point
-    if options["hsfsfx"] is not None and options["hsfsfx"][0] is not ".":
+    if options["hsfsfx"] is not None and options["hsfsfx"][0] != ".":
         options["hsfsfx"] = "." + options["hsfsfx"]
         print(options["hsfsfx"])
 

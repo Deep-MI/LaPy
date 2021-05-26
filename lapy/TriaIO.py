@@ -23,7 +23,7 @@ def import_fssurf(infile):
     except IOError:
         print("[file not found or not readable]\n")
         return
-    return TriaMesh(surf[0],surf[1],fsinfo=surf[2])
+    return TriaMesh(surf[0], surf[1], fsinfo=surf[2])
     
 
 def import_off(infile):
@@ -452,5 +452,3 @@ def export_fssurf(tria, outfile):
     except IOError:
         print("[File " + outfile + " not writable]")
         return
-
-    

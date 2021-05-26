@@ -13,7 +13,7 @@ import plotly
 import plotly.graph_objs as go
 from bisect import bisect
 import re
-import matplotlib.cm as cm
+# import matplotlib.cm as cm
 from .TetMesh import TetMesh
 
 
@@ -195,7 +195,7 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
         elif tfunc.ndim == 2 and np.min(tfunc.shape) == 3:
             # vector tfunc
             s = 0.7 * tria.avg_edge_length()
-            centroids = (1.0/3.0) * (tria.v[tria.t[:, 0], :] + tria.v[tria.t[:, 1], :] \
+            centroids = (1.0/3.0) * (tria.v[tria.t[:, 0], :] + tria.v[tria.t[:, 1], :]
                                      + tria.v[tria.t[:, 2], :])
             xv = np.column_stack(
                 (centroids[:, 0], centroids[:, 0] + s * tfunc[:, 0],

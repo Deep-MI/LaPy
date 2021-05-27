@@ -60,6 +60,7 @@ def _get_color_levels():
                   [1, color1]]
     return colorscale
 
+
 def _get_colorscale(vmin, vmax):
     # put together a colorscale map depending on the range of v-values
     if vmin > vmax:
@@ -105,6 +106,7 @@ def _get_colorscale(vmin, vmax):
                           [1, posstop]]
     return colorscale
 
+
 def _get_colorval(t, colormap):
     # t must be 0...1 and 
     # colormap is a list of values and color code strings
@@ -131,7 +133,7 @@ def _get_colorval(t, colormap):
     # compute new color via linear interpolation
     cval = np.rint(rv1 + tt * (rv2-rv1)).astype(int)
     # format as string again
-    cstr="rgb(%d, %d, %d)" % (cval[0],cval[1],cval[2])
+    cstr = "rgb(%d, %d, %d)" % (cval[0], cval[1], cval[2])
     return cstr
 
 
@@ -147,7 +149,7 @@ def _map_z2color(zval, colormap, zmin, zmax):
                   + '{:d}'.format(int(g * 255 + 0.5)) + ',' \
                   + '{:d}'.format(int(b * 255 + 0.5)) + ')'
     else:
-        rgb = _get_colorval(t,colormap)
+        rgb = _get_colorval(t, colormap)
 
     return rgb
 
@@ -179,14 +181,14 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
                 if np.abs(max_fcol) > 0.0001:
                     min_fcol = -np.abs(min_fcol)
                     max_fcol = np.abs(max_fcol)
-                else: # both are zero 
+                else:  # both are zero
                     min_fcol = -1
                     max_fcol = 1
-            #if min_fcol >= 0 and max_fcol <= 1:
+            # if min_fcol >= 0 and max_fcol <= 1:
             #    min_fcol = 0
             #    max_fcol = 1
-            #colormap = cm.RdBu
-            colormap = _get_colorscale(min_fcol,max_fcol)
+            # colormap = cm.RdBu
+            colormap = _get_colorscale(min_fcol, max_fcol)
             facecolor = [_map_z2color(zz, colormap, min_fcol, max_fcol) for zz in tfunc]
             # for tria colors overwrite flatshading to be true:
             triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
@@ -217,7 +219,7 @@ def plot_tria_mesh(tria, vfunc=None, plot_edges=None, plot_levels=False, tfunc=N
         if plot_levels:
             colorscale = _get_color_levels()
         else: 
-            colorscale = _get_colorscale(min(vfunc),max(vfunc))
+            colorscale = _get_colorscale(min(vfunc), max(vfunc))
             
         triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k,
                               intensity=vfunc,

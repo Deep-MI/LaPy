@@ -456,8 +456,8 @@ class TriaMesh:
                     c_gauss   Gauss curvature: c_min * c_max
                     normals   normals (vnum x 3)
         """
-        #import warnings
-        #warnings.filterwarnings('error')
+        # import warnings
+        # warnings.filterwarnings('error')
         import sys
         # get edge information for inner edges (vertex ids and tria ids):
         vids, tids = self.edges()
@@ -520,7 +520,7 @@ class TriaMesh:
         # sort evals ascending
         # this is instable in perfectly planar regions
         #  (normal can lie in tangential plane)
-        #i = np.argsort(np.abs(evals), axis=1)
+        # i = np.argsort(np.abs(evals), axis=1)
         # instead we find direction that aligns with vertex normals as first
         # the other two will be sorted later anyway
         vnormals = self.vertex_normals()

@@ -330,17 +330,17 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     # sub-function to compute flipped area of trias where normal
     # points towards origin, meaningful for the sphere, centered at zero
-    def get_flipped_area(tria):
-        v1 = tria.v[tria.t[:, 0], :]
-        v2 = tria.v[tria.t[:, 1], :]
-        v3 = tria.v[tria.t[:, 2], :]
-        v2mv1 = v2 - v1
-        v3mv1 = v3 - v1
+    def get_flipped_area(triax):
+        vx1 = triax.v[triax.t[:, 0], :]
+        vx2 = triax.v[triax.t[:, 1], :]
+        vx3 = triax.v[triax.t[:, 2], :]
+        v2mv1 = vx2 - vx1
+        v3mv1 = vx3 - vx1
         cr = np.cross(v2mv1, v3mv1)
-        spatvol = np.sum(v1 * cr, axis=1)
-        areas = 0.5 * np.sqrt(np.sum(cr * cr, axis=1))
-        area = np.sum(areas[np.where(spatvol < 0)])
-        return area
+        spatvolx = np.sum(vx1 * cr, axis=1)
+        areasx = 0.5 * np.sqrt(np.sum(cr * cr, axis=1))
+        areax = np.sum(areasx[np.where(spatvolx < 0)])
+        return areax
 
     fem = Solver(tria, lump=False)
     evals, evecs = fem.eigs(k=4)
@@ -461,8 +461,8 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     # do a few mean curvature flow euler steps to make more convex
     # three should be sufficient
-    if (flow_iter > 0):
-        tflow = tria_mean_curvature_flow(TriaMesh(vn,tria.t),max_iter=flow_iter)
+    if flow_iter > 0:
+        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter)
         vn = tflow.v
             
     # project to sphere and scaled to have the same scale/origin as FS:

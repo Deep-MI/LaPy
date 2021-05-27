@@ -120,6 +120,7 @@ http://dx.doi.org/10.1016/j.cad.2009.02.007
 # ------------------------------------------------------------------------------
 # auxiliary functions
 
+
 # function to run commands
 def run_cmd(cmd, err_msg):
     """
@@ -139,8 +140,8 @@ def run_cmd(cmd, err_msg):
         """
 
         # aux function
-        def is_exe(fpath):
-            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+        def is_exe(fpathx):
+            return os.path.isfile(fpathx) and os.access(fpathx, os.X_OK)
 
         fpath, fname = os.path.split(program)
 
@@ -171,11 +172,12 @@ def run_cmd(cmd, err_msg):
     try:
         subprocess.check_call(args)
     except subprocess.CalledProcessError as e:
-        print('ERROR: ' + err_msg, flush=True)
+        print('ERROR: ' + err_msg + " " + str(e), flush=True)
         raise
 
 # ------------------------------------------------------------------------------
 # check options
+
 
 # check_options
 def check_options(options):
@@ -187,7 +189,7 @@ def check_options(options):
     import os
     import sys
     import tempfile
-    import uuid
+    # import uuid
     import errno
 
     # check if Freesurfer has been sourced
@@ -224,23 +226,23 @@ def check_options(options):
 
     # check format of asegid
     if type(options["asegid"]) is str:
-        options["asegid"] = [ options["asegid"] ]
+        options["asegid"] = [options["asegid"]]
     elif type(options["asegid"]) is int:
-        options["asegid"] = [ str(options["asegid"]) ]
+        options["asegid"] = [str(options["asegid"])]
     elif type(options["asegid"]) is list:
-        options["asegid"] = [ str(x) for x in options["asegid"] ]
+        options["asegid"] = [str(x) for x in options["asegid"]]
     elif type(options["asegid"]) is tuple:
-        options["asegid"] = [ str(x) for x in options["asegid"] ]
+        options["asegid"] = [str(x) for x in options["asegid"]]
 
     # check format of hsfid
     if type(options["hsfid"]) is str:
-        options["hsfid"] = [ options["hsfid"] ]
+        options["hsfid"] = [options["hsfid"]]
     elif type(options["hsfid"]) is int:
-        options["hsfid"] = [ str(options["hsfid"]) ]
+        options["hsfid"] = [str(options["hsfid"])]
     elif type(options["hsfid"]) is list:
-        options["hsfid"] = [ str(x) for x in options["hsfid"] ]
+        options["hsfid"] = [str(x) for x in options["hsfid"]]
     elif type(options["hsfid"]) is tuple:
-        options["hsfid"] = [ str(x) for x in options["hsfid"] ]
+        options["hsfid"] = [str(x) for x in options["hsfid"]]
 
     # if --hsfid is used, then also --hemi needs to be specified
     if options["hsfid"] is not None and options["hemi"] is None:
@@ -258,12 +260,20 @@ def check_options(options):
         print(options["hsfsfx"])
 
     # check if required files are present for --hsfid
-    if options["hsfid"] is not None and options["hemi"] == "lh" and not os.path.isfile(os.path.join(options["sdir"], options["sid"], 'mri', 'lh.' + options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')):
-        print('\nERROR: could not find ' + os.path.join(options["sdir"], options["sid"], 'mri', 'lh.' + options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz') + '\n', flush=True)
+    if options["hsfid"] is not None and options["hemi"] == "lh"\
+            and not os.path.isfile(os.path.join(options["sdir"], options["sid"], 'mri', 'lh.' + options["hsfseg"] +
+                'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')):
+        print('\nERROR: could not find ' + os.path.join(options["sdir"], options["sid"], 'mri', 'lh.' +
+                options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] +
+                options["hsfsfx"] + '.mgz') + '\n', flush=True)
         sys.exit(1)
 
-    if options["hsfid"] is not None and options["hemi"] == "rh" and not os.path.isfile(os.path.join(options["sdir"], options["sid"], 'mri', 'rh.' + options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')):
-        print('\nERROR: could not find ' + os.path.join(options["sdir"], options["sid"], 'mri', 'rh.' + options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz') + '\n', flush=True)
+    if options["hsfid"] is not None and options["hemi"] == "rh"\
+            and not os.path.isfile(os.path.join(options["sdir"], options["sid"], 'mri', 'rh.' + options["hsfseg"] +
+                'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')):
+        print('\nERROR: could not find ' + os.path.join(options["sdir"], options["sid"], 'mri', 'rh.' +
+                options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] +
+                options["hsfsfx"] + '.mgz') + '\n', flush=True)
         sys.exit(1)
 
     # set default output dir
@@ -306,6 +316,7 @@ def check_options(options):
 # ------------------------------------------------------------------------------
 # image and surface processing functions
 
+
 # creates a surface from the aseg and label info and writes it to the outdir
 def get_aseg_surf(options):
     """
@@ -325,7 +336,8 @@ def get_aseg_surf(options):
     segf = os.path.join(options["outdir"], tmpname + '.mgz')
     segsurf = os.path.join(options["outdir"], tmpname + '.surf')
     # binarize on selected labels (creates temp segf)
-    # always binarize first, otherwise pretess may scale aseg if labels are larger than 255 (e.g. aseg+aparc, bug in mri_pretess?)
+    # always binarize first, otherwise pretess may scale aseg if labels are larger than 255
+    # (e.g. aseg+aparc, bug in mri_pretess?)
     cmd = 'mri_binarize --i ' + aseg + ' --match ' + astring + ' --o ' + segf
     run_cmd(cmd, 'mri_binarize failed.')
     ptinput = segf
@@ -348,6 +360,7 @@ def get_aseg_surf(options):
     # return surf name
     return options["outsurf"]
 
+
 # creates a surface from the hsf and label info and writes it to the outdir
 def get_hsf_surf(options):
     """
@@ -362,7 +375,8 @@ def get_hsf_surf(options):
     #
     astring = ' '.join(options["hsfid"])
     subjdir = os.path.join(options["sdir"], options["sid"])
-    hsf = os.path.join(options["sdir"], options["sid"], 'mri', options["hemi"] + '.' + options["hsfseg"] + 'Labels-' + options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')
+    hsf = os.path.join(options["sdir"], options["sid"], 'mri', options["hemi"] + '.' + options["hsfseg"] + 'Labels-' +
+                       options["hsflabel"] + '.' + options["hsfver"] + options["hsfsfx"] + '.mgz')
     print('Creating surfaces from ' + hsf, flush=True)
     if not os.path.isfile(hsf):
         print('\nERROR: could not open ' + hsf + "\n", flush=True)
@@ -372,7 +386,8 @@ def get_hsf_surf(options):
     segf = os.path.join(options["outdir"], tmpname + '.mgz')
     segsurf = os.path.join(options["outdir"], tmpname + '.surf')
     # binarize on selected labels (creates temp segf)
-    # always binarize first, otherwise pretess may scale aseg if labels are larger than 255 (e.g. aseg+aparc, bug in mri_pretess?)
+    # always binarize first, otherwise pretess may scale aseg if labels are larger than 255
+    # (e.g. aseg+aparc, bug in mri_pretess?)
     cmd = 'mri_binarize --i ' + hsf + ' --match ' + astring + ' --o ' + segf
     run_cmd(cmd, 'mri_binarize failed.')
     ptinput = segf
@@ -395,6 +410,7 @@ def get_hsf_surf(options):
     # return surf name
     return options["outsurf"]
 
+
 # gets global path to surface input (if it is a FS surf)
 def get_surf_surf(options):
     """
@@ -416,6 +432,7 @@ def get_surf_surf(options):
 # ------------------------------------------------------------------------------
 # shapeDNA functions
 
+
 # run shapeDNA-tria
 def compute_shapeDNA_tria(surf, options):
     """
@@ -423,7 +440,7 @@ def compute_shapeDNA_tria(surf, options):
     """
 
     # imports
-    from lapy import TriaIO, FuncIO, Solver
+    from . import TriaIO, FuncIO, Solver
 
     # get surface
     tria = TriaIO.import_vtk(surf)
@@ -459,20 +476,23 @@ def compute_shapeDNA_tria(surf, options):
 # ------------------------------------------------------------------------------
 # main function
 
+
 # compute_ShapeDNA
-def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, surf=None, hemi=None, hsfid=None, hsflabel=None, hsfver=None, hsfseg=None, hsfsfx=None, num=50, bcond=1, evec=False):
+def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, surf=None, hemi=None, hsfid=None, hsflabel=None,
+                     hsfver=None, hsfseg=None, hsfsfx=None, num=50, bcond=1, evec=False):
     """
     the main function to compute the ShapeDNA descriptor
 
     """
 
     # imports
-    import os
+    # import os
     import sys
-    import warnings
+    # import warnings
 
     # get options
-    options = dict(sid=sid, sdir=sdir, outdir=outdir, asegid=asegid, hsfid=hsfid, surf=surf, hemi=hemi, hsflabel=hsflabel, hsfver=hsfver, hsfseg=hsfseg, hsfsfx=hsfsfx, num=num, bcond=bcond, evec=evec)
+    options = dict(sid=sid, sdir=sdir, outdir=outdir, asegid=asegid, hsfid=hsfid, surf=surf, hemi=hemi,
+                   hsflabel=hsflabel, hsfver=hsfver, hsfseg=hsfseg, hsfsfx=hsfsfx, num=num, bcond=bcond, evec=evec)
 
     # check command line options
     options = check_options(options)
@@ -495,4 +515,5 @@ def compute_ShapeDNA(sid=None, sdir=None, outdir=None, asegid=None, surf=None, h
         sys.exit(1)
 
     # run shapeDNA tria
+    # (why are these variables not passed anywhere, also not outsurf above???)
     tria, evals, evecs = compute_shapeDNA_tria(surf, options)

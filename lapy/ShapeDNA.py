@@ -124,7 +124,7 @@ def compute_distance(ev1, ev2, dist="euc"):
     """
 
     if dist == "euc":
-        return di.euclidean(ev1["Eigenvalues"][1:], ev2["Eigenvalues"][1:])
+        return di.euclidean(ev1, ev2)
     else:
         print("Only euclidean distance is currently implemented.")
         return

@@ -5,18 +5,16 @@ from .TetMesh import TetMesh
 from .Solver import Solver
 
 # compute shapeDNA
-def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10,
-    norm=False, rwt=False):
+
+def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     """
     a function to compute the shapeDNA descriptor for triangle or tetrahedral
     meshes
 
-    Inputs:     geom        geometry; either TriaMesh or TetMesh
+    Inputs:     geom        geometry object; either TriaMesh or TetMesh
                 k           number of eigenfunctions / eigenvalues
                 lump, aniso, aniso_smooth
                             arguments for 'Solver' class
-                norm        whether to perform area / volume normalization
-                rwt         whether to perform linear reweighting
 
     :return:    ev          a dictionary, including 'Eigenvalues' and
                             'Eigenvectors' fields
@@ -27,18 +25,6 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10,
 
     fem = Solver(geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth)
     evals, evecs = fem.eigs(k=k)
-
-    # surface / volume normalization
-
-    if norm is True:
-
-        evals = _surf_vol_norm(geom, evals)
-
-    # linear reweighting
-
-    if rwt is True:
-
-        evals = _linear_reweighting(evals)
 
     # write ev
 
@@ -59,52 +45,28 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10,
 
     return evDict
 
+# function for ev normalization
 
-# compute shape asysmmetry
-
-def compute_asymmetry(geom1, geom2, dist="euc", k=50, lump=False, aniso=None,
-    aniso_smooth=10, norm=False, rwt=False):
+def normalize_ev(geom, evals, method="geometry"):
     """
-    a function to compute the shape asymmetry from two shapeDNA descriptors
-    for triangle or tetrahedral meshes
+    a function for surface / volume normalization
 
-    Inputs:     geom1, geom2
-                            geometries; either TriaMesh or TetMesh
-                distance    distance measure; currently only 'euc' (euclidean)
-                k           number of eigenfunctions / eigenvalues
-                lump, aniso, aniso_smooth
-                            arguments for 'Solver' class
-                norm        whether to perform area / volume normalization
-                rwt         whether to perform linear reweighting
+    Inputs:     geom         geometry object; either TriaMesh or TetMesh
+                evals        vector of eigenvalues
+                method       either "surface", "volume", or "geometry";
+                             "geometry" will perform surface normalization for
+                             2D objects, and volume normalization for 3D objects
 
-    :return:    dst          a distance measure
-
+    :return:    evals        vector of reweighted eigenvalues
     """
 
-    ev1 = compute_shapedna(geom1, k=k, lump=lump, aniso=aniso,
-        aniso_smooth=aniso_smooth, norm=norm, rwt=rwt)
-
-    ev2 = compute_shapedna(geom2, k=k, lump=lump, aniso=aniso,
-        aniso_smooth=aniso_smooth, norm=norm, rwt=rwt)
-
-    if dist == "euc":
-        return di.euclidean(ev1["Eigenvalues"][1:], ev2["Eigenvalues"][1:])
-    else:
-        print("Only euclidean distance is currently implemented.")
-        return
-
-# internal function for surface / volume normalization
-
-def _surf_vol_norm(geom, evals):
-
-    if type(geom).__name__ == "TriaMesh":
+    if method == "surface":
 
         vol = geom.area()
 
         return evals * vol ** np.divide(2.0, 2.0)
 
-
-    elif type(geom).__name__ == "TetMesh":
+    elif method == "volume":
 
         bnd = geom.boundary_tria()
 
@@ -114,10 +76,55 @@ def _surf_vol_norm(geom, evals):
 
         return evals * vol ** np.divide(2.0, 3.0)
 
-# internal function linear reweighting
+    elif method == "geometry":
 
-def _linear_reweighting(evals):
+        if type(geom).__name__ == "TriaMesh":
+
+            vol = geom.area()
+
+            return evals * vol ** np.divide(2.0, 2.0)
+
+        elif type(geom).__name__ == "TetMesh":
+
+            bnd = geom.boundary_tria()
+
+            bnd.orient_()
+
+            vol = bnd.volume()
+
+            return evals * vol ** np.divide(2.0, 3.0)
+
+# function for linear reweighting
+
+def reweight_ev(evals):
+    """
+    a function for linear reweighting
+
+    Inputs:     evals        vector of eigenvalues
+
+    :return:    evals        vector of reweighted eigenvalues
+    """
 
     evals[1:] = evals[1:] / np.arange(1, len(evals))
 
     return evals
+
+# compute distance
+
+def compute_distance(ev1, ev2, dist="euc"):
+    """
+    a function to compute the shape asymmetry from two shapeDNA descriptors
+    for triangle or tetrahedral meshes
+
+    Inputs:     ev1, ev2    eigenvalues
+                distance    distance measure; currently only 'euc' (euclidean)
+
+    :return:    dst         a distance measure
+
+    """
+
+    if dist == "euc":
+        return di.euclidean(ev1["Eigenvalues"][1:], ev2["Eigenvalues"][1:])
+    else:
+        print("Only euclidean distance is currently implemented.")
+        return

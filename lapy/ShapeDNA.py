@@ -68,11 +68,19 @@ def normalize_ev(geom, evals, method="geometry"):
 
     elif method == "volume":
 
-        bnd = geom.boundary_tria()
+        if type(geom).__name__ == "TriaMesh":
 
-        bnd.orient_()
+            geom.orient_()
 
-        vol = bnd.volume()
+            vol = geom.volume()
+
+        elif type(geom).__name__ == "TetMesh":
+
+            bnd = geom.boundary_tria()
+
+            bnd.orient_()
+
+            vol = bnd.volume()
 
         return evals * vol ** np.divide(2.0, 3.0)
 

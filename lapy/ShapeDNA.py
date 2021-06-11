@@ -113,7 +113,8 @@ def reweight_ev(evals):
     :return:    evals        vector of reweighted eigenvalues
     """
 
-    evals[1:] = evals[1:] / np.arange(1, len(evals))
+    #evals[1:] = evals[1:] / np.arange(1, len(evals))
+    evals = evals / np.arange(1, len(evals)+1)
 
     return evals
 

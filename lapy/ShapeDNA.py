@@ -129,7 +129,6 @@ def compute_distance(ev1, ev2, dist="euc"):
                 distance    distance measure; currently only 'euc' (euclidean)
 
     :return:    dst         a distance measure
-
     """
 
     if dist == "euc":

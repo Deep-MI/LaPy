@@ -7,13 +7,13 @@ def diagonal(t, x, evecs, evals, n):
     for a given time t (can be a vector)
     using only the first n smallest eigenvalues and eigenvectors
 
-    :param   t       time or a row vector of time values
-             x       vertex ids for the positions of K(t,x,x)
-             evecs   eigenvectors (matrix: vnum x evecsnum)
-             evals   vector of eigenvalues (col vector: evecsnum x 1)
-             n       number of evecs and vals to use (smaller or equal length)
+    :param   t :     time or a row vector of time values
+    :param   x :     vertex ids for the positions of K(t,x,x)
+    :param   evecs : eigenvectors (matrix: vnum x evecsnum)
+    :param   evals : vector of eigenvalues (col vector: evecsnum x 1)
+    :param   n  :    number of evecs and vals to use (smaller or equal length)
 
-    :return:  h       matrix, rows: vertices selected in x, cols: times in t
+    :return:  h      matrix, rows: vertices selected in x, cols: times in t
 
     """
     # maybe add code to check dimensions of input and flip axis if necessary

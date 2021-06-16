@@ -42,7 +42,7 @@ class TriaMesh:
         # Compute adjacency matrices
         self.adj_sym = self._construct_adj_sym()
         self.adj_dir = self._construct_adj_dir()
-        self.fsinfo = fsinfo # place for Freesurfer Header info
+        self.fsinfo = fsinfo  # place for Freesurfer Header info
 
     def _construct_adj_sym(self):
         """
@@ -400,7 +400,7 @@ class TriaMesh:
         """
         Compute vertices and adjacent triangle ids for each edge
 
-        :param      with_boundary   also work on boundary half edges, default: ignore
+        :param      with_boundary   also work on boundary half edges, default ignore
 
         :return:    vids            2 column array with starting and end vertex for each
                                     unique inner edge
@@ -456,8 +456,8 @@ class TriaMesh:
                     c_gauss   Gauss curvature: c_min * c_max
                     normals   normals (vnum x 3)
         """
-        #import warnings
-        #warnings.filterwarnings('error')
+        # import warnings
+        # warnings.filterwarnings('error')
         import sys
         # get edge information for inner edges (vertex ids and tria ids):
         vids, tids = self.edges()
@@ -520,11 +520,11 @@ class TriaMesh:
         # sort evals ascending
         # this is instable in perfectly planar regions
         #  (normal can lie in tangential plane)
-        #i = np.argsort(np.abs(evals), axis=1)
+        # i = np.argsort(np.abs(evals), axis=1)
         # instead we find direction that aligns with vertex normals as first
         # the other two will be sorted later anyway
         vnormals = self.vertex_normals()
-        dprod = - np.abs(np.squeeze(np.sum(evecs * vnormals[:,:, np.newaxis], axis=1)))
+        dprod = - np.abs(np.squeeze(np.sum(evecs * vnormals[:, :, np.newaxis], axis=1)))
         i = np.argsort(dprod, axis=1)
         evals = np.take_along_axis(evals, i, axis=1)
         it = np.tile(i.reshape((vnum, 1, 3)), (1, 3, 1))
@@ -554,7 +554,7 @@ class TriaMesh:
         return u_min, u_max, c_min, c_max, c_mean, c_gauss, normals
 
     def curvature_tria(self, smoothit=3):
-        '''
+        """
         Compute min and max curvature and directions (orthognal and in tria plane)
         for each triangle. First we compute these values on vertices and then smooth
         there. Finally they get mapped to the trias (averaging) and projected onto
@@ -564,7 +564,7 @@ class TriaMesh:
                  u_max : max curvature direction on triangles
                  c_min : min curvature on triangles
                  c_max : max curvature on triangles
-        '''
+        """
         u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(smoothit)
 
         # pool vertex functions (u_min and u_max) to triangles:
@@ -678,7 +678,7 @@ class TriaMesh:
     def normal_offset_(self, d):
         """
         normal_offset(d) moves vertices along normal by distance d
-        :param    d - distance  : move distance can be a number or array of vertex length
+        :param    d    move distance, can be a number or array of vertex length
         :return:  none, modifies vertices in place
         """
         n = self.vertex_normals()
@@ -780,11 +780,11 @@ class TriaMesh:
         Maps function for each tria to each vertex by attributing 1/3 to each
         Uses vertices and trias.
 
-        :param    tfunc          Float vector or matrix (#t x N) of values at
+        :param    tfunc :        Float vector or matrix (#t x N) of values at
                                  vertices
-                  weighted       False: weigh only by 1/3, e.g. to compute
+        :param    weighted :     False, weigh only by 1/3, e.g. to compute
                                  vertex areas from tria areas
-                                 True: weigh by triangle area / 3, e.g. to
+                                 True, weigh by triangle area / 3, e.g. to
                                  integrate a function defined on the trias,
                                  for example integrating the "one" function
                                  will also yield the vertex areas.
@@ -826,9 +826,9 @@ class TriaMesh:
         """
         Smoothes vector float function on the mesh iteratively
 
-        :param    vfunc - function   Float vector of values at vertices,
+        :param    vfunc :            Float vector of values at vertices,
                                      if empty, use vertex coordinates
-                  n                  Number of iterations for smoothing
+        :param    n :                Number of iterations for smoothing
 
         :return:  vfunc              Smoothed surface vertex function
         """
@@ -852,14 +852,13 @@ class TriaMesh:
         for i in range(n-1):
             vout = adj2.dot(vout)
         return vout
-            
 
     def smooth_(self, n=1):
-        '''
+        """
         Smoothes mesh in place for a number of iterations
         :param n:   smoothing iterations
         :return:    none, smoothes mesh in place
-        '''
+        """
         vfunc = self.smooth_vfunc(self.v, n)
         self.v = vfunc
         return

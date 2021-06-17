@@ -119,14 +119,14 @@ def import_vtk(infile):
         return
     # expect Dataset Polydata line after ASCII:
     line = f.readline()
-    if not line.startswith("DATASET POLYDATA"):
-        print("[read: " + line + " expected DATASET POLYDATA] --> FAILED\n")
+    if not line.startswith("DATASET POLYDATA") and not line.startswith("DATASET UNSTRUCTURED_GRID"):
+        print("[read: " + line + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> FAILED\n")
         return
     # read number of points
     line = f.readline()
     larr = line.split()
-    if larr[0] != "POINTS" or larr[2] != "float":
-        print("[read: " + line + " expected POINTS # float] --> FAILED\n")
+    if larr[0] != "POINTS" or (larr[2] != "float" and larr[2] != "double"):
+        print("[read: " + line + " expected POINTS # float or POINTS # double ] --> FAILED\n")
         return
     pnum = int(larr[1])
     # read points as chunk
@@ -135,7 +135,7 @@ def import_vtk(infile):
     # expect polygon or tria_strip line
     line = f.readline()
     larr = line.split()
-    if larr[0] == "POLYGONS":
+    if larr[0] == "POLYGONS" or larr[0] == "CELLS":
         tnum = int(larr[1])
         ttnum = int(larr[2])
         npt = float(ttnum) / tnum
@@ -149,7 +149,7 @@ def import_vtk(infile):
             return
         t = np.delete(t, 0, 1)
     else:
-        print("[read: " + line + " expected POLYGONS] --> FAILED\n")
+        print("[read: " + line + " expected POLYGONS or CELLS] --> FAILED\n")
         return
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")

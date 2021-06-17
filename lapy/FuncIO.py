@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def import_vfunc(infile):
+def import_vfunc_deprecated(infile):
     """
     Imports vertex function from txt file. Values can be separated by ; or ,
     and surrounded by {} or () brackets. Also first line can have the
@@ -30,6 +30,40 @@ def import_vfunc(infile):
             # del (tmp1, tmp2)
         i = i + 1
     return vals
+
+
+def import_vfunc(filename):
+    """
+    Imports vertex function from txt file. Values can be separated by ; or ,
+    and surrounded by {} or () brackets. Also first line can have the
+    keyword "Solution:", i.e. the PSOL format from ShapeDNA
+    """
+
+    import re
+    import numpy as np
+
+    try:
+        with open(filename) as f:
+            txt = f.readlines()
+    except IOError:
+        print("[File " + infile + " not found or not readable]")
+        return
+
+    txt = [ x.strip() for x in txt ]
+
+    txt.remove("Solution:")
+
+    txt = [ re.sub("[{()}]",'', x) for x in txt ]
+
+    if len(txt) == 1:
+
+        txt = [ re.split("[,;]", x) for x in txt ][0]
+
+    txt = [ np.float(x) for x in txt ]
+
+    #txt = np.array(txt)
+
+    return txt
 
 
 def import_ev(infile):

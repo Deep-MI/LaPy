@@ -9,17 +9,17 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="LaPy",
-    version="0.9",
+    version="0.2",
     author="Martin Reuter",
     author_email="martin.reuter@dzne.de",
     description="A package for differential geometry on meshes (Laplace, FEM)",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Deep-MI/LaPy",
-    #package_dir={'': 'src'}, 
+    #package_dir={'': 'src'},
     packages=setuptools.find_packages(),
     # see https://pypi.org/classifiers/
-    classifiers=[ 
+    classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT"

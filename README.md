@@ -3,7 +3,7 @@
 LaPy is a package to compute spectral features (Laplace-Beltrami operator) on
 tetrahedral and triangle meshes. It is written purely in python 3 without
 sacrificing speed as almost all loops are vectorized, drawing upon efficient
-and sparse mesh data structures. It is a basically a port of the C++ ShapeDNA
+and sparse mesh data structures. It is basically a port of the C++ ShapeDNA
 project with extended differential geometry capabilities.
 
 ## Contents:

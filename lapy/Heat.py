@@ -57,7 +57,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
       vids          vertex index or indices where initial heat is applied
       m             factor (default 1) to compute time of heat evolution:
                     t = m * avg_edge_length^2
-      use_cholmod   (default True), if Cholmod not installed automatically
+      use_cholmod   (default True), if Cholmod is not found
                     revert to LU decomposition (slower)
 
     :return:
@@ -83,12 +83,11 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     # solve H x = b0
     print("Matrix Format now:  " + hmat.getformat())
     if use_cholmod:
-        print("Solver: cholesky decomp - performance optimal ...")
+        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
         chol = cholesky(hmat)
         vfunc = chol(b0)
     else:
-        print("Package scikit-sparse not found (Cholesky decomp)")
-        print("Solver: spsolve (LU decomp) - performance not optimal ...")
+        print("Solver: spsolve (LU decomposition) ...")
         lu = splu(hmat)
         vfunc = lu.solve(np.float32(b0))
     return vfunc

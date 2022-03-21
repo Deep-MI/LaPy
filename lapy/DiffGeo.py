@@ -248,7 +248,7 @@ def tria_compute_rotated_f(tria, vfunc):
     return vf
 
 
-def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
+def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=True):
     """
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012)
@@ -266,14 +266,16 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
     steps. It will normalize surface area of the mesh and translate the barycenter
     to the origin. Closed meshes will map to the unit sphere. 
     """
-    use_cholmod = True
-    try:
-        from sksparse.cholmod import cholesky
-    except ImportError:
-        use_cholmod = False
-        from scipy.sparse.linalg import spsolve
+    if use_cholmod:
+        try:
+            from sksparse.cholmod import cholesky
+        except ImportError:
+            use_cholmod = False
+
+    if not use_cholmod:
         # Note, it would be better to do sparse Cholesky (CHOLMOD)
         # as it can be 5-6 times faster
+        from scipy.sparse.linalg import spsolve
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -282,9 +284,9 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0):
     fem = Solver(trianorm, lump)
     a_mat = fem.stiffness
     if use_cholmod:
-        print("Solver: cholesky decomp - performance optimal ...")
+        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
     else:
-        print("Solver: spsolve (LU decomp) - performance not optimal ...")
+        print("Solver: spsolve (LU decomposition) ...")
     for x in range(max_iter):
         # store last position (for delta computation below)
         vlast = trianorm.v

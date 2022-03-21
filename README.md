@@ -53,6 +53,8 @@ your choice:
 
 `pip3 install --user --src /my/preferred/location --editable git+https://github.com/Deep-MI/Lapy.git#egg=lapy`
 
+Several functions, e.g. the Solver, require a sparse matrix decomposition, for which either the LU decomposition (from scipy sparse) or the faster Cholesky decomposition (from scikit-sparse cholmod) can be used. If the parameter flag use_cholmod is True, the code will try to import cholmod from the scikit-sparse package and will fall back to LU if the import fails. If you would like to use cholmod, you need to install scikit-sparse separately. It cannot be listed among LaPy's dependencies (e.g. in setup.py or requirements.txt) as that causes errors with pip. scikit-sparse requires numpy and scipy to be installed separately beforehand.
+
 ## References:
 
 If you use this software for a publication please cite both these papers:

@@ -368,12 +368,11 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
         except ImportError:
             use_cholmod = False
     if use_cholmod:
-        print("Solver: cholesky decomp - performance optimal ...")
+        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
         chol = cholesky(A)
         x = chol(b)
     else:
-        print("Package scikit-sparse not found (Cholesky decomp)")
-        print("Solver: spsolve (LU decomp) - performance not optimal ...")
+        print("Solver: spsolve (LU decomposition) ...")
         lu = splu(A)
         x = lu.solve(b)
     return x    

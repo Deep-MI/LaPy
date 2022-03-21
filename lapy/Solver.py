@@ -16,22 +16,27 @@ class Solver:
      for external function that do not need stiffness.
      """
 
-    def __init__(self, geometry, lump=False, aniso=None, aniso_smooth=10):
+    def __init__(self, geometry, lump=False, aniso=None, aniso_smooth=10, use_cholmod=True):
         """
         Construct the Solver class. Computes linear Laplace FEM stiffness and
         mass matrix for TriaMesh or TetMesh input geometries. For TriaMesh it can also
         construct the anisotropic Laplace.
 
         Inputs:
-            geometry  : is a geometry class, currently either TriaMesh or TetMesh
-            aniso     : float, anisotropy for curvature based anisotopic Laplace
-                        can also be tuple (a_min, a_max) to differentially affect
-                        the min and max curvature directions. E.g. (0,50) will set
-                        scaling to 1 into min curv direction even if the max curvature
-                        is large in those regions (= isotropic in regions with 
-                        large max curv and min curv close to zero= concave cylinder)
-            lump      : whether to lump the mass matrix (diagonal), default False
+            geometry    : is a geometry class, currently either TriaMesh or TetMesh
+            aniso       : float, anisotropy for curvature based anisotopic Laplace
+                          can also be tuple (a_min, a_max) to differentially affect
+                          the min and max curvature directions. E.g. (0,50) will set
+                          scaling to 1 into min curv direction even if the max curvature
+                          is large in those regions (= isotropic in regions with 
+                          large max curv and min curv close to zero= concave cylinder)
+            lump        : whether to lump the mass matrix (diagonal), default False
+            use_cholmod : try to use the Cholesky decomposition from the cholmod
+                          library for improved speed. This requires skikit sparse to
+                          be installed. If it cannot be found, we fallback to LU
+                          decomposition. 
         """
+        self.use_cholmod = use_cholmod
         if type(geometry).__name__ == "TriaMesh":
             if aniso is not None:
                 # anisotropic Laplace
@@ -456,7 +461,7 @@ class Solver:
         b = sparse.csc_matrix((local_b, (i, j)))
         return a, b
 
-    def eigs(self, k=10, use_cholmod=True):
+    def eigs(self, k=10):
         """
         Compute linear finite-element method Laplace-Beltrami spectrum
 
@@ -466,18 +471,19 @@ class Solver:
                     eigenfunctions  array: (N x k) with k eigenfunctions (in the columns)
         """
         from scipy.sparse.linalg import LinearOperator, eigsh, splu
-        try:
-            from sksparse.cholmod import cholesky
-        except ImportError:
-            use_cholmod = False
-        if use_cholmod:
-            print("Solver: cholesky decomp - performance optimal ...")
+        if self.use_cholmod:
+            try:
+                from sksparse.cholmod import cholesky
+            except ImportError:
+                self.use_cholmod = False
+
+        if self.use_cholmod:
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
         else:
-            print("Package scikit-sparse not found (Cholesky decomp)")
-            print("Solver: spsolve (LU decomp) - performance not optimal ...")
-        # turns out it is much faster to use cholesky and pass operator
+            print("Solver: spsolve (LU decomposition) ...")
+            # turns out it is much faster to use cholesky and pass operator
         sigma = -0.01
-        if use_cholmod:
+        if self.use_cholmod:
             chol = cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(matvec=chol, shape=self.stiffness.shape,
                                     dtype=self.stiffness.dtype)
@@ -488,7 +494,7 @@ class Solver:
         eigenvalues, eigenvectors = eigsh(self.stiffness, k, self.mass, sigma=sigma, OPinv=op_inv)
         return eigenvalues, eigenvectors
 
-    def poisson(self, h=0.0, dtup=(), ntup=(), use_cholmod=True):
+    def poisson(self, h=0.0, dtup=(), ntup=()):
         """
         poissonSolver solves the poisson equation with boundary conditions
                based on the A and B Laplace matrices:  A x = B h
@@ -505,17 +511,15 @@ class Solver:
                   ntup - Neumann boundary condition as a tuple.
                          Tuple contains index and data arrays of same length.
                          Default: Neumann on all boundaries
-                  useCholmod - default True: try to find Cholesky decomp from sksparse
-                               falls back to scipy sparse splu if not found.
 
         Outputs:  x - array with vertex values of solution
         """
         from scipy.sparse.linalg import splu
-        if use_cholmod:
+        if self.use_cholmod:
             try:
                 from sksparse.cholmod import cholesky
             except ImportError:
-                use_cholmod = False
+                self.use_cholmod = False
         # check matrices
         dim = self.stiffness.shape[0]
         if self.stiffness.shape != self.mass.shape or self.stiffness.shape[1] != dim:
@@ -575,13 +579,12 @@ class Solver:
             a = self.stiffness
         # solve A x = b
         print("Matrix Format now: " + a.getformat())
-        if use_cholmod:
-            print("Solver: cholesky decomp - performance optimal ...")
+        if self.use_cholmod:
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = cholesky(a)
             x = chol(b)
         else:
-            print("Package scikit-sparse not found (Cholesky decomp)")
-            print("Solver: spsolve (LU decomp) - performance not optimal ...")
+            print("Solver: spsolve (LU decomposition) ...")
             lu = splu(a)
             x = lu.solve(b.astype(np.float32))
         x = np.squeeze(np.array(x))

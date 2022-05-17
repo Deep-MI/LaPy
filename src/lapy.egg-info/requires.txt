@@ -1,0 +1,8 @@
+numpy
+scipy>0.10
+plotly
+
+[dev]
+black
+flake8
+ipython

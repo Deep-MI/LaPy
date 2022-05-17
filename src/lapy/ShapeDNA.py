@@ -6,6 +6,7 @@ from .Solver import Solver
 
 # compute shapeDNA
 
+
 def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     """
     a function to compute the shapeDNA descriptor for triangle or tetrahedral
@@ -29,23 +30,25 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     # write ev
 
     evDict = dict()
-    evDict['Refine'] = 0
-    evDict['Degree'] = 1
+    evDict["Refine"] = 0
+    evDict["Degree"] = 1
     if type(geom).__name__ == "TriaMesh":
-        evDict['Dimension'] = 2
+        evDict["Dimension"] = 2
     elif type(geom).__name__ == "TetMesh":
-        evDict['Dimension'] = 3
-    evDict['Elements'] = len(geom.t)
-    evDict['DoF'] = len(geom.v)
-    evDict['NumEW'] = k
-    evDict['Eigenvalues'] = evals
-    evDict['Eigenvectors'] = evecs
+        evDict["Dimension"] = 3
+    evDict["Elements"] = len(geom.t)
+    evDict["DoF"] = len(geom.v)
+    evDict["NumEW"] = k
+    evDict["Eigenvalues"] = evals
+    evDict["Eigenvectors"] = evecs
 
     # return
 
     return evDict
 
+
 # function for ev normalization
+
 
 def normalize_ev(geom, evals, method="geometry"):
     """
@@ -102,7 +105,9 @@ def normalize_ev(geom, evals, method="geometry"):
 
             return evals * vol ** np.divide(2.0, 3.0)
 
+
 # function for linear reweighting
+
 
 def reweight_ev(evals):
     """
@@ -113,12 +118,14 @@ def reweight_ev(evals):
     :return:    evals        vector of reweighted eigenvalues
     """
 
-    #evals[1:] = evals[1:] / np.arange(1, len(evals))
-    evals = evals / np.arange(1, len(evals)+1)
+    # evals[1:] = evals[1:] / np.arange(1, len(evals))
+    evals = evals / np.arange(1, len(evals) + 1)
 
     return evals
 
+
 # compute distance
+
 
 def compute_distance(ev1, ev2, dist="euc"):
     """

@@ -17,7 +17,9 @@ def diagonal(t, x, evecs, evals, n):
 
     """
     # maybe add code to check dimensions of input and flip axis if necessary
-    h = np.matmul(evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t)))
+    h = np.matmul(
+        evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t))
+    )
     return h
 
 
@@ -41,7 +43,9 @@ def kernel(t, vfix, evecs, evals, n):
 
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
-    h = np.matmul(evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n]))
+    h = np.matmul(
+        evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n])
+    )
     return h
 
 
@@ -71,6 +75,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     if not use_cholmod:
         from scipy.sparse.linalg import splu
     from .Solver import Solver
+
     nv = len(geometry.v)
     fem = Solver(geometry, lump=True, aniso=aniso)
     # time of heat evolution:

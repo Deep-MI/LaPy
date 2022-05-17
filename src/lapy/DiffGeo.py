@@ -26,7 +26,9 @@ def compute_rotated_f(geom, vfunc):
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
     else:
-        raise ValueError('Geometry type "' + type(geom).__name__ + '" not implemented')
+        raise ValueError(
+            'Geometry type "' + type(geom).__name__ + '" not implemented'
+        )
 
 
 def compute_geodesic_f(geom, vfunc):
@@ -44,7 +46,7 @@ def compute_geodesic_f(geom, vfunc):
     """
     gradf = compute_gradient(geom, vfunc)
     # normalize gradient
-    gradnorm = gradf / np.sqrt((gradf ** 2).sum(1))[:, np.newaxis]
+    gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
     gradnorm = np.nan_to_num(gradnorm)
     divf = compute_divergence(geom, gradnorm)
     fem = Solver(geom, lump=True)
@@ -71,7 +73,7 @@ def tria_compute_geodesic_f(tria, vfunc):
     """
     gradf = tria_compute_gradient(tria, vfunc)
     # normalize gradient
-    gradnorm = gradf / np.sqrt((gradf ** 2).sum(1))[:, np.newaxis]
+    gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
     gradnorm = np.nan_to_num(gradnorm)
     divf = tria_compute_divergence(tria, gradnorm)
     fem = Solver(tria)
@@ -106,6 +108,7 @@ def tria_compute_gradient(tria, vfunc):
     Desbrun ...
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -143,6 +146,7 @@ def tria_compute_divergence(tria, tfunc):
     with B^-1 to get back the function in some applications
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -171,7 +175,11 @@ def tria_compute_divergence(tria, tfunc):
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
     # convert back to nparray 1D
-    vfunc = np.squeeze(np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype))
+    vfunc = np.squeeze(
+        np.asarray(
+            0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype
+        )
+    )
     return vfunc
 
 
@@ -195,6 +203,7 @@ def tria_compute_divergence2(tria, tfunc):
     with B^-1 to get back the function in some applications
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -216,7 +225,9 @@ def tria_compute_divergence2(tria, tfunc):
     i = np.column_stack((tria.t[:, 0], tria.t[:, 1], tria.t[:, 2])).reshape(-1)
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
-    vfunc = np.squeeze(np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense()))
+    vfunc = np.squeeze(
+        np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense())
+    )
     return vfunc
 
 
@@ -248,7 +259,9 @@ def tria_compute_rotated_f(tria, vfunc):
     return vf
 
 
-def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=True):
+def tria_mean_curvature_flow(
+    tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=True
+):
     """
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012)
@@ -261,10 +274,10 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0, use_ch
     Outputs:  TriaMesh - TriaMesh object (vertices and triangles)
 
     This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
-    made non-singular" which uses the Laplace-Beltrami operator but keeps the 
+    made non-singular" which uses the Laplace-Beltrami operator but keeps the
     stiffness matrix (A) fixed and only adjusts the mass matrix (B) during the
     steps. It will normalize surface area of the mesh and translate the barycenter
-    to the origin. Closed meshes will map to the unit sphere. 
+    to the origin. Closed meshes will map to the unit sphere.
     """
     if use_cholmod:
         try:
@@ -327,8 +340,9 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     Outputs:  tria      : TriaMesh
     """
     import math
+
     if not tria.is_closed():
-        raise ValueError('Error: Can only project closed meshes!')
+        raise ValueError("Error: Can only project closed meshes!")
 
     # sub-function to compute flipped area of trias where normal
     # points towards origin, meaningful for the sphere, centered at zero
@@ -349,17 +363,18 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     if debug:
         data = dict()
-        data['Eigenvalues'] = evals
-        data['Eigenvectors'] = evecs
-        data['Creator'] = 'spherically_project.py'
-        data['Refine'] = 0
-        data['Degree'] = 1
-        data['Dimension'] = 2
-        data['Elements'] = tria.t.shape[0]
-        data['DoF'] = evecs.shape[0]
-        data['NumEW'] = 4
+        data["Eigenvalues"] = evals
+        data["Eigenvectors"] = evecs
+        data["Creator"] = "spherically_project.py"
+        data["Refine"] = 0
+        data["Degree"] = 1
+        data["Dimension"] = 2
+        data["Elements"] = tria.t.shape[0]
+        data["DoF"] = evecs.shape[0]
+        data["NumEW"] = 4
         from .FuncIO import export_ev
-        export_ev(data, 'debug.ev')
+
+        export_ev(data, "debug.ev")
 
     # flip efuncs to align to coordinates consistently
     ev1 = evecs[:, 1]
@@ -384,7 +399,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         print("ERROR: direction 1 should be (anterior -posterior) but is not!")
         print("  debug info: {} {} {} ".format(l11, l21, l31))
         # sys.exit(1)
-        raise ValueError('Direction 1 should be anterior - posterior')
+        raise ValueError("Direction 1 should be anterior - posterior")
 
     # only flip direction if necessary
     print("ev1 min: {}  max {} ".format(cmin1, cmax1))
@@ -442,19 +457,19 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # at the poles, but who knows...
     ev1min = np.amin(ev1)
     ev1max = np.amax(ev1)
-    ev1[ev1 < 0] /= - ev1min
+    ev1[ev1 < 0] /= -ev1min
     ev1[ev1 > 0] /= ev1max
 
     ev2min = np.amin(ev2)
     ev2max = np.amax(ev2)
-    ev2[ev2 < 0] /= - ev2min
+    ev2[ev2 < 0] /= -ev2min
     ev2[ev2 > 0] /= ev2max
 
     ev3min = np.amin(ev3)
     ev3max = np.amax(ev3)
-    ev3[ev3 < 0] /= - ev3min
+    ev3[ev3 < 0] /= -ev3min
     ev3[ev3 > 0] /= ev3max
-    
+
     # set evec as new coordinates (spectral embedding)
     vn = np.empty(tria.v.shape)
     vn[:, 0] = ev3
@@ -464,13 +479,15 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # do a few mean curvature flow euler steps to make more convex
     # three should be sufficient
     if flow_iter > 0:
-        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter)
+        tflow = tria_mean_curvature_flow(
+            TriaMesh(vn, tria.t), max_iter=flow_iter
+        )
         vn = tflow.v
-            
+
     # project to sphere and scaled to have the same scale/origin as FS:
     dist = np.sqrt(np.sum(vn * vn, axis=1))
     vn = 100 * (vn / dist[:, np.newaxis])
-    
+
     trianew = TriaMesh(vn, tria.t)
     svol = trianew.area() / (4.0 * math.pi * 10000)
     print("sphere area fraction: {} ".format(svol))
@@ -479,19 +496,19 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if flippedarea > 0.95:
         print("ERROR: global normal flip, exiting ..")
         # sys.exit(1)
-        raise ValueError('global normal flip')
+        raise ValueError("global normal flip")
 
     print("flipped area fraction: {} ".format(flippedarea))
 
     if svol < 0.99:
         print("ERROR: sphere area fraction should be above .99, exiting ..")
         # sys.exit(1)
-        raise ValueError('sphere area fraction should be above .99')
+        raise ValueError("sphere area fraction should be above .99")
 
     if flippedarea > 0.0008:
         print("ERROR: flipped area fraction should be below .0008, exiting ..")
         # sys.exit(1)
-        raise ValueError('flipped area fraction should be below .0008')
+        raise ValueError("flipped area fraction should be below .0008")
 
     # here we finally check also the spat vol (orthogonality of direction vectors)
     # we could stop earlier, but most failure cases will be covered by the svol and
@@ -499,7 +516,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if spatvol < 0.6:
         print("ERROR: spat vol (orthogonality) should be above .6, exiting ..")
         # sys.exit(1)
-        raise ValueError('spat vol (orthogonality) should be above .6')
+        raise ValueError("spat vol (orthogonality) should be above .6")
 
     return trianew
 
@@ -528,6 +545,7 @@ def tet_compute_gradient(tet, vfunc):
     Desbrun ...
     """
     import sys
+
     v0 = tet.v[tet.t[:, 0], :]
     v1 = tet.v[tet.t[:, 1], :]
     v2 = tet.v[tet.t[:, 2], :]
@@ -545,9 +563,15 @@ def tet_compute_gradient(tet, vfunc):
     voli = np.divide(1.0, vol)[:, np.newaxis]
     # sum weighted edges
     # c0 = vfunc[t[:,0],np.newaxis] * np.cross(,)
-    c1 = (vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(e2, e5)
-    c2 = (vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(e3, e4)
-    c3 = (vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(-e2, e0)
+    c1 = (
+        vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(e2, e5)
+    c2 = (
+        vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(e3, e4)
+    c3 = (
+        vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(-e2, e0)
     # divided by parallelepiped vol
     tfunc = voli * (c1 + c2 + c3)
     return tfunc
@@ -588,8 +612,15 @@ def tet_compute_divergence(tet, tfunc):
     x1 = (n1 * tfunc).sum(1)
     x2 = (n2 * tfunc).sum(1)
     x3 = (n3 * tfunc).sum(1)
-    i = np.column_stack((tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])).reshape(-1)
+    i = np.column_stack(
+        (tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])
+    ).reshape(-1)
     j = np.zeros((4 * len(tet.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2, x3)).reshape(-1)
-    vfunc = -np.squeeze(np.asarray((1.0 / 6.0) * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype))
+    vfunc = -np.squeeze(
+        np.asarray(
+            (1.0 / 6.0) * sparse.csc_matrix((dat, (i, j))).todense(),
+            dtype=tfunc.dtype,
+        )
+    )
     return vfunc

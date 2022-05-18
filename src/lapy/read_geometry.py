@@ -1,12 +1,14 @@
 # IMPORTS
-from collections import OrderedDict
-import numpy as np
 import warnings
+from collections import OrderedDict
+
+import numpy as np
 
 """
-Read FreeSurfer geometry (fix for dev, ll 126-128); 
+Read FreeSurfer geometry (fix for dev, ll 126-128);
 
-Code was taken from nibabel.freesurfer package (https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
+Code was taken from nibabel.freesurfer package
+(https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
 This software is licensed under the following license:
 
 The MIT License
@@ -145,7 +147,8 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
                 volume_info = _read_volume_info(fobj)
         else:
             raise ValueError(
-                "File does not appear to be a Freesurfer surface (triangle file)"
+                "File does not appear to be a Freesurfer surface (triangle \
+                    file)"
             )
 
     coords = coords.astype(np.float)  # XXX: due to mayavi bug on mac 32bits

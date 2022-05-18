@@ -1,7 +1,11 @@
+from typing import Union
+
 import numpy as np
 import scipy.spatial.distance as di
-from .TriaMesh import TriaMesh
-from .TetMesh import TetMesh
+
+from lapy.TetMesh import TetMesh
+from lapy.TriaMesh import TriaMesh
+
 from .Solver import Solver
 
 # compute shapeDNA
@@ -42,25 +46,33 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     evDict["Eigenvalues"] = evals
     evDict["Eigenvectors"] = evecs
 
-    # return
-
     return evDict
 
 
 # function for ev normalization
 
 
-def normalize_ev(geom, evals, method="geometry"):
+def normalize_ev(
+    geom: Union[TriaMesh, TetMesh], evals: np.ndarray, method: str = "geometry"
+) -> np.ndarray:
     """
-    a function for surface / volume normalization
+    A function for surface / volume normalization.
 
-    Inputs:     geom         geometry object; either TriaMesh or TetMesh
-                evals        vector of eigenvalues
-                method       either "surface", "volume", or "geometry";
-                             "geometry" will perform surface normalization for
-                             2D objects, and volume normalization for 3D objects
+    Parameters
+    ----------
+    geom : Union[TriaMesh, TetMesh]
+        Geometry object; either TriaMesh or TetMesh
+    evals : np.ndarray
+        Vector of eigenvalues
+    method : str, optional
+        either "surface", "volume", or "geometry"; "geometry" will perform
+        surface normalization for 2D objects, and volume normalization for 3D
+        objects, by default "geometry"
 
-    :return:    evals        vector of reweighted eigenvalues
+    Returns
+    -------
+    np.ndarray
+        Vector of reweighted eigenvalues
     """
 
     if method == "surface":
@@ -127,15 +139,24 @@ def reweight_ev(evals):
 # compute distance
 
 
-def compute_distance(ev1, ev2, dist="euc"):
+def compute_distance(
+    ev1: np.ndarray, ev2: np.ndarray, dist: str = "euc"
+) -> float:
     """
-    a function to compute the shape asymmetry from two shapeDNA descriptors
-    for triangle or tetrahedral meshes
+    A function to compute the shape asymmetry from two shapeDNA descriptors
+    for triangle or tetrahedral meshes.
 
-    Inputs:     ev1, ev2    eigenvalues
-                distance    distance measure; currently only 'euc' (euclidean)
+    Parameters
+    ----------
+    ev1, ev2 : np.ndarray
+        Eigenvalues vector
+    dist : str, optional
+        distance measure; currently only 'euc' (euclidean)
 
-    :return:    dst         a distance measure
+    Returns
+    -------
+    float
+        A distance measure
     """
 
     if dist == "euc":

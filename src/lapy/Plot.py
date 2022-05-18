@@ -8,11 +8,12 @@ In jupyter notebook do this:
     plotly.offline.init_notebook_mode(connected=True)
 
 """
+import re
+from bisect import bisect
+
 import numpy as np
 import plotly
 import plotly.graph_objs as go
-from bisect import bisect
-import re
 
 # import matplotlib.cm as cm
 from .TetMesh import TetMesh
@@ -220,10 +221,12 @@ def plot_tet_mesh(
         if type(cutting) is not list:
             cutting = [cutting]
 
-        # check if vfunc is defined when functional thresholds are used, otherwise exit
+        # check if vfunc is defined when functional thresholds are used,
+        # otherwise exit
         if any(["f" in x for x in cutting]) and vfunc is None:
             raise ValueError(
-                "Need to specify vfunc if 'f' is used within the 'cutting' argument, exiting."
+                "Need to specify vfunc if 'f' is used within the 'cutting' \
+                    argument, exiting."
             )
 
         # create criteria from cutting info
@@ -329,12 +332,14 @@ def plot_tria_mesh(
         vcolor is not None or tcolor is not None
     ):
         raise ValueError(
-            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor, \
+                but not both at the same time"
         )
 
     if vcolor is not None and tcolor is not None:
         raise ValueError(
-            "plot_tria_mesh can only use either vcolor or tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vcolor or tcolor, but not both\
+                 at the same time"
         )
 
     x, y, z = zip(*tria.v)

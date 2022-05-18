@@ -1,18 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: latin-1 -*-
-#
-# Original Author: Martin Reuter
-# Date: Jul-5-2018
-#
+import os.path
 
 import numpy as np
-import os.path
+
 from .TetMesh import TetMesh
 
 
-def import_gmsh(infile):
+def import_gmsh(infile: str) -> TetMesh:
     """
-    Load GMSH tetrahedron mesh
+    Load GMSH tetrahedron mesh.
+
+    Parameters
+    ----------
+    infile : str
+        Path to *.gmsh* file
+
+    Returns
+    -------
+    TetMesh
+        Tetrahedron mesh
     """
     extension = os.path.splitext(infile)[1]
     verbose = 1
@@ -88,7 +93,7 @@ def import_gmsh(infile):
     # read (nodes X ?) matrix
     t = np.fromfile(f, "int", tnum * len(larr), " ")
     t.shape = (tnum, len(larr))
-    t = np.delete(t, np.s_[0 : len(larr) - 4], 1)
+    t = np.delete(t, np.s_[: len(larr) - 4], 1)
     line = f.readline()
     if not line.startswith("$EndElements"):
         print("Line: ", line, " \n")
@@ -106,9 +111,19 @@ def import_gmsh(infile):
     return TetMesh(v, t)
 
 
-def import_vtk(infile):
+def import_vtk(infile: str) -> TetMesh:
     """
-    Load VTK tetrahedron mesh
+    Load VTK tetrahedron mesh.
+
+    Parameters
+    ----------
+    infile : str
+        Path to *.vtk* file
+
+    Returns
+    -------
+    TetMesh
+        Tetrahedron mesh
     """
     verbose = 1
     if verbose > 0:
@@ -139,7 +154,8 @@ def import_vtk(infile):
         print(
             "[read: "
             + line
-            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> FAILED\n"
+            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> \
+                FAILED\n"
         )
         return
     # read number of points

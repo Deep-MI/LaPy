@@ -1,5 +1,10 @@
+from typing import Tuple, Union
+
 import numpy as np
 from scipy import sparse
+
+from lapy.TetMesh import TetMesh
+from lapy.TriaMesh import TriaMesh
 
 
 class Solver:
@@ -18,30 +23,43 @@ class Solver:
 
     def __init__(
         self,
-        geometry,
-        lump=False,
-        aniso=None,
-        aniso_smooth=10,
-        use_cholmod=True,
+        geometry: Union[TriaMesh, TetMesh],
+        lump: bool = False,
+        aniso: float = None,
+        aniso_smooth: int = 10,
+        use_cholmod: bool = True,
     ):
         """
         Construct the Solver class. Computes linear Laplace FEM stiffness and
-        mass matrix for TriaMesh or TetMesh input geometries. For TriaMesh it can also
-        construct the anisotropic Laplace.
+        mass matrix for TriaMesh or TetMesh input geometries. For TriaMesh it
+        can also construct the anisotropic Laplace.
 
-        Inputs:
-            geometry    : is a geometry class, currently either TriaMesh or TetMesh
-            aniso       : float, anisotropy for curvature based anisotopic Laplace
-                          can also be tuple (a_min, a_max) to differentially affect
-                          the min and max curvature directions. E.g. (0,50) will set
-                          scaling to 1 into min curv direction even if the max curvature
-                          is large in those regions (= isotropic in regions with
-                          large max curv and min curv close to zero= concave cylinder)
-            lump        : whether to lump the mass matrix (diagonal), default False
-            use_cholmod : try to use the Cholesky decomposition from the cholmod
-                          library for improved speed. This requires skikit sparse to
-                          be installed. If it cannot be found, we fallback to LU
-                          decomposition.
+        Parameters
+        ----------
+        geometry : Union[TriaMesh, TetMesh]
+            A geometry class, currently either TriaMesh or TetMesh
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
+        aniso : float, optional
+            Anisotropy for curvature based anisotopic Laplace can also be tuple
+            (a_min, a_max) to differentially affect the min and max curvature
+            directions. E.g. (0,50) will set scaling to 1 into min curv
+            direction even if the max curvature is large in those regions
+            (= isotropic in regions with large max curv and min curv close to
+            zero= concave cylinder), by default None
+        aniso_smooth : int, optional
+            _description_, by default 10
+        use_cholmod : bool, optional
+            try to use the Cholesky decomposition from the cholmod library for
+            improved speed. This requires skikit sparse to be installed. If it
+            cannot be found, we fallback to LU decomposition. by default True
+
+        Raises
+        ------
+        ValueError
+            aniso should be scalar or tuple/array of length 2!
+        ValueError
+            Unknown geometry
         """
         self.use_cholmod = use_cholmod
         if type(geometry).__name__ == "TriaMesh":
@@ -53,7 +71,8 @@ class Solver:
                 if isinstance(aniso, (list, tuple, set, np.ndarray)):
                     if len(aniso) != 2:
                         raise ValueError(
-                            "aniso should be scalar or tuple/array of length 2!"
+                            "aniso should be scalar or tuple/array of length \
+                                2!"
                         )
                     aniso0 = aniso[0]
                     aniso1 = aniso[1]
@@ -79,23 +98,32 @@ class Solver:
         self.geotype = type(geometry)
 
     @staticmethod
-    def _fem_tria(tria, lump=False):
+    def _fem_tria(
+        tria: TriaMesh, lump: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        computeABtria(v,t) computes the two sparse symmetric matrices representing
-               the Laplace Beltrami Operator for a given triangle mesh using
-               the linear finite element method (assuming a closed mesh or
-               the Neumann boundary condition).
+        computeABtria(v,t) computes the two sparse symmetric matrices
+        representing the Laplace Beltrami Operator for a given triangle mesh
+        using the linear finite element method (assuming a closed mesh or the
+        Neumann boundary condition).
 
-        Inputs:   v - vertices : list of lists of 3 floats
-                  t - triangles: list of lists of 3 int of indices (>=0) into v array
+        Can be used to solve sparse generalized Eigenvalue problem:
+        A x = lambda B x or to solve Poisson equation: A x = B f (where f is
+        function on mesh vertices) or to solve Laplace equation: A x = 0
+        or to model the operator's action on a vector x:   y = B\\(Ax)
 
-        Outputs:  A - sparse sym. (n x n) positive semi definite numpy matrix
-                  B - sparse sym. (n x n) positive definite numpy matrix (inner product)
+        Parameters
+        ----------
+        tria : TriaMesh
+            Triangular mesh instance
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
 
-        Can be used to solve sparse generalized Eigenvalue problem: A x = lambda B x
-        or to solve Poisson equation: A x = B f (where f is function on mesh vertices)
-        or to solve Laplace equation: A x = 0
-        or to model the operator's action on a vector x:   y = B\(Ax)
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            sparse sym. (n x n) positive semi definite numpy matrix,
+            sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         import sys
 
@@ -152,27 +180,39 @@ class Solver:
         return a, b
 
     @staticmethod
-    def _fem_tria_aniso(tria, u1, u2, aniso_mat, lump=False):
+    def _fem_tria_aniso(
+        tria: TriaMesh, u1, u2, aniso_mat, lump=False
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        computeABtria(v,t) computes the two sparse symmetric matrices representing
-               the Laplace Beltrami Operator for a given triangle mesh using
-               the linear finite element method (assuming a closed mesh or
-               the Neumann boundary condition).
+        computeABtria(v,t) computes the two sparse symmetric matrices
+        representing the Laplace Beltrami Operator for a given triangle mesh
+        using the linear finite element method (assuming a closed mesh or the
+        Neumann boundary condition).
 
-        Inputs:   v  - vertices : list of lists of 3 floats
-                  t  - triangles: N list of lists of 3 int of indices (>=0) into v array
-                  u1 - min curv:  min curvature direction per triangle (Nx3 floats)
-                  u2 - max curv:  max curvature direction per triangle (Nx3 floats)
-                  aniso_mat  - anisotropy matrix: diagonal elements in u1,u2 basis per
-                                  triangle (Nx2 floats)
+        Can be used to solve sparse generalized Eigenvalue problem:
+        A x = lambda B x or to solve Poisson equation: A x = B f (where f is
+        function on mesh vertices) or to solve Laplace equation: A x = 0
+        or to model the operator's action on a vector x:   y = B\\(Ax)
 
-        Outputs:  A  - sparse sym. (n x n) positive semi definite numpy matrix
-                  B  - sparse sym. (n x n) positive definite numpy matrix (inner product)
+        Parameters
+        ----------
+        tria : TriaMesh
+            Triangular mesh instance
+        u1 : _type_
+            Min curvature direction per triangle (Nx3 floats)
+        u2 : _type_
+            Max curvature direction per triangle (Nx3 floats)
+        aniso_mat : _type_
+            Anisotropy matrix: diagonal elements in u1,u2 basis per triangle
+            (Nx2 floats)
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
 
-        Can be used to solve sparse generalized Eigenvalue problem: A x = lambda B x
-        or to solve Poisson equation: A x = B f (where f is function on mesh vertices)
-        or to solve Laplace equation: A x = 0
-        or to model the operator's action on a vector x:   y = B\(Ax)
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            sparse sym. (n x n) positive semi definite numpy matrix,
+            sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         import sys
 
@@ -240,23 +280,29 @@ class Solver:
         return a, b
 
     @staticmethod
-    def fem_tria_mass(tria, lump=False):
+    def fem_tria_mass(tria: TriaMesh, lump: bool = False) -> np.ndarray:
         """
-        Computes the sparse symmetric mass matrix of the
-        Laplace Beltrami Operator for a given triangle mesh using the
-        linear finite element method (assuming a closed mesh or the
-        Neumann boundary condition).
+        Computes the sparse symmetric mass matrix of the Laplace Beltrami
+        Operator for a given triangle mesh using the linear finite element
+        method (assuming a closed mesh or the Neumann boundary condition).
         This is here, because sometimes only a mass matrix is needed and then
         this call is faster than the constructor above.
 
-        Inputs:   v - vertices : list of lists of 3 floats
-                  t - triangles: list of lists of 3 int of indices (>=0) into v array
-                  lump         : Bool if B matrix should be lumped (diagnoal), default False
-
-        Outputs:  B - sparse sym. (n x n) positive definite numpy matrix (inner product)
-
-        This is only the mass matrix B of the Eigenvalue problem: A x = lambda B x
+        This is only the mass matrix B of the Eigenvalue problem:
+        A x = lambda B x
         Area of the surface mesh can be obtained via B.sum()
+
+        Parameters
+        ----------
+        tria : TriaMesh
+            Triangular mesh instance
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
+
+        Returns
+        -------
+        np.ndarray
+            Sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
@@ -300,26 +346,29 @@ class Solver:
         return b
 
     @staticmethod
-    def _fem_tetra(tetra, lump=False):
+    def _fem_tetra(tetra: TriaMesh, lump: bool = False):
         """
-        computeABtetra(v,t) computes the two sparse symmetric matrices representing
-               the Laplace Beltrami Operator for a given tetrahedral mesh using
-               the linear finite element method (Neumann boundary condition).
+        computeABtetra(v,t) computes the two sparse symmetric matrices
+        representing the Laplace Beltrami Operator for a given tetrahedral mesh
+        using the linear finite element method (Neumann boundary condition).
 
-        Inputs:   v - vertices : list of lists of 3 floats
-                  t - tetras   : list of lists of 4 int of indices (>=0) into v array
-                                 Ordering is important: first three vertices for
-                                 triangle counter-clockwise when looking at it from
-                                 the inside of the tetrahedron
-                  lump         : Bool if B matrix should be lumped (diagnoal), default False
+        Can be used to solve sparse generalized Eigenvalue problem:
+        A x = lambda B x or to solve Poisson equation: A x = B f (where f is
+        function on mesh vertices) or to solve Laplace equation: A x = 0
+        or to model the operator's action on a vector x:   y = B\\(Ax)
 
-        Outputs:  A - sparse sym. (n x n) positive semi definite numpy matrix
-                  B - sparse sym. (n x n) positive definite numpy matrix (inner product)
+        Parameters
+        ----------
+        tria : TriaMesh
+            Triangular mesh instance
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
 
-        Can be used to solve sparse generalized Eigenvalue problem: A x = lambda B x
-        or to solve Poisson equation: A x = B f (where f is function on mesh vertices)
-        or to solve Laplace equation: A x = 0
-        or to model the operator's action on a vector x:   y = B\(Ax)
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            sparse sym. (n x n) positive semi definite numpy matrix,
+            sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tetra.t[:, 0]
@@ -358,11 +407,11 @@ class Solver:
         e26 = np.sum(e2 * e6, axis=1)
         e34 = np.sum(e3 * e4, axis=1)
         e36 = np.sum(e3 * e6, axis=1)
-        # compute entries for A (negations occur when one edge direction is flipped)
-        # these can be computed multiple ways
-        # basically for ij, take opposing edge (call it Ek) and two edges from the starting
-        # point of Ek to point i (=El) and to point j (=Em), then these are of the
-        # scheme:   (El * Ek)  (Em * Ek) - (El * Em) (Ek * Ek)
+        # compute entries for A (negations occur when one edge direction is
+        #  flipped) these can be computed multiple ways. Basically for ij, take
+        # opposing edge (call it Ek) and two edges from the starting point of
+        # Ek to point i (=El) and to point j (=Em), then these are of the
+        # scheme: (El * Ek)  (Em * Ek) - (El * Em) (Ek * Ek)
         # where * is vector dot product
         a12 = (-e36 * e26 + e23 * e66) / vol
         a13 = (-e15 * e25 + e12 * e55) / vol
@@ -442,23 +491,27 @@ class Solver:
     @staticmethod
     def _fem_voxels(vox, lump=False):
         """
-        computeABvoxels(v,t) computes the two sparse symmetric matrices representing
-               the Laplace Beltrami Operator for a given voxel mesh using
-               the linear finite element method (Neumann boundary condition).
+        computeABvoxels(v,t) computes the two sparse symmetric matrices
+        representing the Laplace Beltrami Operator for a given voxel mesh using
+        the linear finite element method (Neumann boundary condition).
 
-        Inputs:   v - vertices : list of lists of 3 floats
-                  t - voxels   : list of lists of 8 int of indices (>=0) into v array
-                                 Ordering: base counter-clockwise, then top counter-
-                                 clockwise when looking from above
-                  lump         : Bool if B matrix should be lumped (diagnoal), default False
+        Can be used to solve sparse generalized Eigenvalue problem:
+        A x = lambda B x or to solve Poisson equation: A x = B f (where f is
+        function on mesh vertices) or to solve Laplace equation: A x = 0
+        or to model the operator's action on a vector x:   y = B\\(Ax)
 
-        Outputs:  A - sparse sym. (n x n) positive semi definite numpy matrix
-                  B - sparse sym. (n x n) positive definite numpy matrix (inner product)
+        Parameters
+        ----------
+        tria : TriaMesh
+            Triangular mesh instance
+        lump : bool, optional
+            Whether to lump the mass matrix (diagonal), by default False
 
-        Can be used to solve sparse generalized Eigenvalue problem: A x = lambda B x
-        or to solve Poisson equation: A x = B f (where f is function on mesh vertices)
-        or to solve Laplace equation: A x = 0
-        or to model the operator's action on a vector x:   y = B\(Ax)
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            sparse sym. (n x n) positive semi definite numpy matrix,
+            sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         tnum = vox.t.shape[0]
         # Linear local matrices on unit voxel
@@ -552,14 +605,24 @@ class Solver:
         b = sparse.csc_matrix((local_b, (i, j)))
         return a, b
 
-    def eigs(self, k=10):
+    def eigs(self, k: int = 10) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Compute linear finite-element method Laplace-Beltrami spectrum
+        Compute linear finite-element method Laplace-Beltrami spectrum.
 
-        :return:    eigenvalues     array: k Laplace eigenvalues, sorted.
-                                    For closed meshes, or Neumann boundary condition
-                                    0 will be first eigenvalue (with constant eigenfunction)
-                    eigenfunctions  array: (N x k) with k eigenfunctions (in the columns)
+        Note
+        ----
+        For closed meshes or Neumann boundary condition, 0 will be first
+        eigenvalue (with constant eigenfunction)
+
+        Parameters
+        ----------
+        k : int, optional
+            The desired number of eigenvalues and eigenvectors, by default 10
+
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            Eigenvalues, eigenfunctions
         """
         from scipy.sparse.linalg import LinearOperator, eigsh, splu
 
@@ -596,25 +659,30 @@ class Solver:
         )
         return eigenvalues, eigenvectors
 
-    def poisson(self, h=0.0, dtup=(), ntup=()):
+    def poisson(
+        self, h: float = 0.0, dtup: tuple = (), ntup: tuple = ()
+    ) -> np.ndarray:
         """
-        poissonSolver solves the poisson equation with boundary conditions
-               based on the A and B Laplace matrices:  A x = B h
+        Solves the poisson equation with boundary conditions based on the A and
+        B Laplace matrices:  A x = B h
 
-        Inputs:   A - sparse sym. (n x n) positive semi definite numpy matrix
-                  B - sparse sym. (n x n) positive definite numpy matrix (inner product)
-                      A and B are obtained via computeAB for either triangle or tet mesh
-        Optional:
-                  h - right hand side, can be constant or array with vertex values
-                      Default: 0.0 (Laplace equation A x = 0)
-                  dtup - Dirichlet boundary condition as a tuple.
-                         Tuple contains index and data arrays of same length.
-                         Default: no Dirichlet condition
-                  ntup - Neumann boundary condition as a tuple.
-                         Tuple contains index and data arrays of same length.
-                         Default: Neumann on all boundaries
+        Parameters
+        ----------
+        h : float, optional
+            right hand side, can be constant or array with vertex values, by
+            default 0.0 (Laplace equation A x = 0)
+        dtup : tuple, optional
+            Dirichlet boundary condition as a tuple. Tuple contains index and
+            data arrays of same length, by default () (no Dirichlet condition)
+        ntup : tuple, optional
+            Neumann boundary condition as a tuple. Tuple contains index and
+            data arrays of same length, by default () (Neumann on all
+            boundaries)
 
-        Outputs:  x - array with vertex values of solution
+        Returns
+        -------
+        np.ndarray
+            Vertex values of solution
         """
         from scipy.sparse.linalg import splu
 
@@ -630,7 +698,8 @@ class Solver:
             or self.stiffness.shape[1] != dim
         ):
             raise ValueError(
-                "Error: Square input matrices should have same number of rows and columns"
+                "Error: Square input matrices should have same number of rows \
+                    and columns"
             )
         # create vector h
         if np.isscalar(h):
@@ -652,7 +721,8 @@ class Solver:
                 raise ValueError("dtup indices need to be unique")
             if not (len(didx) > 0 and len(didx) == len(ddat)):
                 raise ValueError(
-                    "dtup should contain index and data arrays (same lengths > 0)"
+                    "dtup should contain index and data arrays (same lengths >\
+                         0)"
                 )
             dvec = sparse.csc_matrix(
                 (ddat, (didx, np.zeros(len(didx), dtype=np.uint32))), (dim, 1)
@@ -667,7 +737,8 @@ class Solver:
             ndat = ntup[1]
             if not (len(nidx) > 0 and len(nidx) == len(ndat)):
                 raise ValueError(
-                    "dtup should contain index and data arrays (same lengths > 0)"
+                    "dtup should contain index and data arrays (same lengths >\
+                         0)"
                 )
             nvec = sparse.csc_matrix(
                 (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1)

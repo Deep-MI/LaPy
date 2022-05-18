@@ -1,7 +1,8 @@
 import numpy as np
 from scipy import sparse
-from .TriaMesh import TriaMesh
+
 from .Solver import Solver
+from .TriaMesh import TriaMesh
 
 
 def compute_gradient(geom, vfunc):
@@ -50,7 +51,8 @@ def compute_geodesic_f(geom, vfunc):
     gradnorm = np.nan_to_num(gradnorm)
     divf = compute_divergence(geom, gradnorm)
     fem = Solver(geom, lump=True)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here:
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
     vf = fem.poisson(divf)
     vf -= min(vf)
@@ -77,8 +79,9 @@ def tria_compute_geodesic_f(tria, vfunc):
     gradnorm = np.nan_to_num(gradnorm)
     divf = tria_compute_divergence(tria, gradnorm)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
-    # div is the integrated divergence (so it is already B*div)
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here: div is the integrated divergence (so it is
+    # already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0])
     vf = fem.poisson(divf)
     vf -= min(vf)
@@ -132,7 +135,8 @@ def tria_compute_gradient(tria, vfunc):
 
 def tria_compute_divergence(tria, tfunc):
     """
-    Computes integrated divergence of a 3d triangle function f (for each vertex)
+    Computes integrated divergence of a 3d triangle function f (for each
+    vertex).
 
     Inputs:    v           vertices
                t           triangles
@@ -170,7 +174,8 @@ def tria_compute_divergence(tria, tfunc):
     x0 = ((c2 - c1) * tfunc).sum(1)
     x1 = ((c0 - c2) * tfunc).sum(1)
     x2 = ((c1 - c0) * tfunc).sum(1)
-    # use sparse matrix to add multiple entries of each tria at each of its vertices
+    # use sparse matrix to add multiple entries of each tria at each of its
+    # vertices
     i = np.column_stack((tria.t[:, 0], tria.t[:, 1], tria.t[:, 2])).reshape(-1)
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
@@ -186,7 +191,8 @@ def tria_compute_divergence(tria, tfunc):
 # another way to compute divergence using cross products
 def tria_compute_divergence2(tria, tfunc):
     """
-    Computes integrated divergence of a 3d triangle function f (for each vertex)
+    Computes integrated divergence of a 3d triangle function f (for each
+    vertex).
 
     Inputs:    v           vertices
                t           triangles
@@ -252,8 +258,9 @@ def tria_compute_rotated_f(tria, vfunc):
     gradf = np.cross(tn, gradf)
     divf = tria_compute_divergence(tria, gradf)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
-    # div is the integrated divergence (so it is already B*div)
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here: div is the integrated divergence (so it is
+    # already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     vf = fem.poisson(divf)
     return vf
@@ -273,11 +280,11 @@ def tria_mean_curvature_flow(
 
     Outputs:  TriaMesh - TriaMesh object (vertices and triangles)
 
-    This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
-    made non-singular" which uses the Laplace-Beltrami operator but keeps the
-    stiffness matrix (A) fixed and only adjusts the mass matrix (B) during the
-    steps. It will normalize surface area of the mesh and translate the barycenter
-    to the origin. Closed meshes will map to the unit sphere.
+    This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow
+    be made non-singular" which uses the Laplace-Beltrami operator but keeps
+    the stiffness matrix (A) fixed and only adjusts the mass matrix (B) during
+    the steps. It will normalize surface area of the mesh and translate the
+    barycenter to the origin. Closed meshes will map to the unit sphere.
     """
     if use_cholmod:
         try:
@@ -413,7 +420,8 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # for ev2 and ev3 there could be also a swap of the two
     l22 = abs(cmax2[2] - cmin2[2])
     l32 = abs(cmax3[2] - cmin3[2])
-    # usually ev2 should be superior inferior, if ev3 is better in that direction, swap
+    # usually ev2 should be superior inferior, if ev3 is better in that
+    # direction, swap
     if l22 < l32:
         print("swapping direction 2 and 3")
         ev2, ev3 = ev3, ev2
@@ -510,9 +518,9 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         # sys.exit(1)
         raise ValueError("flipped area fraction should be below .0008")
 
-    # here we finally check also the spat vol (orthogonality of direction vectors)
-    # we could stop earlier, but most failure cases will be covered by the svol and
-    # flipped area which can be better interpreted than spatvol
+    # here we finally check also the spat vol (orthogonality of direction
+    # vectors). we could stop earlier, but most failure cases will be covered
+    # by the svol and flipped area which can be better interpreted than spatvol
     if spatvol < 0.6:
         print("ERROR: spat vol (orthogonality) should be above .6, exiting ..")
         # sys.exit(1)

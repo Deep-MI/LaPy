@@ -11,10 +11,9 @@ class TetMesh:
     A class representing a tetrahedral mesh.
     """
 
-    def __init__(self, vertices, tetra):
+    def __init__(self, v, t):
         """
-                Inputs:   v - vertices
-                  t - tetra
+        Initializes a new :class:`TetMesh` instance.
 
         Parameters
         ----------
@@ -31,9 +30,9 @@ class TetMesh:
         ValueError
             Max index exceeds number of vertices
         """
-        self.vertices = np.array(vertices)
-        self.tetra = np.array(tetra)
-        vnum = np.max(self.vertices.shape)
+        self.v = np.array(v)
+        self.t = np.array(t)
+        vnum = np.max(self.v.shape)
         if np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # put more checks here (e.g. the dim 3 conditions on columns)
@@ -42,11 +41,14 @@ class TetMesh:
 
     def construct_adj_sym(self):
         """
-        The adjacency matrix will be symmetric. Each inner
-        edge will get the number of tetrahedra that contain this edge.
-        Inner edges are usually 3 or larger, boundary, 2 or 1.
-        Works on tetras only.
-        :return:    symmetric adjacency matrix as csc sparse matrix
+        The adjacency matrix will be symmetric. Each inner edge will get the
+        number of tetrahedra that contain this edge. Inner edges are usually 3
+        or larger, boundary, 2 or 1. Works on tetras only.
+
+        Returns
+        -------
+        _type_
+            Symmetric adjacency matrix as csc sparse matrix
         """
         t1 = self.t[:, 0]
         t2 = self.t[:, 1]
@@ -61,33 +63,40 @@ class TetMesh:
         adj = sparse.csc_matrix((np.ones(i.shape), (i, j)))
         return adj
 
-    def has_free_vertices(self):
+    def has_free_vertices(self) -> bool:
         """
         Checks if the vertex list has more vertices than what is used in tetra
-        (same implementation as in TriaMesh)
-        :return:    bool
+        (same implementation as in TriaMesh).
+
+        Returns
+        -------
+        bool
+            Has free vertices or not
         """
-        vnum = np.max(self.vertices.shape)
+        vnum = np.max(self.v.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
         return vnum != vnumt
 
-    def is_oriented(self):
+    def is_oriented(self) -> bool:
         """
         Check if tet mesh is oriented. True if all tetrahedra are oriented
         so that v0,v1,v2 are oriented counterclockwise when looking from above,
         and v3 is on top of that triangle.
 
-        :return:   oriented       bool True if max(adj_directed)=1
+        Returns
+        -------
+        bool
+            Whether max(adj_directed)=1 or not
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t0 = self.t[:, 0]
         t1 = self.t[:, 1]
         t2 = self.t[:, 2]
         t3 = self.t[:, 3]
-        v0 = self.vertices[t0, :]
-        v1 = self.vertices[t1, :]
-        v2 = self.vertices[t2, :]
-        v3 = self.vertices[t3, :]
+        v0 = self.v[t0, :]
+        v1 = self.v[t1, :]
+        v2 = self.v[t2, :]
+        v3 = self.v[t3, :]
         e0 = v1 - v0
         e2 = v2 - v0
         e3 = v3 - v0
@@ -107,18 +116,19 @@ class TetMesh:
             print("Orientations are not uniform")
             return False
 
-    def avg_edge_length(self):
+    def avg_edge_length(self) -> float:
         """
-        Get average edge lengths in tet mesh
-        :return:    double  average edge length
+        Get average edge lengths in tet mesh.
+
+        Returns
+        -------
+        float
+            double  average edge length
         """
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
         edgelens = np.sqrt(
-            (
-                (self.vertices[triadj.row, :] - self.vertices[triadj.col, :])
-                ** 2
-            ).sum(1)
+            ((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1)
         )
         return edgelens.mean()
 
@@ -169,8 +179,8 @@ class TetMesh:
             alltidx = np.tile(np.arange(self.t.shape[0]), 4)
             tidx = alltidx[indices[count == 1]]
             triafunc = tetfunc[tidx]
-            return TriaMesh(self.vertices, tria), triafunc
-        return TriaMesh(self.vertices, tria)
+            return TriaMesh(self.v, tria), triafunc
+        return TriaMesh(self.v, tria)
 
     def rm_free_vertices_(self):
         """
@@ -193,7 +203,7 @@ class TetMesh:
             Max index exceeds number of vertices
         """
         tflat = self.t.reshape(-1)
-        vnum = np.max(self.vertices.shape)
+        vnum = np.max(self.v.shape)
         if np.max(tflat) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
@@ -205,34 +215,37 @@ class TetMesh:
         if len(vdel) == 0:
             return np.arange(vnum), []
         # delete unused vertices
-        vnew = self.vertices[vkeep, :]
+        vnew = self.v[vkeep, :]
         # create lookup table
         tlookup = np.cumsum(vkeep) - 1
         # reindex tria
         tnew = tlookup[self.t]
         # convert vkeep to index list
         vkeep = np.nonzero(vkeep)[0]
-        self.vertices = vnew
+        self.v = vnew
         self.t = tnew
         return vkeep, vdel
 
-    def orient_(self):
+    def orient_(self) -> int:
         """
         Ensure that tet mesh is oriented. Re-orient tetras so that
         v0,v1,v2 are oriented counterclockwise when looking from above,
         and v3 is on top of that triangle.
 
-        :return:    int     number of re-oriented tetras
+        Returns
+        -------
+        int
+            Number of re-oriented tetras
         """
         # Compute vertex coordinates and a difference vector for each tetra:
         t0 = self.t[:, 0]
         t1 = self.t[:, 1]
         t2 = self.t[:, 2]
         t3 = self.t[:, 3]
-        v0 = self.vertices[t0, :]
-        v1 = self.vertices[t1, :]
-        v2 = self.vertices[t2, :]
-        v3 = self.vertices[t3, :]
+        v0 = self.v[t0, :]
+        v1 = self.v[t1, :]
+        v2 = self.v[t2, :]
+        v3 = self.v[t3, :]
         e0 = v1 - v0
         e2 = v2 - v0
         e3 = v3 - v0
@@ -251,5 +264,5 @@ class TetMesh:
         tnew[negtet, 2] = temp
         onum = np.sum(negtet)
         print("Flipped " + str(onum) + " tetrahedra")
-        self.__init__(self.vertices, tnew)
+        self.__init__(self.v, tnew)
         return onum

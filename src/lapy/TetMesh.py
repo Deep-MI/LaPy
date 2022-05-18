@@ -11,17 +11,29 @@ class TetMesh:
     A class representing a tetrahedral mesh.
     """
 
-    def __init__(self, v, t):
+    def __init__(self, vertices, tetra):
         """
-        Inputs:   v - vertices   List of lists of 3 float coordinates
-                  t - tetra      List of lists of 4 int of indices (>=0) into v array
-                                 Ordering is important: so that t0,t1,t2 are oriented
-                                 counterclockwise when looking from above, and t3 is
-                                 on top of that triangle.
+                Inputs:   v - vertices
+                  t - tetra
+
+        Parameters
+        ----------
+        vertices : List[List[float, float, float]]
+            List of lists of 3 float coordinates
+        tetra : List[List[int, int, int, int]]
+            List of lists of 4 int of indices (>=0) into vertices array.
+            Ordering is important: so that t0,t1,t2 are oriented
+            counterclockwise when looking from above, and t3 is on top of that
+            triangle
+
+        Raises
+        ------
+        ValueError
+            Max index exceeds number of vertices
         """
-        self.v = np.array(v)
-        self.t = np.array(t)
-        vnum = np.max(self.v.shape)
+        self.vertices = np.array(vertices)
+        self.tetra = np.array(tetra)
+        vnum = np.max(self.vertices.shape)
         if np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # put more checks here (e.g. the dim 3 conditions on columns)
@@ -55,7 +67,7 @@ class TetMesh:
         (same implementation as in TriaMesh)
         :return:    bool
         """
-        vnum = np.max(self.v.shape)
+        vnum = np.max(self.vertices.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
         return vnum != vnumt
 
@@ -72,10 +84,10 @@ class TetMesh:
         t1 = self.t[:, 1]
         t2 = self.t[:, 2]
         t3 = self.t[:, 3]
-        v0 = self.v[t0, :]
-        v1 = self.v[t1, :]
-        v2 = self.v[t2, :]
-        v3 = self.v[t3, :]
+        v0 = self.vertices[t0, :]
+        v1 = self.vertices[t1, :]
+        v2 = self.vertices[t2, :]
+        v3 = self.vertices[t3, :]
         e0 = v1 - v0
         e2 = v2 - v0
         e3 = v3 - v0
@@ -103,25 +115,35 @@ class TetMesh:
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
         edgelens = np.sqrt(
-            ((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1)
+            (
+                (self.vertices[triadj.row, :] - self.vertices[triadj.col, :])
+                ** 2
+            ).sum(1)
         )
         return edgelens.mean()
 
     def boundary_tria(self, tetfunc=None):
         """
-        Get boundary triangle mesh of tetrahedra (can have multiple connected components).
-        Tria will have same vertices (including free vertices), so that the tria indices
-        agree with the tet-mesh, in case we want to transfer information back, e.g.
-        a FEM boundary condition, or to access a TetMesh vertex function with
-        TriaMesh.t indices.
+        Get boundary triangle mesh of tetrahedra (can have multiple connected
+        components). Tria will have same vertices (including free vertices), so
+        that the tria indices agree with the tet-mesh, in case we want to
+        transfer information back, e.g. a FEM boundary condition, or to access
+        a TetMesh vertex function with TriaMesh.t indices.
 
-        !! Note, that it seems to be returning non-oriented triangle meshes,
-        may need some debugging, until then use tria.orient_() after this. !!
+        Warning
+        -------
+        Seems to be returning non-oriented triangle meshes, may need some
+        debugging, until then use tria.orient_() after this.
 
-        Inputs:   tetfunc        List of tetra function values (optional)
+        Parameters
+        ----------
+        tetfunc : _type_, optional
+            List of tetra function values (optional), by default None
 
-        :return:  TriaMesh       TriaMesh of boundary (potentially >1 components)
-                  triafunc       List of tria function values (if tetfunc passed)
+        Returns
+        -------
+        Union[TriaMesh, Tuple[TriaMesh, Callable]]
+            TriaMesh of boundary (potentially >1 components)
         """
         from .TriaMesh import TriaMesh
 
@@ -147,23 +169,31 @@ class TetMesh:
             alltidx = np.tile(np.arange(self.t.shape[0]), 4)
             tidx = alltidx[indices[count == 1]]
             triafunc = tetfunc[tidx]
-            return TriaMesh(self.v, tria), triafunc
-        return TriaMesh(self.v, tria)
+            return TriaMesh(self.vertices, tria), triafunc
+        return TriaMesh(self.vertices, tria)
 
     def rm_free_vertices_(self):
         """
-        Remove unused (free) vertices from v and t. These are vertices that are not
-        used in any triangle. They can produce problems when constructing, e.g.,
-        Laplace matrices.
+        Remove unused (free) vertices from v and t. These are vertices that
+        are not used in any triangle. They can produce problems when
+        constructing, e.g., Laplace matrices.
 
-        Will update v and t in mesh.
-        Same implementation as in TriaMesh
+        Will update vertices and tetra in mesh.
+        Same implementation as in TriaMesh.
 
-        :return:    vkeep          Indices (from original list) of kept vertices
-                    vdel           Indices of deleted (unused) vertices
+        Returns
+        -------
+        Tuple[List[int], List[int]]
+            Indices (from original list) of kept vertices, Indices of deleted
+            (unused) vertices
+
+        Raises
+        ------
+        ValueError
+            Max index exceeds number of vertices
         """
         tflat = self.t.reshape(-1)
-        vnum = np.max(self.v.shape)
+        vnum = np.max(self.vertices.shape)
         if np.max(tflat) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
@@ -175,14 +205,14 @@ class TetMesh:
         if len(vdel) == 0:
             return np.arange(vnum), []
         # delete unused vertices
-        vnew = self.v[vkeep, :]
+        vnew = self.vertices[vkeep, :]
         # create lookup table
         tlookup = np.cumsum(vkeep) - 1
         # reindex tria
         tnew = tlookup[self.t]
         # convert vkeep to index list
         vkeep = np.nonzero(vkeep)[0]
-        self.v = vnew
+        self.vertices = vnew
         self.t = tnew
         return vkeep, vdel
 
@@ -199,10 +229,10 @@ class TetMesh:
         t1 = self.t[:, 1]
         t2 = self.t[:, 2]
         t3 = self.t[:, 3]
-        v0 = self.v[t0, :]
-        v1 = self.v[t1, :]
-        v2 = self.v[t2, :]
-        v3 = self.v[t3, :]
+        v0 = self.vertices[t0, :]
+        v1 = self.vertices[t1, :]
+        v2 = self.vertices[t2, :]
+        v3 = self.vertices[t3, :]
         e0 = v1 - v0
         e2 = v2 - v0
         e3 = v3 - v0
@@ -221,5 +251,5 @@ class TetMesh:
         tnew[negtet, 2] = temp
         onum = np.sum(negtet)
         print("Flipped " + str(onum) + " tetrahedra")
-        self.__init__(self.v, tnew)
+        self.__init__(self.vertices, tnew)
         return onum

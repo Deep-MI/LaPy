@@ -1,15 +1,23 @@
+"""
+Definition of the :class:`Solver` class.
+"""
+import sys
 from typing import Tuple, Union
 
 import numpy as np
 from scipy import sparse
 
+from lapy import messages
+from lapy.configuration import ta00, ta11, ta22, tb
 from lapy.TetMesh import TetMesh
 from lapy.TriaMesh import TriaMesh
+from lapy.utils import test_skparse
 
 
 class Solver:
-    """A class representing a linear FEM solver for:
-    Laplace Eigenvalue problems and Poisson Equation
+    """
+    A class representing a linear FEM solver for Laplace Eigenvalue problems
+    and Poisson Equation.
 
     Inputs can be geometry classes which have vertices and elements.
     Currently TriaMesh and TetMesh are implemented.
@@ -61,8 +69,8 @@ class Solver:
         ValueError
             Unknown geometry
         """
-        self.use_cholmod = use_cholmod
-        if type(geometry).__name__ == "TriaMesh":
+        self.use_cholmod = test_skparse() and use_cholmod
+        if isinstance(geometry, TriaMesh):
             if aniso is not None:
                 # anisotropic Laplace
                 print("TriaMesh with anisotropic Laplace-Beltrami")
@@ -70,15 +78,10 @@ class Solver:
                 # Diag mat to specify anisotropy strength
                 if isinstance(aniso, (list, tuple, set, np.ndarray)):
                     if len(aniso) != 2:
-                        raise ValueError(
-                            "aniso should be scalar or tuple/array of length \
-                                2!"
-                        )
-                    aniso0 = aniso[0]
-                    aniso1 = aniso[1]
+                        raise ValueError(messages.INVALID_ANISO_VALUE)
+                    aniso0, aniso1 = aniso
                 else:
-                    aniso0 = aniso
-                    aniso1 = aniso
+                    aniso0 = aniso1 = aniso
                 aniso_mat = np.empty((geometry.t.shape[0], 2))
                 aniso_mat[:, 1] = np.exp(-aniso1 * np.abs(c1))
                 aniso_mat[:, 0] = np.exp(-aniso0 * np.abs(c2))
@@ -86,13 +89,14 @@ class Solver:
             else:
                 print("TriaMesh with regular Laplace-Beltrami")
                 a, b = self._fem_tria(geometry, lump)
-        elif type(geometry).__name__ == "TetMesh":
+        elif isinstance(geometry, TetMesh):
             print("TetMesh with regular Laplace")
             a, b = self._fem_tetra(geometry, lump)
         else:
-            raise ValueError(
-                'Geometry type "' + type(geometry).__name__ + '" unknown'
+            message = messages.INVALID_GEOMETRY_TYPE.format(
+                geometry=type(geometry)
             )
+            raise ValueError(message)
         self.stiffness = a
         self.mass = b
         self.geotype = type(geometry)
@@ -125,8 +129,6 @@ class Solver:
             sparse sym. (n x n) positive semi definite numpy matrix,
             sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
-        import sys
-
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -214,8 +216,6 @@ class Solver:
             sparse sym. (n x n) positive semi definite numpy matrix,
             sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
-        import sys
-
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -502,8 +502,8 @@ class Solver:
 
         Parameters
         ----------
-        tria : TriaMesh
-            Triangular mesh instance
+        vox : Mesh
+            Mesh instance
         lump : bool, optional
             Whether to lump the mass matrix (diagonal), by default False
 
@@ -514,61 +514,6 @@ class Solver:
             sparse sym. (n x n) positive definite numpy matrix (inner product)
         """
         tnum = vox.t.shape[0]
-        # Linear local matrices on unit voxel
-        tb = (
-            np.array(
-                [
-                    [8.0, 4.0, 2.0, 4.0, 4.0, 2.0, 1.0, 2.0],
-                    [4.0, 8.0, 4.0, 2.0, 2.0, 4.0, 2.0, 1.0],
-                    [2.0, 4.0, 8.0, 4.0, 1.0, 2.0, 4.0, 2.0],
-                    [4.0, 2.0, 4.0, 8.0, 2.0, 1.0, 2.0, 4.0],
-                    [4.0, 2.0, 1.0, 2.0, 8.0, 4.0, 2.0, 4.0],
-                    [2.0, 4.0, 2.0, 1.0, 4.0, 8.0, 4.0, 2.0],
-                    [1.0, 2.0, 4.0, 2.0, 2.0, 4.0, 8.0, 4.0],
-                    [2.0, 1.0, 2.0, 4.0, 4.0, 2.0, 4.0, 8.0],
-                ]
-            )
-            / 216.0
-        )
-        x = 1.0 / 9.0
-        y = 1.0 / 18.0
-        z = 1.0 / 36.0
-        ta00 = np.array(
-            [
-                [x, -x, -y, y, y, -y, -z, z],
-                [-x, x, y, -y, -y, y, z, -z],
-                [-y, y, x, -x, -z, z, y, -y],
-                [y, -y, -x, x, z, -z, -y, y],
-                [y, -y, -z, z, x, -x, -y, y],
-                [-y, y, z, -z, -x, x, y, -y],
-                [-z, z, y, -y, -y, y, x, -x],
-                [z, -z, -y, y, y, -y, -x, x],
-            ]
-        )
-        ta11 = np.array(
-            [
-                [x, y, -y, -x, y, z, -z, -y],
-                [y, x, -x, -y, z, y, -y, -z],
-                [-y, -x, x, y, -z, -y, y, z],
-                [-x, -y, y, x, -y, -z, z, y],
-                [y, z, -z, -y, x, y, -y, -x],
-                [z, y, -y, -z, y, x, -x, -y],
-                [-z, -y, y, z, -y, -x, x, y],
-                [-y, -z, z, y, -x, -y, y, x],
-            ]
-        )
-        ta22 = np.array(
-            [
-                [x, y, z, y, -x, -y, -z, -y],
-                [y, x, y, z, -y, -x, -y, -z],
-                [z, y, x, y, -z, -y, -x, -y],
-                [y, z, y, x, -y, -z, -y, -x],
-                [-x, -y, -z, -y, x, y, z, y],
-                [-y, -x, -y, -z, y, x, y, z],
-                [-z, -y, -x, -y, z, y, x, y],
-                [-y, -z, -y, -x, y, z, y, x],
-            ]
-        )
         # here we assume all voxels have the same dimensions (side lengths)
         v0 = vox.v[vox.t[0, 0], :]
         v1 = vox.v[vox.t[0, 1], :]
@@ -605,7 +550,9 @@ class Solver:
         b = sparse.csc_matrix((local_b, (i, j)))
         return a, b
 
-    def eigs(self, k: int = 10) -> Tuple[np.ndarray, np.ndarray]:
+    def eigs(
+        self, k: int = 10, sigma: float = -0.01
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Compute linear finite-element method Laplace-Beltrami spectrum.
 
@@ -618,6 +565,8 @@ class Solver:
         ----------
         k : int, optional
             The desired number of eigenvalues and eigenvectors, by default 10
+        sigma : float, optional
+            Sigma value used by the solver
 
         Returns
         -------
@@ -627,20 +576,10 @@ class Solver:
         from scipy.sparse.linalg import LinearOperator, eigsh, splu
 
         if self.use_cholmod:
-            try:
-                from sksparse.cholmod import cholesky
-            except ImportError:
-                self.use_cholmod = False
+            from sksparse.cholmod import cholesky
 
-        if self.use_cholmod:
-            print(
-                "Solver: Cholesky decomposition from scikit-sparse cholmod ..."
-            )
-        else:
-            print("Solver: spsolve (LU decomposition) ...")
-            # turns out it is much faster to use cholesky and pass operator
-        sigma = -0.01
-        if self.use_cholmod:
+            print(messages.CHOLESKY_SOLVER)
+
             chol = cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=chol,
@@ -648,6 +587,7 @@ class Solver:
                 dtype=self.stiffness.dtype,
             )
         else:
+            print(messages.LU_SOLVER)
             lu = splu(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=lu.solve,
@@ -686,44 +626,31 @@ class Solver:
         """
         from scipy.sparse.linalg import splu
 
-        if self.use_cholmod:
-            try:
-                from sksparse.cholmod import cholesky
-            except ImportError:
-                self.use_cholmod = False
         # check matrices
         dim = self.stiffness.shape[0]
         if (
             self.stiffness.shape != self.mass.shape
             or self.stiffness.shape[1] != dim
         ):
-            raise ValueError(
-                "Error: Square input matrices should have same number of rows \
-                    and columns"
-            )
+            raise ValueError(messages.NOT_SQUARE)
         # create vector h
         if np.isscalar(h):
             h = np.full((dim, 1), h, dtype="float64")
         elif (not np.isscalar(h)) and h.size != dim:
-            raise ValueError(
-                "h should be either scalar or column vector with row num of A"
-            )
+            raise ValueError(messages.INVALID_POISSON_H)
         # create vector d
         didx = []
         dvec = []
         ddat = []
         if dtup:
             if len(dtup) != 2:
-                raise ValueError("dtup should contain index and data arrays")
+                raise ValueError(messages.BAD_DTUP_NTUP)
             didx = dtup[0]
             ddat = dtup[1]
-            if np.unique(didx).size != len(didx):
-                raise ValueError("dtup indices need to be unique")
-            if not (len(didx) > 0 and len(didx) == len(ddat)):
-                raise ValueError(
-                    "dtup should contain index and data arrays (same lengths >\
-                         0)"
-                )
+            not_unique = np.unique(didx).size != len(didx)
+            bad_length = not (len(didx) > 0 and len(didx) == len(ddat))
+            if not_unique or bad_length:
+                raise ValueError(messages.BAD_DTUP_NTUP)
             dvec = sparse.csc_matrix(
                 (ddat, (didx, np.zeros(len(didx), dtype=np.uint32))), (dim, 1)
             )
@@ -732,14 +659,12 @@ class Solver:
         nvec = 0
         if ntup:
             if len(ntup) != 2:
-                raise ValueError("ntup should contain index and data arrays")
+                raise ValueError(messages.BAD_DTUP_NTUP)
             nidx = ntup[0]
             ndat = ntup[1]
-            if not (len(nidx) > 0 and len(nidx) == len(ndat)):
-                raise ValueError(
-                    "dtup should contain index and data arrays (same lengths >\
-                         0)"
-                )
+            bad_length = not (len(nidx) > 0 and len(nidx) == len(ndat))
+            if bad_length:
+                raise ValueError(messages.BAD_DTUP_NTUP)
             nvec = sparse.csc_matrix(
                 (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1)
             )
@@ -763,19 +688,19 @@ class Solver:
                 a = self.stiffness[mask, :].tocrc()
                 a = a[:, mask]
             else:
-                raise ValueError("A matrix needs to be sparse CSC or CSR")
+                raise ValueError(messages.BAD_STIFFNESS_FORMAT)
         else:
             a = self.stiffness
         # solve A x = b
-        print("Matrix Format now: " + a.getformat())
+        print(f"Matrix Format now: {a.getformat()}")
         if self.use_cholmod:
-            print(
-                "Solver: Cholesky decomposition from scikit-sparse cholmod ..."
-            )
+            from sksparse.cholmod import cholesky
+
+            print(messages.CHOLESKY_SOLVER)
             chol = cholesky(a)
             x = chol(b)
         else:
-            print("Solver: spsolve (LU decomposition) ...")
+            print(messages.LU_SOLVER)
             lu = splu(a)
             x = lu.solve(b.astype(np.float32))
         x = np.squeeze(np.array(x))

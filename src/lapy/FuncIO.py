@@ -41,13 +41,14 @@ def import_vfunc(filename):
     """
 
     import re
+
     import numpy as np
 
     try:
         with open(filename) as f:
             txt = f.readlines()
     except IOError:
-        print("[File " + infile + " not found or not readable]")
+        print("[File " + filename + " not found or not readable]")
         return
 
     txt = [x.strip() for x in txt]

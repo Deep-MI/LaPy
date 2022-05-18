@@ -9,3 +9,10 @@ __pycache__/
 # Virtual environment directory
 venv/
 .venv/
+
+dist/
+build/
+*.egg-info/
+
+.tox/
+.coverage

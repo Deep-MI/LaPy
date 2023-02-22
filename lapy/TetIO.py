@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+#
+# Original Author: Martin Reuter
+# Date: Jul-5-2018
+#
+
 import os.path
 
 import numpy as np
@@ -5,19 +12,9 @@ import numpy as np
 from .TetMesh import TetMesh
 
 
-def import_gmsh(infile: str) -> TetMesh:
+def import_gmsh(infile):
     """
-    Load GMSH tetrahedron mesh.
-
-    Parameters
-    ----------
-    infile : str
-        Path to *.gmsh* file
-
-    Returns
-    -------
-    TetMesh
-        Tetrahedron mesh
+    Load GMSH tetrahedron mesh
     """
     extension = os.path.splitext(infile)[1]
     verbose = 1
@@ -65,7 +62,7 @@ def import_gmsh(infile: str) -> TetMesh:
         f.close()
         return
     pnum = int(f.readline())
-    # read (nodes X 4) matrix as chunk
+    # read (nodes X 4) matrix as chunck
     # drop first column
     v = np.fromfile(f, "float32", 4 * pnum, " ")
     v.shape = (pnum, 4)
@@ -93,7 +90,7 @@ def import_gmsh(infile: str) -> TetMesh:
     # read (nodes X ?) matrix
     t = np.fromfile(f, "int", tnum * len(larr), " ")
     t.shape = (tnum, len(larr))
-    t = np.delete(t, np.s_[: len(larr) - 4], 1)
+    t = np.delete(t, np.s_[0 : len(larr) - 4], 1)
     line = f.readline()
     if not line.startswith("$EndElements"):
         print("Line: ", line, " \n")
@@ -111,19 +108,9 @@ def import_gmsh(infile: str) -> TetMesh:
     return TetMesh(v, t)
 
 
-def import_vtk(infile: str) -> TetMesh:
+def import_vtk(infile):
     """
-    Load VTK tetrahedron mesh.
-
-    Parameters
-    ----------
-    infile : str
-        Path to *.vtk* file
-
-    Returns
-    -------
-    TetMesh
-        Tetrahedron mesh
+    Load VTK tetrahedron mesh
     """
     verbose = 1
     if verbose > 0:
@@ -154,8 +141,7 @@ def import_vtk(infile: str) -> TetMesh:
         print(
             "[read: "
             + line
-            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> \
-                FAILED\n"
+            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> FAILED\n"
         )
         return
     # read number of points

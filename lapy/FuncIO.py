@@ -48,7 +48,7 @@ def import_vfunc(filename):
         with open(filename) as f:
             txt = f.readlines()
     except IOError:
-        print("[File " + filename + " not found or not readable]")
+        print("[File " + infile + " not found or not readable]")
         return
 
     txt = [x.strip() for x in txt]

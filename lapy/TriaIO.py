@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+
+
 import numpy as np
 
 from .TriaMesh import TriaMesh
@@ -12,9 +16,9 @@ def import_fssurf(infile):
     if verbose > 0:
         print("--> FS Surf format     ... ")
     try:
-        # here we use our copy to also support surfaces from dev (and maybe
-        # v7*?) these have an empty line and mess up Nibabel once this is fixed
-        # in nibabel we can switch back
+        # here we use our copy to also support surfaces from dev (and maybe v7*?)
+        # these have an empty line and mess up Nibabel
+        # once this is fixed in nibabel we can switch back
         from .read_geometry import read_geometry
 
         surf = read_geometry(infile, read_metadata=True)
@@ -111,8 +115,7 @@ def import_vtk(infile):
         print(
             "[read: "
             + line
-            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> \
-                FAILED\n"
+            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> FAILED\n"
         )
         return
     # read number of points
@@ -245,6 +248,7 @@ def import_gmsh(infile):
         26: "line4",
         36: "quad16",
     }
+    _meshio_to_gmsh_type = {v: k for k, v in _gmsh_to_meshio_type.items()}
 
     verbose = 1
     if verbose > 0:

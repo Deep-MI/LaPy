@@ -97,7 +97,7 @@ class TriaMesh:
         containing the triangle indices (only for non-manifold meshes)
         Operates only on triangles.
         :return:    Sparse CSC matrix
-                    Similar ot adj_dir, but stores the tria idx+1 instead
+                    Similar to adj_dir, but stores the tria idx+1 instead
                     of one in the matrix (allows lookup of vertex to tria).
         """
         if not self.is_oriented():
@@ -126,7 +126,7 @@ class TriaMesh:
         """
         Check if triangle mesh is manifold (no edges with >2 triangles)
         Operates only on triangles
-        :return:   manifold       bool True if no edges wiht > 2 triangles
+        :return:   manifold       bool True if no edges with > 2 triangles
         """
         return np.max(self.adj_sym.data) <= 2
 
@@ -635,7 +635,7 @@ class TriaMesh:
 
     def curvature_tria(self, smoothit: int = 3):
         """
-        Compute min and max curvature and directions (orthognal and in tria
+        Compute min and max curvature and directions (orthogonal and in tria
         plane) for each triangle. First we compute these values on vertices
         and then smooth there. Finally they get mapped to the trias (averaging)
         and projected onto the triangle plane, and orthogonalized.

@@ -65,7 +65,7 @@ def import_gmsh(infile: str) -> TetMesh:
         f.close()
         return
     pnum = int(f.readline())
-    # read (nodes X 4) matrix as chunck
+    # read (nodes X 4) matrix as chunk
     # drop first column
     v = np.fromfile(f, "float32", 4 * pnum, " ")
     v.shape = (pnum, 4)

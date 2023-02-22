@@ -75,7 +75,7 @@ def spherical_conformal_map(tria: TriaMesh):
         + sparse.csc_matrix(((1, 1, 1), (fixed, fixed)), shape=(nv, nv))
     )
 
-    # find embedding of the bigtria (bounary condition later)
+    # find embedding of the bigtria (boundary condition later)
     # arbitrarily set first two points
     x0, y0, x1, y1 = 0, 0, 1, 0
     a = tria.v[p1, :] - tria.v[p0, :]

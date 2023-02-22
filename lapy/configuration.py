@@ -1,6 +1,5 @@
-"""
-Configuration for various execution options and defaults.
-"""
+"""Configuration for various execution options and defaults."""
+
 import numpy as np
 
 SHAPEDNA_DEFAULTS: dict = {"Refine": 0, "Degree": 1}

@@ -58,7 +58,6 @@ def import_vfunc(filename):
     txt = [re.sub("[{()}]", "", x) for x in txt]
 
     if len(txt) == 1:
-
         txt = [re.split("[,;]", x) for x in txt][0]
 
     txt = [np.float(x) for x in txt]

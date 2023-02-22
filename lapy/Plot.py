@@ -186,7 +186,6 @@ def plot_tet_mesh(
     showcaxis=False,
     caxis=None,
 ):
-
     """
     this is a function to plot tetra meshes
 
@@ -216,7 +215,6 @@ def plot_tet_mesh(
 
     # evaluate cutting criteria
     if cutting is not None:
-
         # check inputs
         if type(cutting) is not list:
             cutting = [cutting]

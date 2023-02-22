@@ -43,6 +43,7 @@ dependencies = [
     'nibabel',
     'numpy>=1.21',
     'plotly',
+    'psutil',
     'scipy',
 ]
 

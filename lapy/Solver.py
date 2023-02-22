@@ -1,6 +1,5 @@
-"""
-Definition of the :class:`Solver` class.
-"""
+"""Definition of the :class:`Solver` class."""
+
 import sys
 from typing import Tuple, Union
 
@@ -11,7 +10,7 @@ from lapy import messages
 from lapy.configuration import ta00, ta11, ta22, tb
 from lapy.TetMesh import TetMesh
 from lapy.TriaMesh import TriaMesh
-from lapy.utils import test_skparse
+from lapy.utils._imports import import_optional_dependency
 
 
 class Solver:
@@ -69,7 +68,6 @@ class Solver:
         ValueError
             Unknown geometry
         """
-        self.use_cholmod = test_skparse() and use_cholmod
         if isinstance(geometry, TriaMesh):
             if aniso is not None:
                 # anisotropic Laplace
@@ -575,12 +573,10 @@ class Solver:
         """
         from scipy.sparse.linalg import LinearOperator, eigsh, splu
 
-        if self.use_cholmod:
-            from sksparse.cholmod import cholesky
-
+        sksparse = import_optional_dependency("sksparse", raise_error=False)
+        if sksparse is not None:
             print(messages.CHOLESKY_SOLVER)
-
-            chol = cholesky(self.stiffness - sigma * self.mass)
+            chol = sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=chol,
                 shape=self.stiffness.shape,
@@ -693,11 +689,10 @@ class Solver:
             a = self.stiffness
         # solve A x = b
         print(f"Matrix Format now: {a.getformat()}")
-        if self.use_cholmod:
-            from sksparse.cholmod import cholesky
-
+        sksparse = import_optional_dependency("sksparse", raise_error=False)
+        if sksparse is not None:
             print(messages.CHOLESKY_SOLVER)
-            chol = cholesky(a)
+            chol = sksparse.cholmod.cholesky(a)
             x = chol(b)
         else:
             print(messages.LU_SOLVER)

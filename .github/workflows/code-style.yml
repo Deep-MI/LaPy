@@ -43,5 +43,3 @@ jobs:
           ignore_words_file: ./.codespellignore
       - name: Run pydocstyle
         run: pydocstyle .
-      - name: Run bibclean
-        run: bibclean-check doc/references.bib

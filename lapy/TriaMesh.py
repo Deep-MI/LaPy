@@ -5,9 +5,7 @@ from scipy import sparse
 
 
 class TriaMesh:
-    """
-    A class representing a triangle mesh.
-    """
+    """A class representing a triangle mesh."""
 
     def __init__(
         self,
@@ -16,7 +14,7 @@ class TriaMesh:
         fsinfo=None,
     ):
         """
-        Initializes a new :class:`TriaMesh` instance.
+        Initialize a new :class:`TriaMesh` instance.
 
         Parameters
         ----------
@@ -51,7 +49,7 @@ class TriaMesh:
 
     def _construct_adj_sym(self):
         """
-        Constructs symmetric adjacency matrix (edge graph) of triangle mesh t
+        Construct symmetric adjacency matrix (edge graph) of triangle mesh t
         Operates only on triangles.
         :return:    Sparse symmetric CSC matrix
                     The non-directed adjacency matrix
@@ -73,7 +71,7 @@ class TriaMesh:
 
     def _construct_adj_dir(self):
         """
-        Constructs directed adjacency matrix (edge graph) of triangle mesh t
+        Construct directed adjacency matrix (edge graph) of triangle mesh t
         Operates only on triangles.
         :return:    Sparse CSC matrix
                     The directed adjacency matrix is not symmetric if
@@ -95,7 +93,7 @@ class TriaMesh:
 
     def construct_adj_dir_tidx(self):
         """
-        Constructs directed adjacency matrix (edge graph) of triangle mesh t
+        Construct directed adjacency matrix (edge graph) of triangle mesh t
         containing the triangle indices (only for non-manifold meshes)
         Operates only on triangles.
         :return:    Sparse CSC matrix
@@ -117,8 +115,8 @@ class TriaMesh:
         return sparse.csc_matrix((dat, (i, j)), shape=(n, n))
 
     def is_closed(self):
-        """
-        Check if triangle mesh is closed (no boundary edges)
+        """Check if triangle mesh is closed (no boundary edges)
+
         Operates only on triangles
         :return:   closed         bool True if no boundary edges in adj matrix
         """
@@ -142,8 +140,8 @@ class TriaMesh:
         return np.max(self.adj_dir.data) == 1
 
     def euler(self):
-        """
-        Computes the Euler Characteristic (=#V-#E+#T)
+        """Compute the Euler Characteristic (=#V-#E+#T)
+
         Operates only on triangles
         :return:   euler          Euler Characteristic (2=sphere,0=torus)
         """

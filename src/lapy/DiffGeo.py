@@ -1,7 +1,8 @@
 import numpy as np
 from scipy import sparse
-from .TriaMesh import TriaMesh
+
 from .Solver import Solver
+from .TriaMesh import TriaMesh
 
 
 def compute_gradient(geom, vfunc):
@@ -26,29 +27,38 @@ def compute_rotated_f(geom, vfunc):
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
     else:
-        raise ValueError('Geometry type "' + type(geom).__name__ + '" not implemented')
+        raise ValueError(
+            'Geometry type "' + type(geom).__name__ + '" not implemented'
+        )
 
 
 def compute_geodesic_f(geom, vfunc):
     """
     Computes function with normalized gradient (geodesic distance)
-
-    Inputs:     geom        geometry either TriaMesh, TetMesh
-                vfunc       scalar function at vertices
-
-    :return:    vfunc       scalar geodesic function at vertices
-
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat" for triangles.
+
+    Parameters
+    ----------
+    geom : Union[TriaMesh, TetMesh]
+        Geometry instance
+    vfunc : _type_
+        Scalar function at vertices
+
+    Returns
+    -------
+    _type_
+        Scalar geodesic function at vertices
     """
     gradf = compute_gradient(geom, vfunc)
     # normalize gradient
-    gradnorm = gradf / np.sqrt((gradf ** 2).sum(1))[:, np.newaxis]
+    gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
     gradnorm = np.nan_to_num(gradnorm)
     divf = compute_divergence(geom, gradnorm)
     fem = Solver(geom, lump=True)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here:
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
     vf = fem.poisson(divf)
     vf -= min(vf)
@@ -57,26 +67,32 @@ def compute_geodesic_f(geom, vfunc):
 
 def tria_compute_geodesic_f(tria, vfunc):
     """
-    Computes function with normalized gradient (geodesic distance)
-
-    Inputs:    v           vertices
-               t           triangles
-               vfunc       scalar function at vertices
-
-    Outputs:   vfunc       scalar geodesic function at vertices
-
+    Computes function with normalized gradient (geodesic distance).
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat".
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    vfunc : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        Scalar geodesic function at vertices
     """
     gradf = tria_compute_gradient(tria, vfunc)
     # normalize gradient
-    gradnorm = gradf / np.sqrt((gradf ** 2).sum(1))[:, np.newaxis]
+    gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
     gradnorm = np.nan_to_num(gradnorm)
     divf = tria_compute_divergence(tria, gradnorm)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
-    # div is the integrated divergence (so it is already B*div)
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here: div is the integrated divergence (so it is
+    # already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0])
     vf = fem.poisson(divf)
     vf -= min(vf)
@@ -86,26 +102,33 @@ def tria_compute_geodesic_f(tria, vfunc):
 # note , numexpr could speed up the following functions if necessary
 def tria_compute_gradient(tria, vfunc):
     """
-    Computes gradient of a vertex function f (for each triangle)
-
-    Inputs:    v           vertices
-               t           triangles
-               vfunc       scalar function at vertices
-
-    Outputs:   tfunc       3d vector function of gradient at triangles
-
+    Computes gradient of a vertex function f (for each triangle).
     grad(f) = [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A)
             = [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
     for triangle (vi,vj,vk) with area A, where (.)' is 90 degrees rotated
     edge, which is equal to cross(n,vec).
 
+    Note
+    ----
     Good background to read:
     http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
     Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
       http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
-    Desbrun ...
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    vfunc : _type_
+        Scalar function at vertices
+
+    Returns
+    -------
+    _type_
+        3d vector function of gradient at triangles
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -127,22 +150,31 @@ def tria_compute_gradient(tria, vfunc):
     return tfunc
 
 
-def tria_compute_divergence(tria, tfunc):
+def tria_compute_divergence(tria: TriaMesh, tfunc):
     """
-    Computes integrated divergence of a 3d triangle function f (for each vertex)
-
-    Inputs:    v           vertices
-               t           triangles
-               tfunc       3d vector field on triangles
-
-    Outputs:   vfunc       scalar function of divergence at vertices
-
+    Computes integrated divergence of a 3d triangle function f (for each
+    vertex).
     Divergence is the flux density leaving or entering a point.
 
-    Note: this is the integrated divergence, you may want to multiply
-    with B^-1 to get back the function in some applications
+    Note
+    ----
+    This is the integrated divergence, you may want to multiply with B^-1 to
+    get back the function in some applications.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    tfunc : _type_
+        3d vector field on triangles
+
+    Returns
+    -------
+    _type_
+        Scalar function of divergence at vertices
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -166,35 +198,49 @@ def tria_compute_divergence(tria, tfunc):
     x0 = ((c2 - c1) * tfunc).sum(1)
     x1 = ((c0 - c2) * tfunc).sum(1)
     x2 = ((c1 - c0) * tfunc).sum(1)
-    # use sparse matrix to add multiple entries of each tria at each of its vertices
+    # use sparse matrix to add multiple entries of each tria at each of its
+    # vertices
     i = np.column_stack((tria.t[:, 0], tria.t[:, 1], tria.t[:, 2])).reshape(-1)
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
     # convert back to nparray 1D
-    vfunc = np.squeeze(np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype))
+    vfunc = np.squeeze(
+        np.asarray(
+            0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype
+        )
+    )
     return vfunc
 
 
 # another way to compute divergence using cross products
-def tria_compute_divergence2(tria, tfunc):
+def tria_compute_divergence2(tria: TriaMesh, tfunc):
     """
-    Computes integrated divergence of a 3d triangle function f (for each vertex)
-
-    Inputs:    v           vertices
-               t           triangles
-               tfunc       3d vector field on triangles
-
-    Outputs:   vfunc       scalar function of divergence at vertices
-
+    Computes integrated divergence of a 3d triangle function f (for each
+    vertex).
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer edges of the 1-ring triangles
     around a vertex. Summing < tfunc , e_ij cross n >
 
-    Note: this is the integrated divergence, you may want to multiply
+    Note
+    ----
+    This is the integrated divergence, you may want to multiply
     with B^-1 to get back the function in some applications
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    tfunc : _type_
+        3d vector field on triangles
+
+    Returns
+    -------
+    _type_
+        Scalar function of divergence at vertices
     """
     import sys
+
     v0 = tria.v[tria.t[:, 0], :]
     v1 = tria.v[tria.t[:, 1], :]
     v2 = tria.v[tria.t[:, 2], :]
@@ -216,22 +262,29 @@ def tria_compute_divergence2(tria, tfunc):
     i = np.column_stack((tria.t[:, 0], tria.t[:, 1], tria.t[:, 2])).reshape(-1)
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
-    vfunc = np.squeeze(np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense()))
+    vfunc = np.squeeze(
+        np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense())
+    )
     return vfunc
 
 
-def tria_compute_rotated_f(tria, vfunc):
+def tria_compute_rotated_f(tria: TriaMesh, vfunc):
     """
     Compute function whose level sets are orthgonal to the ones of vfunc.
-
-    Inputs:    v           vertices
-               t           triangles
-               vfunc       scalar function at triangles
-
-    Outputs:   vfunc       rotated function
-
     This is done by rotating the gradient around the normal by 90 degrees,
     then solving the Poisson equations with the divergence of rotated grad.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    vfunc : _type_
+        Scalar function at triangles
+
+    Returns
+    -------
+    _type_
+        Rotated function
     """
     gradf = tria_compute_gradient(tria, vfunc)
     tn = tria.tria_normals()
@@ -241,30 +294,47 @@ def tria_compute_rotated_f(tria, vfunc):
     gradf = np.cross(tn, gradf)
     divf = tria_compute_divergence(tria, gradf)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
-    # div is the integrated divergence (so it is already B*div)
+    # as long as div does not care about weighing with a Bi, we can pass
+    # identity instead of B here: div is the integrated divergence (so it is
+    # already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     vf = fem.poisson(divf)
     return vf
 
 
-def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=True):
+def tria_mean_curvature_flow(
+    tria: TriaMesh,
+    max_iter: int = 30,
+    stop_eps: float = 1e-13,
+    step: float = 1.0,
+    use_cholmod: bool = True,
+):
     """
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012)
+    This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow
+    be made non-singular" which uses the Laplace-Beltrami operator but keeps
+    the stiffness matrix (A) fixed and only adjusts the mass matrix (B) during
+    the steps. It will normalize surface area of the mesh and translate the
+    barycenter to the origin. Closed meshes will map to the unit sphere.
 
-    Inputs:   tria        TriaMesh object (vertices and triangles)
-              max_iter    maximal number of steps
-              stops_eps   stopping threshold
-              step        Euler step size
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    max_iter : int, optional
+        maximal number of steps, by default 30
+    stop_eps : _type_, optional
+        Stopping threshold, by default 1e-13
+    step : float, optional
+        Euler step size, by default 1.0
+    use_cholmod : bool, optional
+        Use Cholesky decomposition, by default True
 
-    Outputs:  TriaMesh - TriaMesh object (vertices and triangles)
-
-    This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
-    made non-singular" which uses the Laplace-Beltrami operator but keeps the 
-    stiffness matrix (A) fixed and only adjusts the mass matrix (B) during the
-    steps. It will normalize surface area of the mesh and translate the barycenter
-    to the origin. Closed meshes will map to the unit sphere. 
+    Returns
+    -------
+    TriaMesh
+        Triangular mesh instance
     """
     if use_cholmod:
         try:
@@ -311,24 +381,41 @@ def tria_mean_curvature_flow(tria, max_iter=30, stop_eps=1e-13, step=1.0, use_ch
     return trianorm
 
 
-def tria_spherical_project(tria, flow_iter=3, debug=False):
+def tria_spherical_project(
+    tria: TriaMesh, flow_iter: int = 3, debug: bool = False
+) -> TriaMesh:
     """
-    spherical(tria) computes the first three non-constant eigenfunctions
-           and then projects the spectral embedding onto a sphere. This works
-           when the first functions have a single closed zero level set,
-           splitting the mesh into two domains each. Depending on the original
-           shape triangles could get inverted. We also flip the functions
-           according to the axes that they are aligned with for the special
-           case of brain surfaces in FreeSurfer coordinates.
+    Spherical(tria) computes the first three non-constant eigenfunctions and
+    then projects the spectral embedding onto a sphere. This works when the
+    first functions have a single closed zero level set, splitting the mesh
+    into two domains each. Depending on the original shape triangles could
+    get inverted. We also flip the functions according to the axes that they
+    are aligned with for the special case of brain surfaces in FreeSurfer
+    coordinates.
 
     Inputs:   tria      : TriaMesh
-              flow_iter : mean curv flow iterations (3 should be enough)
+              flow_iter :
 
     Outputs:  tria      : TriaMesh
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangular mesh instance
+    flow_iter : int, optional
+        Mean curv flow iterations (3 should be enough), by default 3
+    debug : bool, optional
+        Whether to create a debug file, by default False
+
+    Returns
+    -------
+    TriaMesh
+        Triangular mesh
     """
     import math
+
     if not tria.is_closed():
-        raise ValueError('Error: Can only project closed meshes!')
+        raise ValueError("Error: Can only project closed meshes!")
 
     # sub-function to compute flipped area of trias where normal
     # points towards origin, meaningful for the sphere, centered at zero
@@ -349,17 +436,18 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     if debug:
         data = dict()
-        data['Eigenvalues'] = evals
-        data['Eigenvectors'] = evecs
-        data['Creator'] = 'spherically_project.py'
-        data['Refine'] = 0
-        data['Degree'] = 1
-        data['Dimension'] = 2
-        data['Elements'] = tria.t.shape[0]
-        data['DoF'] = evecs.shape[0]
-        data['NumEW'] = 4
+        data["Eigenvalues"] = evals
+        data["Eigenvectors"] = evecs
+        data["Creator"] = "spherically_project.py"
+        data["Refine"] = 0
+        data["Degree"] = 1
+        data["Dimension"] = 2
+        data["Elements"] = tria.t.shape[0]
+        data["DoF"] = evecs.shape[0]
+        data["NumEW"] = 4
         from .FuncIO import export_ev
-        export_ev(data, 'debug.ev')
+
+        export_ev(data, "debug.ev")
 
     # flip efuncs to align to coordinates consistently
     ev1 = evecs[:, 1]
@@ -384,7 +472,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         print("ERROR: direction 1 should be (anterior -posterior) but is not!")
         print("  debug info: {} {} {} ".format(l11, l21, l31))
         # sys.exit(1)
-        raise ValueError('Direction 1 should be anterior - posterior')
+        raise ValueError("Direction 1 should be anterior - posterior")
 
     # only flip direction if necessary
     print("ev1 min: {}  max {} ".format(cmin1, cmax1))
@@ -398,7 +486,8 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # for ev2 and ev3 there could be also a swap of the two
     l22 = abs(cmax2[2] - cmin2[2])
     l32 = abs(cmax3[2] - cmin3[2])
-    # usually ev2 should be superior inferior, if ev3 is better in that direction, swap
+    # usually ev2 should be superior inferior, if ev3 is better in that
+    # direction, swap
     if l22 < l32:
         print("swapping direction 2 and 3")
         ev2, ev3 = ev3, ev2
@@ -442,19 +531,19 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # at the poles, but who knows...
     ev1min = np.amin(ev1)
     ev1max = np.amax(ev1)
-    ev1[ev1 < 0] /= - ev1min
+    ev1[ev1 < 0] /= -ev1min
     ev1[ev1 > 0] /= ev1max
 
     ev2min = np.amin(ev2)
     ev2max = np.amax(ev2)
-    ev2[ev2 < 0] /= - ev2min
+    ev2[ev2 < 0] /= -ev2min
     ev2[ev2 > 0] /= ev2max
 
     ev3min = np.amin(ev3)
     ev3max = np.amax(ev3)
-    ev3[ev3 < 0] /= - ev3min
+    ev3[ev3 < 0] /= -ev3min
     ev3[ev3 > 0] /= ev3max
-    
+
     # set evec as new coordinates (spectral embedding)
     vn = np.empty(tria.v.shape)
     vn[:, 0] = ev3
@@ -464,13 +553,15 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # do a few mean curvature flow euler steps to make more convex
     # three should be sufficient
     if flow_iter > 0:
-        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter)
+        tflow = tria_mean_curvature_flow(
+            TriaMesh(vn, tria.t), max_iter=flow_iter
+        )
         vn = tflow.v
-            
+
     # project to sphere and scaled to have the same scale/origin as FS:
     dist = np.sqrt(np.sum(vn * vn, axis=1))
     vn = 100 * (vn / dist[:, np.newaxis])
-    
+
     trianew = TriaMesh(vn, tria.t)
     svol = trianew.area() / (4.0 * math.pi * 10000)
     print("sphere area fraction: {} ".format(svol))
@@ -479,39 +570,34 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if flippedarea > 0.95:
         print("ERROR: global normal flip, exiting ..")
         # sys.exit(1)
-        raise ValueError('global normal flip')
+        raise ValueError("global normal flip")
 
     print("flipped area fraction: {} ".format(flippedarea))
 
     if svol < 0.99:
         print("ERROR: sphere area fraction should be above .99, exiting ..")
         # sys.exit(1)
-        raise ValueError('sphere area fraction should be above .99')
+        raise ValueError("sphere area fraction should be above .99")
 
     if flippedarea > 0.0008:
         print("ERROR: flipped area fraction should be below .0008, exiting ..")
         # sys.exit(1)
-        raise ValueError('flipped area fraction should be below .0008')
+        raise ValueError("flipped area fraction should be below .0008")
 
-    # here we finally check also the spat vol (orthogonality of direction vectors)
-    # we could stop earlier, but most failure cases will be covered by the svol and
-    # flipped area which can be better interpreted than spatvol
+    # here we finally check also the spat vol (orthogonality of direction
+    # vectors). we could stop earlier, but most failure cases will be covered
+    # by the svol and flipped area which can be better interpreted than spatvol
     if spatvol < 0.6:
         print("ERROR: spat vol (orthogonality) should be above .6, exiting ..")
         # sys.exit(1)
-        raise ValueError('spat vol (orthogonality) should be above .6')
+        raise ValueError("spat vol (orthogonality) should be above .6")
 
     return trianew
 
 
 def tet_compute_gradient(tet, vfunc):
     """
-    Computes gradient of a vertex function f (for each tetra)
-
-    Inputs:    vfunc       scalar function at vertices
-
-    :return:   tfunc       3d vector function of gradient at tetras
-
+    Computes gradient of a vertex function f (for each tetra).
     grad(f) = [  (f_j - f_i) (vi-vk) x (vh-vk)
                + (f_k - f_i) (vi-vh) x (vj-vh)
                + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V)
@@ -521,13 +607,27 @@ def tet_compute_gradient(tet, vfunc):
                + f_h (vk-vi) x (vj-vi) ] / (2 V)
     for tetrahedron (vi,vj,vk,vh) with volume V.
 
+    Note
+    ----
     Good background to read:
     Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
     http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
     http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
-    Desbrun ...
+
+    Parameters
+    ----------
+    tet : _type_
+        _description_
+    vfunc : _type_
+        Scalar function at vertices
+
+    Returns
+    -------
+    _type_
+        3d vector function of gradient at tetras
     """
     import sys
+
     v0 = tet.v[tet.t[:, 0], :]
     v1 = tet.v[tet.t[:, 1], :]
     v2 = tet.v[tet.t[:, 2], :]
@@ -545,9 +645,15 @@ def tet_compute_gradient(tet, vfunc):
     voli = np.divide(1.0, vol)[:, np.newaxis]
     # sum weighted edges
     # c0 = vfunc[t[:,0],np.newaxis] * np.cross(,)
-    c1 = (vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(e2, e5)
-    c2 = (vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(e3, e4)
-    c3 = (vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(-e2, e0)
+    c1 = (
+        vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(e2, e5)
+    c2 = (
+        vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(e3, e4)
+    c3 = (
+        vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
+    ) * np.cross(-e2, e0)
     # divided by parallelepiped vol
     tfunc = voli * (c1 + c2 + c3)
     return tfunc
@@ -588,8 +694,15 @@ def tet_compute_divergence(tet, tfunc):
     x1 = (n1 * tfunc).sum(1)
     x2 = (n2 * tfunc).sum(1)
     x3 = (n3 * tfunc).sum(1)
-    i = np.column_stack((tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])).reshape(-1)
+    i = np.column_stack(
+        (tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])
+    ).reshape(-1)
     j = np.zeros((4 * len(tet.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2, x3)).reshape(-1)
-    vfunc = -np.squeeze(np.asarray((1.0 / 6.0) * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype))
+    vfunc = -np.squeeze(
+        np.asarray(
+            (1.0 / 6.0) * sparse.csc_matrix((dat, (i, j))).todense(),
+            dtype=tfunc.dtype,
+        )
+    )
     return vfunc

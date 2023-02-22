@@ -1,12 +1,14 @@
 # IMPORTS
-from collections import OrderedDict
-import numpy as np
 import warnings
+from collections import OrderedDict
+
+import numpy as np
 
 """
-Read FreeSurfer geometry (fix for dev, ll 126-128); 
+Read FreeSurfer geometry (fix for dev, ll 126-128);
 
-Code was taken from nibabel.freesurfer package (https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
+Code was taken from nibabel.freesurfer package
+(https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
 This software is licensed under the following license:
 
 The MIT License
@@ -57,23 +59,33 @@ def _fread3(fobj):
 def _read_volume_info(fobj):
     """Helper for reading the footer from a surface file."""
     volume_info = OrderedDict()
-    head = np.fromfile(fobj, '>i4', 1)
+    head = np.fromfile(fobj, ">i4", 1)
     if not np.array_equal(head, [20]):  # Read two bytes more
-        head = np.concatenate([head, np.fromfile(fobj, '>i4', 2)])
-        if not np.array_equal(head, [2, 0, 20]) and not np.array_equal(head, [2, 1, 20]):
+        head = np.concatenate([head, np.fromfile(fobj, ">i4", 2)])
+        if not np.array_equal(head, [2, 0, 20]) and not np.array_equal(
+            head, [2, 1, 20]
+        ):
             warnings.warn("Unknown extension code.")
             return volume_info
         head = [2, 0, 20]
 
-    volume_info['head'] = head
-    for key in ['valid', 'filename', 'volume', 'voxelsize', 'xras', 'yras',
-                'zras', 'cras']:
-        pair = fobj.readline().decode('utf-8').split('=')
+    volume_info["head"] = head
+    for key in [
+        "valid",
+        "filename",
+        "volume",
+        "voxelsize",
+        "xras",
+        "yras",
+        "zras",
+        "cras",
+    ]:
+        pair = fobj.readline().decode("utf-8").split("=")
         if pair[0].strip() != key or len(pair) != 2:
-            raise IOError('Error parsing volume info.')
-        if key in ('valid', 'filename'):
+            raise IOError("Error parsing volume info.")
+        if key in ("valid", "filename"):
             volume_info[key] = pair[1].strip()
-        elif key == 'volume':
+        elif key == "volume":
             volume_info[key] = np.array(pair[1].split()).astype(int)
         else:
             volume_info[key] = np.array(pair[1].split()).astype(float)
@@ -122,9 +134,9 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
         magic = _fread3(fobj)
 
         if magic == TRIANGLE_MAGIC:  # Triangle file
-            create_stamp = fobj.readline().rstrip(b'\n').decode('utf-8')
+            create_stamp = fobj.readline().rstrip(b"\n").decode("utf-8")
             test_dev = fobj.peek(1)[:1]
-            if test_dev == b'\n':
+            if test_dev == b"\n":
                 fobj.readline()
             vnum = np.fromfile(fobj, ">i4", 1)[0]
             fnum = np.fromfile(fobj, ">i4", 1)[0]
@@ -134,14 +146,17 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
             if read_metadata:
                 volume_info = _read_volume_info(fobj)
         else:
-            raise ValueError("File does not appear to be a Freesurfer surface (triangle file)")
+            raise ValueError(
+                "File does not appear to be a Freesurfer surface (triangle \
+                    file)"
+            )
 
     coords = coords.astype(float)  # XXX: due to mayavi bug on mac 32bits
 
     ret = (coords, faces)
     if read_metadata:
         if len(volume_info) == 0:
-            warnings.warn('No volume information contained in the file')
+            warnings.warn("No volume information contained in the file")
         ret += (volume_info,)
     if read_stamp:
         ret += (create_stamp,)

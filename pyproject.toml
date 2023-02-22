@@ -51,6 +51,9 @@ build = [
     'build',
     'twine',
 ]
+chol = [
+    'scikit-sparse',
+]
 style = [
     'bibclean',
     'black',

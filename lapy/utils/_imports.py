@@ -8,8 +8,7 @@ import importlib
 # A mapping from import name to package name (on PyPI) when the package name
 # is different.
 INSTALL_MAPPING = {
-    "cv2": "opencv-python",
-    "serial": "pyserial",
+    "sksparse": "scikit-sparse",
 }
 
 

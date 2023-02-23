@@ -34,11 +34,11 @@ class TriaMesh:
         # Check a few things
         vnum = np.max(self.v.shape)
         if np.max(self.t) >= vnum:
-            raise ValueError('Max index exceeds number of vertices')
+            raise ValueError("Max index exceeds number of vertices")
         if self.t.shape[1] != 3:
-            raise ValueError('Triangles should have 3 vertices')
+            raise ValueError("Triangles should have 3 vertices")
         if self.v.shape[1] != 3:
-            raise ValueError('Vertices should have 3 coordinates')
+            raise ValueError("Vertices should have 3 coordinates")
         # Compute adjacency matrices
         self.adj_sym = self._construct_adj_sym()
         self.adj_dir = self._construct_adj_dir()
@@ -98,7 +98,9 @@ class TriaMesh:
                     of one in the matrix (allows lookup of vertex to tria).
         """
         if not self.is_oriented():
-            raise ValueError('Error: Can only tidx matrix for oriented triangle meshes!')
+            raise ValueError(
+                "Error: Can only tidx matrix for oriented triangle meshes!"
+            )
         t0 = self.t[:, 0]
         t1 = self.t[:, 1]
         t2 = self.t[:, 2]
@@ -160,8 +162,8 @@ class TriaMesh:
         a = np.sqrt(np.sum(v1mv0 * v1mv0, axis=1))
         b = np.sqrt(np.sum(v2mv1 * v2mv1, axis=1))
         c = np.sqrt(np.sum(v0mv2 * v0mv2, axis=1))
-        ph = 0.5 * (a+b+c)
-        areas = np.sqrt(ph * (ph-a) * (ph-b) * (ph-c))
+        ph = 0.5 * (a + b + c)
+        areas = np.sqrt(ph * (ph - a) * (ph - b) * (ph - c))
         return areas
 
     def area(self):
@@ -180,7 +182,9 @@ class TriaMesh:
         if not self.is_closed():
             return 0.0
         if not self.is_oriented():
-            raise ValueError('Error: Can only compute volume for oriented triangle meshes!')
+            raise ValueError(
+                "Error: Can only compute volume for oriented triangle meshes!"
+            )
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
         v2 = self.v[self.t[:, 2], :]
@@ -222,8 +226,10 @@ class TriaMesh:
         :return:   edgelength     Avg. edge length
         """
         # get only upper off-diag elements from symmetric adj matrix
-        triadj = sparse.triu(self.adj_sym, 1, format='coo')
-        edgelens = np.sqrt(((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1))
+        triadj = sparse.triu(self.adj_sym, 1, format="coo")
+        edgelens = np.sqrt(
+            ((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1)
+        )
         return edgelens.mean()
 
     def tria_normals(self):
@@ -233,6 +239,7 @@ class TriaMesh:
         :return:  n - normals (num triangles X 3 )
         """
         import sys
+
         # Compute vertex coordinates and a difference vectors for each triangle:
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -260,8 +267,11 @@ class TriaMesh:
         :return:  n - normals (num vertices X 3 )
         """
         if not self.is_oriented():
-            raise ValueError('Error: Vertex normals are meaningless for un-oriented triangle meshes!')
+            raise ValueError(
+                "Error: Vertex normals are meaningless for un-oriented triangle meshes!"
+            )
         import sys
+
         # Compute vertex coordinates and a difference vector for each triangle:
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -320,7 +330,11 @@ class TriaMesh:
         # compute length (2*area)
         ln = np.sqrt(np.sum(n * n, axis=1))
         q = 2.0 * np.sqrt(3) * ln
-        es = (v1mv0 * v1mv0).sum(1) + (v2mv1 * v2mv1).sum(1) + (v0mv2 * v0mv2).sum(1)
+        es = (
+            (v1mv0 * v1mv0).sum(1)
+            + (v2mv1 * v2mv1).sum(1)
+            + (v0mv2 * v0mv2).sum(1)
+        )
         return q / es
 
     def boundary_loops(self):
@@ -333,13 +347,15 @@ class TriaMesh:
         :return:   loops          List of lists with boundary loops
         """
         if not self.is_manifold():
-            raise ValueError('Error: tria not manifold (edges with more than 2 triangles)!')
+            raise ValueError(
+                "Error: tria not manifold (edges with more than 2 triangles)!"
+            )
         if self.is_closed():
             return []
         # get directed matrix of only boundary edges
-        inneredges = (self.adj_sym == 2)
+        inneredges = self.adj_sym == 2
         if not self.is_oriented():
-            raise ValueError('Error: tria not oriented !')
+            raise ValueError("Error: tria not oriented !")
         adj = self.adj_dir.copy()
         adj[inneredges] = 0
         adj.eliminate_zeros()
@@ -393,7 +409,7 @@ class TriaMesh:
         totalarea = areas.sum()
         areas = areas / totalarea
         centers = (1.0 / 3.0) * (v0 + v1 + v2)
-        c = (centers * areas[:, np.newaxis])
+        c = centers * areas[:, np.newaxis]
         return np.sum(c, axis=0), totalarea
 
     def edges(self, with_boundary=False):
@@ -413,19 +429,21 @@ class TriaMesh:
                                     associated triangle to each boundary edge
         """
         if not self.is_oriented():
-            raise ValueError('Error: Can only compute edge information for oriented meshes!')
+            raise ValueError(
+                "Error: Can only compute edge information for oriented meshes!"
+            )
         adjtria = self.construct_adj_dir_tidx().tolil()
         # for boundary edges, we can just remove those edges (implicitly a zero angle)
         bdredges = []
         bdrtrias = []
         if 1 in self.adj_sym.data:
-            bdredges = (self.adj_sym == 1)
+            bdredges = self.adj_sym == 1
             bdrtrias = adjtria[bdredges].toarray().ravel() - 1
-            adjtria[bdredges] = 0  
+            adjtria[bdredges] = 0
         # get transpose adjTria matrix and keep only upper triangular matrices
         adjtria2 = adjtria.transpose()
-        adjtriu1 = sparse.triu(adjtria, 0, format='csr')
-        adjtriu2 = sparse.triu(adjtria2, 0, format='csr')
+        adjtriu1 = sparse.triu(adjtria, 0, format="csr")
+        adjtriu2 = sparse.triu(adjtria2, 0, format="csr")
         vids = np.array(np.nonzero(adjtriu1)).T
         tids = np.empty(vids.shape, dtype=np.int32)
         tids[:, 0] = adjtriu1.data - 1
@@ -459,12 +477,15 @@ class TriaMesh:
         # import warnings
         # warnings.filterwarnings('error')
         import sys
+
         # get edge information for inner edges (vertex ids and tria ids):
         vids, tids = self.edges()
         # compute normals for each tria
         tnormals = self.tria_normals()
         # compute dot product of normals at each edge
-        sprod = np.sum(tnormals[tids[:, 0], :] * tnormals[tids[:, 1], :], axis=1)
+        sprod = np.sum(
+            tnormals[tids[:, 0], :] * tnormals[tids[:, 1], :], axis=1
+        )
         # compute unsigned angles (clamp to ensure range)
         angle = np.maximum(sprod, -1)
         angle = np.minimum(angle, 1)
@@ -474,7 +495,7 @@ class TriaMesh:
         edgelen = np.sqrt(np.sum(edgevecs**2, axis=1))
         # get sign (if normals face towards each other or away, across each edge)
         cp = np.cross(tnormals[tids[:, 0], :], tnormals[tids[:, 1], :])
-        si = -np.sign(np.sum(cp*edgevecs, axis=1))
+        si = -np.sign(np.sum(cp * edgevecs, axis=1))
         angle = angle * si
         # normalized edges
         edgelen[edgelen < sys.float_info.epsilon] = 1  # avoid division by zero
@@ -524,7 +545,9 @@ class TriaMesh:
         # instead we find direction that aligns with vertex normals as first
         # the other two will be sorted later anyway
         vnormals = self.vertex_normals()
-        dprod = - np.abs(np.squeeze(np.sum(evecs * vnormals[:, :, np.newaxis], axis=1)))
+        dprod = -np.abs(
+            np.squeeze(np.sum(evecs * vnormals[:, :, np.newaxis], axis=1))
+        )
         i = np.argsort(dprod, axis=1)
         evals = np.take_along_axis(evals, i, axis=1)
         it = np.tile(i.reshape((vnum, 1, 3)), (1, 3, 1))
@@ -565,7 +588,9 @@ class TriaMesh:
                  c_min : min curvature on triangles
                  c_max : max curvature on triangles
         """
-        u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(smoothit)
+        u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(
+            smoothit
+        )
 
         # pool vertex functions (u_min and u_max) to triangles:
         tumin = self.map_vfunc_to_tfunc(u_min)
@@ -622,7 +647,7 @@ class TriaMesh:
         tflat = self.t.reshape(-1)
         vnum = np.max(self.v.shape)
         if np.max(tflat) >= vnum:
-            raise ValueError('Max index exceeds number of vertices')
+            raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
         vkeep = np.full(vnum, False, dtype=bool)
         vkeep[tflat] = True
@@ -652,7 +677,7 @@ class TriaMesh:
         """
         for x in range(it):
             # make symmetric adj matrix to upper triangle
-            adjtriu = sparse.triu(self.adj_sym, 0, format='csr')
+            adjtriu = sparse.triu(self.adj_sym, 0, format="csr")
             # create new vertex index for each edge
             edgeno = adjtriu.data.shape[0]
             vno = self.v.shape[0]
@@ -671,7 +696,9 @@ class TriaMesh:
             t2 = np.column_stack((self.t[:, 1], e2, e1))
             t3 = np.column_stack((self.t[:, 2], e3, e2))
             t4 = np.column_stack((e1, e2, e3))
-            tnew = np.reshape(np.concatenate((t1, t2, t3, t4), axis=1), (-1, 3))
+            tnew = np.reshape(
+                np.concatenate((t1, t2, t3, t4), axis=1), (-1, 3)
+            )
             # set new vertices and tria and re-init adj matrices
             self.__init__(vnew, tnew)
 
@@ -715,26 +742,32 @@ class TriaMesh:
             # tidx for each half edge
             tidx = np.repeat(np.arange(0, self.t.shape[0]), 3)
             # if edge points from smaller to larger index or not
-            dirij = (i < j)
+            dirij = i < j
             ndirij = np.logical_not(dirij)
             ij = np.column_stack((i, j))
             # make sure i < j
             ij[np.ix_(ndirij, [1, 0])] = ij[np.ix_(ndirij, [0, 1])]
             # remove rows with unique (boundary) edges (half-edges without partner)
-            u, ind, c = np.unique(ij, axis=0, return_index=True, return_counts=True)
+            u, ind, c = np.unique(
+                ij, axis=0, return_index=True, return_counts=True
+            )
             bidx = ind[c == 1]
             # assert remaining edges have two triangles: min = max =2
             # note if we have only a single triangle or triangle soup
             # this will fail as we have no inner edges.
             if max(c) != 2 or min(c) < 1:
-                raise ValueError('Without boundary edges, all should have two triangles!')
+                raise ValueError(
+                    "Without boundary edges, all should have two triangles!"
+                )
             # inner is a mask for inner edges
             inner = np.ones(ij.shape[0], bool)
             inner[bidx] = False
             # stack i,j,tria_id, edge_direction (smaller to larger vidx) for inner edges
             ijk = np.column_stack((ij, tidx, dirij))[inner, :]
             # sort according to first two columns
-            ind = np.lexsort((ijk[:, 0], ijk[:, 1]))  # Sort by column 0, then by column 1
+            ind = np.lexsort(
+                (ijk[:, 0], ijk[:, 1])
+            )  # Sort by column 0, then by column 1
             ijks = ijk[ind, :]
             # select both tria indices at each edge and the edge directions
             tdir = ijks.reshape((-1, 8))[:, [2, 6, 3, 7]]
@@ -754,13 +787,18 @@ class TriaMesh:
             v = tmat[:, 0]
             count = 0
             import time
+
             startt = time.time()
             while len(v.data) < tdim:
                 count = count + 1
                 v = tmat * v
                 v.data = np.sign(v.data)
             endt = time.time()
-            print("Searched mesh after {} flooding iterations ({} sec).".format(count, endt-startt))
+            print(
+                "Searched mesh after {} flooding iterations ({} sec).".format(
+                    count, endt - startt
+                )
+            )
             # get tria indices that need flipping:
             idx = v.toarray() == -1
             idx = idx.reshape(-1)
@@ -792,7 +830,9 @@ class TriaMesh:
         :return:   vfunc          Function on vertices vector or matrix (#v x N)
         """
         if self.t.shape[0] != tfunc.shape[0]:
-            raise ValueError('Error: length of tfunc needs to match number of triangles')
+            raise ValueError(
+                "Error: length of tfunc needs to match number of triangles"
+            )
         tfunca = np.array(tfunc)
         # make sure tfunc is 2D (even with only 1-dim input)
         if tfunca.ndim == 1:
@@ -817,7 +857,9 @@ class TriaMesh:
         :return:  tfunc          Function on trias vector or matrix (#t x N)
         """
         if self.v.shape[0] != vfunc.shape[0]:
-            raise ValueError('Error: length of vfunc needs to match number of vertices')
+            raise ValueError(
+                "Error: length of vfunc needs to match number of vertices"
+            )
         vfunc = np.array(vfunc) / 3.0
         tfunc = np.sum(vfunc[self.t], axis=1)
         return tfunc
@@ -836,7 +878,9 @@ class TriaMesh:
             vfunc = self.v
         vfunc = np.array(vfunc)
         if self.v.shape[0] != vfunc.shape[0]:
-            raise ValueError('Error: length of vfunc needs to match number of vertices')
+            raise ValueError(
+                "Error: length of vfunc needs to match number of vertices"
+            )
         areas = self.vertex_areas()[:, np.newaxis]
         adj = self.adj_sym.copy()
         # binarize:
@@ -849,7 +893,7 @@ class TriaMesh:
         adj2 = adj2.multiply(1.0 / rowsum)
         # apply sparse matrix n times (fast in spite of loop)
         vout = adj2.dot(vfunc)
-        for i in range(n-1):
+        for i in range(n - 1):
             vout = adj2.dot(vout)
         return vout
 

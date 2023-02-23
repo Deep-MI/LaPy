@@ -29,7 +29,7 @@ class TetMesh:
         self.t = np.array(t)
         vnum = np.max(self.v.shape)
         if np.max(self.t) >= vnum:
-            raise ValueError('Max index exceeds number of vertices')
+            raise ValueError("Max index exceeds number of vertices")
         # put more checks here (e.g. the dim 3 conditions on columns)
         # self.orient_()
         self.adj_sym = self.construct_adj_sym()
@@ -46,8 +46,12 @@ class TetMesh:
         t2 = self.t[:, 1]
         t3 = self.t[:, 2]
         t4 = self.t[:, 3]
-        i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4)).reshape(-1)
-        j = np.column_stack((t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3)).reshape(-1)
+        i = np.column_stack(
+            (t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4)
+        ).reshape(-1)
+        j = np.column_stack(
+            (t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3)
+        ).reshape(-1)
         adj = sparse.csc_matrix((np.ones(i.shape), (i, j)))
         return adj
 
@@ -85,16 +89,16 @@ class TetMesh:
         cr = np.cross(e0, e2)
         vol = np.sum(e3 * cr, axis=1)
         if np.max(vol) < 0.0:
-            print('All tet orientations are flipped')
+            print("All tet orientations are flipped")
             return False
         elif np.min(vol) > 0.0:
-            print('All tet orientations are correct')
+            print("All tet orientations are correct")
             return True
         elif np.count_nonzero(vol) < len(vol):
-            print('We have degenerated zero-volume tetrahedra')
+            print("We have degenerated zero-volume tetrahedra")
             return False
         else:
-            print('Orientations are not uniform')
+            print("Orientations are not uniform")
             return False
 
     def avg_edge_length(self):
@@ -103,8 +107,10 @@ class TetMesh:
         :return:    double  average edge length
         """
         # get only upper off-diag elements from symmetric adj matrix
-        triadj = sparse.triu(self.adj_sym, 1, format='coo')
-        edgelens = np.sqrt(((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1))
+        triadj = sparse.triu(self.adj_sym, 1, format="coo")
+        edgelens = np.sqrt(
+            ((self.v[triadj.row, :] - self.v[triadj.col, :]) ** 2).sum(1)
+        )
         return edgelens.mean()
 
     def boundary_tria(self, tetfunc=None):
@@ -124,17 +130,24 @@ class TetMesh:
                   triafunc       List of tria function values (if tetfunc passed)
         """
         from .TriaMesh import TriaMesh
+
         # get all triangles
-        allt = np.vstack((self.t[:, np.array([3, 1, 2])],
-                          self.t[:, np.array([2, 0, 3])],
-                          self.t[:, np.array([1, 3, 0])],
-                          self.t[:, np.array([0, 2, 1])]))
+        allt = np.vstack(
+            (
+                self.t[:, np.array([3, 1, 2])],
+                self.t[:, np.array([2, 0, 3])],
+                self.t[:, np.array([1, 3, 0])],
+                self.t[:, np.array([0, 2, 1])],
+            )
+        )
         # sort rows so that faces are reorder in ascending order of indices
         allts = np.sort(allt, axis=1)
         # find unique trias without a neighbor
-        tria, indices, count = np.unique(allts, axis=0, return_index=True, return_counts=True)
+        tria, indices, count = np.unique(
+            allts, axis=0, return_index=True, return_counts=True
+        )
         tria = allt[indices[count == 1]]
-        print('Found ' + str(np.size(tria, 0)) + ' triangles on boundary.')
+        print("Found " + str(np.size(tria, 0)) + " triangles on boundary.")
         # if we have tetra function, map these to the boundary triangles
         if tetfunc is not None:
             alltidx = np.tile(np.arange(self.t.shape[0]), 4)
@@ -158,7 +171,7 @@ class TetMesh:
         tflat = self.t.reshape(-1)
         vnum = np.max(self.v.shape)
         if np.max(tflat) >= vnum:
-            raise ValueError('Max index exceeds number of vertices')
+            raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
         vkeep = np.full(vnum, False, dtype=bool)
         vkeep[tflat] = True
@@ -202,10 +215,10 @@ class TetMesh:
         # Compute cross product and 6 * vol for each tetra:
         cr = np.cross(e0, e2)
         vol = np.sum(e3 * cr, axis=1)
-        negtet = (vol < 0.0)
+        negtet = vol < 0.0
         negnum = np.sum(negtet)
         if negnum == 0:
-            print('Mesh is oriented, nothing to do')
+            print("Mesh is oriented, nothing to do")
             return 0
         tnew = self.t
         # negtet = np.where(negtet)
@@ -213,6 +226,6 @@ class TetMesh:
         tnew[negtet, 1] = self.t[negtet, 2]
         tnew[negtet, 2] = temp
         onum = np.sum(negtet)
-        print('Flipped ' + str(onum) + ' tetrahedra')
+        print("Flipped " + str(onum) + " tetrahedra")
         self.__init__(self.v, tnew)
         return onum

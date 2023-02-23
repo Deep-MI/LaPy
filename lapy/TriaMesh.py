@@ -94,7 +94,7 @@ class TriaMesh:
         containing the triangle indices (only for non-manifold meshes)
         Operates only on triangles.
         :return:    Sparse CSC matrix
-                    Similar ot adj_dir, but stores the tria idx+1 instead
+                    Similar to adj_dir, but stores the tria idx+1 instead
                     of one in the matrix (allows lookup of vertex to tria).
         """
         if not self.is_oriented():
@@ -123,7 +123,7 @@ class TriaMesh:
         """
         Check if triangle mesh is manifold (no edges with >2 triangles)
         Operates only on triangles
-        :return:   manifold       bool True if no edges wiht > 2 triangles
+        :return:   manifold       bool True if no edges with > 2 triangles
         """
         return np.max(self.adj_sym.data) <= 2
 
@@ -330,11 +330,7 @@ class TriaMesh:
         # compute length (2*area)
         ln = np.sqrt(np.sum(n * n, axis=1))
         q = 2.0 * np.sqrt(3) * ln
-        es = (
-            (v1mv0 * v1mv0).sum(1)
-            + (v2mv1 * v2mv1).sum(1)
-            + (v0mv2 * v0mv2).sum(1)
-        )
+        es = (v1mv0 * v1mv0).sum(1) + (v2mv1 * v2mv1).sum(1) + (v0mv2 * v0mv2).sum(1)
         return q / es
 
     def boundary_loops(self):
@@ -483,9 +479,7 @@ class TriaMesh:
         # compute normals for each tria
         tnormals = self.tria_normals()
         # compute dot product of normals at each edge
-        sprod = np.sum(
-            tnormals[tids[:, 0], :] * tnormals[tids[:, 1], :], axis=1
-        )
+        sprod = np.sum(tnormals[tids[:, 0], :] * tnormals[tids[:, 1], :], axis=1)
         # compute unsigned angles (clamp to ensure range)
         angle = np.maximum(sprod, -1)
         angle = np.minimum(angle, 1)
@@ -545,9 +539,7 @@ class TriaMesh:
         # instead we find direction that aligns with vertex normals as first
         # the other two will be sorted later anyway
         vnormals = self.vertex_normals()
-        dprod = -np.abs(
-            np.squeeze(np.sum(evecs * vnormals[:, :, np.newaxis], axis=1))
-        )
+        dprod = -np.abs(np.squeeze(np.sum(evecs * vnormals[:, :, np.newaxis], axis=1)))
         i = np.argsort(dprod, axis=1)
         evals = np.take_along_axis(evals, i, axis=1)
         it = np.tile(i.reshape((vnum, 1, 3)), (1, 3, 1))
@@ -578,7 +570,7 @@ class TriaMesh:
 
     def curvature_tria(self, smoothit=3):
         """
-        Compute min and max curvature and directions (orthognal and in tria plane)
+        Compute min and max curvature and directions (orthogonal and in tria plane)
         for each triangle. First we compute these values on vertices and then smooth
         there. Finally they get mapped to the trias (averaging) and projected onto
         the triangle plane, and orthogonalized.
@@ -588,9 +580,7 @@ class TriaMesh:
                  c_min : min curvature on triangles
                  c_max : max curvature on triangles
         """
-        u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(
-            smoothit
-        )
+        u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(smoothit)
 
         # pool vertex functions (u_min and u_max) to triangles:
         tumin = self.map_vfunc_to_tfunc(u_min)
@@ -696,9 +686,7 @@ class TriaMesh:
             t2 = np.column_stack((self.t[:, 1], e2, e1))
             t3 = np.column_stack((self.t[:, 2], e3, e2))
             t4 = np.column_stack((e1, e2, e3))
-            tnew = np.reshape(
-                np.concatenate((t1, t2, t3, t4), axis=1), (-1, 3)
-            )
+            tnew = np.reshape(np.concatenate((t1, t2, t3, t4), axis=1), (-1, 3))
             # set new vertices and tria and re-init adj matrices
             self.__init__(vnew, tnew)
 
@@ -748,9 +736,7 @@ class TriaMesh:
             # make sure i < j
             ij[np.ix_(ndirij, [1, 0])] = ij[np.ix_(ndirij, [0, 1])]
             # remove rows with unique (boundary) edges (half-edges without partner)
-            u, ind, c = np.unique(
-                ij, axis=0, return_index=True, return_counts=True
-            )
+            u, ind, c = np.unique(ij, axis=0, return_index=True, return_counts=True)
             bidx = ind[c == 1]
             # assert remaining edges have two triangles: min = max =2
             # note if we have only a single triangle or triangle soup
@@ -857,9 +843,7 @@ class TriaMesh:
         :return:  tfunc          Function on trias vector or matrix (#t x N)
         """
         if self.v.shape[0] != vfunc.shape[0]:
-            raise ValueError(
-                "Error: length of vfunc needs to match number of vertices"
-            )
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
         vfunc = np.array(vfunc) / 3.0
         tfunc = np.sum(vfunc[self.t], axis=1)
         return tfunc
@@ -878,9 +862,7 @@ class TriaMesh:
             vfunc = self.v
         vfunc = np.array(vfunc)
         if self.v.shape[0] != vfunc.shape[0]:
-            raise ValueError(
-                "Error: length of vfunc needs to match number of vertices"
-            )
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
         areas = self.vertex_areas()[:, np.newaxis]
         adj = self.adj_sym.copy()
         # binarize:

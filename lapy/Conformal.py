@@ -72,14 +72,12 @@ def spherical_conformal_map(tria):
         + sparse.csc_matrix(((1, 1, 1), (fixed, fixed)), shape=(nv, nv))
     )
 
-    # find embedding of the bigtria (bounary condition later)
+    # find embedding of the bigtria (boundary condition later)
     # arbitrarily set first two points
     x0, y0, x1, y1 = 0, 0, 1, 0
     a = tria.v[p1, :] - tria.v[p0, :]
     b = tria.v[p2, :] - tria.v[p0, :]
-    sin1 = np.linalg.norm(np.cross(a, b)) / (
-        np.linalg.norm(a) * np.linalg.norm(b)
-    )
+    sin1 = np.linalg.norm(np.cross(a, b)) / (np.linalg.norm(a) * np.linalg.norm(b))
     ori_h = np.linalg.norm(b) * sin1
     ratio = np.sqrt(((x0 - x1) ** 2 + (y0 - y1) ** 2)) / np.linalg.norm(a)
     y2 = ori_h * ratio  # compute the coordinates of the third vertex
@@ -109,9 +107,7 @@ def spherical_conformal_map(tria):
 
     # find the index of the southernmost triangle
     index = np.argsort(
-        np.abs(z[tria.t[:, 0]])
-        + np.abs(z[tria.t[:, 1]])
-        + np.abs(z[tria.t[:, 2]])
+        np.abs(z[tria.t[:, 0]]) + np.abs(z[tria.t[:, 1]]) + np.abs(z[tria.t[:, 2]])
     )
     inner = index[0]
     if inner == bigtri:
@@ -362,30 +358,19 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     v11 = (af * uxv1 * uxv1 + 2 * bf * uxv1 * uyv1 + gf * uyv1 * uyv1) / area2
     v22 = (af * uxv2 * uxv2 + 2 * bf * uxv2 * uyv2 + gf * uyv2 * uyv2) / area2
     v01 = (
-        af * uxv1 * uxv0
-        + bf * uxv1 * uyv0
-        + bf * uxv0 * uyv1
-        + gf * uyv1 * uyv0
+        af * uxv1 * uxv0 + bf * uxv1 * uyv0 + bf * uxv0 * uyv1 + gf * uyv1 * uyv0
     ) / area2
     v12 = (
-        af * uxv2 * uxv1
-        + bf * uxv2 * uyv1
-        + bf * uxv1 * uyv2
-        + gf * uyv2 * uyv1
+        af * uxv2 * uxv1 + bf * uxv2 * uyv1 + bf * uxv1 * uyv2 + gf * uyv2 * uyv1
     ) / area2
     v20 = (
-        af * uxv0 * uxv2
-        + bf * uxv0 * uyv2
-        + bf * uxv2 * uyv0
-        + gf * uyv0 * uyv2
+        af * uxv0 * uxv2 + bf * uxv0 * uyv2 + bf * uxv2 * uyv0 + gf * uyv0 * uyv2
     ) / area2
 
     # create symmetric A
     i = np.column_stack((t0, t1, t2, t0, t1, t1, t2, t2, t0)).reshape(-1)
     j = np.column_stack((t0, t1, t2, t1, t0, t2, t1, t0, t2)).reshape(-1)
-    dat = np.column_stack(
-        (v00, v11, v22, v01, v01, v12, v12, v20, v20)
-    ).reshape(-1)
+    dat = np.column_stack((v00, v11, v22, v01, v01, v12, v12, v20, v20)).reshape(-1)
     nv = tria.v.shape[0]
     A = sparse.csc_matrix((dat, (i, j)), shape=(nv, nv), dtype=complex)
 

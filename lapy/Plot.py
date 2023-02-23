@@ -370,9 +370,7 @@ def plot_tria_mesh(
             #    max_fcol = 1
             # colormap = cm.RdBu
             colormap = _get_colorscale(min_fcol, max_fcol)
-            facecolor = [
-                _map_z2color(zz, colormap, min_fcol, max_fcol) for zz in tfunc
-            ]
+            facecolor = [_map_z2color(zz, colormap, min_fcol, max_fcol) for zz in tfunc]
             # for tria colors overwrite flatshading to be true:
             triangles = go.Mesh3d(
                 x=x,
@@ -420,9 +418,7 @@ def plot_tria_mesh(
                 mode="lines",
                 line=dict(color=tic_color, width=2),
             )
-            triangles = go.Mesh3d(
-                x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading
-            )
+            triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading)
         else:
             raise ValueError(
                 "tfunc should be scalar (face color) or 3d for each triangle"
@@ -473,9 +469,7 @@ def plot_tria_mesh(
         vlines = go.Scatter3d(
             x=xv, y=yv, z=zv, mode="lines", line=dict(color=tic_color, width=2)
         )
-        triangles = go.Mesh3d(
-            x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading
-        )
+        triangles = go.Mesh3d(x=x, y=y, z=z, i=i, j=j, k=k, flatshading=flatshading)
     else:
         raise ValueError("vfunc should be scalar or 3d for each vertex")
 

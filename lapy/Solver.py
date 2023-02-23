@@ -80,9 +80,7 @@ class Solver:
             print("TetMesh with regular Laplace")
             a, b = self._fem_tetra(geometry, lump)
         else:
-            raise ValueError(
-                'Geometry type "' + type(geometry).__name__ + '" unknown'
-            )
+            raise ValueError('Geometry type "' + type(geometry).__name__ + '" unknown')
         self.stiffness = a
         self.mass = b
         self.geotype = type(geometry)
@@ -172,7 +170,9 @@ class Solver:
         return a, b
 
     @staticmethod
-    def _fem_tria_aniso(tria, u1, u2, aniso_mat, lump: bool = False):  # computeABtria(v,t)
+    def _fem_tria_aniso(
+        tria, u1, u2, aniso_mat, lump: bool = False
+    ):  # computeABtria(v,t)
         r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a triangle mesh.
 
         The 2 sparse symmetric matrices are computed for a given triangle mesh using the
@@ -325,12 +325,8 @@ class Solver:
                 (b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)
             ).reshape(-1)
             # stack edge and diag coords for matrix indices
-            i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(
-                -1
-            )
-            j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(
-                -1
-            )
+            i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(-1)
+            j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(-1)
             # Construct sparse matrix:
             b = sparse.csc_matrix((local_b, (i, j)))
         else:
@@ -409,9 +405,9 @@ class Solver:
         e36 = np.sum(e3 * e6, axis=1)
         # compute entries for A (negations occur when one edge direction is flipped)
         # these can be computed multiple ways
-        # basically for ij, take opposing edge (call it Ek) and two edges from the starting
-        # point of Ek to point i (=El) and to point j (=Em), then these are of the
-        # scheme:   (El * Ek)  (Em * Ek) - (El * Em) (Ek * Ek)
+        # basically for ij, take opposing edge (call it Ek) and two edges from the
+        # starting point of Ek to point i (=El) and to point j (=Em), then these are of
+        # the scheme:   (El * Ek)  (Em * Ek) - (El * Em) (Ek * Ek)
         # where * is vector dot product
         a12 = (-e36 * e26 + e23 * e66) / vol
         a13 = (-e15 * e25 + e12 * e55) / vol
@@ -523,7 +519,8 @@ class Solver:
         #                          clockwise when looking from above
         #
         # Outputs:  A - sparse sym. (n x n) positive semi definite numpy matrix
-        #           B - sparse sym. (n x n) positive definite numpy matrix (inner product)
+        #           B - sparse sym. (n x n) positive definite numpy matrix (inner
+        #               product)
         tnum = vox.t.shape[0]
         # Linear local matrices on unit voxel
         tb = (
@@ -600,17 +597,11 @@ class Solver:
         else:
             local_b = tb * vol
         local_a = vol * (a0 * ta00 + a1 * ta11 + a2 * ta22)
-        local_b = np.repeat(local_b[np.newaxis, :, :], tnum, axis=0).reshape(
-            -1
-        )
-        local_a = np.repeat(local_a[np.newaxis, :, :], tnum, axis=0).reshape(
-            -1
-        )
+        local_b = np.repeat(local_b[np.newaxis, :, :], tnum, axis=0).reshape(-1)
+        local_a = np.repeat(local_a[np.newaxis, :, :], tnum, axis=0).reshape(-1)
         # Construct row and col indices.
         i = np.array([np.tile(x, (8, 1)) for x in vox.t]).reshape(-1)
-        j = np.array(
-            [np.transpose(np.tile(x, (8, 1))) for x in vox.t]
-        ).reshape(-1)
+        j = np.array([np.transpose(np.tile(x, (8, 1))) for x in vox.t]).reshape(-1)
         # Construct sparse matrix:
         a = sparse.csc_matrix((local_a, (i, j)))
         b = sparse.csc_matrix((local_b, (i, j)))
@@ -638,9 +629,7 @@ class Solver:
 
         sigma = -0.01
         if self.sksparse is not None:
-            print(
-                "Solver: Cholesky decomposition from scikit-sparse cholmod ..."
-            )
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=chol,
@@ -667,8 +656,8 @@ class Solver:
         """Solver for the poisson equation with boundary conditions.
 
         This solver is based on the ``A`` and ``B`` Laplace matrices where ``A x = B h``
-        and ``A`` is a sparse symetric positive semi definitive matrix of shape
-        ``(n`, n)`` and B is a sparse symetric positive definitive matrix of shape
+        and ``A`` is a sparse symmetric positive semi definitive matrix of shape
+        ``(n`, n)`` and B is a sparse symmetric positive definitive matrix of shape
         ``(n, n)``.
 
         Parameters
@@ -697,12 +686,10 @@ class Solver:
         """
         # check matrices
         dim = self.stiffness.shape[0]
-        if (
-            self.stiffness.shape != self.mass.shape
-            or self.stiffness.shape[1] != dim
-        ):
+        if self.stiffness.shape != self.mass.shape or self.stiffness.shape[1] != dim:
             raise ValueError(
-                "Error: Square input matrices should have same number of rows and columns"
+                "Error: Square input matrices should have same number of rows and "
+                "columns."
             )
         # create vector h
         if np.isscalar(h):
@@ -770,9 +757,7 @@ class Solver:
         # solve A x = b
         print("Matrix Format now: " + a.getformat())
         if self.sparse is not None:
-            print(
-                "Solver: Cholesky decomposition from scikit-sparse cholmod ..."
-            )
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sparse.cholesky(a)
             x = chol(b)
         else:

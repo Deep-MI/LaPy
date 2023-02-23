@@ -18,6 +18,7 @@ from scipy.optimize import minimize
 
 from .Solver import Solver
 from .TriaMesh import TriaMesh
+from .utils._imports import import_optional_dependency
 
 
 def spherical_conformal_map(tria):
@@ -413,18 +414,14 @@ def linear_beltrami_solver(tria, mu, landmark, target):
 
 
 def sparse_symmetric_solve(A, b, use_cholmod=True):
-    from scipy.sparse.linalg import splu
-
-    if use_cholmod:
-        try:
-            from sksparse.cholmod import cholesky
-        except ImportError:
-            use_cholmod = False
-    if use_cholmod:
+    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
+    if sksparse is not None:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-        chol = cholesky(A)
+        chol = sksparse.cholmod.cholesky(A)
         x = chol(b)
     else:
+        from scipy.sparse.linalg import splu
+
         print("Solver: spsolve (LU decomposition) ...")
         lu = splu(A)
         x = lu.solve(b)

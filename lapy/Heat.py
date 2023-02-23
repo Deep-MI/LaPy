@@ -1,5 +1,7 @@
 import numpy as np
 
+from .utils._imports import import_optional_dependency
+
 
 def diagonal(t, x, evecs, evals, n):
     """
@@ -67,13 +69,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     :return:
       vfunc         heat diffusion at vertices
     """
-    if use_cholmod:
-        try:
-            from sksparse.cholmod import cholesky
-        except ImportError:
-            use_cholmod = False
-    if not use_cholmod:
-        from scipy.sparse.linalg import splu
+    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
     from .Solver import Solver
 
     nv = len(geometry.v)
@@ -87,11 +83,13 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     b0[np.array(vids)] = 1.0
     # solve H x = b0
     print("Matrix Format now:  " + hmat.getformat())
-    if use_cholmod:
+    if sksparse is not None:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-        chol = cholesky(hmat)
+        chol = sksparse.choldmod.cholesky(hmat)
         vfunc = chol(b0)
     else:
+        from scipy.sparse.linalg import splu
+
         print("Solver: spsolve (LU decomposition) ...")
         lu = splu(hmat)
         vfunc = lu.solve(np.float32(b0))

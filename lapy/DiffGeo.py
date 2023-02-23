@@ -3,6 +3,7 @@ from scipy import sparse
 
 from .Solver import Solver
 from .TriaMesh import TriaMesh
+from .utils._imports import import_optional_dependency
 
 
 def compute_gradient(geom, vfunc):
@@ -280,16 +281,7 @@ def tria_mean_curvature_flow(
     steps. It will normalize surface area of the mesh and translate the barycenter
     to the origin. Closed meshes will map to the unit sphere.
     """
-    if use_cholmod:
-        try:
-            from sksparse.cholmod import cholesky
-        except ImportError:
-            use_cholmod = False
-
-    if not use_cholmod:
-        # Note, it would be better to do sparse Cholesky (CHOLMOD)
-        # as it can be 5-6 times faster
-        from scipy.sparse.linalg import spsolve
+    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -297,10 +289,6 @@ def tria_mean_curvature_flow(
     lump = True  # for computation here and inside loop
     fem = Solver(trianorm, lump)
     a_mat = fem.stiffness
-    if use_cholmod:
-        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-    else:
-        print("Solver: spsolve (LU decomposition) ...")
     for x in range(max_iter):
         # store last position (for delta computation below)
         vlast = trianorm.v
@@ -308,10 +296,16 @@ def tria_mean_curvature_flow(
         mass = Solver.fem_tria_mass(trianorm, lump)
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
-        if use_cholmod:
-            factor = cholesky(mass + step * a_mat)
+        if sksparse is not None:
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+            factor = sksparse.cholmod.cholesky(mass + step * a_mat)
             trianorm.v = factor(mass_v)
         else:
+            # Note, it would be better to do sparse Cholesky (CHOLMOD)
+            # as it can be 5-6 times faster
+            from scipy.sparse.linalg import spsolve
+
+            print("Solver: spsolve (LU decomposition) ...")
             trianorm.v = spsolve(mass + step * a_mat, mass_v)
         # normalize updated mesh
         trianorm.normalize_()

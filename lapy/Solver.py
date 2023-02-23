@@ -641,7 +641,7 @@ class Solver:
             print(
                 "Solver: Cholesky decomposition from scikit-sparse cholmod ..."
             )
-            chol = self.sksparse.cholesky(self.stiffness - sigma * self.mass)
+            chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=chol,
                 shape=self.stiffness.shape,

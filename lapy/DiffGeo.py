@@ -3,6 +3,7 @@ from scipy import sparse
 
 from .Solver import Solver
 from .TriaMesh import TriaMesh
+from .utils._imports import import_optional_dependency
 
 
 def compute_gradient(geom, vfunc):
@@ -27,9 +28,7 @@ def compute_rotated_f(geom, vfunc):
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
     else:
-        raise ValueError(
-            'Geometry type "' + type(geom).__name__ + '" not implemented'
-        )
+        raise ValueError('Geometry type "' + type(geom).__name__ + '" not implemented')
 
 
 def compute_geodesic_f(geom, vfunc):
@@ -177,9 +176,7 @@ def tria_compute_divergence(tria, tfunc):
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
     # convert back to nparray 1D
     vfunc = np.squeeze(
-        np.asarray(
-            0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype
-        )
+        np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense(), dtype=tfunc.dtype)
     )
     return vfunc
 
@@ -226,9 +223,7 @@ def tria_compute_divergence2(tria, tfunc):
     i = np.column_stack((tria.t[:, 0], tria.t[:, 1], tria.t[:, 2])).reshape(-1)
     j = np.zeros((3 * len(tria.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2)).reshape(-1)
-    vfunc = np.squeeze(
-        np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense())
-    )
+    vfunc = np.squeeze(np.asarray(0.5 * sparse.csc_matrix((dat, (i, j))).todense()))
     return vfunc
 
 
@@ -280,16 +275,7 @@ def tria_mean_curvature_flow(
     steps. It will normalize surface area of the mesh and translate the barycenter
     to the origin. Closed meshes will map to the unit sphere.
     """
-    if use_cholmod:
-        try:
-            from sksparse.cholmod import cholesky
-        except ImportError:
-            use_cholmod = False
-
-    if not use_cholmod:
-        # Note, it would be better to do sparse Cholesky (CHOLMOD)
-        # as it can be 5-6 times faster
-        from scipy.sparse.linalg import spsolve
+    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -297,10 +283,6 @@ def tria_mean_curvature_flow(
     lump = True  # for computation here and inside loop
     fem = Solver(trianorm, lump)
     a_mat = fem.stiffness
-    if use_cholmod:
-        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-    else:
-        print("Solver: spsolve (LU decomposition) ...")
     for x in range(max_iter):
         # store last position (for delta computation below)
         vlast = trianorm.v
@@ -308,10 +290,16 @@ def tria_mean_curvature_flow(
         mass = Solver.fem_tria_mass(trianorm, lump)
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
-        if use_cholmod:
-            factor = cholesky(mass + step * a_mat)
+        if sksparse is not None:
+            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+            factor = sksparse.cholmod.cholesky(mass + step * a_mat)
             trianorm.v = factor(mass_v)
         else:
+            # Note, it would be better to do sparse Cholesky (CHOLMOD)
+            # as it can be 5-6 times faster
+            from scipy.sparse.linalg import spsolve
+
+            print("Solver: spsolve (LU decomposition) ...")
             trianorm.v = spsolve(mass + step * a_mat, mass_v)
         # normalize updated mesh
         trianorm.normalize_()
@@ -480,9 +468,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # do a few mean curvature flow euler steps to make more convex
     # three should be sufficient
     if flow_iter > 0:
-        tflow = tria_mean_curvature_flow(
-            TriaMesh(vn, tria.t), max_iter=flow_iter
-        )
+        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter)
         vn = tflow.v
 
     # project to sphere and scaled to have the same scale/origin as FS:
@@ -564,15 +550,15 @@ def tet_compute_gradient(tet, vfunc):
     voli = np.divide(1.0, vol)[:, np.newaxis]
     # sum weighted edges
     # c0 = vfunc[t[:,0],np.newaxis] * np.cross(,)
-    c1 = (
-        vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
-    ) * np.cross(e2, e5)
-    c2 = (
-        vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
-    ) * np.cross(e3, e4)
-    c3 = (
-        vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]
-    ) * np.cross(-e2, e0)
+    c1 = (vfunc[tet.t[:, 1], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(
+        e2, e5
+    )
+    c2 = (vfunc[tet.t[:, 2], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(
+        e3, e4
+    )
+    c3 = (vfunc[tet.t[:, 3], np.newaxis] - vfunc[tet.t[:, 0], np.newaxis]) * np.cross(
+        -e2, e0
+    )
     # divided by parallelepiped vol
     tfunc = voli * (c1 + c2 + c3)
     return tfunc
@@ -613,9 +599,9 @@ def tet_compute_divergence(tet, tfunc):
     x1 = (n1 * tfunc).sum(1)
     x2 = (n2 * tfunc).sum(1)
     x3 = (n3 * tfunc).sum(1)
-    i = np.column_stack(
-        (tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])
-    ).reshape(-1)
+    i = np.column_stack((tet.t[:, 0], tet.t[:, 1], tet.t[:, 2], tet.t[:, 3])).reshape(
+        -1
+    )
     j = np.zeros((4 * len(tet.t), 1), dtype=int).reshape(-1)
     dat = np.column_stack((x0, x1, x2, x3)).reshape(-1)
     vfunc = -np.squeeze(

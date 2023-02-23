@@ -46,12 +46,12 @@ class TetMesh:
         t2 = self.t[:, 1]
         t3 = self.t[:, 2]
         t4 = self.t[:, 3]
-        i = np.column_stack(
-            (t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4)
-        ).reshape(-1)
-        j = np.column_stack(
-            (t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3)
-        ).reshape(-1)
+        i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4)).reshape(
+            -1
+        )
+        j = np.column_stack((t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3)).reshape(
+            -1
+        )
         adj = sparse.csc_matrix((np.ones(i.shape), (i, j)))
         return adj
 

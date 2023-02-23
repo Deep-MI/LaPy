@@ -71,13 +71,7 @@ def import_off(infile):
         return
     t = t[:, 1:]
     f.close()
-    print(
-        " --> DONE ( V: "
-        + str(v.shape[0])
-        + " , T: "
-        + str(t.shape[0])
-        + " )\n"
-    )
+    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     return TriaMesh(v, t)
 
 
@@ -175,20 +169,10 @@ def import_vtk(infile):
                 tt.append(tria)
         t = np.array(tt)
     else:
-        print(
-            "[read: "
-            + line
-            + " expected POLYGONS or TRIANGLE_STRIPS] --> FAILED\n"
-        )
+        print("[read: " + line + " expected POLYGONS or TRIANGLE_STRIPS] --> FAILED\n")
         return
     f.close()
-    print(
-        " --> DONE ( V: "
-        + str(v.shape[0])
-        + " , T: "
-        + str(t.shape[0])
-        + " )\n"
-    )
+    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     return TriaMesh(v, t)
 
 
@@ -312,9 +296,9 @@ def import_gmsh(infile):
             line = f.readline()
             num_nodes = int(line)
             if is_ascii:
-                points = numpy.fromfile(
-                    f, count=num_nodes * 4, sep=" "
-                ).reshape((num_nodes, 4))
+                points = numpy.fromfile(f, count=num_nodes * 4, sep=" ").reshape(
+                    (num_nodes, 4)
+                )
                 # The first number is the index
                 points = points[:, 1:]
             else:
@@ -333,9 +317,7 @@ def import_gmsh(infile):
             line = f.readline()
             assert line.strip() == "$EndNodes"
         else:
-            assert environ == "Elements", "Unknown environment '{}'.".format(
-                environ
-            )
+            assert environ == "Elements", "Unknown environment '{}'.".format(environ)
             # The first line is the number of elements
             line = f.readline()
             total_num_cells = int(line)
@@ -387,14 +369,10 @@ def import_gmsh(infile):
                     # assert num_tags >= 2
 
                     # read element data
-                    num_bytes = 4 * (
-                        num_elems0 * (1 + num_tags + num_nodes_per_elem)
-                    )
+                    num_bytes = 4 * (num_elems0 * (1 + num_tags + num_nodes_per_elem))
                     shape = (num_elems0, 1 + num_tags + num_nodes_per_elem)
                     b = f.read(num_bytes)
-                    data = numpy.fromstring(b, dtype=numpy.int32).reshape(
-                        shape
-                    )
+                    data = numpy.fromstring(b, dtype=numpy.int32).reshape(shape)
 
                     if t not in cells:
                         cells[t] = []
@@ -438,9 +416,7 @@ def import_gmsh(infile):
             cell_data = output_cell_data
 
     if has_additional_tag_data:
-        logging.warning(
-            "The file contains tag data that couldn't be processed."
-        )
+        logging.warning("The file contains tag data that couldn't be processed.")
 
     return points, cells, point_data, cell_data, field_data
 

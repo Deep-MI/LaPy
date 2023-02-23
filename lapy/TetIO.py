@@ -62,7 +62,7 @@ def import_gmsh(infile):
         f.close()
         return
     pnum = int(f.readline())
-    # read (nodes X 4) matrix as chunck
+    # read (nodes X 4) matrix as chunk
     # drop first column
     v = np.fromfile(f, "float32", 4 * pnum, " ")
     v.shape = (pnum, 4)
@@ -98,13 +98,7 @@ def import_gmsh(infile):
         f.close()
         return
     f.close()
-    print(
-        " --> DONE ( V: "
-        + str(v.shape[0])
-        + " , T: "
-        + str(t.shape[0])
-        + " )\n"
-    )
+    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     return TetMesh(v, t)
 
 
@@ -167,9 +161,7 @@ def import_vtk(infile):
         npt = float(ttnum) / tnum
         if npt != 5.0:
             print(
-                "[having: "
-                + str(npt)
-                + " data per tetra, expected 4+1] --> FAILED\n"
+                "[having: " + str(npt) + " data per tetra, expected 4+1] --> FAILED\n"
             )
             return
         t = np.fromfile(f, "int", ttnum, " ")
@@ -182,13 +174,7 @@ def import_vtk(infile):
         print("[read: " + line + " expected POLYGONS or CELLS] --> FAILED\n")
         return
     f.close()
-    print(
-        " --> DONE ( V: "
-        + str(v.shape[0])
-        + " , T: "
-        + str(t.shape[0])
-        + " )\n"
-    )
+    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     return TetMesh(v, t)
 
 
@@ -215,11 +201,7 @@ def export_vtk(tet, outfile):
         f.write(" ".join(map(str, tet.v[i, :])))
         f.write("\n")
     f.write(
-        "POLYGONS "
-        + str(np.shape(tet.t)[0])
-        + " "
-        + str(5 * np.shape(tet.t)[0])
-        + "\n"
+        "POLYGONS " + str(np.shape(tet.t)[0]) + " " + str(5 * np.shape(tet.t)[0]) + "\n"
     )
     for i in range(np.shape(tet.t)[0]):
         f.write(" ".join(map(str, np.append(4, tet.t[i, :]))))

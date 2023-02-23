@@ -134,18 +134,14 @@ def import_ev(infile):
             i = i + 1
         elif ll[i].lstrip().startswith("Eigenvalues"):
             i = i + 1
-            while (
-                ll[i].find("{") < 0
-            ):  # possibly introduce termination criterion
+            while ll[i].find("{") < 0:  # possibly introduce termination criterion
                 i = i + 1
             if ll[i].find("}") >= 0:  # '{' and '}' on the same line
                 evals = ll[i].strip().replace("{", "").replace("}", "")
             else:
                 evals = str()
                 while ll[i].find("}") < 0:
-                    evals = evals + ll[i].strip().replace("{", "").replace(
-                        "}", ""
-                    )
+                    evals = evals + ll[i].strip().replace("{", "").replace("}", "")
                     i = i + 1
                 evals = evals + ll[i].strip().replace("{", "").replace("}", "")
             evals = np.array(evals.split(";")).astype(np.float)
@@ -156,16 +152,10 @@ def import_ev(infile):
             while not (ll[i].strip().startswith("sizes")):
                 i = i + 1
             d.update(
-                {
-                    "EigenvectorsSize": np.array(
-                        ll[i].strip().split()[1:]
-                    ).astype(np.int)
-                }
+                {"EigenvectorsSize": np.array(ll[i].strip().split()[1:]).astype(np.int)}
             )
             i = i + 1
-            while (
-                ll[i].find("{") < 0
-            ):  # possibly introduce termination criterion
+            while ll[i].find("{") < 0:  # possibly introduce termination criterion
                 i = i + 1
             if ll[i].find("}") >= 0:  # '{' and '}' on the same line
                 evecs = ll[i].strip().replace("{", "").replace("}", "")
@@ -176,18 +166,14 @@ def import_ev(infile):
                         "}", ""
                     ).replace("(", "").replace(")", "")
                     i = i + 1
-                evecs = evecs + ll[i].strip().replace("{", "").replace(
-                    "}", ""
-                ).replace("(", "").replace(")", "")
+                evecs = evecs + ll[i].strip().replace("{", "").replace("}", "").replace(
+                    "(", ""
+                ).replace(")", "")
             evecs = np.array(
                 evecs.replace(";", " ").replace(",", " ").strip().split()
             ).astype(np.float)
-            if len(evecs) == (
-                d["EigenvectorsSize"][0] * d["EigenvectorsSize"][1]
-            ):
-                evecs = np.transpose(
-                    np.reshape(evecs, d["EigenvectorsSize"][1::-1])
-                )
+            if len(evecs) == (d["EigenvectorsSize"][0] * d["EigenvectorsSize"][1]):
+                evecs = np.transpose(np.reshape(evecs, d["EigenvectorsSize"][1::-1]))
                 d.update({"Eigenvectors": evecs})
             else:
                 print(

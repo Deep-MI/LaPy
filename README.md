@@ -46,14 +46,14 @@ illustrate prototypical use cases of the toolbox.
 Use the following code to download, build and install a package from this
 repository into your local Python package directory:
 
-`pip3 install --user git+https://github.com/Deep-MI/LaPy.git#egg=lapy`
+`python3 -m pip install lapy`
 
-Use the following code to install the package in editable mode to a location of
+Use the following code to install the dev package in editable mode to a location of
 your choice:
 
-`pip3 install --user --src /my/preferred/location --editable git+https://github.com/Deep-MI/Lapy.git#egg=lapy`
+`python3 -m pip install --user --src /my/preferred/location --editable git+https://github.com/Deep-MI/Lapy.git#egg=lapy`
 
-Several functions, e.g. the Solver, require a sparse matrix decomposition, for which either the LU decomposition (from scipy sparse) or the faster Cholesky decomposition (from scikit-sparse cholmod) can be used. If the parameter flag use_cholmod is True, the code will try to import cholmod from the scikit-sparse package and will fall back to LU if the import fails. If you would like to use cholmod, you need to install scikit-sparse separately. It cannot be listed among LaPy's dependencies (e.g. in setup.py or requirements.txt) as that causes errors with pip. scikit-sparse requires numpy and scipy to be installed separately beforehand.
+Several functions, e.g. the Solver, require a sparse matrix decomposition, for which either the LU decomposition (from scipy sparse) or the faster Cholesky decomposition (from scikit-sparse cholmod) can be used. If the parameter flag use_cholmod is True, the code will try to import cholmod from the scikit-sparse package and will fall back to LU if the import fails. If you would like to use cholmod, you need to install scikit-sparse separately. It cannot be listed among LaPy's dependencies as that causes errors with pip. scikit-sparse requires numpy and scipy to be installed separately beforehand.
 
 ## References:
 
@@ -75,5 +75,3 @@ For non-singular mean curvature flow please cite:
 https://doi.org/10.1111/j.1467-8659.2012.03179.x
 
 We also invite you to check out our lab webpage at https://deep-mi.org
-
-Martin Reuter

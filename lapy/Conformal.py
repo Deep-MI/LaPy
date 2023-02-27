@@ -25,10 +25,18 @@ def spherical_conformal_map(tria):
     """
     A linear method for computing spherical conformal map of a genus-0 closed surface
 
-    Input:   TriaMesh (vertices and faces)
-    Output:
-    mapped_vertices: nv x 3 vertex coordinates of the spherical conformal parameterization
+    Parameters
+    ----------
+    tria : TriaMesh
+        vertices and faces
 
+    Returns
+    -------
+    mapped_vertices: np.ndarray of shape (n,3)
+        vertex coordinates of the spherical conformal parameterization
+
+    Notes
+    -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
        "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
@@ -41,6 +49,7 @@ def spherical_conformal_map(tria):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
+
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
         print("ERROR: The mesh is not a genus-0 closed surface ..")
@@ -179,16 +188,24 @@ def mobius_area_correction_spherical(tria, mapping):
     Find an optimal Mobius transformation for reducing the area distortion of a spherical conformal parameterization
     using the method in [1].
 
-    Input:
-    tria : TriaMesh (vertices, triangle) of genus-0 closed triangle mesh
-    mapping: nv x 3 vertex coordinates of the spherical conformal parameterization
+    Parameters
+    -------
+    tria : TriaMesh
+        (vertices, triangle) of genus-0 closed triangle mesh
+    mapping : np.ndarray of shape (n,3)
+        vertex coordinates of the spherical conformal parameterization
 
-    Output:
-    map_mobius: nv x 3 vertex coordinates of the updated spherical conformal parameterization
-    x: the optimal parameters for the Mobius transformation, where
-       f(z) = \frac{az+b}{cz+d}
-            = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j))
+    Returns
+    -------
+    map_mobius: np.ndarray of shape (n,3)
+        vertex coordinates of the updated spherical conformal parameterization
+    result: OptimizeResult
+        the optimal parameters (x) for the Mobius transformation, where
+            f(z) = \frac{az+b}{cz+d}
+                = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j))
 
+    Notes
+    -------
     If you use this code in your own work, please cite the following paper:
     [1] G. P. T. Choi, Y. Leung-Liu, X. Gu, and L. M. Lui,
         "Parallelizable global conformal parameterization of simply-connected surfaces via partial welding."
@@ -251,6 +268,21 @@ def mobius_area_correction_spherical(tria, mapping):
 def beltrami_coefficient(tria, mapping):
     """
     Compute the Beltrami coefficient of a mapping.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        (vertices, triangle) of genus-0 closed triangle mesh
+    mapping : np.ndarray of shape (n,3)
+        coordinates of the spherical conformal parameterization
+
+    Returns
+    -------
+    mu: Union[complex, float]
+        [MISSING]
+
+    Notes
+    -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
@@ -263,6 +295,7 @@ def beltrami_coefficient(tria, mapping):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
+
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         print("ERROR: mesh should be on complex plane ..")
@@ -311,6 +344,25 @@ def beltrami_coefficient(tria, mapping):
 def linear_beltrami_solver(tria, mu, landmark, target):
     """
     Linear Beltrami solver
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        (vertices, triangle) of genus-0 closed triangle mesh
+    mu : Union[complex, float]
+        [MISSING]
+    landmark : np.ndarray of shape ()
+        [MISSING]
+    target : np.ndarray of shape ()
+        [MISSING]
+
+    Returns
+    -------
+    mapping : np.ndarray of shape (n,3)
+        vertex coordinates of [MISSING]
+
+    Notes
+    ------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
@@ -399,6 +451,38 @@ def linear_beltrami_solver(tria, mu, landmark, target):
 
 
 def sparse_symmetric_solve(A, b, use_cholmod=True):
+    """
+    [MISSING]
+
+    Parameters
+    ----------
+    A : [MISSING]
+    b : [MISSING]
+    use_cholmod : bool, default=True
+        Which solver to use:
+            * True : Use Cholesky decomposition from scikit-sparse cholmod
+            * False: Use spsolve (LU decomposition)
+
+    Returns
+    -------
+    x: np.ndarray
+        [MISSING]
+
+    Notes
+    ------
+    If you use this code in your own work, please cite the following paper:
+    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+
+    Adopted by Martin Reuter from Matlab code at
+    https://github.com/garyptchoi/spherical-conformal-map
+    with this
+    Copyright (c) 2013-2020, Gary Pui-Tung Choi
+    https://math.mit.edu/~ptchoi
+    and has been distributed with the Apache 2 License
+    """
+
     sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
     if sksparse is not None:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
@@ -414,9 +498,35 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
 
 
 def stereographic(u):
-    # Map sphere to complex plane
-    # u has three columns (x,y,z)
-    # return z as array of complex numbers
+    """
+    Map sphere to complex plane
+
+    Parameters
+    ----------
+    u : np.ndarray
+        u has three columns (x,y,z)
+
+    Returns
+    -------
+    v: np.ndarray
+       return z as array of complex numbers
+
+    Notes
+    -------
+    If you use this code in your own work, please cite the following paper:
+    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+
+    Adopted by Martin Reuter from Matlab code at
+    https://github.com/garyptchoi/spherical-conformal-map
+    with this
+    Copyright (c) 2013-2020, Gary Pui-Tung Choi
+    https://math.mit.edu/~ptchoi
+    and has been distributed with the Apache 2 License
+    """
+
+
     x = u[:, 0]
     y = u[:, 1]
     z = u[:, 2]
@@ -427,9 +537,34 @@ def stereographic(u):
 
 
 def inverse_stereographic(u):
-    # Computes mapping from complex plane to sphere
-    # u can be complex array, or two columns (real,img)
-    # returns v as (nv x 3) coordinates on sphere
+    """
+    Computes mapping from complex plane to sphere
+
+    Parameters
+    ----------
+    u : np.ndarray
+        can be complex array, or two columns (real,img)
+
+    Returns
+    -------
+    v: np.ndarray of shape (n,3)
+        coordinates on sphere
+
+    Notes
+    -------
+    If you use this code in your own work, please cite the following paper:
+    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+
+    Adopted by Martin Reuter from Matlab code at
+    https://github.com/garyptchoi/spherical-conformal-map
+    with this
+    Copyright (c) 2013-2020, Gary Pui-Tung Choi
+    https://math.mit.edu/~ptchoi
+    and has been distributed with the Apache 2 License
+    """
+
     if np.iscomplexobj(u):
         x = u.real
         y = u.imag

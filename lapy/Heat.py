@@ -76,7 +76,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     ----------
     geometry : TriaMesh or TetMesh
         Object on which to run diffusion
-    vids : np.ndarray
+    vids : array_like
         vertex index or indices where initial heat is applied
     m : float, default=1.0
         factor  to compute time of heat evolution:

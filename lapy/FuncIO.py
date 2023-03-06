@@ -333,7 +333,7 @@ def export_vfunc(outfile, vfunc):
     ----------
     outfile : str
         filename to save to
-    vfunc : np.ndarray
+    vfunc : array_like
         list of vfunc parameters
     """
 

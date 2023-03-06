@@ -66,7 +66,7 @@ def normalize_ev(geom, evals, method="geometry"):
     ----------
     geom : TriaMesh or TetMesh
         geometry object
-    evals : np.ndarray
+    evals : array_like
         vector of eigenvalues
     method : str
         either "surface", "volume", or "geometry";
@@ -75,7 +75,7 @@ def normalize_ev(geom, evals, method="geometry"):
 
     Returns
     -------
-    evals: np.ndarray
+    array_like
         vector of reweighted eigenvalues
     """
 
@@ -124,12 +124,12 @@ def reweight_ev(evals):
 
     Parameters
     ----------
-    evals : np.ndarray
+    evals : array_like
         vector of eigenvalues
 
     Returns
     -------
-    evals: np.ndarray
+    evals: array_like
         vector of reweighted eigenvalues
     """
 

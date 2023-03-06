@@ -32,7 +32,7 @@ def spherical_conformal_map(tria):
 
     Returns
     -------
-    mapped_vertices: np.ndarray of shape (n,3)
+    mapping: np.ndarray of shape (n,3)
         vertex coordinates of the spherical conformal parameterization
 
     Notes

@@ -22,8 +22,8 @@ def _get_color_levels():
 
     Returns
     -------
-    colorscale: np.ndarray of shape (38, 2)
-        vector color for diffrent levels
+    colorscale: array_like of shape (38, 2)
+        vector color for different levels
     """
 
     color1 = "rgb(55, 155, 255)"
@@ -84,7 +84,7 @@ def _get_colorscale(vmin, vmax):
 
     Returns
     -------
-    colorscale: np.ndarray of shape (2,2)
+    colorscale: array_like of shape (2,2)
         colorscale map
     """
 
@@ -143,7 +143,7 @@ def _get_colorval(t, colormap):
     ----------
     t : float
         must be 0...1
-    colormap : np.ndarray
+    colormap : array_like
         list of values and color code strings (should have entries at least for 0 and 1)
 
     Returns

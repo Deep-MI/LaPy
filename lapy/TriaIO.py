@@ -10,9 +10,19 @@ from .TriaMesh import TriaMesh
 def import_fssurf(infile):
     """
     Load triangle mesh from FreeSurfer surface geometry file
-    :return:    TriaMesh
+
+    Parameters
+    ----------
+    infile : str
+        filename to load
+
+    Returns
+    -------
+    TriaMesh
+        loaded triangle mesh
     """
-    verbose = 1
+
+    verbose = 1 #[MISSING]
     if verbose > 0:
         print("--> FS Surf format     ... ")
     try:
@@ -32,8 +42,18 @@ def import_fssurf(infile):
 def import_off(infile):
     """
     Load triangle mesh from OFF txt file
-    :return:    TriaMesh
+
+    Parameters
+    ----------
+    infile : str
+        filename to load
+
+    Returns
+    -------
+    TriaMesh
+        loaded triangle mesh
     """
+
     verbose = 1
     if verbose > 0:
         print("--> OFF format         ... ")
@@ -79,7 +99,18 @@ def import_vtk(infile):
     """
     Load triangle mesh from VTK txt file
     :return:    TriaMesh
+
+    Parameters
+    ----------
+    infile : str
+        filename to load
+
+    Returns
+    -------
+    TriaMesh
+        loaded triangle mesh
     """
+
     verbose = 1
     if verbose > 0:
         print("--> VTK format         ... ")
@@ -179,6 +210,27 @@ def import_vtk(infile):
 def import_gmsh(infile):
     """
     Load GMSH tetra mesh ASCII Format
+
+    Parameters
+    ----------
+    infile : str
+        filename to load
+
+    Returns
+    -------
+    points : np.ndarray
+        List of points [MISSING]
+    cells : array_like
+        List of cells [MISSING]
+    point_data : array_like
+        data of points [MISSING]
+    cell_data : aray_like
+        data of cells [MISSING]
+    field_data : array_like
+        data of fields [MISSING]
+
+    Notes
+    -------
     http://geuz.org/gmsh/doc/texinfo/gmsh.html#MSH-ASCII-file-format
     .. moduleauthor:: Nico Schloemer <nico.schloemer@gmail.com>
     LICENSE MIT
@@ -425,7 +477,15 @@ def export_vtk(tria, outfile):
     """
     Save VTK file
     usage: exportVTK(TriaMesh,outfile)
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangle mesh to save
+    outfile : str
+        filename to save to
     """
+
     # open file
     try:
         f = open(outfile, "w")
@@ -459,6 +519,17 @@ def export_vtk(tria, outfile):
 def export_fssurf(tria, outfile):
     """
     Save Freesurfer Surface Geometry file (wrap Nibabel)
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangle mesh to save
+    outfile : str
+        filename to save to
+
+    Returns
+    -------
+    None
     """
     # open file
     try:

@@ -22,7 +22,7 @@ def import_fssurf(infile):
         loaded triangle mesh
     """
 
-    verbose = 1 #[MISSING]
+    verbose = 1  # [MISSING]
     if verbose > 0:
         print("--> FS Surf format     ... ")
     try:
@@ -284,7 +284,7 @@ def import_gmsh(infile):
         26: "line4",
         36: "quad16",
     }
-    _meshio_to_gmsh_type = {v: k for k, v in _gmsh_to_meshio_type.items()}
+    _meshio_to_gmsh_type = {v: k for k, v in _gmsh_to_meshio_type.items()}  # noqa: F841
 
     verbose = 1
     if verbose > 0:

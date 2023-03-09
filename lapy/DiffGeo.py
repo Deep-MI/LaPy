@@ -117,7 +117,8 @@ def compute_geodesic_f(geom, vfunc):
     gradnorm = np.nan_to_num(gradnorm)
     divf = compute_divergence(geom, gradnorm)
     fem = Solver(geom, lump=True)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
+    # as long as div does not care about weighing with a Bi,
+    #   we can pass identity instead of B here:
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
     vf = fem.poisson(divf)
     vf -= min(vf)
@@ -152,7 +153,8 @@ def tria_compute_geodesic_f(tria, vfunc):
     gradnorm = np.nan_to_num(gradnorm)
     divf = tria_compute_divergence(tria, gradnorm)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
+    # as long as div does not care about weighing with a Bi,
+    #   we can pass identity instead of B here:
     # div is the integrated divergence (so it is already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0])
     vf = fem.poisson(divf)
@@ -281,7 +283,6 @@ def tria_compute_divergence(tria, tfunc):
     return vfunc
 
 
-
 def tria_compute_divergence2(tria, tfunc):
     """
     Computes integrated divergence of a 3d triangle function f (for each vertex)
@@ -373,7 +374,8 @@ def tria_compute_rotated_f(tria, vfunc):
     gradf = np.cross(tn, gradf)
     divf = tria_compute_divergence(tria, gradf)
     fem = Solver(tria)
-    # as long as div does not care about weighing with a Bi, we can pass identity instead of B here:
+    # as long as div does not care about weighing with a Bi,
+    #   we can pass identity instead of B here:
     # div is the integrated divergence (so it is already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     vf = fem.poisson(divf)

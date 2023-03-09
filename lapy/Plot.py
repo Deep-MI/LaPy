@@ -289,7 +289,9 @@ def plot_tet_mesh(
     showcaxis : bool, Default=False
         whether a colorbar is displayed or not
     caxis : list or tuple of shape (2, 1):
-        Sets the bound of the color domain. caxis[0] is lower bound caxis[1] upper bound. Elements are int or float
+        Sets the bound of the color domain.
+        caxis[0] is lower bound caxis[1] upper bound.
+        Elements are int or float
     """
 
     if type(tetra).__name__ != "TetMesh":
@@ -308,7 +310,8 @@ def plot_tet_mesh(
         # check if vfunc is defined when functional thresholds are used, otherwise exit
         if any(["f" in x for x in cutting]) and vfunc is None:
             raise ValueError(
-                "Need to specify vfunc if 'f' is used within the 'cutting' argument, exiting."
+                "Need to specify vfunc if 'f' is used"
+                " within the 'cutting' argument, exiting."
             )
 
         # create criteria from cutting info
@@ -422,7 +425,9 @@ def plot_tria_mesh(
     showcaxis : bool, Default=False
         whether a colorbar is displayed or not
     caxis : list or tuple of shape (2, 1):
-        Sets the bound of the color domain. caxis[0] is lower bound caxis[1] upper bound. Elements are int or float
+        Sets the bound of the color domain.
+        caxis[0] is lower bound caxis[1] upper bound.
+        Elements are int or float
     xrange : list or tuple of shape (2, 1)
         Sets the range of the x-axis
     yrange : list or tuple of shape (2, 1)
@@ -467,12 +472,14 @@ def plot_tria_mesh(
         vcolor is not None or tcolor is not None
     ):
         raise ValueError(
-            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor,"
+            " but not both at the same time"
         )
 
     if vcolor is not None and tcolor is not None:
         raise ValueError(
-            "plot_tria_mesh can only use either vcolor or tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vcolor or tcolor,"
+            " but not both at the same time"
         )
 
     x, y, z = zip(*tria.v)

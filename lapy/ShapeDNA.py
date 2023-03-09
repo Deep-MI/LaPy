@@ -2,8 +2,8 @@ import numpy as np
 import scipy.spatial.distance as di
 
 from .Solver import Solver
-from .TetMesh import TetMesh
-from .TriaMesh import TriaMesh
+from .TetMesh import TetMesh  # noqa: F401
+from .TriaMesh import TriaMesh  # noqa: F401
 
 # compute shapeDNA
 
@@ -20,11 +20,14 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     k : int, default=50
         number of eigenfunctions / eigenvalues
     lump : bool, Default=False
-        If True, lump the mass matrix (diagonal) (See 'lapy.Solver.Solver' class)
+        If True, lump the mass matrix (diagonal)
+            (See 'lapy.Solver.Solver' class)
     aniso :  float or tuple of shape (2,)
-        Anisotropy for curvature based anisotopic Laplace. (See 'lapy.Solver.Solver' class)
+        Anisotropy for curvature based anisotopic Laplace.
+            (See 'lapy.Solver.Solver' class)
     aniso_smooth : int
-        Number of smoothing iterations for curvature computation on vertices. (See 'lapy.Solver.Solver' class)
+        Number of smoothing iterations for curvature computation on vertices.
+            (See 'lapy.Solver.Solver' class)
 
     Returns
     -------

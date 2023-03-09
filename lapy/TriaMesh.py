@@ -36,7 +36,8 @@ class TriaMesh:
     _construct_adj_dir()
         Constructs directed adjacency matrix of triangle mesh t
     construct_adj_dir_tidx()
-        Constructs directed adjacency matrix of triangle mesh t containing the triangle indices
+        Constructs directed adjacency matrix of triangle mesh t
+        containing the triangle indices
     is_closed()
         Check if triangle mesh is closed
     is_manifold()
@@ -367,13 +368,13 @@ class TriaMesh:
     def vertex_areas(self):
         """
         Computes the area associated to each vertex (1/3 of one-ring trias)
-        
+
         Returns
         -------
         vareas : np.ndarray
             Array of vertex areas
         """
-        
+
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
         v2 = self.v[self.t[:, 2], :]
@@ -395,7 +396,7 @@ class TriaMesh:
         float
             Avg. edge length
         """
-        
+
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
         edgelens = np.sqrt(
@@ -466,7 +467,8 @@ class TriaMesh:
         v2mv1 = v2 - v1
         v0mv2 = v0 - v2
         # Compute cross product at every vertex
-        # will all point in the same direction but have different lengths depending on spanned area
+        # will all point in the same direction but have
+        #   different lengths depending on spanned area
         cr0 = np.cross(v1mv0, -v0mv2)
         cr1 = np.cross(v2mv1, -v1mv0)
         cr2 = np.cross(v0mv2, -v2mv1)
@@ -681,7 +683,8 @@ class TriaMesh:
         Compute various curvature values at vertices.
 
         For the algorithm see e.g.
-        Pierre Alliez, David Cohen-Steiner, Olivier Devillers, Bruno Levy, and Mathieu Desbrun.
+        Pierre Alliez, David Cohen-Steiner, Olivier Devillers,
+        Bruno Levy, and Mathieu Desbrun.
         Anisotropic Polygonal Remeshing.
         ACM Transactions on Graphics, 2003.
 
@@ -851,7 +854,8 @@ class TriaMesh:
         tumin2 = tumin - tn * (np.sum(tn * tumin, axis=1)).reshape(-1, 1)
         tuminl = np.sqrt(np.sum(tumin2 * tumin2, axis=1)).reshape(-1, 1)
         tumin2 = tumin2 / np.maximum(tuminl, 1e-8)
-        # project tumax back to tria plane and normalize (will not be orthogonal to tumin)
+        # project tumax back to tria plane and normalize
+        #   (will not be orthogonal to tumin)
         # tumax1 = tumax - tn * (np.sum(tn * tumax, axis=1)).reshape(-1, 1)
         # in a second step orthorgonalize to tumin
         # tumax1 = tumax1 - tumin * (np.sum(tumin * tumax1, axis=1)).reshape(-1, 1)
@@ -861,8 +865,10 @@ class TriaMesh:
         # or simply create vector that is orthogonal to both normal and tumin
         tumax2 = np.cross(tn, tumin2)
         # if really necessary flip direction if that is true for inputs
-        # tumax3 = np.sign(np.sum(np.cross(tumin, tumax) * tn, axis=1)).reshape(-1, 1) * tumax2
-        # I wonder how much changes, if we first map umax to tria and then find orhtogonal umin next?
+        # tumax3 = np.sign(np.sum(np.cross(tumin, tumax) * tn, axis=1)).reshape(-1, 1)
+        #           * tumax2
+        # I wonder how much changes, if we first map umax to tria and then
+        #   find orhtogonal umin next?
         return tumin2, tumax2, tcmin, tcmax
 
     def normalize_(self):
@@ -921,7 +927,8 @@ class TriaMesh:
     def refine_(self, it=1):
         """
         Refines the triangle mesh by placing new vertex on each edge midpoint
-        and thus creating 4 similar triangles from one parent triangle. Modifies mesh in place
+        and thus creating 4 similar triangles from one parent triangle.
+        Modifies mesh in place
 
         Parameters
         ----------
@@ -977,9 +984,10 @@ class TriaMesh:
         Algorithm:
         1. Construct list for each half-edge with its triangle and edge direction
         2. Drop boundary half-edges and find half-edge pairs
-        3. Construct sparse matrix with triangle neighbors, with entry 1 for opposite half edges
-           and -1 for parallel half-edges (normal flip across this edge)
-        4. Flood mesh from first tria using triangle neighbor matrix - keeping track of sign
+        3. Construct sparse matrix with triangle neighbors, with entry 1 for opposite
+            half edges and -1 for parallel half-edges (normal flip across this edge)
+        4. Flood mesh from first tria using triangle neighbor matrix
+            - keeping track of sign
         5. When flooded, negative sign for a triangle indicates it needs to be flipped
         6. If global volume is negative, flip everything (first tria was wrong)
 
@@ -1040,7 +1048,8 @@ class TriaMesh:
             tsgn = np.append(tsgn, tsgn)
             i = np.append(tdir[:, 0], tdir[:, 1])
             j = np.append(tdir[:, 1], tdir[:, 0])
-            # construct sparse tria neighbor matrix where weights indicate normal flips across edge
+            # construct sparse tria neighbor matrix where
+            #   weights indicate normal flips across edge
             tmat = sparse.csc_matrix((tsgn, (i, j)))
             tdim = max(i) + 1
             tmat = tmat + sparse.eye(tdim)

@@ -13,7 +13,7 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 
     Parameters
     ----------
-    fid : file-like, deufault=None
+    fid : file-like, default=None
         The file to write to, passed to :func:`print`.
         Can be None to use :data:`sys.stdout`.
     developer : bool, default=False

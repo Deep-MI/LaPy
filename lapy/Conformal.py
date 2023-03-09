@@ -39,7 +39,8 @@ def spherical_conformal_map(tria):
     -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-       "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+       "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+       for Genus-0 Closed Brain Surfaces."
        SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted from Matlab code at
@@ -62,7 +63,8 @@ def spherical_conformal_map(tria):
     # If it turns out that the spherical parameterization result is homogeneous
     # you can try to change bigtri to the id of some other triangles with good quality
 
-    # North pole step: Compute spherical map by solving laplace equation on a big triangle
+    # North pole step: Compute spherical map
+    #   by solving laplace equation on a big triangle
     nv = tria.v.shape[0]
     S = Solver(tria)
     M = S.stiffness.astype(complex)
@@ -185,8 +187,8 @@ def spherical_conformal_map(tria):
 
 def mobius_area_correction_spherical(tria, mapping):
     """
-    Find an optimal Mobius transformation for reducing the area distortion of a spherical conformal parameterization
-    using the method in [1].
+    Find an optimal Mobius transformation for reducing the area distortion
+    of a spherical conformal parameterization using the method in [1].
 
     Parameters
     -------
@@ -208,7 +210,8 @@ def mobius_area_correction_spherical(tria, mapping):
     -------
     If you use this code in your own work, please cite the following paper:
     [1] G. P. T. Choi, Y. Leung-Liu, X. Gu, and L. M. Lui,
-        "Parallelizable global conformal parameterization of simply-connected surfaces via partial welding."
+        "Parallelizable global conformal parameterization
+        of simply-connected surfaces via partial welding."
         SIAM Journal on Imaging Sciences, 2020.
 
     Adopted by Martin Reuter from Matlab code at
@@ -285,7 +288,8 @@ def beltrami_coefficient(tria, mapping):
     -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+    for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted by Martin Reuter from Matlab code at
@@ -365,7 +369,8 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     ------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+    for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted by Martin Reuter from Matlab code at
@@ -472,7 +477,8 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
     ------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+    for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted by Martin Reuter from Matlab code at
@@ -515,7 +521,8 @@ def stereographic(u):
     -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+     for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted by Martin Reuter from Matlab code at
@@ -525,7 +532,6 @@ def stereographic(u):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
 
     x = u[:, 0]
     y = u[:, 1]
@@ -554,7 +560,8 @@ def inverse_stereographic(u):
     -------
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces."
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+     for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted by Martin Reuter from Matlab code at

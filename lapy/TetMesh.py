@@ -174,11 +174,11 @@ class TetMesh:
 
     def boundary_tria(self, tetfunc=None):
         """
-        Get boundary triangle mesh of tetrahedra (can have multiple connected components).
-        Tria will have same vertices (including free vertices), so that the tria indices
-        agree with the tet-mesh, in case we want to transfer information back, e.g.
-        a FEM boundary condition, or to access a TetMesh vertex function with
-        TriaMesh.t indices.
+        Get boundary triangle mesh of tetrahedra (can have multiple connected
+        components). Tria will have same vertices (including free vertices),
+        so that the tria indices agree with the tet-mesh, in case we want to
+        transfer information back, e.g. a FEM boundary condition, or to access
+        a TetMesh vertex function with TriaMesh.t indices.
 
         !! Note, that it seems to be returning non-oriented triangle meshes,
         may need some debugging, until then use tria.orient_() after this. !!

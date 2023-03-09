@@ -5,9 +5,10 @@ from collections import OrderedDict
 import numpy as np
 
 """
-Read FreeSurfer geometry (fix for dev, ll 126-128); 
+Read FreeSurfer geometry (fix for dev, ll 126-128);
 
-Code was taken from nibabel.freesurfer package (https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
+Code was taken from nibabel.freesurfer package
+(https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
 This software is licensed under the following license:
 
 The MIT License

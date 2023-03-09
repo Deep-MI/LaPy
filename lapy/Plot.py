@@ -258,7 +258,7 @@ def plot_tet_mesh(
     plot_edges : bool, Default=False
         whether to plot edges or not
     plot_levels : bool, Default=False
-        wheter to plot levels or not
+        whether to plot levels or not
     tfunc : function, Default=None
         3d vector function of gradient
     cutting : str, Default=None
@@ -437,13 +437,13 @@ def plot_tria_mesh(
     plot_edges : bool, Default=False
         whether to plot edges or not
     plot_levels : bool, Default=False
-        wheter to plot levels or not
+        whether to plot levels or not
     edge_color : str, Default="rgb(50,50,50)"
         color of the edge
     tic_color : str, Default="rgb(50,200,10)"
         color of the ticks
     background_color : str, Default=None
-        color of backround
+        color of background
     flatshading : bool, Default=False
         whether normal smoothing is applied to the meshes or not
     view : [MISSING]

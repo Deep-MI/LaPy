@@ -868,7 +868,7 @@ class TriaMesh:
         # tumax3 = np.sign(np.sum(np.cross(tumin, tumax) * tn, axis=1)).reshape(-1, 1)
         #           * tumax2
         # I wonder how much changes, if we first map umax to tria and then
-        #   find orhtogonal umin next?
+        #   find orthogonal umin next?
         return tumin2, tumax2, tcmin, tcmax
 
     def normalize_(self):

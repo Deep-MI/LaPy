@@ -97,7 +97,7 @@ class TriaMesh:
     """
 
     def __init__(self, v, t, fsinfo=None):
-        """ Constructor
+        """Constructor
 
         Parameters
         ----------

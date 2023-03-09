@@ -46,7 +46,7 @@ class TetMesh:
     """
 
     def __init__(self, v, t):
-        """ Constructor
+        """Constructor
 
         Parameters
         ----------
@@ -74,7 +74,7 @@ class TetMesh:
         self.adj_sym = self.construct_adj_sym()
 
     def construct_adj_sym(self):
-        """ Creates adjacency symmetric matrix
+        """Creates adjacency symmetric matrix
 
         The adjacency matrix will be symmetric. Each inner
         edge will get the number of tetrahedra that contain this edge.

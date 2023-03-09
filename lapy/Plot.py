@@ -18,7 +18,7 @@ from .TetMesh import TetMesh
 
 
 def _get_color_levels():
-    """ [MISSING]
+    """[MISSING]
 
     Returns
     -------
@@ -137,7 +137,7 @@ def _get_colorscale(vmin, vmax):
 
 
 def _get_colorval(t, colormap):
-    """ [MISSING]
+    """[MISSING]
 
     Parameters
     ----------

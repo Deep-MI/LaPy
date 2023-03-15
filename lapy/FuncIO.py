@@ -104,7 +104,7 @@ def import_ev(infile):
     Returns
     -------
     d: dict
-        dictionary of eigenvalues, eigenvectors (optional), and associated 
+        dictionary of eigenvalues, eigenvectors (optional), and associated
         information
     """
 
@@ -239,7 +239,7 @@ def export_ev(outfile, d):
     outfile : str
         filename to save to
     d : dict
-        dictionary of eigenvalues, eigenvectors (optional), and associated 
+        dictionary of eigenvalues, eigenvectors (optional), and associated
         information
     """
 

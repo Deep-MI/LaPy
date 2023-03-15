@@ -401,7 +401,7 @@ def plot_tria_mesh(
     no_display=False,
 ):
     """
-    plot tria mesh 
+    plot tria mesh
 
     Parameters
     ----------
@@ -456,7 +456,7 @@ def plot_tria_mesh(
 
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
-    
+
     if type(tria).__name__ != "TriaMesh":
         raise ValueError("plot_tria_mesh works only on TriaMesh class")
 

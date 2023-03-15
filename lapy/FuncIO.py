@@ -104,7 +104,8 @@ def import_ev(infile):
     Returns
     -------
     d: dict
-        dictionary of EV [MISSING]
+        dictionary of eigenvalues, eigenvectors (optional), and associated 
+        information
     """
 
     # open file
@@ -238,7 +239,8 @@ def export_ev(outfile, d):
     outfile : str
         filename to save to
     d : dict
-        data dictionary [MISSING]
+        dictionary of eigenvalues, eigenvectors (optional), and associated 
+        information
     """
 
     # open file

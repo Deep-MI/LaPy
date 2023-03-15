@@ -73,11 +73,11 @@ def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
     Parameters
     ----------
     out : Callable
-        [MISSING]
+        output function
     ljust : int
-         [MISSING]
+         length of returned string
     dependencies : List[str]
-        [MISSING]
+        list of dependencies
 
     """
 

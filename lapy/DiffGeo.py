@@ -136,7 +136,7 @@ def tria_compute_geodesic_f(tria, vfunc):
     Parameters
     ----------
     tria : TriaMesh
-        geometry vertices [MISSING]
+        geometry vertices
             v           vertices
             t           triangles
     vfunc : function
@@ -682,7 +682,7 @@ def tet_compute_gradient(tet, vfunc):
 
     Parameters
     ----------
-    tet : [MISSING]
+    tet : TetMesh
     vfunc : function
         scalar function at vertices
 
@@ -745,7 +745,7 @@ def tet_compute_divergence(tet, tfunc):
 
     Parameters
     ----------
-    tet : [MISSING]
+    tet : TetMesh
     tfunc : function
         3d vector field on tets
 

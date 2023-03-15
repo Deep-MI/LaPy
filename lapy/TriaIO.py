@@ -22,7 +22,7 @@ def import_fssurf(infile):
         loaded triangle mesh
     """
 
-    verbose = 1  # [MISSING]
+    verbose = 1
     if verbose > 0:
         print("--> FS Surf format     ... ")
     try:
@@ -219,15 +219,15 @@ def import_gmsh(infile):
     Returns
     -------
     points : np.ndarray
-        List of points [MISSING]
+        List of points
     cells : array_like
-        List of cells [MISSING]
+        List of cells
     point_data : array_like
-        data of points [MISSING]
+        data of points
     cell_data : aray_like
-        data of cells [MISSING]
+        data of cells
     field_data : array_like
-        data of fields [MISSING]
+        data of fields
 
     Notes
     -------

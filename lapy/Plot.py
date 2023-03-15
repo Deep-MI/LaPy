@@ -18,7 +18,7 @@ from .TetMesh import TetMesh
 
 
 def _get_color_levels():
-    """[MISSING]
+    """returns a pre-set colorscale
 
     Returns
     -------
@@ -137,7 +137,7 @@ def _get_colorscale(vmin, vmax):
 
 
 def _get_colorval(t, colormap):
-    """[MISSING]
+    """turn a scalar value into a color value
 
     Parameters
     ----------
@@ -184,7 +184,7 @@ def _map_z2color(zval, colormap, zmin, zmax):
     Parameters
     ----------
     zval : float
-        [MISSING]
+        value to be mapped
     colormap : matplotlib.colors.LinearSegmentedColormap or np.ndarray
         list of values and color code strings
     zmin : float
@@ -238,16 +238,10 @@ def plot_tet_mesh(
     caxis=None,
 ):
     """
-    this is a function to plot tetra meshes
+    plot tetra meshes
 
-    it is essentially a wrapper around the plotTriaMesh function,
-    as the tetra mesh will be converted to its tria boundary mesh,
+    the tetra mesh will be converted to its tria boundary mesh,
     and only this will be plotted.
-
-
-
-    only tetras whose vertices fulfill all criteria will be considered
-    for plotting
 
     Parameters
     ----------
@@ -398,7 +392,6 @@ def plot_tria_mesh(
     tic_color="rgb(50,200,10)",
     background_color=None,
     flatshading=False,
-    view=None,
     width=800,
     height=800,
     camera=None,
@@ -408,7 +401,7 @@ def plot_tria_mesh(
     no_display=False,
 ):
     """
-    [MISSING]
+    plot tria mesh 
 
     Parameters
     ----------
@@ -446,7 +439,6 @@ def plot_tria_mesh(
         color of background
     flatshading : bool, Default=False
         whether normal smoothing is applied to the meshes or not
-    view : [MISSING]
     width : int, Default=800
         width of the plot (in px)
     height : int, Default=800
@@ -464,7 +456,7 @@ def plot_tria_mesh(
 
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
-    #
+    
     if type(tria).__name__ != "TriaMesh":
         raise ValueError("plot_tria_mesh works only on TriaMesh class")
 

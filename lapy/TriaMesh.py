@@ -108,7 +108,7 @@ class TriaMesh:
             Ordering is important: All triangles should be
             oriented the same way (counter-clockwise, when
             looking from above)
-        fsinfo : [MISSING], Default=None
+        fsinfo : dict, Default=None
             FreeSurfer Surface Header Info
 
         Raises
@@ -994,7 +994,7 @@ class TriaMesh:
         Returns
         -------
         flipped : int
-            [MISSING]
+            number of trias flipped
 
         Raises
         ------

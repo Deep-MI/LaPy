@@ -13,12 +13,13 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 
     Parameters
     ----------
-    fid : file-like | None
+    fid : file-like, default=None
         The file to write to, passed to :func:`print`.
         Can be None to use :data:`sys.stdout`.
-    developer : bool
+    developer : bool, default=False
         If True, display information about optional dependencies.
     """
+
     ljust = 26
     out = partial(print, end="", file=fid)
     package = __package__.split(".")[0]
@@ -67,7 +68,19 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 
 
 def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
-    """List dependencies names and versions."""
+    """List dependencies names and versions.
+
+    Parameters
+    ----------
+    out : Callable
+        output function
+    ljust : int
+         length of returned string
+    dependencies : List[str]
+        list of dependencies
+
+    """
+
     for dep in dependencies:
         # handle dependencies with version specifiers
         specifiers_pattern = r"(~=|==|!=|<=|>=|<|>|===)"

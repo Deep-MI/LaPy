@@ -1,12 +1,10 @@
 """
-
 Dependency:
     plotly 3.6
 
 In jupyter notebook do this:
     import plotly
     plotly.offline.init_notebook_mode(connected=True)
-
 """
 import re
 from bisect import bisect
@@ -20,6 +18,14 @@ from .TetMesh import TetMesh
 
 
 def _get_color_levels():
+    """returns a pre-set colorscale
+
+    Returns
+    -------
+    colorscale: array_like of shape (38, 2)
+        vector color for different levels
+    """
+
     color1 = "rgb(55, 155, 255)"
     color2 = "rgb(255, 255, 0)"
     colorscale = [
@@ -66,7 +72,22 @@ def _get_color_levels():
 
 
 def _get_colorscale(vmin, vmax):
-    # put together a colorscale map depending on the range of v-values
+    """
+    put together a colorscale map depending on the range of v-values
+    Parameters
+
+    ----------
+    vmin : float
+        minimum value
+    vmax : float
+        maximum value
+
+    Returns
+    -------
+    colorscale: array_like of shape (2,2)
+        colorscale map
+    """
+
     if vmin > vmax:
         raise ValueError("incorrect relation between vmin and vmax")
     # color definitions
@@ -116,10 +137,21 @@ def _get_colorscale(vmin, vmax):
 
 
 def _get_colorval(t, colormap):
-    # t must be 0...1 and
-    # colormap is a list of values and color code strings
-    #     (should have entries at least for 0 and 1)
-    # we return the interpolated color for this value of t
+    """turn a scalar value into a color value
+
+    Parameters
+    ----------
+    t : float
+        must be 0...1
+    colormap : array_like
+        list of values and color code strings (should have entries at least for 0 and 1)
+
+    Returns
+    -------
+    cstr/*: str
+        interpolated color for this value of t
+    """
+
     if t == 0:
         return colormap[0][1]
     if t == 1:
@@ -146,7 +178,26 @@ def _get_colorval(t, colormap):
 
 
 def _map_z2color(zval, colormap, zmin, zmax):
-    # map the normalized value zval to a corresponding color in the colormap
+    """
+    map the normalized value zval to a corresponding color in the colormap
+
+    Parameters
+    ----------
+    zval : float
+        value to be mapped
+    colormap : matplotlib.colors.LinearSegmentedColormap or np.ndarray
+        list of values and color code strings
+    zmin : float
+        minimum
+    zmax : float
+        minimum
+
+    Returns
+    -------
+    rgb : str
+        corresponding color of the zval
+    """
+
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
 
@@ -171,7 +222,7 @@ def _map_z2color(zval, colormap, zmin, zmax):
 def plot_tet_mesh(
     tetra,
     vfunc=None,
-    plot_edges=None,
+    plot_edges=False,
     plot_levels=False,
     tfunc=None,
     cutting=None,
@@ -187,25 +238,56 @@ def plot_tet_mesh(
     caxis=None,
 ):
     """
-    this is a function to plot tetra meshes
+    plot tetra meshes
 
-    it is essentially a wrapper around the plotTriaMesh function,
-    as the tetra mesh will be converted to its tria boundary mesh,
+    the tetra mesh will be converted to its tria boundary mesh,
     and only this will be plotted.
 
-    to view the 'interior' of the tetra mesh, one or more cutting
-    criteria can be defined as input arguments to this function:
+    Parameters
+    ----------
+    tetra : lapy.TetMesh.TetMesh
+        tetraheral mesh to plot
+    vfunc : function, Default=None
+        scalar function at vertices
+    plot_edges : bool, Default=False
+        whether to plot edges or not
+    plot_levels : bool, Default=False
+        whether to plot levels or not
+    tfunc : function, Default=None
+        3d vector function of gradient
+    cutting : str, Default=None
+        to view the 'interior' of the tetra mesh, one or more cutting
+        criteria can be defined as input arguments to this function:
 
-    e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
+        e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
 
-    where x,y,z represent dimensions 0,1,2 of the vertex array,
-    and f represents the vfunc (which cannot be None if f is used
-    to define a cutting criterion)
-
-    only tetras whose vertices fulfill all criteria will be considered
-    for plotting
-
+        where x,y,z represent dimensions 0,1,2 of the vertex array,
+        and f represents the vfunc (which cannot be None if f is used
+        to define a cutting criterion)
+    edge_color : str, Default="rgb(50,50,50)"
+        color of the edge
+    html_output : bool, Default=False
+        weather or not to give out as html output
+    width : int, Default=800
+        width of the plot (in px)
+    height : int, Default=800
+        height  of the plot (in px)
+    flatshading : bool, Default=False
+        whether normal smoothing is applied to the meshes or not
+    xrange : list or tuple of shape (2, 1)
+        Sets the range of the x-axis
+    yrange : list or tuple of shape (2, 1)
+        Sets the range of the y-axis
+    zrange :  list or tuple of shape (2, 1)
+        Sets the range of the z-axis
+    showcaxis : bool, Default=False
+        whether a colorbar is displayed or not
+    caxis : list or tuple of shape (2, 1):
+        Sets the bound of the color domain.
+        caxis[0] is lower bound caxis[1] upper bound.
+        Elements are int or float
     """
+
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
 
@@ -222,7 +304,8 @@ def plot_tet_mesh(
         # check if vfunc is defined when functional thresholds are used, otherwise exit
         if any(["f" in x for x in cutting]) and vfunc is None:
             raise ValueError(
-                "Need to specify vfunc if 'f' is used within the 'cutting' argument, exiting."
+                "Need to specify vfunc if 'f' is used"
+                " within the 'cutting' argument, exiting."
             )
 
         # create criteria from cutting info
@@ -303,13 +386,12 @@ def plot_tria_mesh(
     xrange=None,
     yrange=None,
     zrange=None,
-    plot_edges=None,
+    plot_edges=False,
     plot_levels=False,
     edge_color="rgb(50,50,50)",
     tic_color="rgb(50,200,10)",
     background_color=None,
     flatshading=False,
-    view=None,
     width=800,
     height=800,
     camera=None,
@@ -318,9 +400,63 @@ def plot_tria_mesh(
     scale_png=1.0,
     no_display=False,
 ):
+    """
+    plot tria mesh
+
+    Parameters
+    ----------
+    tria : lapy.TriaMesh.Triamesh
+        triangle mesh to plot
+    vfunc : function, Default=None
+        scalar function at vertices
+    tfunc : function, Default=None
+        3d vector function of gradient
+    vcolor : list of str, Default=None
+        Sets the color of each vertex
+    tcolor : list of str, Default=None
+         Sets the color of each face
+    showcaxis : bool, Default=False
+        whether a colorbar is displayed or not
+    caxis : list or tuple of shape (2, 1):
+        Sets the bound of the color domain.
+        caxis[0] is lower bound caxis[1] upper bound.
+        Elements are int or float
+    xrange : list or tuple of shape (2, 1)
+        Sets the range of the x-axis
+    yrange : list or tuple of shape (2, 1)
+        Sets the range of the y-axis
+    zrange :  list or tuple of shape (2, 1)
+        Sets the range of the z-axis
+    plot_edges : bool, Default=False
+        whether to plot edges or not
+    plot_levels : bool, Default=False
+        whether to plot levels or not
+    edge_color : str, Default="rgb(50,50,50)"
+        color of the edge
+    tic_color : str, Default="rgb(50,200,10)"
+        color of the ticks
+    background_color : str, Default=None
+        color of background
+    flatshading : bool, Default=False
+        whether normal smoothing is applied to the meshes or not
+    width : int, Default=800
+        width of the plot (in px)
+    height : int, Default=800
+        height  of the plot (in px)
+    camera :
+    html_output : bool, Default=False
+        weather or not to give out as html output
+    export_png : str or writeable, Default=None
+        local file path or a writeable object to write the image on
+    scale_png : int or float
+        scale factor of image. >1.0 increase resolution; <1.0 decrease resolution
+    no_display : bool, Default=False
+        whether to plot on display or not
+    """
+
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
-    #
+
     if type(tria).__name__ != "TriaMesh":
         raise ValueError("plot_tria_mesh works only on TriaMesh class")
 
@@ -328,12 +464,14 @@ def plot_tria_mesh(
         vcolor is not None or tcolor is not None
     ):
         raise ValueError(
-            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vfunc/tfunc or vcolor/tcolor,"
+            " but not both at the same time"
         )
 
     if vcolor is not None and tcolor is not None:
         raise ValueError(
-            "plot_tria_mesh can only use either vcolor or tcolor, but not both at the same time"
+            "plot_tria_mesh can only use either vcolor or tcolor,"
+            " but not both at the same time"
         )
 
     x, y, z = zip(*tria.v)

@@ -6,7 +6,22 @@ def import_vfunc_deprecated(infile):
     Imports vertex function from txt file. Values can be separated by ; or ,
     and surrounded by {} or () brackets. Also first line can have the
     keyword "Solution:", i.e. the PSOL format from ShapeDNA
+
+    Parameters
+    ----------
+    infile : str
+        filename of input
+
+    Returns
+    -------
+    vals : list
+        list of vfunc parameters
+
+    Notes
+    ------
+    deprecated, use import_vfunc() instead
     """
+
     import re
 
     try:
@@ -38,6 +53,16 @@ def import_vfunc(filename):
     Imports vertex function from txt file. Values can be separated by ; or ,
     and surrounded by {} or () brackets. Also first line can have the
     keyword "Solution:", i.e. the PSOL format from ShapeDNA
+
+    Parameters
+    ----------
+    filename : str
+        filename of input
+
+    Returns
+    -------
+    vals : np.ndarray
+        list of vfunc parameters
     """
 
     import re
@@ -48,7 +73,7 @@ def import_vfunc(filename):
         with open(filename) as f:
             txt = f.readlines()
     except IOError:
-        print("[File " + infile + " not found or not readable]")
+        print("[File " + filename + " not found or not readable]")
         return
 
     txt = [x.strip() for x in txt]
@@ -70,7 +95,19 @@ def import_vfunc(filename):
 def import_ev(infile):
     """
     Load EV file
+
+    Parameters
+    ----------
+    infile : str
+        filename of input
+
+    Returns
+    -------
+    d: dict
+        dictionary of eigenvalues, eigenvectors (optional), and associated
+        information
     """
+
     # open file
     try:
         f = open(infile, "r")
@@ -196,7 +233,16 @@ def export_ev(outfile, d):
     """
     Save EV data structures as txt file (format from ShapeDNA)
     usage: exportEV(data,outfile)
+
+    Parameters
+    ----------
+    outfile : str
+        filename to save to
+    d : dict
+        dictionary of eigenvalues, eigenvectors (optional), and associated
+        information
     """
+
     # open file
     try:
         f = open(outfile, "w")
@@ -284,7 +330,15 @@ def export_vfunc(outfile, vfunc):
     """
     Exports vertex function in PSOL txt file:
     First line "Solution:", "," separated values inside ()
+
+    Parameters
+    ----------
+    outfile : str
+        filename to save to
+    vfunc : array_like
+        list of vfunc parameters
     """
+
     try:
         f = open(outfile, "w")
     except IOError:

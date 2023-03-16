@@ -26,9 +26,9 @@ def import_optional_dependency(
     ----------
     name : str
         The module name.
-    extra : str
+    extra : str, default=""
         Additional text to include in the ImportError message.
-    raise_error : bool
+    raise_error : bool, default=True
         What to do when a dependency is not found.
         * True : Raise an ImportError.
         * False: Return None.
@@ -39,7 +39,13 @@ def import_optional_dependency(
         The imported module when found.
         None is returned when the package is not found and raise_error is
         False.
+
+    Raises
+    -------
+    ImportError
+        dependency not found; see raise_error
     """
+
     package_name = INSTALL_MAPPING.get(name)
     install_name = package_name if package_name is not None else name
 

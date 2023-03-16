@@ -2,8 +2,8 @@ import numpy as np
 import scipy.spatial.distance as di
 
 from .Solver import Solver
-from .TetMesh import TetMesh
-from .TriaMesh import TriaMesh
+from .TetMesh import TetMesh  # noqa: F401
+from .TriaMesh import TriaMesh  # noqa: F401
 
 # compute shapeDNA
 
@@ -13,14 +13,26 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     a function to compute the shapeDNA descriptor for triangle or tetrahedral
     meshes
 
-    Inputs:     geom        geometry object; either TriaMesh or TetMesh
-                k           number of eigenfunctions / eigenvalues
-                lump, aniso, aniso_smooth
-                            arguments for 'Solver' class
+    Parameters
+    ----------
+    geom : TriaMesh or TetMesh
+        geometry object
+    k : int, default=50
+        number of eigenfunctions / eigenvalues
+    lump : bool, Default=False
+        If True, lump the mass matrix (diagonal)
+            (See 'lapy.Solver.Solver' class)
+    aniso :  float or tuple of shape (2,)
+        Anisotropy for curvature based anisotopic Laplace.
+            (See 'lapy.Solver.Solver' class)
+    aniso_smooth : int
+        Number of smoothing iterations for curvature computation on vertices.
+            (See 'lapy.Solver.Solver' class)
 
-    :return:    ev          a dictionary, including 'Eigenvalues' and
-                            'Eigenvectors' fields
-
+    Returns
+    -------
+    ev : dict
+         a dictionary, including 'Eigenvalues' and 'Eigenvectors' fields
     """
 
     # get fem, evals, evecs
@@ -43,8 +55,6 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     evDict["Eigenvalues"] = evals
     evDict["Eigenvectors"] = evecs
 
-    # return
-
     return evDict
 
 
@@ -55,13 +65,21 @@ def normalize_ev(geom, evals, method="geometry"):
     """
     a function for surface / volume normalization
 
-    Inputs:     geom         geometry object; either TriaMesh or TetMesh
-                evals        vector of eigenvalues
-                method       either "surface", "volume", or "geometry";
-                             "geometry" will perform surface normalization for
-                             2D objects, and volume normalization for 3D objects
+    Parameters
+    ----------
+    geom : TriaMesh or TetMesh
+        geometry object
+    evals : array_like
+        vector of eigenvalues
+    method : str
+        either "surface", "volume", or "geometry";
+        "geometry" will perform surface normalization for
+        2D objects, and volume normalization for 3D objects
 
-    :return:    evals        vector of reweighted eigenvalues
+    Returns
+    -------
+    array_like
+        vector of reweighted eigenvalues
     """
 
     if method == "surface":
@@ -107,9 +125,15 @@ def reweight_ev(evals):
     """
     a function for linear reweighting
 
-    Inputs:     evals        vector of eigenvalues
+    Parameters
+    ----------
+    evals : array_like
+        vector of eigenvalues
 
-    :return:    evals        vector of reweighted eigenvalues
+    Returns
+    -------
+    evals: array_like
+        vector of reweighted eigenvalues
     """
 
     # evals[1:] = evals[1:] / np.arange(1, len(evals))
@@ -126,10 +150,17 @@ def compute_distance(ev1, ev2, dist="euc"):
     a function to compute the shape asymmetry from two shapeDNA descriptors
     for triangle or tetrahedral meshes
 
-    Inputs:     ev1, ev2    eigenvalues
-                distance    distance measure; currently only 'euc' (euclidean)
+    Parameters
+    ----------
+    ev1, ev2 : float
+        eigenvalues
+    dist : str
+        distance measure; currently only 'euc' (euclidean)
 
-    :return:    dst         a distance measure
+    Returns
+    -------
+    * :  double
+        a distance measure
     """
 
     if dist == "euc":

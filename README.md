@@ -21,11 +21,6 @@ project with extended differential geometry capabilities.
 - ShapeDNA: compute the ShapeDNA descriptor of surfaces and solids
 - Plot: functions for interactive visualization (wrapping plotly)
 
-## ToDo:
-
-- Add unit tests and automated testing (e.g. travis)
-- Add command line scripts for various functions
-
 ## Usage:
 
 The LaPy package is a comprehensive collection of scripts, so we refer to the

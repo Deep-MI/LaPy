@@ -20,7 +20,7 @@ Version 0.5
 Enhancements
 ------------
 
-- Comply with the numpy convention for docstrings (by `Andreas Girodi`_, `Kersten Diers`_ and `Martin Reuter`_ in :pr:`19` :pr:`21`)
+- Comply with the numpy convention for docstrings (by `Andreas Girodi`_, `Kersten Diers`_ and `Martin Reuter`_ in :pr:`19` and :pr:`21`)
 - Add documentation build (by `Mathieu Scheltienne`_ in :pr:`22`)
 
 Bugs

@@ -22,8 +22,7 @@ from .utils._imports import import_optional_dependency
 
 
 def spherical_conformal_map(tria):
-    """
-    A linear method for computing spherical conformal map of a genus-0 closed surface
+    """Compute spherical conformal map of a genus-0 closed surface with a linear method.
 
     Parameters
     ----------
@@ -36,7 +35,7 @@ def spherical_conformal_map(tria):
         vertex coordinates of the spherical conformal parameterization
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
        "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -50,7 +49,6 @@ def spherical_conformal_map(tria):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
         print("ERROR: The mesh is not a genus-0 closed surface ..")
@@ -186,12 +184,10 @@ def spherical_conformal_map(tria):
 
 
 def mobius_area_correction_spherical(tria, mapping):
-    """
-    Find an optimal Mobius transformation for reducing the area distortion
-    of a spherical conformal parameterization using the method in [1].
+    r"""Find an optimal Mobius transformation for reducing the area distortion of a spherical conformal parameterization using the method in footcite:t:`conformal_parameterization_2020`.
 
     Parameters
-    -------
+    ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
     mapping : np.ndarray of shape (n,3)
@@ -207,21 +203,17 @@ def mobius_area_correction_spherical(tria, mapping):
                 = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j))
 
     Notes
-    -------
-    If you use this code in your own work, please cite the following paper:
-    [1] G. P. T. Choi, Y. Leung-Liu, X. Gu, and L. M. Lui,
-        "Parallelizable global conformal parameterization
-        of simply-connected surfaces via partial welding."
-        SIAM Journal on Imaging Sciences, 2020.
-
-    Adopted by Martin Reuter from Matlab code at
+    -----
+    Adapted by Martin Reuter from Matlab code at
     https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2019-2020, Gary Pui-Tung Choi
+    with this Copyright (c) 2019-2020, Gary Pui-Tung Choi
     https://scholar.harvard.edu/choi
     and has been distributed with the Apache 2 License
-    """
 
+    References
+    ----------
+    .. footbibliography::
+    """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
     area_t = area_t / area_t.sum()
@@ -269,8 +261,7 @@ def mobius_area_correction_spherical(tria, mapping):
 
 
 def beltrami_coefficient(tria, mapping):
-    """
-    Compute the Beltrami coefficient of a mapping.
+    """Compute the Beltrami coefficient of a mapping.
 
     Parameters
     ----------
@@ -285,7 +276,7 @@ def beltrami_coefficient(tria, mapping):
     mu: np.ndarray of complex beltrami coefficient per triangle
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -299,7 +290,6 @@ def beltrami_coefficient(tria, mapping):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         print("ERROR: mesh should be on complex plane ..")
@@ -346,8 +336,7 @@ def beltrami_coefficient(tria, mapping):
 
 
 def linear_beltrami_solver(tria, mu, landmark, target):
-    """
-    Linear Beltrami solver
+    """Linear Beltrami solver.
 
     Parameters
     ----------
@@ -365,7 +354,7 @@ def linear_beltrami_solver(tria, mu, landmark, target):
         vertex coordinates of new mapping
 
     Notes
-    ------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -379,7 +368,6 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         print("ERROR: mesh should be on complex plane ..")
@@ -455,8 +443,7 @@ def linear_beltrami_solver(tria, mu, landmark, target):
 
 
 def sparse_symmetric_solve(A, b, use_cholmod=True):
-    """
-    A sparse symmetric solver for ``A x = b``
+    """Sparse symmetric solver for ``A x = b``.
 
     Parameters
     ----------
@@ -471,7 +458,6 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
     -------
     x: np.ndarray of length n, solution to  ``A x = b``
     """
-
     sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
     if sksparse is not None:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
@@ -487,8 +473,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
 
 
 def stereographic(u):
-    """
-    Map sphere to complex plane via stereographic projection
+    """Map sphere to complex plane via stereographic projection.
 
     Parameters
     ----------
@@ -501,7 +486,7 @@ def stereographic(u):
        stereographic map of u in complex plane
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -515,7 +500,6 @@ def stereographic(u):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     x = u[:, 0]
     y = u[:, 1]
     z = u[:, 2]
@@ -526,8 +510,7 @@ def stereographic(u):
 
 
 def inverse_stereographic(u):
-    """
-    Map from complex plane to sphere via inverse stereographic projection
+    """Map from complex plane to sphere via inverse stereographic projection.
 
     Parameters
     ----------
@@ -541,7 +524,7 @@ def inverse_stereographic(u):
         coordinates on sphere in 3D
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -555,7 +538,6 @@ def inverse_stereographic(u):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     if np.iscomplexobj(u):
         x = u.real
         y = u.imag

@@ -13,8 +13,7 @@ from .TetMesh import TetMesh
 
 
 def import_gmsh(infile):
-    """
-    Load GMSH tetrahedron mesh
+    """Load GMSH tetrahedron mesh.
 
     Parameters
     ----------
@@ -26,7 +25,6 @@ def import_gmsh(infile):
     tet : TetMesh
         Object of loaded  GMSH tetrahedron mesh
     """
-
     extension = os.path.splitext(infile)[1]
     verbose = 1
     if verbose > 0:
@@ -114,8 +112,7 @@ def import_gmsh(infile):
 
 
 def import_vtk(infile):
-    """
-    Load VTK tetrahedron mesh
+    """Load VTK tetrahedron mesh.
 
     Parameters
     ----------
@@ -127,7 +124,6 @@ def import_vtk(infile):
     tet : TetMesh
         Object of loaded  VTK tetrahedron mesh
     """
-
     verbose = 1
     if verbose > 0:
         print("--> VTK format         ... ")
@@ -201,8 +197,7 @@ def import_vtk(infile):
 
 
 def export_vtk(tet, outfile):
-    """
-    Save VTK file
+    """Save VTK file.
 
     Parameters
     ----------
@@ -211,7 +206,6 @@ def export_vtk(tet, outfile):
     outfile : str
         filename to save to
     """
-
     # open file
     try:
         f = open(outfile, "w")

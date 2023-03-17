@@ -5,13 +5,9 @@ from .Solver import Solver
 from .TetMesh import TetMesh  # noqa: F401
 from .TriaMesh import TriaMesh  # noqa: F401
 
-# compute shapeDNA
-
 
 def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
-    """
-    a function to compute the shapeDNA descriptor for triangle or tetrahedral
-    meshes
+    """Computethe shapeDNA descriptor for triangle or tetrahedral mesh.
 
     Parameters
     ----------
@@ -34,7 +30,6 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     ev : dict
          a dictionary, including 'Eigenvalues' and 'Eigenvectors' fields
     """
-
     # get fem, evals, evecs
 
     fem = Solver(geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth)
@@ -58,12 +53,8 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     return evDict
 
 
-# function for ev normalization
-
-
 def normalize_ev(geom, evals, method="geometry"):
-    """
-    a function for surface / volume normalization
+    """Normalize a surface or a volume.
 
     Parameters
     ----------
@@ -81,7 +72,6 @@ def normalize_ev(geom, evals, method="geometry"):
     array_like
         vector of reweighted eigenvalues
     """
-
     if method == "surface":
         vol = geom.area()
 
@@ -118,12 +108,8 @@ def normalize_ev(geom, evals, method="geometry"):
             return evals * vol ** np.divide(2.0, 3.0)
 
 
-# function for linear reweighting
-
-
 def reweight_ev(evals):
-    """
-    a function for linear reweighting
+    """Apply linear reweighting.
 
     Parameters
     ----------
@@ -135,20 +121,14 @@ def reweight_ev(evals):
     evals: array_like
         vector of reweighted eigenvalues
     """
-
     # evals[1:] = evals[1:] / np.arange(1, len(evals))
     evals = evals / np.arange(1, len(evals) + 1)
 
     return evals
 
 
-# compute distance
-
-
 def compute_distance(ev1, ev2, dist="euc"):
-    """
-    a function to compute the shape asymmetry from two shapeDNA descriptors
-    for triangle or tetrahedral meshes
+    """Compute the shape asymmetry from two shapeDNA descriptors.
 
     Parameters
     ----------
@@ -162,7 +142,6 @@ def compute_distance(ev1, ev2, dist="euc"):
     * :  double
         a distance measure
     """
-
     if dist == "euc":
         return di.euclidean(ev1, ev2)
     else:

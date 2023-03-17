@@ -1,11 +1,10 @@
-"""
-Dependency:
-    plotly 3.6
+"""Dependency: plotly 3.6.
 
 In jupyter notebook do this:
     import plotly
     plotly.offline.init_notebook_mode(connected=True)
 """
+
 import re
 from bisect import bisect
 
@@ -18,14 +17,13 @@ from .TetMesh import TetMesh
 
 
 def _get_color_levels():
-    """returns a pre-set colorscale
+    """Return a pre-set colorscale.
 
     Returns
     -------
     colorscale: array_like of shape (38, 2)
         vector color for different levels
     """
-
     color1 = "rgb(55, 155, 255)"
     color2 = "rgb(255, 255, 0)"
     colorscale = [
@@ -72,10 +70,9 @@ def _get_color_levels():
 
 
 def _get_colorscale(vmin, vmax):
-    """
-    put together a colorscale map depending on the range of v-values
-    Parameters
+    """Put together a colorscale map depending on the range of v-values.
 
+    Parameters
     ----------
     vmin : float
         minimum value
@@ -87,7 +84,6 @@ def _get_colorscale(vmin, vmax):
     colorscale: array_like of shape (2,2)
         colorscale map
     """
-
     if vmin > vmax:
         raise ValueError("incorrect relation between vmin and vmax")
     # color definitions
@@ -137,7 +133,7 @@ def _get_colorscale(vmin, vmax):
 
 
 def _get_colorval(t, colormap):
-    """turn a scalar value into a color value
+    """Turn a scalar value into a color value.
 
     Parameters
     ----------
@@ -151,7 +147,6 @@ def _get_colorval(t, colormap):
     cstr/*: str
         interpolated color for this value of t
     """
-
     if t == 0:
         return colormap[0][1]
     if t == 1:
@@ -178,8 +173,7 @@ def _get_colorval(t, colormap):
 
 
 def _map_z2color(zval, colormap, zmin, zmax):
-    """
-    map the normalized value zval to a corresponding color in the colormap
+    """Map the normalized value zval to a corresponding color in the colormap.
 
     Parameters
     ----------
@@ -197,7 +191,6 @@ def _map_z2color(zval, colormap, zmin, zmax):
     rgb : str
         corresponding color of the zval
     """
-
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
 
@@ -237,10 +230,9 @@ def plot_tet_mesh(
     showcaxis=False,
     caxis=None,
 ):
-    """
-    plot tetra meshes
+    """Plot tetra meshes.
 
-    the tetra mesh will be converted to its tria boundary mesh,
+    The tetra mesh will be converted to its tria boundary mesh,
     and only this will be plotted.
 
     Parameters
@@ -287,7 +279,6 @@ def plot_tet_mesh(
         caxis[0] is lower bound caxis[1] upper bound.
         Elements are int or float
     """
-
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
 
@@ -400,8 +391,7 @@ def plot_tria_mesh(
     scale_png=1.0,
     no_display=False,
 ):
-    """
-    plot tria mesh
+    """Plot tria mesh.
 
     Parameters
     ----------
@@ -453,7 +443,6 @@ def plot_tria_mesh(
     no_display : bool, Default=False
         whether to plot on display or not
     """
-
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/
 

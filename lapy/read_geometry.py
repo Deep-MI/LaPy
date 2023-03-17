@@ -1,11 +1,4 @@
-# IMPORTS
-import warnings
-from collections import OrderedDict
-
-import numpy as np
-
-"""
-Read FreeSurfer geometry (fix for dev, ll 126-128);
+"""Read FreeSurfer geometry (fix for dev, ll 126-128).
 
 Code was taken from nibabel.freesurfer package
 (https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).
@@ -40,25 +33,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import warnings
+from collections import OrderedDict
+
+import numpy as np
+
 
 def _fread3(fobj):
-    """Read a 3-byte int from an open binary file object
+    """Read a 3-byte int from an open binary file object.
+
     Parameters
     ----------
     fobj : file
         File descriptor
+
     Returns
     -------
     n : int
         A 3 byte int
     """
-
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
     return (b1 << 16) + (b2 << 8) + b3
 
 
 def _read_volume_info(fobj):
-    """Helper for reading the footer from a surface file.
+    """Read the footer from a surface file.
 
     Parameters
     ----------
@@ -70,7 +69,6 @@ def _read_volume_info(fobj):
     volume_info: np.ndarray
         Key-value pairs found in the file.
     """
-
     volume_info = OrderedDict()
     head = np.fromfile(fobj, ">i4", 1)
     if not np.array_equal(head, [20]):  # Read two bytes more
@@ -141,7 +139,6 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
         Returned only if `read_stamp` is True.  The comment added by the
         program that saved the file.
     """
-
     volume_info = OrderedDict()
 
     TRIANGLE_MAGIC = 16777214

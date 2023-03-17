@@ -28,7 +28,6 @@ class TetMesh:
     """
 
     def __init__(self, v, t):
-
         self.v = np.array(v)
         self.t = np.array(t)
         vnum = np.max(self.v.shape)

@@ -41,5 +41,5 @@ jobs:
           check_hidden: true
           skip: './.git,./build,./.mypy_cache,./.pytest_cache'
           ignore_words_file: ./.codespellignore
-      # - name: Run pydocstyle
-      #   run: pydocstyle .
+      - name: Run pydocstyle
+        run: pydocstyle .

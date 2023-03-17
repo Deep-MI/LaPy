@@ -55,6 +55,18 @@ build = [
 chol = [
     'scikit-sparse',
 ]
+doc = [
+    'furo',
+    'matplotlib',
+    'memory-profiler',
+    'numpydoc',
+    'sphinx',
+    'sphinxcontrib-bibtex',
+    'sphinx-copybutton',
+    'sphinx-design',
+    'sphinx-gallery',
+    'sphinx-issues',
+]
 style = [
     'bibclean',
     'black',
@@ -102,10 +114,12 @@ include = '\.pyi?$'
 extend-exclude = '''
 (
       __pycache__
-    | \.github
+    | .github
     | setup.py
     | data/
+    | doc/
     | examples/
+    | tutorials/
 )
 '''
 
@@ -117,7 +131,9 @@ py_version = 38
 extend_skip_glob = [
     'setup.py',
     'data/*',
+    'doc/*',
     'examples/*',
+    'tutorials/*',
 ]
 
 [tool.pydocstyle]

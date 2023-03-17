@@ -276,13 +276,13 @@ def beltrami_coefficient(tria, mapping):
     ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
+        TriaMesh should be planar mapping on complex plane
     mapping : np.ndarray of shape (n,3)
         coordinates of the spherical conformal parameterization
 
     Returns
     -------
-    mu: Union[complex, float]
-        [MISSING]
+    mu: np.ndarray of complex beltrami coefficient per triangle
 
     Notes
     -------
@@ -353,17 +353,16 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
-    mu : Union[complex, float]
-        [MISSING]
-    landmark : np.ndarray of shape ()
-        [MISSING]
-    target : np.ndarray of shape ()
-        [MISSING]
+        TriaMesh should be planar mapping on complex plane
+    mu : np.array of complex beltrami coefficients
+    landmark : np.ndarray of fixed vertex indices
+    target : np.ndarray of shape (n,3)
+        2D landmark target coordinates (third coordinate is zero)
 
     Returns
     -------
     mapping : np.ndarray of shape (n,3)
-        vertex coordinates of [MISSING]
+        vertex coordinates of new mapping
 
     Notes
     ------
@@ -457,12 +456,12 @@ def linear_beltrami_solver(tria, mu, landmark, target):
 
 def sparse_symmetric_solve(A, b, use_cholmod=True):
     """
-    [MISSING]
+    A sparse symmetric solver for ``A x = b``
 
     Parameters
     ----------
-    A : [MISSING]
-    b : [MISSING]
+    A : sparse matrix of shape (n, n)
+    b : np.ndarray vector of length n
     use_cholmod : bool, default=True
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
@@ -470,23 +469,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
 
     Returns
     -------
-    x: np.ndarray
-        [MISSING]
-
-    Notes
-    ------
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
-    Adopted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
+    x: np.ndarray of length n, solution to  ``A x = b``
     """
 
     sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
@@ -505,17 +488,17 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
 
 def stereographic(u):
     """
-    Map sphere to complex plane
+    Map sphere to complex plane via stereographic projection
 
     Parameters
     ----------
-    u : np.ndarray
-        u has three columns (x,y,z)
+    u : np.ndarray of shape (n,3)
+        u represents the three vertex coordinates
 
     Returns
     -------
-    v: np.ndarray
-       return z as array of complex numbers
+    v: np.ndarray of n complex numbers
+       stereographic map of u in complex plane
 
     Notes
     -------
@@ -544,17 +527,18 @@ def stereographic(u):
 
 def inverse_stereographic(u):
     """
-    Computes mapping from complex plane to sphere
+    Map from complex plane to sphere via inverse stereographic projection
 
     Parameters
     ----------
     u : np.ndarray
         can be complex array, or two columns (real,img)
+        for coordinates on complex plane
 
     Returns
     -------
     v: np.ndarray of shape (n,3)
-        coordinates on sphere
+        coordinates on sphere in 3D
 
     Notes
     -------

@@ -7,4 +7,5 @@ This is the reference for classes (``CamelCase`` names) and functions
 .. toctree::
     :maxdepth: 2
 
-    logging.rst
+    lapy.meshes.rst
+    lapy.solver.rst

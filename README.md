@@ -71,6 +71,6 @@ https://doi.org/10.1111/j.1467-8659.2012.03179.x
 
 For conformal mapping plase cite:
 
-[5] Choi PT, Lam KC, Lui LM. FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces. SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+[5] Choi PT, Lam KC, Lui LM. FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces. SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015. https://doi.org/10.1137/130950008
 
 We also invite you to check out our lab webpage at https://deep-mi.org

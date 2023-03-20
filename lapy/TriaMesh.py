@@ -281,7 +281,7 @@ class TriaMesh:
         Returns
         -------
         float
-            Avgerage edge length.
+            Average edge length.
         """
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")

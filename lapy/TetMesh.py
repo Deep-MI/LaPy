@@ -14,17 +14,12 @@ class TetMesh:
     Parameters
     ----------
     v : array_like
-        List of lists of 3 float coordinates
+        List of lists of 3 float coordinates.
     t : array_like
         List of lists of 4 int of indices (>=0) into v array
         Ordering is important: so that t0,t1,t2 are oriented
         counterclockwise when looking from above, and t3 is
         on top of that triangle.
-
-    Raises
-    ------
-    ValueError
-        Max index exceeds number of vertices.
     """
 
     def __init__(self, v, t):
@@ -47,8 +42,8 @@ class TetMesh:
 
         Returns
         -------
-        adj : scipy.sparse.csc_matrix
-            symmetric adjacency matrix as csc sparse matrix
+        adj : csc_matrix
+            Symmetric adjacency matrix as csc sparse matrix.
         """
         t1 = self.t[:, 0]
         t2 = self.t[:, 1]
@@ -66,12 +61,12 @@ class TetMesh:
     def has_free_vertices(self):
         """Check if the vertex list has more vertices than what is used in tetra.
 
-        (same implementation as in TriaMesh)
+        (same implementation as in `~lapy.TriaMesh`)
 
         Returns
         -------
         bool
-            whether vertex list has more vertices than tetra or not
+            Whether vertex list has more vertices than tetra or not.
         """
         vnum = np.max(self.v.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
@@ -87,7 +82,7 @@ class TetMesh:
         Returns
         -------
         oriented: bool
-            True if max(adj_directed)=1
+            True if ``max(adj_directed)=1``.
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t0 = self.t[:, 0]
@@ -122,8 +117,8 @@ class TetMesh:
 
         Returns
         -------
-        double
-            average edge length
+        float
+            Average edge length.
         """
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
@@ -148,15 +143,15 @@ class TetMesh:
 
         Parameters
         ----------
-        tetfunc : array_like, Default=None
-            List of tetra function values (optional)
+        tetfunc : array | None
+            List of tetra function values (optional).
 
         Returns
         -------
         TriaMesh
-            TriaMesh of boundary (potentially >1 components)
-        triafunc array_like
-            List of tria function values (if tetfunc passed)
+            TriaMesh of boundary (potentially >1 components).
+        triafunc : array
+            List of tria function values (only retured if ``tetfunc`` is provided).
         """
         from .TriaMesh import TriaMesh
 
@@ -192,19 +187,14 @@ class TetMesh:
         when constructing, e.g., Laplace matrices.
 
         Will update v and t in mesh.
-        Same implementation as in TriaMesh
+        Same implementation as in `~lapy.TriaMesh`.
 
         Returns
         -------
-        vkeep: np.ndarray
-            Indices (from original list) of kept vertices
-        vdel: np.ndarray
-            Indices of deleted (unused) vertices
-
-        Raises
-        ------
-        ValueError
-            Max index exceeds number of vertices
+        vkeep: array
+            Indices (from original list) of kept vertices.
+        vdel: array
+            Indices of deleted (unused) vertices.
         """
         tflat = self.t.reshape(-1)
         vnum = np.max(self.v.shape)
@@ -240,7 +230,7 @@ class TetMesh:
         Returns
         -------
         onum : int
-            number of re-oriented tetras
+            Number of re-oriented tetras.
         """
         # Compute vertex coordinates and a difference vector for each tetra:
         t0 = self.t[:, 0]

@@ -122,24 +122,27 @@ numpydoc_attributes_as_param_list = False
 # x-ref
 numpydoc_xref_param_type = True
 numpydoc_xref_aliases = {
+    # LaPy
+    "TetMesh": "lapy.TetMesh",
+    "TriaMesh": "lapy.TriaMesh",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
     "Figure": "matplotlib.figure.Figure",
-    # MNE
-    "DigMontage": "mne.channels.DigMontage",
-    "Epochs": "mne.Epochs",
-    "Evoked": "mne.Evoked",
-    "Info": "mne.Info",
-    "Projection": "mne.Projection",
-    "Raw": "mne.io.Raw",
     # Python
     "bool": ":class:`python:bool`",
     "Path": "pathlib.Path",
     "TextIO": "io.TextIOBase",
+    # Scipy
+    "csc_matrix": "scipy.sparse.csc_matrix",
 }
 numpydoc_xref_ignore = {
+    "k",  # Solver, bad variable name
+    "n",  # Solver, bad variable name
+    "N",  # Solver, bad variable name
+    "n_triangles",  # TriaMesh
     "of",
     "shape",
+    "vnum",  # TriaMesh
 }
 
 # validation

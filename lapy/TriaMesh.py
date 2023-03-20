@@ -15,26 +15,26 @@ class TriaMesh:
     Parameters
     ----------
     v : array_like
-        List of lists of 3 float coordinates
+        List of lists of 3 float coordinates.
     t : array_like
         List of lists of 3 int of indices (``≥ 0``) into ``v`` array
         Ordering is important: All triangles should be
         oriented in the same way (counter-clockwise, when
         looking from above).
-    fsinfo : dict, Default=None
+    fsinfo : dict | None
         FreeSurfer Surface Header Info.
 
     Attributes
     ----------
     v : array_like
-        List of lists of 3 float coordinates
+        List of lists of 3 float coordinates.
     t : array_like
         List of lists of 4 int of indices (`` ≥ 0``) into ``v`` array.
-    adj_sym : scipy.sparse.csc_matrix
+    adj_sym : csc_matrix
         Symmetric adjacency matrix as csc sparse matrix.
-    adj_dir :
+    adj_dir : csc_matrix
         Directed adjacency matrix as csc sparse matrix.
-    fsinfo :
+    fsinfo : dict | None
         FreeSurfer Surface Header Info.
     """
 
@@ -66,15 +66,14 @@ class TriaMesh:
 
         Returns
         -------
-        scipy.sparse.csc_matrix
-            Sparse symmetric CSC matrix
+        csc_matrix
             The non-directed adjacency matrix
             will be symmetric. Each inner edge (i,j) will have
             the number of triangles that contain this edge.
             Inner edges usually 2, boundary edges 1. Higher
             numbers can occur when there are non-manifold triangles.
             The sparse matrix can be binarized via:
-            adj.data = np.ones(adj.data.shape)
+            adj.data = np.ones(adj.data.shape).
         """
         t0 = self.t[:, 0]
         t1 = self.t[:, 1]
@@ -92,8 +91,7 @@ class TriaMesh:
 
         Returns
         -------
-        scipy.sparse.csc_matrix
-            Sparse CSC matrix
+        csc_matrix
             The directed adjacency matrix is not symmetric if
             boundaries exist or if mesh is non-manifold.
             For manifold meshes, there are only entries with
@@ -119,15 +117,9 @@ class TriaMesh:
 
         Returns
         -------
-        scipy.sparse.csc_matrix
-            Sparse CSC matrix
+        csc_matrix
             Similar to adj_dir, but stores the tria idx+1 instead
             of one in the matrix (allows lookup of vertex to tria).
-
-        Raises
-        ------
-        ValueError
-            Can only tidx matrix for oriented triangle meshes!
         """
         if not self.is_oriented():
             raise ValueError(
@@ -151,7 +143,7 @@ class TriaMesh:
         Returns
         -------
         bool
-            True if no boundary edges in adj matrix
+            True if no boundary edges in adj matrix.
         """
         return 1 not in self.adj_sym.data
 
@@ -162,8 +154,8 @@ class TriaMesh:
 
         Returns
         -------
-        bool:
-            True if no edges with > 2 triangles
+        bool
+            True if no edges with > 2 triangles.
         """
         return np.max(self.adj_sym.data) <= 2
 
@@ -176,7 +168,7 @@ class TriaMesh:
         Returns
         -------
         bool
-            True if ``max(adj_directed)=1``
+            True if ``max(adj_directed)=1``.
         """
         return np.max(self.adj_dir.data) == 1
 
@@ -188,7 +180,7 @@ class TriaMesh:
         Returns
         -------
         int
-            Euler Characteristic (2=sphere,0=torus)
+            Euler Characteristic (2=sphere, 0=torus).
         """
         # v can contain unused vertices so we get vnum from trias
         vnum = len(np.unique(self.t.reshape(-1)))
@@ -223,7 +215,7 @@ class TriaMesh:
         Returns
         -------
         float
-            Total surface area
+            Total surface area.
         """
         areas = self.tria_areas()
         return np.sum(areas)
@@ -234,12 +226,7 @@ class TriaMesh:
         Returns
         -------
         vol : float
-            Total enclosed volume
-
-        Raises
-        ------
-        ValueError
-            Can only compute volume for oriented triangle meshes.
+            Total enclosed volume.
         """
         if not self.is_closed():
             return 0.0
@@ -262,8 +249,8 @@ class TriaMesh:
 
         Returns
         -------
-        vdeg : np.ndarray
-            Array of vertex degrees
+        vdeg : array
+            Array of vertex degrees.
         """
         vdeg = np.bincount(self.t.reshape(-1))
         return vdeg
@@ -273,8 +260,8 @@ class TriaMesh:
 
         Returns
         -------
-        vareas : np.ndarray
-            Array of vertex areas
+        vareas : array
+            Array of vertex areas.
         """
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -294,7 +281,7 @@ class TriaMesh:
         Returns
         -------
         float
-            Avg. edge length
+            Avgerage edge length.
         """
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
@@ -306,12 +293,12 @@ class TriaMesh:
     def tria_normals(self):
         """Compute triangle normals.
 
-        Ordering of trias is important: counterclockwise when looking
+        Ordering of triangles is important: counterclockwise when looking.
 
         Returns
         -------
-        n : np.ndarray
-            normals (num triangles X 3 )
+        n : array of shape (n_triangles, 3)
+            Triangle normals.
         """
         # Compute vertex coordinates and a difference vectors for each triangle:
         v0 = self.v[self.t[:, 0], :]
@@ -341,13 +328,8 @@ class TriaMesh:
 
         Returns
         -------
-        n : np.ndarray
-            normals (num triangles X 3 )
-
-        Raises
-        ------
-        ValueError
-            Vertex normals are meaningless for un-oriented triangle meshes!
+        n : array of shape (n_triangles, 3)
+            Vertex normals.
         """
         if not self.is_oriented():
             raise ValueError(
@@ -389,7 +371,7 @@ class TriaMesh:
         Returns
         -------
         bool
-            whether vertex list has more vertices or not
+            Whether vertex list has more vertices or not.
         """
         vnum = np.max(self.v.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
@@ -400,14 +382,17 @@ class TriaMesh:
 
         q = 4 sqrt(3) A / (e1^2 + e2^2 + e3^2 )
         where A is the triangle area and ei the edge length of the three edges.
-        This measure is used by FEMLAB and can also be found in:
-            R.E. Bank, PLTMG ..., Frontiers in Appl. Math. (7), 1990.
         Constants are chosen so that q=1 for the equilateral triangle.
+
+        .. note::
+
+            This measure is used by FEMLAB and can also be found in:
+            R.E. Bank, PLTMG ..., Frontiers in Appl. Math. (7), 1990.
 
         Returns
         -------
-        np.ndarray
-            Array with triangle qualities
+        array
+            Array with triangle qualities.
         """
         # Compute vertex coordinates and a difference vectors for each triangle:
         v0 = self.v[self.t[:, 0], :]
@@ -434,13 +419,8 @@ class TriaMesh:
 
         Returns
         -------
-        loops : np.ndarray
-            List of lists with boundary loops
-
-        Raises
-        ------
-        ValueError
-            tria not manifold (edges with more than 2 triangles)!
+        loops : list of list
+            List of lists with boundary loops.
         """
         if not self.is_manifold():
             raise ValueError(
@@ -493,9 +473,9 @@ class TriaMesh:
         Returns
         -------
         centroid : float
-            The centroid of the mesh
+            The centroid of the mesh.
         totalarea : float
-            he total area of the mesh
+            The total area of the mesh.
         """
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -516,28 +496,23 @@ class TriaMesh:
 
         Parameters
         ----------
-        with_boundary : bool, Default=False
-            also work on boundary half edges, default ignore
+        with_boundary : bool
+            Also work on boundary half edges, default ignore.
 
         Returns
         -------
-        vids : np.ndarray
-            column array with starting and end vertex for each unique inner edge
-        tids : np.ndarray
+        vids : array
+            Column array with starting and end vertex for each unique inner edge.
+        tids : array
             2 column array with triangle containing the half edge
             from vids[0,:] to vids [1,:] in first column and the
-            neighboring triangle in the second column
-        bdrvids : np.ndarray
-            if with_boundary is true: 2 column array with each
-            boundary half-edge
-        bdrtids : np.ndarray
-            if with_boundary is true: 1 column array with the
-            associated triangle to each boundary edge
-
-        Raises
-        ------
-        ValueError
-            Error: Can only compute edge information for oriented meshes!
+            neighboring triangle in the second column.
+        bdrvids : array
+            If with_boundary is true: 2 column array with each
+            boundary half-edge.
+        bdrtids : array
+            If with_boundary is true: 1 column array with the
+            associated triangle to each boundary edge.
         """
         if not self.is_oriented():
             raise ValueError(
@@ -578,25 +553,25 @@ class TriaMesh:
 
         Parameters
         ----------
-        smoothit : int, Default=3
-            smoothing iterations on vertex functions
+        smoothit : int
+            Smoothing iterations on vertex functions.
 
         Returns
         -------
-        u_min : np.ndarray
-            minimal curvature directions (vnum x 3)
-        u_max : np.ndarray
-             maximal curvature directions (vnum x 3)
-        c_min : np.ndarray
-             minimal curvature
-        c_max : np.ndarray
-             maximal curvature
-        c_mean : np.ndarray
-            mean curvature: (c_min + c_max) / 2.0
-        c_gauss : np.ndarray
-           Gauss curvature: c_min * c_max
-        normals : np.ndarray
-           normals (vnum x 3)
+        u_min : array of shape (vnum, 3)
+            Minimal curvature directions.
+        u_max : array of shape (vnum, 3)
+            Maximal curvature directions.
+        c_min : array
+            Minimal curvature.
+        c_max : array
+            Maximal curvature
+        c_mean : array
+            Mean curvature: (c_min + c_max) / 2.0m
+        c_gauss : array
+           Gauss curvature: c_min * c_maxm
+        normals : array of shape (vnum, 3)
+           Normals.
         """
         # import warnings
         # warnings.filterwarnings('error')
@@ -704,19 +679,19 @@ class TriaMesh:
 
         Parameters
         ----------
-        smoothit : int, Default=3
-            number of smoothing iterations for curvature computation on vertices
+        smoothit : int
+            Number of smoothing iterations for curvature computation on vertices.
 
         Returns
         -------
-        u_min : np.ndarray
-            min curvature direction on triangles
-        u_max : np.ndarray
-            max curvature direction on triangles
-        c_min : np.ndarray
-            min curvature on triangles
-        c_max : np.ndarray
-            max curvature on triangles
+        u_min : array
+            Min curvature direction on triangles.
+        u_max : array
+            Max curvature direction on triangles.
+        c_min : array
+            Min curvature on triangles.
+        c_max : array
+            Max curvature on triangles.
         """
         u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(smoothit)
 
@@ -775,15 +750,10 @@ class TriaMesh:
 
         Returns
         -------
-        vkeep : np.ndarray
-            Indices (from original list) of kept vertices
-        vdel : np.ndarray
-            Indices of deleted (unused) vertices
-
-        Raises
-        ------
-        Value Error
-            Max index exceeds number of vertices
+        vkeep : array
+            Indices (from original list) of kept vertices.
+        vdel : array
+            Indices of deleted (unused) vertices.
         """
         tflat = self.t.reshape(-1)
         vnum = np.max(self.v.shape)
@@ -813,12 +783,12 @@ class TriaMesh:
         """Refine the triangle mesh by placing new vertex on each edge midpoint.
 
         Thus creates 4 similar triangles from one parent triangle.
-        Modifies mesh in place
+        Modifies mesh in place.
 
         Parameters
         ----------
-        it : int, default=1
-            number of iterations
+        it : int
+            Number of iterations.
         """
         for x in range(it):
             # make symmetric adj matrix to upper triangle
@@ -852,8 +822,8 @@ class TriaMesh:
 
         Parameters
         ----------
-        d : int or np.ndarray
-            move distance
+        d : int | array
+            Move distance.
         """
         n = self.vertex_normals()
         vn = self.v + d * n
@@ -863,28 +833,23 @@ class TriaMesh:
     def orient_(self):
         """Re-orients triangles of manifold mesh to be consistent.
 
-        orient_ re-orients triangles of manifold mesh to be consistent, so that vertices
+        Re-orients triangles of manifold mesh to be consistent, so that vertices
         are listed counter-clockwise, when looking from above (outside).
 
         Algorithm:
-        1. Construct list for each half-edge with its triangle and edge direction
-        2. Drop boundary half-edges and find half-edge pairs
-        3. Construct sparse matrix with triangle neighbors, with entry 1 for opposite
-            half edges and -1 for parallel half-edges (normal flip across this edge)
-        4. Flood mesh from first tria using triangle neighbor matrix
-            - keeping track of sign
-        5. When flooded, negative sign for a triangle indicates it needs to be flipped
-        6. If global volume is negative, flip everything (first tria was wrong)
+        * Construct list for each half-edge with its triangle and edge direction
+        * Drop boundary half-edges and find half-edge pairs
+        * Construct sparse matrix with triangle neighbors, with entry 1 for opposite
+          half edges and -1 for parallel half-edges (normal flip across this edge)
+        * Flood mesh from first tria using triangle neighbor matrix and keeping track of
+          sign
+        * When flooded, negative sign for a triangle indicates it needs to be flipped
+        * If global volume is negative, flip everything (first tria was wrong)
 
         Returns
         -------
         flipped : int
-            number of trias flipped
-
-        Raises
-        ------
-        ValueError
-            Without boundary edges, all should have two triangles!
+            Number of trias flipped.
         """
         tnew = self.t
         flipped = 0
@@ -988,13 +953,8 @@ class TriaMesh:
 
         Returns
         -------
-        vfunc : np.ndarray
-            Function on vertices vector or matrix (#v x N)
-
-        Raises
-        ------
-        ValueError
-            length of tfunc needs to match number of triangles
+        vfunc : array
+            Function on vertices vector or matrix (#v x N).
         """
         if self.t.shape[0] != tfunc.shape[0]:
             raise ValueError(
@@ -1025,13 +985,8 @@ class TriaMesh:
 
         Returns
         -------
-        tfunc
-            Function on trias vector or matrix (#t x N)
-
-        Raises
-        ------
-        ValueError
-            length of vfunc needs to match number of vertices
+        tfunc : array
+            Function on trias vector or matrix (#t x N).
         """
         if self.v.shape[0] != vfunc.shape[0]:
             raise ValueError("Error: length of vfunc needs to match number of vertices")
@@ -1044,15 +999,15 @@ class TriaMesh:
 
         Parameters
         ----------
-        vfunc : np.ndarray
+        vfunc : array
             Float vector of values at vertices, if empty, use vertex coordinates.
         n : int, default=1
             Number of iterations for smoothing.
 
         Returns
         -------
-        vfunc : Function
-            Smoothed surface vertex function
+        vfunc : array
+            Smoothed surface vertex function.
         """
         if vfunc is None:
             vfunc = self.v
@@ -1080,8 +1035,8 @@ class TriaMesh:
 
         Parameters
         ----------
-        n : int, default=1
-            smoothing iterations
+        n : int
+            Smoothing iterations.
         """
         vfunc = self.smooth_vfunc(self.v, n)
         self.v = vfunc

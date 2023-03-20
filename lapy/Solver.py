@@ -618,7 +618,7 @@ class Solver:
 
         Returns
         -------
-        eigenvalues : array of shape (k)
+        eigenvalues : array of shape (k,)
             Array of k eigenvalues. For closed meshes or Neumann boundary condition,
             ``0`` will be the first eigenvalue (with constant eigenvector).
         eigenvectors : array of shape (N, k)

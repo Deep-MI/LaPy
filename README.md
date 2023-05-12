@@ -69,7 +69,7 @@ For non-singular mean curvature flow please cite:
 [4] Kazhdan M, Solomon J, Ben-Chen M. 2012. Can Mean-Curvature Flow be Modified to be Non-singular? Comput. Graph. Forum 31, 5, 1745–1754.
 https://doi.org/10.1111/j.1467-8659.2012.03179.x
 
-For conformal mapping plase cite:
+For conformal mapping please cite:
 
 [5] Choi PT, Lam KC, Lui LM. FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0 Closed Brain Surfaces. SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015. https://doi.org/10.1137/130950008
 

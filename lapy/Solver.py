@@ -756,9 +756,9 @@ class Solver:
             a = self.stiffness
         # solve A x = b
         print("Matrix Format now: " + a.getformat())
-        if self.sparse is not None:
+        if self.sksparse is not None:
             print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-            chol = self.sparse.cholesky(a)
+            chol = self.sksparse.cholmod.cholesky(a)
             x = chol(b)
         else:
             from scipy.sparse.linalg import splu

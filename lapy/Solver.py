@@ -33,10 +33,11 @@ class Solver:
         close to 0, i.e. a concave cylinder).
     aniso_smooth : int
         Number of smoothing iterations for curvature computation on vertices.
-    use_cholmod : bool
+    use_cholmod : bool, default: False
         If True, attempts to use the Cholesky decomposition for improved execution
-        speed. Requires the ``scikit-sparse`` library. If it can not be found, fallback
-        to LU decomposition.
+        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error 
+        will be thrown.
+        If False, will use slower LU decomposition.
 
     Notes
     -----
@@ -50,9 +51,12 @@ class Solver:
         lump: bool = False,
         aniso: Optional[Union[float, Tuple[float, float]]] = None,
         aniso_smooth: int = 10,
-        use_cholmod: bool = True,
+        use_cholmod: bool = False,
     ) -> None:
-        self.sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
+        if use_cholmod:
+            self.sksparse = import_optional_dependency("sksparse", raise_error=True)
+        else:
+            self.sksparse = None
         if type(geometry).__name__ == "TriaMesh":
             if aniso is not None:
                 # anisotropic Laplace
@@ -84,6 +88,7 @@ class Solver:
         self.stiffness = a
         self.mass = b
         self.geotype = type(geometry)
+        self.use_cholmod = use_cholmod
 
     @staticmethod
     def _fem_tria(tria: TriaMesh, lump: bool = False):  # computeABtria(v,t)
@@ -625,10 +630,10 @@ class Solver:
             Array representing the k eigenvectors. The column ``eigenvectors[:, i]`` is
             the eigenvector corresponding to ``eigenvalues[i]``.
         """
-        from scipy.sparse.linalg import LinearOperator
+        from scipy.sparse.linalg import LinearOperator, eigsh
 
         sigma = -0.01
-        if self.sksparse is not None:
+        if self.use_cholmod:
             print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
@@ -637,7 +642,7 @@ class Solver:
                 dtype=self.stiffness.dtype,
             )
         else:
-            from scipy.sparse.linalg import eigsh, splu
+            from scipy.sparse.linalg import splu
 
             print("Solver: spsolve (LU decomposition) ...")
             # turns out it is much faster to use cholesky and pass operator
@@ -756,7 +761,7 @@ class Solver:
             a = self.stiffness
         # solve A x = b
         print("Matrix Format now: " + a.getformat())
-        if self.sksparse is not None:
+        if self.use_cholmod:
             print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(a)
             x = chol(b)

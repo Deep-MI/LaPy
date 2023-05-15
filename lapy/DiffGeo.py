@@ -423,7 +423,7 @@ def tria_mean_curvature_flow(
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
     else:
-        skspare = None
+        sksparse = None
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()

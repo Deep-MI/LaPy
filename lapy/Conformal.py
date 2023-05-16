@@ -12,6 +12,8 @@
 # SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
 
+import importlib
+
 import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
@@ -21,7 +23,7 @@ from .TriaMesh import TriaMesh
 from .utils._imports import import_optional_dependency
 
 
-def spherical_conformal_map(tria):
+def spherical_conformal_map(tria, use_cholmod=False):
     """
     A linear method for computing spherical conformal map of a genus-0 closed surface
 
@@ -29,6 +31,10 @@ def spherical_conformal_map(tria):
     ----------
     tria : TriaMesh
         vertices and faces
+    use_cholmod : bool, default=False
+        Which solver to use:
+            * True : Use Cholesky decomposition from scikit-sparse cholmod
+            * False: Use spsolve (LU decomposition)        
 
     Returns
     -------
@@ -104,7 +110,7 @@ def spherical_conformal_map(tria):
     rhs.real = c.flatten()
     rhs.imag = d.flatten()
 
-    z = sparse_symmetric_solve(M, rhs)
+    z = sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
     z = np.squeeze(np.array(z))
     z = z - np.mean(z, axis=0)
 
@@ -167,7 +173,7 @@ def spherical_conformal_map(tria):
     mu = beltrami_coefficient(triasouth, tria.v)
 
     # compose the map with another quasi-conformal map to cancel the distortion
-    mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :])
+    mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
 
     if np.isnan(np.sum(mapping)):
         # if the result has NaN entries, then most probably the number of
@@ -176,7 +182,7 @@ def spherical_conformal_map(tria):
         print("South pole compsed map has nan value(s)!")
         fixnum = fixnum * 5  # again, this number can be changed
         fixed = idx[0 : np.minimum(nv, fixnum)]
-        mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :])
+        mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
         if np.isnan(np.sum(mapping)):
             mapping = P  # use the old result
 
@@ -345,7 +351,7 @@ def beltrami_coefficient(tria, mapping):
     return mu
 
 
-def linear_beltrami_solver(tria, mu, landmark, target):
+def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     """
     Linear Beltrami solver
 
@@ -358,6 +364,10 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     landmark : np.ndarray of fixed vertex indices
     target : np.ndarray of shape (n,3)
         2D landmark target coordinates (third coordinate is zero)
+    use_cholmod : bool, default=False
+        Which solver to use:
+            * True : Use Cholesky decomposition from scikit-sparse cholmod
+            * False: Use spsolve (LU decomposition)             
 
     Returns
     -------
@@ -447,14 +457,14 @@ def linear_beltrami_solver(tria, mu, landmark, target):
     A = A - Azero + Aones
     A.eliminate_zeros()
 
-    x = sparse_symmetric_solve(A, b)
+    x = sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
 
     mapping = np.squeeze(np.array(x))
     mapping = np.column_stack((np.real(mapping), np.imag(mapping)))
     return mapping
 
 
-def sparse_symmetric_solve(A, b, use_cholmod=True):
+def sparse_symmetric_solve(A, b, use_cholmod=False):
     """
     A sparse symmetric solver for ``A x = b``
 
@@ -462,7 +472,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
     ----------
     A : sparse matrix of shape (n, n)
     b : np.ndarray vector of length n
-    use_cholmod : bool, default=True
+    use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
             * False: Use spsolve (LU decomposition)
@@ -472,8 +482,12 @@ def sparse_symmetric_solve(A, b, use_cholmod=True):
     x: np.ndarray of length n, solution to  ``A x = b``
     """
 
-    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
-    if sksparse is not None:
+    if use_cholmod:
+        sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
+    else:
+        sksparse = None
+    if use_cholmod:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
         chol = sksparse.cholmod.cholesky(A)
         x = chol(b)

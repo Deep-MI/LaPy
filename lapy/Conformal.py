@@ -12,6 +12,8 @@
 # SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
 
+import importlib
+
 import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
@@ -482,6 +484,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=False):
 
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
     else:
         sksparse = None
     if use_cholmod:

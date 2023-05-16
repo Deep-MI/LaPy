@@ -1,4 +1,5 @@
 import numpy as np
+import importlib
 from scipy import sparse
 
 from .Solver import Solver
@@ -422,6 +423,7 @@ def tria_mean_curvature_flow(
 
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
     else:
         sksparse = None
     # pre-normalize

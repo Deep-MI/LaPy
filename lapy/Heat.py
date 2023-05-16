@@ -1,3 +1,5 @@
+import importlib
+
 import numpy as np
 
 from .utils._imports import import_optional_dependency
@@ -96,6 +98,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=False):
 
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
     else:
         sksparse = None
     from .Solver import Solver

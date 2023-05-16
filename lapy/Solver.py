@@ -1,4 +1,5 @@
 import sys
+import importlib
 from typing import Optional, Tuple, Union
 
 import numpy as np
@@ -55,6 +56,7 @@ class Solver:
     ) -> None:
         if use_cholmod:
             self.sksparse = import_optional_dependency("sksparse", raise_error=True)
+            importlib.import_module(".cholmod", self.sksparse.__name__)
         else:
             self.sksparse = None
         if type(geometry).__name__ == "TriaMesh":

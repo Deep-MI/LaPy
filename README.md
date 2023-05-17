@@ -8,18 +8,18 @@ project with extended differential geometry capabilities.
 
 ## Contents:
 
-- TriaMesh: a class for triangle meshes offering various operations, such as
+- **TriaMesh**: a class for triangle meshes offering various operations, such as
   fixing orientation, smoothing, curvature, boundary, quality, normals, and
   various efficient mesh datastructure (edges, adjacency matrices)
-- TetMesh: a class for tetrahedral meshes (orientation, boundary ...)
-- TriaIO, TetIO: for both tets and trias from off, vtk, etc. formats
-- FuncIO: import/export vertex functions and eigenvector files
-- Solver: a class for linear FEM computation (Laplace stiffness and mass
+- **TetMesh**: a class for tetrahedral meshes (orientation, boundary ...)
+- **TriaIO**, **TetIO**: for both tets and trias from off, vtk, etc. formats
+- **FuncIO**: import/export vertex functions and eigenvector files
+- **Solver**: a class for linear FEM computation (Laplace stiffness and mass
   matrix, fast and sparse eigenvalue solver, anisotropic Laplace, Poisson)
-- DiffGeo: compute gradients, divergence, mean curvature flow, etc.
-- Heat: for heat kernel and diffusion
-- ShapeDNA: compute the ShapeDNA descriptor of surfaces and solids
-- Plot: functions for interactive visualization (wrapping plotly)
+- **DiffGeo**: compute gradients, divergence, mean curvature flow, etc.
+- **Heat**: for heat kernel and diffusion
+- **ShapeDNA**: compute the ShapeDNA descriptor of surfaces and solids
+- **Plot**: functions for interactive visualization (wrapping plotly)
 
 ## Usage:
 
@@ -38,8 +38,8 @@ illustrate prototypical use cases of the toolbox.
 
 ## Installation:
 
-Use the following code to download, build and install a package from this
-repository into your local Python package directory:
+Use the following code to install the latest release of LaPy into your local
+Python package directory:
 
 `python3 -m pip install lapy`
 
@@ -48,7 +48,7 @@ your choice:
 
 `python3 -m pip install --user --src /my/preferred/location --editable git+https://github.com/Deep-MI/Lapy.git#egg=lapy`
 
-Several functions, e.g. the Solver, require a sparse matrix decomposition, for which either the LU decomposition (from scipy sparse) or the faster Cholesky decomposition (from scikit-sparse cholmod) can be used. The default is to use the LU decomposition. If the parameter flag use_cholmod is True, the code will try to import cholmod from the scikit-sparse package. If this fails, an error will be thrown. If you would like to use cholmod, you need to install scikit-sparse separately. It cannot be listed among LaPy's dependencies as that causes errors with pip. scikit-sparse requires numpy and scipy to be installed separately beforehand.
+Several functions, e.g. the Solver, require a sparse matrix decomposition, for which either the LU decomposition (from scipy sparse, default) or the faster Cholesky decomposition (from scikit-sparse cholmod, recommended) can be used. If the parameter flag use_cholmod is True, the code will try to import cholmod from the scikit-sparse package. If this fails, an error will be thrown. If you would like to use cholmod, you need to install scikit-sparse separately, as pip currently cannot install it (conda can). scikit-sparse requires numpy and scipy to be installed separately beforehand.
 
 ## References:
 

@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/lapy.svg)](https://badge.fury.io/py/lapy)
+[![PyPI version](https://badge.fury.io/py/lapy.svg)](https://pypi.org/project/lapy/)
 # LaPy
 
 LaPy is a package to compute spectral features (Laplace-Beltrami operator) on

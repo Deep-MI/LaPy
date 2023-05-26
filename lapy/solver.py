@@ -32,7 +32,7 @@ class Solver:
         curvature direction, even if the maximum curvature is large in those regions (
         i.e. isotropic in regions with large maximum curvature and minimum curvature
         close to 0, i.e. a concave cylinder).
-    aniso_smooth : int
+    aniso_smooth : int | None
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default: False
         If True, attempts to use the Cholesky decomposition for improved execution

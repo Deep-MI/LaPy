@@ -178,12 +178,12 @@ def _map_z2color(zval, colormap, zmin, zmax):
     ----------
     zval : float
         value to be mapped
-    colormap : matplotlib.colors.LinearSegmentedColormap or np.ndarray
+    colormap : matplotlib.colors.LinearSegmentedColormap | array
         list of values and color code strings
     zmin : float
-        minimum
+        minimum.
     zmax : float
-        minimum
+        maximum.
 
     Returns
     -------

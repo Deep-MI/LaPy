@@ -62,7 +62,7 @@ def import_vfunc(filename):
 
     Returns
     -------
-    vals : np.ndarray
+    vals : array
         list of vfunc parameters
     """
     import re

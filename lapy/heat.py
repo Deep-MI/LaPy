@@ -1,4 +1,5 @@
 import importlib
+from typing import Optional
 
 import numpy as np
 
@@ -13,20 +14,20 @@ def diagonal(t, x, evecs, evals, n):
 
     Parameters
     ----------
-    t : float or np.ndarray
+    t : float | array
         time or a row vector of time values
-    x : np.ndarray
+    x : array
         vertex ids for the positions of K(t,x,x)
-    evecs : np.ndarray
+    evecs : array
         eigenvectors (matrix: vnum x evecsnum)
-    evals : np.ndarray
+    evals : array
         vector of eigenvalues (col vector: evecsnum x 1)
     n : int
         number of evecs and vals to use (smaller or equal length)
 
     Returns
     -------
-    h:
+    h : array
         matrix, rows: vertices selected in x, cols: times in t
     """
     # maybe add code to check dimensions of input and flip axis if necessary
@@ -44,20 +45,20 @@ def kernel(t, vfix, evecs, evals, n):
 
     Parameters
     ----------
-    t : number or np.ndarray
+    t : float | array
         time (can also be a row vector, if passing multiple times)
-    vfix : np.ndarray
+    vfix : array
         fixed vertex index
-    evecs : np.ndarray
+    evecs : array
         matrix of eigenvectors (M x N), M = #vertices, N=#eigenvectors
-    evals : np.ndarray
+    evals : array
         col vector of eigenvalues (N)
     n : int
         number of eigenvalues/vectors used in heat kernel (n<=N)
 
     Returns
     -------
-    h : np.ndarray
+    h : array
         matrix m rows: all vertices, cols: times in t
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
@@ -65,7 +66,7 @@ def kernel(t, vfix, evecs, evals, n):
     return h
 
 
-def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=False):
+def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=False):
     """
     Computes heat diffusion from initial vertices in vids using
     backward Euler solution for time t:
@@ -74,15 +75,15 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=False):
 
     Parameters
     ----------
-    geometry : TriaMesh or TetMesh
+    geometry : TriaMesh | TetMesh
         Object on which to run diffusion
-    vids : array_like
+    vids : array
         vertex index or indices where initial heat is applied
     m : float, default=1.0
         factor  to compute time of heat evolution:
                     t = m * avg_edge_length^2
-    aniso : , Default=None
-
+    aniso : int
+        Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod

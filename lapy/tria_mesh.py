@@ -193,8 +193,8 @@ class TriaMesh:
 
         Returns
         -------
-        areas : np.ndarray
-            array with areas of each triangle
+        areas : array
+            Array with areas of each triangle.
         """
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -565,11 +565,11 @@ class TriaMesh:
         c_min : array
             Minimal curvature.
         c_max : array
-            Maximal curvature
+            Maximal curvature.
         c_mean : array
-            Mean curvature: (c_min + c_max) / 2.0m
+            Mean curvature ``(c_min + c_max) / 2.0m``.
         c_gauss : array
-           Gauss curvature: c_min * c_maxm
+           Gauss curvature ``c_min * c_maxm``.
         normals : array of shape (vnum, 3)
            Normals.
         """
@@ -837,6 +837,7 @@ class TriaMesh:
         listed counter-clockwise, when looking from above (outside).
 
         Algorithm:
+
         * Construct list for each half-edge with its triangle and edge direction
         * Drop boundary half-edges and find half-edge pairs
         * Construct sparse matrix with triangle neighbors, with entry 1 for opposite
@@ -941,8 +942,8 @@ class TriaMesh:
 
         Parameters
         ----------
-        tfunc : np.ndarray
-            Float vector or matrix (#t x N) of values at vertices
+        tfunc : array
+            Float vector or matrix (#t x N) of values at vertices.
         weighted : bool, default=False
             False, weigh only by 1/3, e.g. to compute
             vertex areas from tria areas
@@ -980,8 +981,8 @@ class TriaMesh:
 
         Parameters
         ----------
-        vfunc : np.ndarray
-            Float vector or matrix (#t x N) of values at vertices
+        vfunc : array
+            Float vector or matrix (#t x N) of values at vertices.
 
         Returns
         -------

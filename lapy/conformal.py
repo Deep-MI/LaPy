@@ -37,7 +37,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
     Returns
     -------
-    mapping: np.ndarray of shape (n,3)
+    mapping: array of shape (n,3)
         vertex coordinates of the spherical conformal parameterization
 
     Notes
@@ -200,12 +200,12 @@ def mobius_area_correction_spherical(tria, mapping):
     ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         vertex coordinates of the spherical conformal parameterization
 
     Returns
     -------
-    map_mobius: np.ndarray of shape (n,3)
+    map_mobius: array of shape (n,3)
         vertex coordinates of the updated spherical conformal parameterization
     result: OptimizeResult
         the optimal parameters (x) for the Mobius transformation, where
@@ -278,12 +278,12 @@ def beltrami_coefficient(tria, mapping):
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
         TriaMesh should be planar mapping on complex plane
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         coordinates of the spherical conformal parameterization
 
     Returns
     -------
-    mu: np.ndarray of complex beltrami coefficient per triangle
+    mu : array of complex beltrami coefficient per triangle
 
     Notes
     -----
@@ -346,8 +346,7 @@ def beltrami_coefficient(tria, mapping):
 
 
 def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
-    """
-    Linear Beltrami solver
+    """Linear Beltrami solver.
 
     Parameters
     ----------
@@ -355,8 +354,8 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
         (vertices, triangle) of genus-0 closed triangle mesh
         TriaMesh should be planar mapping on complex plane
     mu : np.array of complex beltrami coefficients
-    landmark : np.ndarray of fixed vertex indices
-    target : np.ndarray of shape (n,3)
+    landmark : array of fixed vertex indices
+    target : array of shape (n,3)
         2D landmark target coordinates (third coordinate is zero)
     use_cholmod : bool, default=False
         Which solver to use:
@@ -365,7 +364,7 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
     Returns
     -------
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         vertex coordinates of new mapping
 
     Notes
@@ -464,7 +463,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=False):
     Parameters
     ----------
     A : sparse matrix of shape (n, n)
-    b : np.ndarray vector of length n
+    b : array vector of length n
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
@@ -472,7 +471,7 @@ def sparse_symmetric_solve(A, b, use_cholmod=False):
 
     Returns
     -------
-    x: np.ndarray of length n, solution to  ``A x = b``
+    x: array of length n, solution to  ``A x = b``
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -497,12 +496,12 @@ def stereographic(u):
 
     Parameters
     ----------
-    u : np.ndarray of shape (n,3)
+    u : array of shape (n,3)
         u represents the three vertex coordinates
 
     Returns
     -------
-    v: np.ndarray of n complex numbers
+    v: array of n complex numbers
        stereographic map of u in complex plane
 
     Notes
@@ -534,13 +533,13 @@ def inverse_stereographic(u):
 
     Parameters
     ----------
-    u : np.ndarray
+    u : array
         can be complex array, or two columns (real,img)
         for coordinates on complex plane
 
     Returns
     -------
-    v: np.ndarray of shape (n,3)
+    v: array of shape (n,3)
         coordinates on sphere in 3D
 
     Notes

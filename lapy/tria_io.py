@@ -210,7 +210,7 @@ def import_gmsh(infile):
 
     Returns
     -------
-    points : np.ndarray
+    points : array
         List of points
     cells : array_like
         List of cells

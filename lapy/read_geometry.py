@@ -66,7 +66,7 @@ def _read_volume_info(fobj):
 
     Returns
     -------
-    volume_info: np.ndarray
+    volume_info : array
         Key-value pairs found in the file.
     """
     volume_info = OrderedDict()

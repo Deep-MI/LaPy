@@ -5,7 +5,8 @@ from typing import Optional, Tuple, Union
 import numpy as np
 from scipy import sparse
 
-from . import TetMesh, TriaMesh
+from .tet_mesh import TetMesh
+from .tria_mesh import TriaMesh
 from .utils._imports import import_optional_dependency
 
 

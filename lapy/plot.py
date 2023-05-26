@@ -269,7 +269,7 @@ def plot_tet_mesh(
         Sets the range of the x-axis
     yrange : list or tuple of shape (2, 1)
         Sets the range of the y-axis
-    zrange :  list or tuple of shape (2, 1)
+    zrange : list or tuple of shape (2, 1)
         Sets the range of the z-axis
     showcaxis : bool, Default=False
         whether a colorbar is displayed or not
@@ -410,7 +410,7 @@ def plot_tria_mesh(
         Sets the range of the x-axis
     yrange : list or tuple of shape (2, 1)
         Sets the range of the y-axis
-    zrange :  list or tuple of shape (2, 1)
+    zrange : list or tuple of shape (2, 1)
         Sets the range of the z-axis
     plot_edges : bool, Default=False
         whether to plot edges or not

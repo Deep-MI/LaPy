@@ -18,7 +18,7 @@ def compute_shapedna(
     lump : bool, default=False
         If True, lump the mass matrix (diagonal)
             (See 'lapy.Solver.Solver' class)
-    aniso :  float or tuple of shape (2,)
+    aniso : float or tuple of shape (2,)
         Anisotropy for curvature based anisotopic Laplace.
             (See 'lapy.Solver.Solver' class)
     aniso_smooth : int
@@ -146,7 +146,7 @@ def compute_distance(ev1, ev2, dist="euc"):
 
     Returns
     -------
-    * :  double
+    * : double
         a distance measure
     """
     if dist == "euc":

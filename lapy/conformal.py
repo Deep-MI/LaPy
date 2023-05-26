@@ -18,7 +18,7 @@ import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
 
-from . import TriaMesh, Solver
+from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
 
 
@@ -171,7 +171,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
     mu = beltrami_coefficient(triasouth, tria.v)
 
     # compose the map with another quasi-conformal map to cancel the distortion
-    mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
+    mapping = linear_beltrami_solver(
+        triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+    )
 
     if np.isnan(np.sum(mapping)):
         # if the result has NaN entries, then most probably the number of
@@ -180,7 +182,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
         print("South pole compsed map has nan value(s)!")
         fixnum = fixnum * 5  # again, this number can be changed
         fixed = idx[0 : np.minimum(nv, fixnum)]
-        mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
+        mapping = linear_beltrami_solver(
+            triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+        )
         if np.isnan(np.sum(mapping)):
             mapping = P  # use the old result
 

@@ -1,5 +1,6 @@
-import numpy as np
 import importlib
+
+import numpy as np
 from scipy import sparse
 
 from . import Solver, TriaMesh

@@ -4,7 +4,9 @@ import scipy.spatial.distance as di
 from . import Solver
 
 
-def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_cholmod=False):
+def compute_shapedna(
+    geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_cholmod=False
+):
     """
     a function to compute the shapeDNA descriptor for triangle or tetrahedral
     meshes
@@ -37,7 +39,9 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_ch
     """
     # get fem, evals, evecs
 
-    fem = Solver(geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth, use_cholmod=use_cholmod)
+    fem = Solver(
+        geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth, use_cholmod=use_cholmod
+    )
     evals, evecs = fem.eigs(k=k)
 
     # write ev

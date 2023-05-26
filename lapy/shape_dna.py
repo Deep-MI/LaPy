@@ -7,9 +7,7 @@ from . import Solver
 def compute_shapedna(
     geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_cholmod=False
 ):
-    """
-    a function to compute the shapeDNA descriptor for triangle or tetrahedral
-    meshes
+    """Compute the shapeDNA descriptor for triangle or tetrahedral meshes.
 
     Parameters
     ----------

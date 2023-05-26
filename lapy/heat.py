@@ -67,11 +67,9 @@ def kernel(t, vfix, evecs, evals, n):
 
 
 def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=False):
-    """
-    Computes heat diffusion from initial vertices in vids using
-    backward Euler solution for time t:
+    """Compute the heat diffusion from initial vertices in vids.
 
-      t = m * avg_edge_length^2
+    It uses the backward Euler solution: ``t = m * avg_edge_length^2``.
 
     Parameters
     ----------

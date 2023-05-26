@@ -23,8 +23,7 @@ from .utils._imports import import_optional_dependency
 
 
 def spherical_conformal_map(tria, use_cholmod=False):
-    """
-    A linear method for computing spherical conformal map of a genus-0 closed surface
+    """Linear method for computing spherical conformal map of a genus-0 closed surface.
 
     Parameters
     ----------
@@ -457,8 +456,7 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
 
 def sparse_symmetric_solve(A, b, use_cholmod=False):
-    """
-    A sparse symmetric solver for ``A x = b``
+    """Sparse symmetric solver for ``A x = b``.
 
     Parameters
     ----------

@@ -12,8 +12,7 @@ import numpy as np
 import plotly
 import plotly.graph_objs as go
 
-# import matplotlib.cm as cm
-from .TetMesh import TetMesh
+from . import TetMesh
 
 
 def _get_color_levels():
@@ -281,10 +280,6 @@ def plot_tet_mesh(
     """
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
-
-    # from plotTriaMesh import plotTriaMesh
-    # from tria import is_oriented
-    # from tetra import tetra_get_boundary_tria, tetra_fix_orientation
 
     # evaluate cutting criteria
     if cutting is not None:

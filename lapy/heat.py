@@ -98,7 +98,7 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=False):
         importlib.import_module(".cholmod", sksparse.__name__)
     else:
         sksparse = None
-    from .Solver import Solver
+    from . import Solver
 
     nv = len(geometry.v)
     fem = Solver(geometry, lump=True, aniso=aniso)

@@ -831,10 +831,10 @@ class TriaMesh:
         # no need to re-init, only changed vertices
 
     def orient_(self):
-        """Re-orients triangles of manifold mesh to be consistent.
+        """Re-orient triangles of manifold mesh to be consistent.
 
-        Re-orients triangles of manifold mesh to be consistent, so that vertices
-        are listed counter-clockwise, when looking from above (outside).
+        Re-orients triangles of manifold mesh to be consistent, so that vertices are
+        listed counter-clockwise, when looking from above (outside).
 
         Algorithm:
         * Construct list for each half-edge with its triangle and edge direction

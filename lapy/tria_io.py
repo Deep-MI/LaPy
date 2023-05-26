@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from .TriaMesh import TriaMesh
+from . import TriaMesh
 
 
 def import_fssurf(infile):

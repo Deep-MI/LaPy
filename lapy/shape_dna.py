@@ -1,9 +1,7 @@
 import numpy as np
 import scipy.spatial.distance as di
 
-from .Solver import Solver
-from .TetMesh import TetMesh  # noqa: F401
-from .TriaMesh import TriaMesh  # noqa: F401
+from . import Solver
 
 
 def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_cholmod=False):

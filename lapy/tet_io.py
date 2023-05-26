@@ -9,7 +9,7 @@ import os.path
 
 import numpy as np
 
-from .TetMesh import TetMesh
+from . import TetMesh
 
 
 def import_gmsh(infile):

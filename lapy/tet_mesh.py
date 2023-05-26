@@ -153,7 +153,7 @@ class TetMesh:
         triafunc : array
             List of tria function values (only returned if ``tetfunc`` is provided).
         """
-        from .TriaMesh import TriaMesh
+        from . import TriaMesh
 
         # get all triangles
         allt = np.vstack(

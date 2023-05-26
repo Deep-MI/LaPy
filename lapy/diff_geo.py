@@ -2,8 +2,7 @@ import numpy as np
 import importlib
 from scipy import sparse
 
-from .Solver import Solver
-from .TriaMesh import TriaMesh
+from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
 
 
@@ -511,7 +510,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         data["Elements"] = tria.t.shape[0]
         data["DoF"] = evecs.shape[0]
         data["NumEW"] = 4
-        from .FuncIO import export_ev
+        from .func_io import export_ev
 
         export_ev(data, "debug.ev")
 

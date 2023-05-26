@@ -5,8 +5,7 @@ from typing import Optional, Tuple, Union
 import numpy as np
 from scipy import sparse
 
-from .TetMesh import TetMesh
-from .TriaMesh import TriaMesh
+from . import TetMesh, TriaMesh
 from .utils._imports import import_optional_dependency
 
 
@@ -36,7 +35,7 @@ class Solver:
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default: False
         If True, attempts to use the Cholesky decomposition for improved execution
-        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error 
+        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
         will be thrown.
         If False, will use slower LU decomposition.
 

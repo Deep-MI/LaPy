@@ -18,8 +18,7 @@ import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
 
-from .Solver import Solver
-from .TriaMesh import TriaMesh
+from . import TriaMesh, Solver
 from .utils._imports import import_optional_dependency
 
 

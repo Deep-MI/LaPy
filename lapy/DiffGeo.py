@@ -1,4 +1,5 @@
 import numpy as np
+import importlib
 from scipy import sparse
 
 from .Solver import Solver
@@ -369,7 +370,7 @@ def tria_compute_rotated_f(tria, vfunc):
 
 
 def tria_mean_curvature_flow(
-    tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=True
+    tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=False
 ):
     """Flow a triangle mesh along the mean curvature normal.
 
@@ -392,7 +393,7 @@ def tria_mean_curvature_flow(
         stopping threshold
     step : float, default=1.0
         Euler step size
-    use_cholmod : bool, default=True
+    use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
             * False: Use spsolve (LU decomposition)
@@ -406,7 +407,11 @@ def tria_mean_curvature_flow(
     -----
     numexpr could speed up this functions if necessary
     """
-    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
+    if use_cholmod:
+        sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
+    else:
+        sksparse = None
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -421,7 +426,7 @@ def tria_mean_curvature_flow(
         mass = Solver.fem_tria_mass(trianorm, lump)
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
-        if sksparse is not None:
+        if use_cholmod:
             print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             factor = sksparse.cholmod.cholesky(mass + step * a_mat)
             trianorm.v = factor(mass_v)

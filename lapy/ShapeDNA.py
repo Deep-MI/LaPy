@@ -6,8 +6,10 @@ from .TetMesh import TetMesh  # noqa: F401
 from .TriaMesh import TriaMesh  # noqa: F401
 
 
-def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
-    """Computethe shapeDNA descriptor for triangle or tetrahedral mesh.
+def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10, use_cholmod=False):
+    """
+    a function to compute the shapeDNA descriptor for triangle or tetrahedral
+    meshes
 
     Parameters
     ----------
@@ -15,7 +17,7 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
         geometry object
     k : int, default=50
         number of eigenfunctions / eigenvalues
-    lump : bool, Default=False
+    lump : bool, default=False
         If True, lump the mass matrix (diagonal)
             (See 'lapy.Solver.Solver' class)
     aniso :  float or tuple of shape (2,)
@@ -24,6 +26,11 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     aniso_smooth : int
         Number of smoothing iterations for curvature computation on vertices.
             (See 'lapy.Solver.Solver' class)
+    use_cholmod : bool, default: False
+        If True, attempts to use the Cholesky decomposition for improved execution
+        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
+        will be thrown.
+        If False, will use slower LU decomposition.
 
     Returns
     -------
@@ -32,7 +39,7 @@ def compute_shapedna(geom, k=50, lump=False, aniso=None, aniso_smooth=10):
     """
     # get fem, evals, evecs
 
-    fem = Solver(geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth)
+    fem = Solver(geom, lump=lump, aniso=aniso, aniso_smooth=aniso_smooth, use_cholmod=use_cholmod)
     evals, evecs = fem.eigs(k=k)
 
     # write ev

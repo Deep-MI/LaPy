@@ -1,3 +1,5 @@
+import importlib
+
 import numpy as np
 
 from .utils._imports import import_optional_dependency
@@ -63,10 +65,10 @@ def kernel(t, vfix, evecs, evals, n):
     return h
 
 
-def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
-    """Compute heat diffusion from initial vertices in vids .
-
-    Uses backward Euler solution for time t:
+def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=False):
+    """
+    Computes heat diffusion from initial vertices in vids using
+    backward Euler solution for time t:
 
       t = m * avg_edge_length^2
 
@@ -81,16 +83,21 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
                     t = m * avg_edge_length^2
     aniso : , Default=None
 
-    use_cholmod : Default=True
-        if Cholmod is not found
-            revert to LU decomposition (slower)
+    use_cholmod : bool, default=False
+        Which solver to use:
+            * True : Use Cholesky decomposition from scikit-sparse cholmod
+            * False: Use spsolve (LU decomposition)
 
     Returns
     -------
     vfunc: function
         heat diffusion at vertices
     """
-    sksparse = import_optional_dependency("sksparse", raise_error=use_cholmod)
+    if use_cholmod:
+        sksparse = import_optional_dependency("sksparse", raise_error=True)
+        importlib.import_module(".cholmod", sksparse.__name__)
+    else:
+        sksparse = None
     from .Solver import Solver
 
     nv = len(geometry.v)
@@ -104,9 +111,9 @@ def diffusion(geometry, vids, m=1.0, aniso=None, use_cholmod=True):
     b0[np.array(vids)] = 1.0
     # solve H x = b0
     print("Matrix Format now:  " + hmat.getformat())
-    if sksparse is not None:
+    if use_cholmod:
         print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-        chol = sksparse.choldmod.cholesky(hmat)
+        chol = sksparse.cholmod.cholesky(hmat)
         vfunc = chol(b0)
     else:
         from scipy.sparse.linalg import splu

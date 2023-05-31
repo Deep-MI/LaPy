@@ -1,12 +1,12 @@
-import sys
 import importlib
+import sys
 from typing import Optional, Tuple, Union
 
 import numpy as np
 from scipy import sparse
 
-from .TetMesh import TetMesh
-from .TriaMesh import TriaMesh
+from .tet_mesh import TetMesh
+from .tria_mesh import TriaMesh
 from .utils._imports import import_optional_dependency
 
 
@@ -32,11 +32,11 @@ class Solver:
         curvature direction, even if the maximum curvature is large in those regions (
         i.e. isotropic in regions with large maximum curvature and minimum curvature
         close to 0, i.e. a concave cylinder).
-    aniso_smooth : int
+    aniso_smooth : int | None
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default: False
         If True, attempts to use the Cholesky decomposition for improved execution
-        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error 
+        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
         will be thrown.
         If False, will use slower LU decomposition.
 
@@ -625,7 +625,7 @@ class Solver:
 
         Returns
         -------
-        eigenvalues : array of shape (k)
+        eigenvalues : array of shape (k,)
             Array of k eigenvalues. For closed meshes or Neumann boundary condition,
             ``0`` will be the first eigenvalue (with constant eigenvector).
         eigenvectors : array of shape (N, k)

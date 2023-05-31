@@ -18,14 +18,12 @@ import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
 
-from .Solver import Solver
-from .TriaMesh import TriaMesh
+from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
 
 
 def spherical_conformal_map(tria, use_cholmod=False):
-    """
-    A linear method for computing spherical conformal map of a genus-0 closed surface
+    """Linear method for computing spherical conformal map of a genus-0 closed surface.
 
     Parameters
     ----------
@@ -34,15 +32,15 @@ def spherical_conformal_map(tria, use_cholmod=False):
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)        
+            * False: Use spsolve (LU decomposition)
 
     Returns
     -------
-    mapping: np.ndarray of shape (n,3)
+    mapping: array of shape (n,3)
         vertex coordinates of the spherical conformal parameterization
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
        "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -56,7 +54,6 @@ def spherical_conformal_map(tria, use_cholmod=False):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
         print("ERROR: The mesh is not a genus-0 closed surface ..")
@@ -173,7 +170,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
     mu = beltrami_coefficient(triasouth, tria.v)
 
     # compose the map with another quasi-conformal map to cancel the distortion
-    mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
+    mapping = linear_beltrami_solver(
+        triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+    )
 
     if np.isnan(np.sum(mapping)):
         # if the result has NaN entries, then most probably the number of
@@ -182,7 +181,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
         print("South pole compsed map has nan value(s)!")
         fixnum = fixnum * 5  # again, this number can be changed
         fixed = idx[0 : np.minimum(nv, fixnum)]
-        mapping = linear_beltrami_solver(triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod)
+        mapping = linear_beltrami_solver(
+            triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+        )
         if np.isnan(np.sum(mapping)):
             mapping = P  # use the old result
 
@@ -192,20 +193,18 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 
 def mobius_area_correction_spherical(tria, mapping):
-    """
-    Find an optimal Mobius transformation for reducing the area distortion
-    of a spherical conformal parameterization using the method in [1].
+    r"""Find an optimal Mobius transformation for reducing the area distortion of a spherical conformal parameterization using the method in footcite:t:`conformal_parameterization_2020`.
 
     Parameters
-    -------
+    ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         vertex coordinates of the spherical conformal parameterization
 
     Returns
     -------
-    map_mobius: np.ndarray of shape (n,3)
+    map_mobius: array of shape (n,3)
         vertex coordinates of the updated spherical conformal parameterization
     result: OptimizeResult
         the optimal parameters (x) for the Mobius transformation, where
@@ -213,21 +212,17 @@ def mobius_area_correction_spherical(tria, mapping):
                 = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j))
 
     Notes
-    -------
-    If you use this code in your own work, please cite the following paper:
-    [1] G. P. T. Choi, Y. Leung-Liu, X. Gu, and L. M. Lui,
-        "Parallelizable global conformal parameterization
-        of simply-connected surfaces via partial welding."
-        SIAM Journal on Imaging Sciences, 2020.
-
-    Adopted by Martin Reuter from Matlab code at
+    -----
+    Adapted by Martin Reuter from Matlab code at
     https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2019-2020, Gary Pui-Tung Choi
+    with this Copyright (c) 2019-2020, Gary Pui-Tung Choi
     https://scholar.harvard.edu/choi
     and has been distributed with the Apache 2 License
-    """
 
+    References
+    ----------
+    .. footbibliography::
+    """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
     area_t = area_t / area_t.sum()
@@ -275,23 +270,22 @@ def mobius_area_correction_spherical(tria, mapping):
 
 
 def beltrami_coefficient(tria, mapping):
-    """
-    Compute the Beltrami coefficient of a mapping.
+    """Compute the Beltrami coefficient of a mapping.
 
     Parameters
     ----------
     tria : TriaMesh
         (vertices, triangle) of genus-0 closed triangle mesh
         TriaMesh should be planar mapping on complex plane
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         coordinates of the spherical conformal parameterization
 
     Returns
     -------
-    mu: np.ndarray of complex beltrami coefficient per triangle
+    mu : array of complex beltrami coefficient per triangle
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -305,7 +299,6 @@ def beltrami_coefficient(tria, mapping):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         print("ERROR: mesh should be on complex plane ..")
@@ -352,8 +345,7 @@ def beltrami_coefficient(tria, mapping):
 
 
 def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
-    """
-    Linear Beltrami solver
+    """Linear Beltrami solver.
 
     Parameters
     ----------
@@ -361,21 +353,21 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
         (vertices, triangle) of genus-0 closed triangle mesh
         TriaMesh should be planar mapping on complex plane
     mu : np.array of complex beltrami coefficients
-    landmark : np.ndarray of fixed vertex indices
-    target : np.ndarray of shape (n,3)
+    landmark : array of fixed vertex indices
+    target : array of shape (n,3)
         2D landmark target coordinates (third coordinate is zero)
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)             
+            * False: Use spsolve (LU decomposition)
 
     Returns
     -------
-    mapping : np.ndarray of shape (n,3)
+    mapping : array of shape (n,3)
         vertex coordinates of new mapping
 
     Notes
-    ------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -389,7 +381,6 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         print("ERROR: mesh should be on complex plane ..")
@@ -465,13 +456,12 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
 
 def sparse_symmetric_solve(A, b, use_cholmod=False):
-    """
-    A sparse symmetric solver for ``A x = b``
+    """Sparse symmetric solver for ``A x = b``.
 
     Parameters
     ----------
     A : sparse matrix of shape (n, n)
-    b : np.ndarray vector of length n
+    b : array vector of length n
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod
@@ -479,9 +469,8 @@ def sparse_symmetric_solve(A, b, use_cholmod=False):
 
     Returns
     -------
-    x: np.ndarray of length n, solution to  ``A x = b``
+    x: array of length n, solution to  ``A x = b``
     """
-
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
         importlib.import_module(".cholmod", sksparse.__name__)
@@ -501,21 +490,20 @@ def sparse_symmetric_solve(A, b, use_cholmod=False):
 
 
 def stereographic(u):
-    """
-    Map sphere to complex plane via stereographic projection
+    """Map sphere to complex plane via stereographic projection.
 
     Parameters
     ----------
-    u : np.ndarray of shape (n,3)
+    u : array of shape (n,3)
         u represents the three vertex coordinates
 
     Returns
     -------
-    v: np.ndarray of n complex numbers
+    v: array of n complex numbers
        stereographic map of u in complex plane
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -529,7 +517,6 @@ def stereographic(u):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     x = u[:, 0]
     y = u[:, 1]
     z = u[:, 2]
@@ -540,22 +527,21 @@ def stereographic(u):
 
 
 def inverse_stereographic(u):
-    """
-    Map from complex plane to sphere via inverse stereographic projection
+    """Map from complex plane to sphere via inverse stereographic projection.
 
     Parameters
     ----------
-    u : np.ndarray
+    u : array
         can be complex array, or two columns (real,img)
         for coordinates on complex plane
 
     Returns
     -------
-    v: np.ndarray of shape (n,3)
+    v: array of shape (n,3)
         coordinates on sphere in 3D
 
     Notes
-    -------
+    -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
@@ -569,7 +555,6 @@ def inverse_stereographic(u):
     https://math.mit.edu/~ptchoi
     and has been distributed with the Apache 2 License
     """
-
     if np.iscomplexobj(u):
         x = u.real
         y = u.imag

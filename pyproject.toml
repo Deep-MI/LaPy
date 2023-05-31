@@ -55,13 +55,25 @@ build = [
 chol = [
     'scikit-sparse',
 ]
+doc = [
+    'furo',
+    'matplotlib',
+    'memory-profiler',
+    'numpydoc',
+    'sphinx',
+    'sphinxcontrib-bibtex',
+    'sphinx-copybutton',
+    'sphinx-design',
+    'sphinx-gallery',
+    'sphinx-issues',
+]
 style = [
     'bibclean',
     'black',
     'codespell',
     'isort',
-    'flake8',
     'pydocstyle[toml]',
+    'ruff',
 ]
 test = [
     'pytest',
@@ -102,10 +114,12 @@ include = '\.pyi?$'
 extend-exclude = '''
 (
       __pycache__
-    | \.github
+    | .github
     | setup.py
     | data/
+    | doc/
     | examples/
+    | tutorials/
 )
 '''
 
@@ -117,7 +131,9 @@ py_version = 38
 extend_skip_glob = [
     'setup.py',
     'data/*',
+    'doc/*',
     'examples/*',
+    'tutorials/*',
 ]
 
 [tool.pydocstyle]
@@ -126,6 +142,16 @@ ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
 match-dir = '^lapy.*'
 add_ignore = 'D100,D104,D107'
+
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    "doc",
+    "setup.py",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
 
 [tool.pytest.ini_options]
 minversion = '6.0'

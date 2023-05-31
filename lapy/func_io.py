@@ -2,10 +2,11 @@ import numpy as np
 
 
 def import_vfunc_deprecated(infile):
-    """
-    Imports vertex function from txt file. Values can be separated by ; or ,
-    and surrounded by {} or () brackets. Also first line can have the
-    keyword "Solution:", i.e. the PSOL format from ShapeDNA
+    """Import vertex from txt file.
+
+    Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
+    brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
+    from ShapeDNA.
 
     Parameters
     ----------
@@ -18,10 +19,9 @@ def import_vfunc_deprecated(infile):
         list of vfunc parameters
 
     Notes
-    ------
+    -----
     deprecated, use import_vfunc() instead
     """
-
     import re
 
     try:
@@ -49,10 +49,11 @@ def import_vfunc_deprecated(infile):
 
 
 def import_vfunc(filename):
-    """
-    Imports vertex function from txt file. Values can be separated by ; or ,
-    and surrounded by {} or () brackets. Also first line can have the
-    keyword "Solution:", i.e. the PSOL format from ShapeDNA
+    """Import vertex from txt file.
+
+    Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
+    brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
+    from ShapeDNA.
 
     Parameters
     ----------
@@ -61,13 +62,10 @@ def import_vfunc(filename):
 
     Returns
     -------
-    vals : np.ndarray
+    vals : array
         list of vfunc parameters
     """
-
     import re
-
-    import numpy as np
 
     try:
         with open(filename) as f:
@@ -93,8 +91,7 @@ def import_vfunc(filename):
 
 
 def import_ev(infile):
-    """
-    Load EV file
+    """Load EV file.
 
     Parameters
     ----------
@@ -107,7 +104,6 @@ def import_ev(infile):
         dictionary of eigenvalues, eigenvectors (optional), and associated
         information
     """
-
     # open file
     try:
         f = open(infile, "r")
@@ -230,8 +226,8 @@ def import_ev(infile):
 
 
 def export_ev(outfile, d):
-    """
-    Save EV data structures as txt file (format from ShapeDNA)
+    """Save EV data structures as txt file (format from ShapeDNA).
+
     usage: exportEV(data,outfile)
 
     Parameters
@@ -242,7 +238,6 @@ def export_ev(outfile, d):
         dictionary of eigenvalues, eigenvectors (optional), and associated
         information
     """
-
     # open file
     try:
         f = open(outfile, "w")
@@ -327,8 +322,8 @@ def export_ev(outfile, d):
 
 
 def export_vfunc(outfile, vfunc):
-    """
-    Exports vertex function in PSOL txt file:
+    """Export vertex in PSOL txt file.
+
     First line "Solution:", "," separated values inside ()
 
     Parameters
@@ -338,7 +333,6 @@ def export_vfunc(outfile, vfunc):
     vfunc : array_like
         list of vfunc parameters
     """
-
     try:
         f = open(outfile, "w")
     except IOError:

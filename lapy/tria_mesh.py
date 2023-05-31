@@ -545,6 +545,8 @@ class TriaMesh:
     def curvature(self, smoothit=3):
         """Compute various curvature values at vertices.
 
+        .. note::
+
         For the algorithm see e.g.
         Pierre Alliez, David Cohen-Steiner, Olivier Devillers,
         Bruno Levy, and Mathieu Desbrun.
@@ -732,7 +734,7 @@ class TriaMesh:
         return tumin2, tumax2, tcmin, tcmax
 
     def normalize_(self):
-        """Normalize TriaMesh to unit surface area with a centroid at the origin.
+        """Normalize TriaMesh to unit surface area and centroid at the origin.
 
         Modifies the vertices.
         """
@@ -740,11 +742,10 @@ class TriaMesh:
         self.v = (1.0 / np.sqrt(area)) * (self.v - centroid)
 
     def rm_free_vertices_(self):
-        """Remove unused (free) vertices from v and t.
+        """Remove unused (free) vertices.
 
-        These are vertices that are not
-        used in any triangle. They can produce problems when constructing, e.g.,
-        Laplace matrices.
+        Free vertices are vertices that are not used in any triangle.
+        They can produce problems when constructing, e.g., Laplace matrices.
 
         Will update v and t in mesh.
 
@@ -936,7 +937,7 @@ class TriaMesh:
         return flipped
 
     def map_tfunc_to_vfunc(self, tfunc, weighted=False):
-        """Map each tria to each vertex by attributing 1/3 to each.
+        """Map tria function to vertices by attributing 1/3 to each vertex of a triangle.
 
         Uses vertices and trias.
 
@@ -975,7 +976,7 @@ class TriaMesh:
         return np.squeeze(vfunc / 3.0)
 
     def map_vfunc_to_tfunc(self, vfunc):
-        """Map each vertex to each triangle by attributing 1/3 to each.
+        """Map vertex function to triangles by attributing 1/3 to each.
 
         Uses number of vertices and trias
 
@@ -996,7 +997,7 @@ class TriaMesh:
         return tfunc
 
     def smooth_vfunc(self, vfunc, n=1):
-        """Smooth the mesh iteratively.
+        """Smooth the mesh or a vertex function iteratively.
 
         Parameters
         ----------

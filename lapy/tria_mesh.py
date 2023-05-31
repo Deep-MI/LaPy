@@ -937,8 +937,7 @@ class TriaMesh:
         return flipped
 
     def map_tfunc_to_vfunc(self, tfunc, weighted=False):
-        """Map tria function to vertices by attributing 1/3 to each vertex of a
-        triangle.
+        """Map tria function to vertices by attributing 1/3 to each vertex of triangle.
 
         Uses vertices and trias.
 

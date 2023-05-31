@@ -547,11 +547,11 @@ class TriaMesh:
 
         .. note::
 
-        For the algorithm see e.g.
-        Pierre Alliez, David Cohen-Steiner, Olivier Devillers,
-        Bruno Levy, and Mathieu Desbrun.
-        Anisotropic Polygonal Remeshing.
-        ACM Transactions on Graphics, 2003.
+            For the algorithm see e.g.
+            Pierre Alliez, David Cohen-Steiner, Olivier Devillers,
+            Bruno Levy, and Mathieu Desbrun.
+            Anisotropic Polygonal Remeshing.
+            ACM Transactions on Graphics, 2003.
 
         Parameters
         ----------

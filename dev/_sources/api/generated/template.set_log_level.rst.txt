@@ -1,0 +1,9 @@
+﻿template.set\_log\_level
+========================
+
+.. currentmodule:: template
+
+.. autofunction:: set_log_level
+
+.. minigallery:: template.set_log_level
+    :add-heading:

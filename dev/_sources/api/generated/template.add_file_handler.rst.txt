@@ -1,0 +1,9 @@
+﻿template.add\_file\_handler
+===========================
+
+.. currentmodule:: template
+
+.. autofunction:: add_file_handler
+
+.. minigallery:: template.add_file_handler
+    :add-heading:

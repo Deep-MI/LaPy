@@ -60,7 +60,7 @@ class TriaMesh:
         self.fsinfo = fsinfo  # place for Freesurfer Header info
 
     def _construct_adj_sym(self):
-        """Construct symmetric adjacency matrix (edge graph) of triangle mesh t.
+        """Construct symmetric adjacency matrix (edge graph) of triangle mesh.
 
         Operates only on triangles.
 
@@ -85,7 +85,7 @@ class TriaMesh:
         return sparse.csc_matrix((dat, (i, j)), shape=(n, n))
 
     def _construct_adj_dir(self):
-        """Construct directed adjacency matrix (edge graph) of triangle mesh t.
+        """Construct directed adjacency matrix (edge graph) of triangle mesh.
 
         Operates only on triangles.
 
@@ -110,7 +110,7 @@ class TriaMesh:
         return sparse.csc_matrix((dat, (i, j)), shape=(n, n))
 
     def construct_adj_dir_tidx(self):
-        """Construct directed adjacency matrix (edge graph) of triangle mesh t.
+        """Construct directed adjacency matrix (edge graph) of triangle mesh.
 
         The directed adjacency matrix contains the triangle indices (only for
         non-manifold meshes). Operates only on triangles.

@@ -1,0 +1,11 @@
+﻿lapy.TriaMesh
+=============
+
+.. currentmodule:: lapy
+
+.. autoclass:: TriaMesh
+   :members:
+   :inherited-members:
+
+.. minigallery:: lapy.TriaMesh
+    :add-heading:

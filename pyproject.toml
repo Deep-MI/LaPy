@@ -92,8 +92,8 @@ full = [
 ]
 
 [project.urls]
-homepage = 'https://github.com/Deep-MI/LaPy'
-documentation = 'https://github.com/Deep-MI/LaPy'
+homepage = 'https://Deep-MI.github.io/LaPy/dev/index.html'
+documentation = 'https://Deep-MI.github.io/LaPy/dev/index.html'
 source = 'https://github.com/Deep-MI/LaPy'
 tracker = 'https://github.com/Deep-MI/LaPy/issues'
 

@@ -214,7 +214,7 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         branch = "main"
     else:
         return None  # alternatively, link to a maint/version branch
-    fname = fname.split(f"/{package}/")[1]
+    fname = fname.rsplit(f"/{package}/")[1]
     url = f"{gh_url}/blob/{branch}/{package}/{fname}#{lines}"
     return url
 

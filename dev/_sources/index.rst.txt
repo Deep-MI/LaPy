@@ -10,11 +10,15 @@
    generated/tutorials/index
    changes/index
 
-LaPy is a package to compute spectral features (Laplace-Beltrami operator) on
-tetrahedral and triangle meshes. It is written purely in python 3 without
-sacrificing speed as almost all loops are vectorized, drawing upon efficient
-and sparse mesh data structures. It is basically a port of the C++ ShapeDNA
-project with extended differential geometry capabilities.
+LaPy is an open-source Python package for differential geometry on triangle
+and tetrahedra meshes. It includes an FEM solver to estimate the Laplace,
+Poisson or Heat equations. Further functionality includes the computations
+of gradients, divergence, mean-curvature flow, conformal mappings, 
+geodesics, ShapeDNA (Laplace spectra), and IO and plotting methods. 
+
+LaPy is written purely in Python 3 without sacrificing speed as almost all
+loops are vectorized, drawing upon efficient and sparse mesh data structures.
+
 
 Install
 -------

@@ -10,11 +10,12 @@
    generated/tutorials/index
    changes/index
 
-LaPy is an open-source Python package for differential geometry on triangle
-and tetrahedra meshes. It includes an FEM solver to estimate the Laplace,
-Poisson or Heat equations. Further functionality includes the computations
-of gradients, divergence, mean-curvature flow, conformal mappings, 
-geodesics, ShapeDNA (Laplace spectra), and IO and plotting methods. 
+LaPy is an `open-source Python package <project github_>`_ for differential
+geometry on triangle and tetrahedra meshes. It includes an FEM solver to
+estimate the Laplace, Poisson or Heat equations. Further functionality
+includes the computations of gradients, divergence, mean-curvature flow,
+conformal mappings, geodesics, ShapeDNA (Laplace spectra), and IO and
+plotting methods. 
 
 LaPy is written purely in Python 3 without sacrificing speed as almost all
 loops are vectorized, drawing upon efficient and sparse mesh data structures.

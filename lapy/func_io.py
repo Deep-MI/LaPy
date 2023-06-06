@@ -185,7 +185,7 @@ def import_ev(infile):
             while not (ll[i].strip().startswith("sizes")):
                 i = i + 1
             d.update(
-                {"EigenvectorsSize": np.array(ll[i].strip().split()[1:]).astype(np.int)}
+                {"EigenvectorsSize": np.array(ll[i].strip().split()[1:]).astype(int)}
             )
             i = i + 1
             while ll[i].find("{") < 0:  # possibly introduce termination criterion

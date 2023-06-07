@@ -83,7 +83,7 @@ def import_vfunc(filename):
     if len(txt) == 1:
         txt = [re.split("[,;]", x) for x in txt][0]
 
-    txt = [np.float(x) for x in txt]
+    txt = [float(x) for x in txt]
 
     # txt = np.array(txt)
 
@@ -177,7 +177,7 @@ def import_ev(infile):
                     evals = evals + ll[i].strip().replace("{", "").replace("}", "")
                     i = i + 1
                 evals = evals + ll[i].strip().replace("{", "").replace("}", "")
-            evals = np.array(evals.split(";")).astype(np.float)
+            evals = np.array(evals.split(";")).astype(float)
             d.update({"Eigenvalues": evals})
             i = i + 1
         elif ll[i].lstrip().startswith("Eigenvectors"):
@@ -185,7 +185,7 @@ def import_ev(infile):
             while not (ll[i].strip().startswith("sizes")):
                 i = i + 1
             d.update(
-                {"EigenvectorsSize": np.array(ll[i].strip().split()[1:]).astype(np.int)}
+                {"EigenvectorsSize": np.array(ll[i].strip().split()[1:]).astype(int)}
             )
             i = i + 1
             while ll[i].find("{") < 0:  # possibly introduce termination criterion
@@ -204,7 +204,7 @@ def import_ev(infile):
                 ).replace(")", "")
             evecs = np.array(
                 evecs.replace(";", " ").replace(",", " ").strip().split()
-            ).astype(np.float)
+            ).astype(float)
             if len(evecs) == (d["EigenvectorsSize"][0] * d["EigenvectorsSize"][1]):
                 evecs = np.transpose(np.reshape(evecs, d["EigenvectorsSize"][1::-1]))
                 d.update({"Eigenvectors": evecs})

@@ -1,55 +1,11 @@
+"""Functions to read and write spectra and vertex functions.
+"""
+
 import numpy as np
 
 
-def import_vfunc_deprecated(infile):
-    """Import vertex from txt file.
-
-    Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
-    brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
-    from ShapeDNA.
-
-    Parameters
-    ----------
-    infile : str
-        filename of input
-
-    Returns
-    -------
-    vals : list
-        list of vfunc parameters
-
-    Notes
-    -----
-    deprecated, use import_vfunc() instead
-    """
-    import re
-
-    try:
-        f = open(infile, "r")
-    except IOError:
-        print("[File " + infile + " not found or not readable]")
-        return
-    txt = f.readlines()
-    i = 0
-    vals = list()
-    while i < len(txt):
-        if "Solution:" in txt[i]:
-            i = i + 1
-            tmp1 = list()
-            while i < len(txt):
-                if txt[i].isspace():
-                    break
-                tmp1.append(txt[i].strip())
-                i = i + 1
-            for tmp2 in re.split("[;,]", re.sub("[{()}]", "", "".join(tmp1))):
-                vals.append(float(tmp2))
-            # del (tmp1, tmp2)
-        i = i + 1
-    return vals
-
-
-def import_vfunc(filename):
-    """Import vertex from txt file.
+def read_vfunc(filename):
+    """Import vertex functions from txt file.
 
     Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
     brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
@@ -73,29 +29,22 @@ def import_vfunc(filename):
     except IOError:
         print("[File " + filename + " not found or not readable]")
         return
-
     txt = [x.strip() for x in txt]
-
     txt.remove("Solution:")
-
     txt = [re.sub("[{()}]", "", x) for x in txt]
-
     if len(txt) == 1:
         txt = [re.split("[,;]", x) for x in txt][0]
-
     txt = [float(x) for x in txt]
-
     # txt = np.array(txt)
-
     return txt
 
 
-def import_ev(infile):
+def read_ev(filename):
     """Load EV file.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename of input
 
     Returns
@@ -106,9 +55,9 @@ def import_ev(infile):
     """
     # open file
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
-        print("[File " + infile + " not found or not readable]")
+        print("[File " + filename + " not found or not readable]")
         return
     # read file (and get rid of all \n)
     ll = f.read().splitlines()
@@ -225,14 +174,12 @@ def import_ev(infile):
     return d
 
 
-def export_ev(outfile, d):
+def write_ev(filename, d):
     """Save EV data structures as txt file (format from ShapeDNA).
-
-    usage: exportEV(data,outfile)
 
     Parameters
     ----------
-    outfile : str
+    filename : str
         filename to save to
     d : dict
         dictionary of eigenvalues, eigenvectors (optional), and associated
@@ -240,9 +187,9 @@ def export_ev(outfile, d):
     """
     # open file
     try:
-        f = open(outfile, "w")
+        f = open(filename, "w")
     except IOError:
-        print("[File " + outfile + " not writable]")
+        print("[File " + filename + " not writable]")
         return
     # check data structure
     if "Eigenvalues" not in d:
@@ -321,22 +268,22 @@ def export_ev(outfile, d):
     f.close()
 
 
-def export_vfunc(outfile, vfunc):
-    """Export vertex in PSOL txt file.
+def write_vfunc(filename, vfunc):
+    """Save vertex in PSOL txt file.
 
     First line "Solution:", "," separated values inside ()
 
     Parameters
     ----------
-    outfile : str
+    filename : str
         filename to save to
     vfunc : array_like
         list of vfunc parameters
     """
     try:
-        f = open(outfile, "w")
+        f = open(filename, "w")
     except IOError:
-        print("[File " + outfile + " not writable]")
+        print("[File " + filename + " not writable]")
         return
     f.write("Solution:\n")
     f.write("(" + ",".join(vfunc.astype(str)) + ")")

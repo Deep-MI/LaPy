@@ -1,3 +1,10 @@
+"""Functions for computing and comparing Laplace spectra.
+
+Includes code for solving the anisotropic Laplace-Beltrami eigenvalue
+problem as well as functions for normalization and comparison of 
+Laplace spectra. 
+"""
+
 import numpy as np
 import scipy.spatial.distance as di
 

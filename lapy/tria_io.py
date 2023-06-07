@@ -1,18 +1,19 @@
-#!/usr/bin/env python
-# -*- coding: latin-1 -*-
+"""Functions for IO of Triangle Meshes.
 
+Should be called via the TriaMesh member functions.
+"""
 
 import numpy as np
 
 from . import TriaMesh
 
 
-def import_fssurf(infile):
+def read_fssurf(filename):
     """Load triangle mesh from FreeSurfer surface geometry file.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -29,7 +30,7 @@ def import_fssurf(infile):
         # once this is fixed in nibabel we can switch back
         from .read_geometry import read_geometry
 
-        surf = read_geometry(infile, read_metadata=True)
+        surf = read_geometry(filename, read_metadata=True)
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -37,12 +38,12 @@ def import_fssurf(infile):
     return TriaMesh(surf[0], surf[1], fsinfo=surf[2])
 
 
-def import_off(infile):
+def read_off(filename):
     """Load triangle mesh from OFF txt file.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -54,7 +55,7 @@ def import_off(infile):
     if verbose > 0:
         print("--> OFF format         ... ")
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -91,12 +92,12 @@ def import_off(infile):
     return TriaMesh(v, t)
 
 
-def import_vtk(infile):
+def read_vtk(filename):
     """Load triangle mesh from VTK txt file.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -108,7 +109,7 @@ def import_vtk(infile):
     if verbose > 0:
         print("--> VTK format         ... ")
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -200,12 +201,12 @@ def import_vtk(infile):
     return TriaMesh(v, t)
 
 
-def import_gmsh(infile):
+def read_gmsh(filename):
     """Load GMSH tetra mesh ASCII Format.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -282,7 +283,7 @@ def import_gmsh(infile):
         print("--> GMSH format         ... ")
 
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -464,23 +465,23 @@ def import_gmsh(infile):
     return points, cells, point_data, cell_data, field_data
 
 
-def export_vtk(tria, outfile):
+def write_vtk(tria, filename):
     """Save VTK file.
 
-    usage: exportVTK(TriaMesh,outfile)
+    usage: exportVTK(TriaMesh,filename)
 
     Parameters
     ----------
     tria : TriaMesh
         Triangle mesh to save
-    outfile : str
+    filename : str
         filename to save to
     """
     # open file
     try:
-        f = open(outfile, "w")
+        f = open(filename, "w")
     except IOError:
-        print("[File " + outfile + " not writable]")
+        print("[File " + filename + " not writable]")
         return
     # check data structure
     # ...
@@ -506,21 +507,21 @@ def export_vtk(tria, outfile):
     f.close()
 
 
-def export_fssurf(tria, outfile):
+def write_fssurf(tria, filename):
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 
     Parameters
     ----------
     tria : TriaMesh
         Triangle mesh to save
-    outfile : str
+    filename : str
         filename to save to
     """
     # open file
     try:
         from nibabel.freesurfer.io import write_geometry
 
-        write_geometry(outfile, tria.v, tria.t, volume_info=tria.fsinfo)
+        write_geometry(filename, tria.v, tria.t, volume_info=tria.fsinfo)
     except IOError:
-        print("[File " + outfile + " not writable]")
+        print("[File " + filename + " not writable]")
         return

@@ -1,3 +1,12 @@
+"""Differential Geometry Functions for meshes.
+
+This module includes gradient, divergence, curvature, geodesics,
+mean curvature flow etc. 
+
+Note, the interface is not yet final, some functions are split into
+tet and tria versions.
+"""
+
 import importlib
 
 import numpy as np

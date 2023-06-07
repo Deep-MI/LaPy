@@ -7,6 +7,7 @@ import sys
 
 import numpy as np
 from scipy import sparse
+import tria_io as io
 
 
 class TriaMesh:
@@ -58,6 +59,74 @@ class TriaMesh:
         self.adj_sym = self._construct_adj_sym()
         self.adj_dir = self._construct_adj_dir()
         self.fsinfo = fsinfo  # place for Freesurfer Header info
+
+    @classmethod
+    def read_fssurf(cls, filename):
+        """Load triangle mesh from FreeSurfer surface geometry file.
+
+        Parameters
+        ----------
+        filename : str
+            filename to load
+
+        Returns
+        -------
+        TriaMesh
+            loaded triangle mesh
+        """
+        return io.read_fssurf(filename)
+
+    @classmethod
+    def read_off(cls, filename):
+        """Load triangle mesh from OFF txt file.
+
+        Parameters
+        ----------
+        filename : str
+            filename to load
+
+        Returns
+        -------
+        TriaMesh
+            loaded triangle mesh
+        """
+        return io.read_off(filename)
+
+    @classmethod
+    def read_vtk(cls, filename):
+        """Load triangle mesh from VTK txt file.
+
+        Parameters
+        ----------
+        filename : str
+            filename to load
+
+        Returns
+        -------
+        TriaMesh
+            loaded triangle mesh
+        """
+        return io.read_vtk(filename)
+
+    def write_vtk(self, filename):
+        """Save as VTK file.
+
+        Parameters
+        ----------
+        filename : str
+            filename to save to
+        """
+        return io.write_vtk(self, filename)
+
+    def write_fssurf(self, filename):
+        """Save as Freesurfer Surface Geometry file (wrap Nibabel).
+
+        Parameters
+        ----------
+        filename : str
+            filename to save to
+        """
+        return io.write_fssurf(self, filename)
 
     def _construct_adj_sym(self):
         """Construct symmetric adjacency matrix (edge graph) of triangle mesh.

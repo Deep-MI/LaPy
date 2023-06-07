@@ -5,7 +5,7 @@ Should be called via the TriaMesh member functions.
 
 import numpy as np
 
-from . import TriaMesh
+import TriaMesh
 
 
 def read_fssurf(filename):

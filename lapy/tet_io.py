@@ -7,7 +7,7 @@ import os.path
 
 import numpy as np
 
-from . import TetMesh
+import TetMesh
 
 
 def read_gmsh(filename):

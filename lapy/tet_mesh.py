@@ -6,7 +6,8 @@ Date: Feb-01-2019
 
 import numpy as np
 from scipy import sparse
-import tet_io as io
+
+from . import tet_io as io
 
 
 class TetMesh:

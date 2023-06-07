@@ -7,7 +7,8 @@ import sys
 
 import numpy as np
 from scipy import sparse
-import tria_io as io
+
+from . import tria_io as io
 
 
 class TriaMesh:

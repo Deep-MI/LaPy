@@ -1,5 +1,4 @@
-"""Functions to read and write spectra and vertex functions.
-"""
+"""Functions to read and write spectra and vertex functions."""
 
 import numpy as np
 

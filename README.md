@@ -62,7 +62,7 @@ If you use this software for a publication please cite both these papers:
 
 [2] BrainPrint: a discriminative characterization of brain morphology. Wachinger C, Golland P, Kremen W, Fischl B, Reuter M. Neuroimage. 2015;109:232-48. http://dx.doi.org/10.1016/j.neuroimage.2015.01.032 http://www.ncbi.nlm.nih.gov/pubmed/25613439
 
-[1] introduces the FEM methods and the Laplace spectra for shape analysis, while [2] focusses on medical applications.
+Shape-DNA [1] introduces the FEM methods and the Laplace spectra for shape analysis, while BrainPrint [2] focusses on medical applications.
 
 For Geodesics please cite:
 

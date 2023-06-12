@@ -6,7 +6,6 @@ Should be called via the TriaMesh member functions.
 import numpy as np
 
 
-
 def read_fssurf(filename):
     """Load triangle mesh from FreeSurfer surface geometry file.
 

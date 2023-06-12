@@ -68,12 +68,12 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            filename to load
+            Filename to load.
 
         Returns
         -------
         TriaMesh
-            loaded triangle mesh
+            Loaded triangle mesh.
         """
         return io.read_fssurf(filename)
 
@@ -84,12 +84,12 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            filename to load
+            Filename to load.
 
         Returns
         -------
         TriaMesh
-            loaded triangle mesh
+            Loaded triangle mesh.
         """
         return io.read_off(filename)
 
@@ -100,12 +100,12 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            filename to load
+            Filename to load.
 
         Returns
         -------
         TriaMesh
-            loaded triangle mesh
+            Loaded triangle mesh.
         """
         return io.read_vtk(filename)
 
@@ -115,9 +115,9 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            filename to save to
+            Filename to save to.
         """
-        return io.write_vtk(self, filename)
+        io.write_vtk(self, filename)
 
     def write_fssurf(self, filename):
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
@@ -125,9 +125,9 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            filename to save to
+            Filename to save to.
         """
-        return io.write_fssurf(self, filename)
+        io.write_fssurf(self, filename)
 
     def _construct_adj_sym(self):
         """Construct symmetric adjacency matrix (edge graph) of triangle mesh.

@@ -41,12 +41,12 @@ class TetMesh:
         Parameters
         ----------
         filename : str
-            filename to load
+            Filename to load.
 
         Returns
         -------
         tet : TetMesh
-            Object of loaded  GMSH tetrahedron mesh
+            Object of loaded GMSH tetrahedron mesh.
         """
         return io.read_gmsh(filename)
 
@@ -57,12 +57,12 @@ class TetMesh:
         Parameters
         ----------
         filename : str
-            filename to load
+            Filename to load.
 
         Returns
         -------
         tet : TetMesh
-            Object of loaded  VTK tetrahedron mesh
+            Object of loaded VTK tetrahedron mesh.
         """
         return io.read_vtk(filename)
 
@@ -72,9 +72,9 @@ class TetMesh:
         Parameters
         ----------
         filename : str
-            filename to save to
+            Filename to save to.
         """
-        return io.write_vtk(self, filename)
+        io.write_vtk(self, filename)
 
     def construct_adj_sym(self):
         """Create adjacency symmetric matrix.

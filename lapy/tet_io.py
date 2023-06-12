@@ -7,8 +7,6 @@ import os.path
 
 import numpy as np
 
-import TetMesh
-
 
 def read_gmsh(filename):
     """Load GMSH tetrahedron mesh.
@@ -106,6 +104,7 @@ def read_gmsh(filename):
         return
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    from . import TetMesh
     return TetMesh(v, t)
 
 
@@ -191,6 +190,7 @@ def read_vtk(filename):
         return
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    from . import TetMesh
     return TetMesh(v, t)
 
 

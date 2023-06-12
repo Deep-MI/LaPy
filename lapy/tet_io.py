@@ -1,23 +1,19 @@
-#!/usr/bin/env python
-# -*- coding: latin-1 -*-
-#
-# Original Author: Martin Reuter
-# Date: Jul-5-2018
-#
+"""Functions for IO of Tetrahedra Meshes.
+
+Should be called via the TetMesh member functions.
+"""
 
 import os.path
 
 import numpy as np
 
-from . import TetMesh
 
-
-def import_gmsh(infile):
+def read_gmsh(filename):
     """Load GMSH tetrahedron mesh.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -25,7 +21,7 @@ def import_gmsh(infile):
     tet : TetMesh
         Object of loaded  GMSH tetrahedron mesh
     """
-    extension = os.path.splitext(infile)[1]
+    extension = os.path.splitext(filename)[1]
     verbose = 1
     if verbose > 0:
         print("--> GMSH format         ... ")
@@ -33,7 +29,7 @@ def import_gmsh(infile):
         print("[no .msh file] --> FAILED\n")
         return
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -108,15 +104,17 @@ def import_gmsh(infile):
         return
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    from . import TetMesh
+
     return TetMesh(v, t)
 
 
-def import_vtk(infile):
+def read_vtk(filename):
     """Load VTK tetrahedron mesh.
 
     Parameters
     ----------
-    infile : str
+    filename : str
         filename to load
 
     Returns
@@ -128,7 +126,7 @@ def import_vtk(infile):
     if verbose > 0:
         print("--> VTK format         ... ")
     try:
-        f = open(infile, "r")
+        f = open(filename, "r")
     except IOError:
         print("[file not found or not readable]\n")
         return
@@ -193,24 +191,26 @@ def import_vtk(infile):
         return
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    from . import TetMesh
+
     return TetMesh(v, t)
 
 
-def export_vtk(tet, outfile):
+def write_vtk(tet, filename):
     """Save VTK file.
 
     Parameters
     ----------
     tet : TetMesh
         tetrahedron mesh to save
-    outfile : str
+    filename : str
         filename to save to
     """
     # open file
     try:
-        f = open(outfile, "w")
+        f = open(filename, "w")
     except IOError:
-        print("[File " + outfile + " not writable]")
+        print("[File " + filename + " not writable]")
         return
     # check data structure
     # ...

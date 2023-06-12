@@ -7,6 +7,8 @@ Date: Feb-01-2019
 import numpy as np
 from scipy import sparse
 
+from . import tet_io as io
+
 
 class TetMesh:
     """A class representing a tetraheral mesh.
@@ -31,6 +33,48 @@ class TetMesh:
         # put more checks here (e.g. the dim 3 conditions on columns)
         # self.orient_()
         self.adj_sym = self.construct_adj_sym()
+
+    @classmethod
+    def read_gmsh(cls, filename):
+        """Load GMSH tetrahedron mesh.
+
+        Parameters
+        ----------
+        filename : str
+            Filename to load.
+
+        Returns
+        -------
+        tet : TetMesh
+            Object of loaded GMSH tetrahedron mesh.
+        """
+        return io.read_gmsh(filename)
+
+    @classmethod
+    def read_vtk(cls, filename):
+        """Load VTK tetrahedron mesh.
+
+        Parameters
+        ----------
+        filename : str
+            Filename to load.
+
+        Returns
+        -------
+        tet : TetMesh
+            Object of loaded VTK tetrahedron mesh.
+        """
+        return io.read_vtk(filename)
+
+    def write_vtk(self, filename):
+        """Save as VTK file.
+
+        Parameters
+        ----------
+        filename : str
+            Filename to save to.
+        """
+        io.write_vtk(self, filename)
 
     def construct_adj_sym(self):
         """Create adjacency symmetric matrix.

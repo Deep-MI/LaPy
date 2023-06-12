@@ -1,8 +1,12 @@
-"""Dependency: plotly 3.6.
+"""Functions for plotting Tet and Tria Meshes with overlays.
 
-In jupyter notebook do this:
-    import plotly
-    plotly.offline.init_notebook_mode(connected=True)
+For visualizing results in a juypter notebook use this::
+
+    .. code-block:: python
+
+        import plotly
+        plotly.offline.init_notebook_mode(connected=True)
+        ...
 """
 
 import re

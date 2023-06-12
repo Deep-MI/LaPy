@@ -1,16 +1,18 @@
-# Adopted from Matlab code at
-# https://github.com/garyptchoi/spherical-conformal-map
-# with this
-# Copyright (c) 2013-2020, Gary Pui-Tung Choi
-# https://math.mit.edu/~ptchoi
-# and has been distributed with the Apache 2 License
+"""Computes spherical conformal mappings of triangle meshes.
 
-# If you use this code in your own work, please cite the following paper:
-# [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-# "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0
-#  Closed Brain Surfaces."
-# SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+Functions are adopted from Matlab code at
+https://github.com/garyptchoi/spherical-conformal-map
+with this
+Copyright (c) 2013-2020, Gary Pui-Tung Choi
+https://math.mit.edu/~ptchoi
+and has been distributed with the Apache 2 License
 
+If you use this code in your own work, please cite the following paper:
+[1] P. T. Choi, K. C. Lam, and L. M. Lui,
+"FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0
+Closed Brain Surfaces."
+SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+"""
 
 import importlib
 
@@ -107,7 +109,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
     rhs.real = c.flatten()
     rhs.imag = d.flatten()
 
-    z = sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
+    z = _sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
     z = np.squeeze(np.array(z))
     z = z - np.mean(z, axis=0)
 
@@ -448,19 +450,19 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     A = A - Azero + Aones
     A.eliminate_zeros()
 
-    x = sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
+    x = _sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
 
     mapping = np.squeeze(np.array(x))
     mapping = np.column_stack((np.real(mapping), np.imag(mapping)))
     return mapping
 
 
-def sparse_symmetric_solve(A, b, use_cholmod=False):
+def _sparse_symmetric_solve(A, b, use_cholmod=False):
     """Sparse symmetric solver for ``A x = b``.
 
     Parameters
     ----------
-    A : sparse matrix of shape (n, n)
+    A : sparse symmetric matrix of shape (n, n)
     b : array vector of length n
     use_cholmod : bool, default=False
         Which solver to use:

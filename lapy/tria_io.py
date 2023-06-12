@@ -33,6 +33,7 @@ def read_fssurf(filename):
         print("[file not found or not readable]\n")
         return
     from . import TriaMesh
+
     return TriaMesh(surf[0], surf[1], fsinfo=surf[2])
 
 
@@ -88,6 +89,7 @@ def read_off(filename):
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     from . import TriaMesh
+
     return TriaMesh(v, t)
 
 
@@ -198,6 +200,7 @@ def read_vtk(filename):
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     from . import TriaMesh
+
     return TriaMesh(v, t)
 
 

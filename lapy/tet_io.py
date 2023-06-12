@@ -105,6 +105,7 @@ def read_gmsh(filename):
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     from . import TetMesh
+
     return TetMesh(v, t)
 
 
@@ -191,6 +192,7 @@ def read_vtk(filename):
     f.close()
     print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
     from . import TetMesh
+
     return TetMesh(v, t)
 
 

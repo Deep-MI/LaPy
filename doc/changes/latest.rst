@@ -20,13 +20,13 @@ Version 1.0
 API and behavior changes
 ------------------------
 
-- Module names have been changed to comply with PEP conventions. For example, the `TriaMesh` module has been renamed to `tria_mesh` , `DiffGeo` to `diff_geo`, and `Plot` to `plot`, among others. 
-- Changed import functions: the `TriaIO`` and `TetIO`` modules have been deprecated, and `import_*` / `export_*` functions have been renamed to `read_*` / `write_*`, which are now static functions of the `tria_mesh` and `tet_mesh` classes. For example, use `tria_mesh.read_vtk()` to import a vtk file. The former `FuncIO` module has been renamed to `func_io`, but is kept as a separate module.
+- Module names have been changed to comply with PEP8 conventions. For example, the TriaMesh module has been renamed to tria_mesh, DiffGeo to diff_geo, and Plot to plot, among others. 
+- Changed import functions: the TriaIO and TetIO modules have been deprecated, and import\_* / export\_* functions have been renamed to read\_* / write\_*, which are now static functions of the tria_mesh and tet_mesh classes. For example, use tria_mesh.read_vtk() to import a vtk file. The former FuncIO module has been renamed to func_io, but is kept as a separate module.
 
 Bugs
 ----
 
-- Fixed `numpy` deprecation issue in `import_vfunc` and `import_ev` functions.
+- Fixed numpy deprecation issue in import_vfunc and import_ev functions.
 
 Version 0.7
 ===========

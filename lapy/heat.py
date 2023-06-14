@@ -15,26 +15,26 @@ from .utils._imports import import_optional_dependency
 def diagonal(t, x, evecs, evals, n):
     """Compute heat kernel diagonal ( K(t,x,x,) ).
 
-    for a given time t (can be a vector)
-    using only the first n smallest eigenvalues and eigenvectors
+    For a given time t (can be a vector)
+    using only the first n smallest eigenvalues and eigenvectors.
 
     Parameters
     ----------
     t : float | array
-        time or a row vector of time values
+        Time or a row vector of time values.
     x : array
-        vertex ids for the positions of K(t,x,x)
+        Vertex ids for the positions of K(t,x,x).
     evecs : array
-        eigenvectors (matrix: vnum x evecsnum)
+        Eigenvectors (matrix: vnum x evecsnum).
     evals : array
-        vector of eigenvalues (col vector: evecsnum x 1)
+        Vector of eigenvalues (col vector: evecsnum x 1).
     n : int
-        number of evecs and vals to use (smaller or equal length)
+        Number of evecs and vals to use (smaller or equal length).
 
     Returns
     -------
     h : array
-        matrix, rows: vertices selected in x, cols: times in t
+        Matrix, rows: vertices selected in x, cols: times in t.
     """
     # maybe add code to check dimensions of input and flip axis if necessary
     h = np.matmul(evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t)))
@@ -44,28 +44,27 @@ def diagonal(t, x, evecs, evals, n):
 def kernel(t, vfix, evecs, evals, n):
     """Compute heat kernel from all points to a fixed point (vfix).
 
-    for a given time t (using only the first n smallest eigenvalues
-    and eigenvectors)
-
+    For a given time t (using only the first n smallest eigenvalues
+    and eigenvectors):
     K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)
 
     Parameters
     ----------
     t : float | array
-        time (can also be a row vector, if passing multiple times)
+        Time (can also be a row vector, if passing multiple times).
     vfix : array
-        fixed vertex index
+        Fixed vertex index.
     evecs : array
-        matrix of eigenvectors (M x N), M = #vertices, N=#eigenvectors
+        Matrix of eigenvectors (M x N), M = #vertices, N=#eigenvectors.
     evals : array
-        col vector of eigenvalues (N)
+        Column vector of eigenvalues (N).
     n : int
-        number of eigenvalues/vectors used in heat kernel (n<=N)
+        Number of eigenvalues/vectors used in heat kernel (n<=N).
 
     Returns
     -------
     h : array
-        matrix m rows: all vertices, cols: times in t
+        Matrix m rows: all vertices, cols: times in t.
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
     h = np.matmul(evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n]))
@@ -80,23 +79,23 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     Parameters
     ----------
     geometry : TriaMesh | TetMesh
-        Object on which to run diffusion
+        Geometric object on which to run diffusion.
     vids : array
-        vertex index or indices where initial heat is applied
+        Vertex index or indices where initial heat is applied.
     m : float, default=1.0
-        factor  to compute time of heat evolution:
-                    t = m * avg_edge_length^2
+        Factor to compute time of heat evolution:
+                    t = m * avg_edge_length^2.
     aniso : int
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default=False
         Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition).
 
     Returns
     -------
-    vfunc: function
-        heat diffusion at vertices
+    vfunc: array of shape (n, 1)
+        Heat diffusion at vertices.
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)

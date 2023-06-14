@@ -30,16 +30,16 @@ def spherical_conformal_map(tria, use_cholmod=False):
     Parameters
     ----------
     tria : TriaMesh
-        vertices and faces
+        Triangle mesh.
     use_cholmod : bool, default=False
         Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition).
 
     Returns
     -------
     mapping: array of shape (n,3)
-        vertex coordinates of the spherical conformal parameterization
+        Vertex coordinates of the spherical conformal parameterization.
 
     Notes
     -----
@@ -200,18 +200,18 @@ def mobius_area_correction_spherical(tria, mapping):
     Parameters
     ----------
     tria : TriaMesh
-        (vertices, triangle) of genus-0 closed triangle mesh
-    mapping : array of shape (n,3)
-        vertex coordinates of the spherical conformal parameterization
+        Genus-0 closed triangle mesh.
+    mapping : array of shape (n, 3)
+        Vertex coordinates of the spherical conformal parameterization.
 
     Returns
     -------
-    map_mobius: array of shape (n,3)
-        vertex coordinates of the updated spherical conformal parameterization
+    map_mobius: array of shape (n, 3)
+        Vertex coordinates of the updated spherical conformal parameterization.
     result: OptimizeResult
-        the optimal parameters (x) for the Mobius transformation, where
+        Optimal parameters (x) for the Mobius transformation, where
             f(z) = \frac{az+b}{cz+d}
-                = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j))
+                 = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)).
 
     Notes
     -----
@@ -277,14 +277,15 @@ def beltrami_coefficient(tria, mapping):
     Parameters
     ----------
     tria : TriaMesh
-        (vertices, triangle) of genus-0 closed triangle mesh
-        TriaMesh should be planar mapping on complex plane
+        Genus-0 closed triangle mesh.
+        Should be planar mapping on complex plane.
     mapping : array of shape (n,3)
-        coordinates of the spherical conformal parameterization
+        Coordinates of the spherical conformal parameterization.
 
     Returns
     -------
-    mu : array of complex beltrami coefficient per triangle
+    mu : array
+        Complex Beltrami coefficient per triangle.
 
     Notes
     -----
@@ -352,21 +353,23 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     Parameters
     ----------
     tria : TriaMesh
-        (vertices, triangle) of genus-0 closed triangle mesh
-        TriaMesh should be planar mapping on complex plane
-    mu : np.array of complex beltrami coefficients
-    landmark : array of fixed vertex indices
-    target : array of shape (n,3)
-        2D landmark target coordinates (third coordinate is zero)
+        Genus-0 closed triangle mesh.
+        Should be planar mapping on complex plane
+    mu : np.array
+        Complex Beltrami coefficients.
+    landmark : array
+        Fixed vertex indices.
+    target : array of shape (n, 3)
+        2D landmark target coordinates (third coordinate is zero).
     use_cholmod : bool, default=False
         Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition).
 
     Returns
     -------
-    mapping : array of shape (n,3)
-        vertex coordinates of new mapping
+    mapping : array of shape (n, 3)
+        Vertex coordinates of new mapping.
 
     Notes
     -----
@@ -462,16 +465,19 @@ def _sparse_symmetric_solve(A, b, use_cholmod=False):
 
     Parameters
     ----------
-    A : sparse symmetric matrix of shape (n, n)
-    b : array vector of length n
+    A : csc_matrix of shape (n, n)
+        Sparse symmetric matrix.
+    b : array of length n
+        Vector for right hand side of equation.
     use_cholmod : bool, default=False
         Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod
-            * False: Use spsolve (LU decomposition)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition).
 
     Returns
     -------
-    x: array of length n, solution to  ``A x = b``
+    x: array of length n
+        Solution to  ``A x = b``.
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -496,22 +502,21 @@ def stereographic(u):
 
     Parameters
     ----------
-    u : array of shape (n,3)
-        u represents the three vertex coordinates
+    u : array of shape (n, 3)
+        Represents the three vertex coordinates.
 
     Returns
     -------
     v: array of n complex numbers
-       stereographic map of u in complex plane
+       Stereographic map of u in complex plane.
 
     Notes
     -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-     for Genus-0 Closed Brain Surfaces."
+    for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
     Adopted by Martin Reuter from Matlab code at
     https://github.com/garyptchoi/spherical-conformal-map
     with this
@@ -534,22 +539,21 @@ def inverse_stereographic(u):
     Parameters
     ----------
     u : array
-        can be complex array, or two columns (real,img)
-        for coordinates on complex plane
+        Can be complex array, or two columns (real,img)
+        for coordinates on complex plane.
 
     Returns
     -------
-    v: array of shape (n,3)
-        coordinates on sphere in 3D
+    v: array of shape (n, 3)
+        Coordinates on sphere in 3D.
 
     Notes
     -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
     "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-     for Genus-0 Closed Brain Surfaces."
+    for Genus-0 Closed Brain Surfaces."
     SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
     Adopted by Martin Reuter from Matlab code at
     https://github.com/garyptchoi/spherical-conformal-map
     with this

@@ -303,9 +303,9 @@ class Solver:
 
         Notes
         -----
-        This only returns the mass matrix ``B`` of the Eigenvalue problem:
-        ``A x = lambda B x``. The area of the surface mesh can be obtained via
-        ``B.sum()``.
+            This only returns the mass matrix ``B`` of the Eigenvalue problem:
+            ``A x = lambda B x``. The area of the surface mesh can be obtained via
+            ``B.sum()``.
         """  # noqa: E501
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]

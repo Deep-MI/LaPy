@@ -17,35 +17,28 @@
 Version 1.0
 ===========
 
-API and behavior changes
-------------------------
+API changes
+-----------
 
-- Module names have been changed to comply with PEP8 conventions. For example, the TriaMesh module has been renamed to tria_mesh, DiffGeo to diff_geo, and Plot to plot, among others. 
-- Changed import functions: the TriaIO and TetIO modules have been deprecated, and import\_* / export\_* functions have been renamed to read\_* / write\_*, which are now static functions of the tria_mesh and tet_mesh classes. For example, use tria_mesh.read_vtk() to import a vtk file. The former FuncIO module has been renamed to func_io, but is kept as a separate module.
+- Classes: TriaMesh, TetMesh, and Solver are still available dirctly at top level and improted
+directly from lapy.
+- Mesh IO: mesh clases have been extended with IO class member functions and TriaIO and TetIO have
+been deprecated. Use read\_* and write\_* class members to load and write mehses, for example,
+TriaMesh.read_vtk() to import a VTK triangle mesh file. This simplifies IO greatly.
+- Module names have been changed to comply with PEP8 conventions (lower case and underscore).
+For example, DiffGeo to diff_geo, FuncIO to func_io, and Plot to plot, etc. 
 
 Bugs
 ----
 
 - Fixed numpy deprecation issue in import_vfunc and import_ev functions.
 
-Version 0.7
-===========
-
 Enhancements
 ------------
 
 - Comply with the numpy convention for docstrings (by `Andreas Girodi`_, `Kersten Diers`_ and `Martin Reuter`_ in :pr:`19` and :pr:`21`)
-- Add documentation build (by `Mathieu Scheltienne`_ in :pr:`22`)
+- Add initial documentation build (by `Mathieu Scheltienne`_ in :pr:`22`)
 
-Bugs
-----
-
-- xxx
-
-API and behavior changes
-------------------------
-
-- xxx
 
 Authors
 -------

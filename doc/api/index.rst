@@ -9,3 +9,4 @@ This is the reference for classes (``CamelCase`` names) and functions
 
     lapy.meshes.rst
     lapy.solver.rst
+    lapy.modules.rst

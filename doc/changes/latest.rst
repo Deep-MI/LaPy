@@ -14,24 +14,27 @@
 
 .. _latest:
 
-Version 0.7
+Version 1.0
 ===========
+
+API changes
+-----------
+
+- Classes: TriaMesh, TetMesh, and Solver are still available directly at top level and imported directly from lapy.
+- Mesh IO: mesh classes have been extended with IO class member functions and TriaIO and TetIO have been deprecated. Use read\_* and write\_* class members to load and write mehses, for example, TriaMesh.read_vtk() to import a VTK triangle mesh file. This simplifies IO greatly.
+- Module names have been changed to comply with PEP8 conventions (lower case and underscore). For example, DiffGeo to diff_geo, FuncIO to func_io, and Plot to plot, etc. 
+
+Bugs
+----
+
+- Fixed numpy deprecation issue in import_vfunc and import_ev functions.
 
 Enhancements
 ------------
 
 - Comply with the numpy convention for docstrings (by `Andreas Girodi`_, `Kersten Diers`_ and `Martin Reuter`_ in :pr:`19` and :pr:`21`)
-- Add documentation build (by `Mathieu Scheltienne`_ in :pr:`22`)
+- Add initial documentation build (by `Mathieu Scheltienne`_ in :pr:`22`)
 
-Bugs
-----
-
-- xxx
-
-API and behavior changes
-------------------------
-
-- xxx
 
 Authors
 -------

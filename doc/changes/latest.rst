@@ -20,9 +20,9 @@ Version 1.0
 API changes
 -----------
 
-- Classes: TriaMesh, TetMesh, and Solver are still available dirctly at top level and improted
+- Classes: TriaMesh, TetMesh, and Solver are still available directly at top level and imported
 directly from lapy.
-- Mesh IO: mesh clases have been extended with IO class member functions and TriaIO and TetIO have
+- Mesh IO: mesh classes have been extended with IO class member functions and TriaIO and TetIO have
 been deprecated. Use read\_* and write\_* class members to load and write mehses, for example,
 TriaMesh.read_vtk() to import a VTK triangle mesh file. This simplifies IO greatly.
 - Module names have been changed to comply with PEP8 conventions (lower case and underscore).

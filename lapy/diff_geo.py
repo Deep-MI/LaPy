@@ -167,10 +167,11 @@ def tria_compute_geodesic_f(tria, vfunc):
 
 # note , numexpr could speed up the following functions if necessary
 def tria_compute_gradient(tria, vfunc):
-    """Compute gradient of a vertex function f (for each triangle).
+    r"""Compute gradient of a vertex function f (for each triangle).
 
-    grad(f) = [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A)
-            = [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
+    .. math::
+        grad(f) &= [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A) \\
+                &= [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
     for triangle (vi,vj,vk) with area A, where (.)' is 90 degrees rotated
     edge, which is equal to cross(n,vec).
 
@@ -192,7 +193,7 @@ def tria_compute_gradient(tria, vfunc):
     Good background to read:
     http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
     Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
-      http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
+    http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
     Desbrun ...
     """
     import sys
@@ -660,13 +661,14 @@ def tet_compute_gradient(tet, vfunc):
     r"""Compute gradient of a vertex function f (for each tetra).
 
     For a tetrahedron (vi,vj,vk,vh) with volume V we have:
-        grad(f) = [  (f_j - f_i) (vi-vk) x (vh-vk)
-        + (f_k - f_i) (vi-vh) x (vj-vh)
-        + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V)
-        = [  f_i (?-?) x ( ? -?)
-        + f_j (vi-vk) x (vh-vk)
-        + f_k (vi-vh) x (vj-vh)
-        + f_h (vk-vi) x (vj-vi) ] / (2 V).
+    .. math::
+        grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
+        &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
+        &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
+        &= [  f_i (?-?) x ( ? -?) \\
+        &   + f_j (vi-vk) x (vh-vk) \\
+        &   + f_k (vi-vh) x (vj-vh) \\
+        &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
 
     Parameters
     ----------

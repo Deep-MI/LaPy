@@ -1,5 +1,0 @@
-﻿lapy.func_io
-============
-
-.. automodule:: lapy.func_io
-    :members:

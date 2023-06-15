@@ -1,0 +1,5 @@
+﻿lapy.shapedna
+=============
+
+.. automodule:: lapy.shapedna
+    :members:

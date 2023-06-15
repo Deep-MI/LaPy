@@ -172,10 +172,10 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../api/lapy.modules.html">Modules</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.func_io.html">lapy.func_io</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.shape_dna.html">lapy.shape_dna</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.io.html">lapy.io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.shapedna.html">lapy.shapedna</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.heat.html">lapy.heat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.diff_geo.html">lapy.diff_geo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.diffgeo.html">lapy.diffgeo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.conformal.html">lapy.conformal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/lapy.plot.html">lapy.plot</a></li>
 </ul>
@@ -228,7 +228,7 @@
 <ul class="simple">
 <li><p>Classes: TriaMesh, TetMesh, and Solver are still available directly at top level and imported directly from lapy.</p></li>
 <li><p>Mesh IO: mesh classes have been extended with IO class member functions and TriaIO and TetIO have been deprecated. Use read_* and write_* class members to load and write mehses, for example, TriaMesh.read_vtk() to import a VTK triangle mesh file. This simplifies IO greatly.</p></li>
-<li><p>Module names have been changed to comply with PEP8 conventions (lower case and underscore). For example, DiffGeo to diff_geo, FuncIO to func_io, and Plot to plot, etc.</p></li>
+<li><p>Module names have been changed to comply with PEP8 conventions (lower case). For example, DiffGeo to diffgeo, FuncIO to io, and Plot to plot, etc.</p></li>
 </ul>
 </section>
 <section id="bugs">

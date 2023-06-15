@@ -1,0 +1,5 @@
+﻿lapy.diffgeo
+============
+
+.. automodule:: lapy.diffgeo
+    :members:

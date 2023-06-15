@@ -8,7 +8,7 @@ https://math.mit.edu/~ptchoi
 and has been distributed with the Apache 2 License.
 
 Notes
-=====
+-----
 If you use this code in your own work, please cite the following paper:
 
 [1] P. T. Choi, K. C. Lam, and L. M. Lui,

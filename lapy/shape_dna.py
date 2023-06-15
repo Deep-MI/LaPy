@@ -19,18 +19,18 @@ def compute_shapedna(
     Parameters
     ----------
     geom : TriaMesh or TetMesh
-        geometry object
+        Mesh geometry.
     k : int, default=50
-        number of eigenfunctions / eigenvalues
+        Number of eigenfunctions / eigenvalues.
     lump : bool, default=False
-        If True, lump the mass matrix (diagonal)
-            (See 'lapy.Solver.Solver' class)
+        If True, lump the mass matrix (diagonal).
+            (See 'lapy.Solver.Solver' class).
     aniso : float or tuple of shape (2,)
         Anisotropy for curvature based anisotopic Laplace.
-            (See 'lapy.Solver.Solver' class)
+            (See 'lapy.Solver.Solver' class).
     aniso_smooth : int
         Number of smoothing iterations for curvature computation on vertices.
-            (See 'lapy.Solver.Solver' class)
+            (See 'lapy.Solver.Solver' class).
     use_cholmod : bool, default: False
         If True, attempts to use the Cholesky decomposition for improved execution
         speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
@@ -40,7 +40,7 @@ def compute_shapedna(
     Returns
     -------
     ev : dict
-         a dictionary, including 'Eigenvalues' and 'Eigenvectors' fields
+        A dictionary, including 'Eigenvalues' and 'Eigenvectors' fields.
     """
     # get fem, evals, evecs
 
@@ -73,18 +73,18 @@ def normalize_ev(geom, evals, method="geometry"):
     Parameters
     ----------
     geom : TriaMesh or TetMesh
-        geometry object
+        Mesh geometry.
     evals : array_like
-        vector of eigenvalues
+        Set of sorted eigenvalues.
     method : str
-        either "surface", "volume", or "geometry";
+        Either "surface", "volume", or "geometry";
         "geometry" will perform surface normalization for
-        2D objects, and volume normalization for 3D objects
+        2D objects, and volume normalization for 3D objects.
 
     Returns
     -------
     array_like
-        vector of reweighted eigenvalues
+        Vector of re-weighted eigenvalues.
     """
     if method == "surface":
         vol = geom.area()
@@ -123,17 +123,17 @@ def normalize_ev(geom, evals, method="geometry"):
 
 
 def reweight_ev(evals):
-    """Apply linear reweighting.
+    """Apply linear re-weighting.
 
     Parameters
     ----------
     evals : array_like
-        vector of eigenvalues
+        Set of sorted eigenvalues.
 
     Returns
     -------
     evals: array_like
-        vector of reweighted eigenvalues
+        Vector of re-weighted eigenvalues.
     """
     # evals[1:] = evals[1:] / np.arange(1, len(evals))
     evals = evals / np.arange(1, len(evals) + 1)
@@ -142,19 +142,21 @@ def reweight_ev(evals):
 
 
 def compute_distance(ev1, ev2, dist="euc"):
-    """Compute the shape asymmetry from two shapeDNA descriptors.
+    """Compute the shape dissimilarity from two shapeDNA descriptors.
 
     Parameters
     ----------
-    ev1, ev2 : float
-        eigenvalues
+    ev1 : array_like
+        First set of sorted eigenvalues.
+    ev2 : array_like
+        Second set of sorted eigenvalues.
     dist : str
-        distance measure; currently only 'euc' (euclidean)
+        Distance measure; currently only 'euc' (Euclidean).
 
     Returns
     -------
-    * : double
-        a distance measure
+    * : float
+        Distance between the eigenvalue arrays.
     """
     if dist == "euc":
         return di.euclidean(ev1, ev2)

@@ -7,6 +7,7 @@
    :hidden:
 
    api/index
+   tutorials/index
    generated/tutorials/index
    changes/index
 

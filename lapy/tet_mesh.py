@@ -8,7 +8,7 @@ class TetMesh:
     """Class representing a tetraheral mesh.
 
     This is an efficient implementation of a tetrahedral mesh data structure
-    with core functionality using sparse matrices internally (Scipy). 
+    with core functionality using sparse matrices internally (Scipy).
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ class TetMesh:
         Ordering is important: so that t0, t1, t2 are oriented
         counterclockwise when looking from above, and t3 is
         on top of that triangle.
-	
+
     Notes
     -----
     The class has static class methods to read tetrahera meshes from

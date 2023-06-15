@@ -8,9 +8,9 @@ from . import _tria_io as io
 
 class TriaMesh:
     """Class representing a triangle mesh.
-    
+
     This is an efficient implementation of a triangle mesh data structure
-    with core functionality using sparse matrices internally (Scipy). 
+    with core functionality using sparse matrices internally (Scipy).
 
     Parameters
     ----------
@@ -36,7 +36,7 @@ class TriaMesh:
         Directed adjacency matrix as csc sparse matrix.
     fsinfo : dict | None
         FreeSurfer Surface Header Info.
-	
+
     Notes
     -----
     The class has static class methods to read triangle meshes from FreeSurfer,
@@ -249,9 +249,9 @@ class TriaMesh:
         """Compute the Euler Characteristic.
 
         The Euler characteristic is the number of vertices minus the number
-	of edges plus the number of triangles  (= #V - #E + #T). For example,
-	it is 2 for the sphere and 0 for the torus.
-	This operates only on triangles array.
+        of edges plus the number of triangles  (= #V - #E + #T). For example,
+        it is 2 for the sphere and 0 for the torus.
+        This operates only on triangles array.
 
         Returns
         -------
@@ -266,9 +266,9 @@ class TriaMesh:
 
     def tria_areas(self):
         """Compute the area of triangles using Heron's formula.
-	
-	`Heron's formula <https://en.wikipedia.org/wiki/Heron%27s_formula>`_
-	computes the area of a triangle by using the three edge lengths. 
+
+        `Heron's formula <https://en.wikipedia.org/wiki/Heron%27s_formula>`_
+        computes the area of a triangle by using the three edge lengths.
 
         Returns
         -------

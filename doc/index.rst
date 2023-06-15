@@ -7,7 +7,8 @@
    :hidden:
 
    api/index
-   generated/tutorials/index
+   tutorials/index
+   generated/examples/index
    changes/index
 
 LaPy is an `open-source Python package <project github_>`_ for differential

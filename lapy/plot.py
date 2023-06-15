@@ -434,7 +434,7 @@ def plot_tria_mesh(
         Camera describing center, eye and up direction.
     html_output : bool, Default=False
         Whether or not to give out as html output.
-    export_png : str or file, Default=None
+    export_png : str, Default=None
         Local file path or file object to write the image to.
     scale_png : int or float
         Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution.

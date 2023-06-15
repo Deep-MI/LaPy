@@ -89,7 +89,7 @@ def compute_rotated_f(geom, vfunc):
 
     Raises
     ------
-    Value Error
+    ValueError
         If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":

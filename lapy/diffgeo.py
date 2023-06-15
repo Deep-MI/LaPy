@@ -511,7 +511,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         data["Elements"] = tria.t.shape[0]
         data["DoF"] = evecs.shape[0]
         data["NumEW"] = 4
-        from .func_io import export_ev
+        from .io import export_ev
 
         export_ev(data, "debug.ev")
 

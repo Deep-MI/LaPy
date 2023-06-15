@@ -661,7 +661,7 @@ def tet_compute_gradient(tet, vfunc):
 
     For a tetrahedron (vi,vj,vk,vh) with volume V we have:
     .. math::
-    grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
+        grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
             &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
             &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
             &= [  f_i (?-?) x ( ? -?) \\
@@ -687,7 +687,7 @@ def tet_compute_gradient(tet, vfunc):
     Good background to read:
     Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
     http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
-    http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
+    http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions
     Desbrun et al.
     """
     import sys

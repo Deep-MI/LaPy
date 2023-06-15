@@ -172,6 +172,7 @@ def tria_compute_gradient(tria, vfunc):
     .. math::
         grad(f) &= [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A) \\
                 &= [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
+
     for triangle (vi,vj,vk) with area A, where (.)' is 90 degrees rotated
     edge, which is equal to cross(n,vec).
 
@@ -661,14 +662,15 @@ def tet_compute_gradient(tet, vfunc):
     r"""Compute gradient of a vertex function f (for each tetra).
 
     For a tetrahedron (vi,vj,vk,vh) with volume V we have:
+    
     .. math::
         grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
-        &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
-        &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
-        &= [  f_i (?-?) x ( ? -?) \\
-        &   + f_j (vi-vk) x (vh-vk) \\
-        &   + f_k (vi-vh) x (vj-vh) \\
-        &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
+                &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
+                &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
+                &= [  f_i (?-?) x ( ? -?) \\
+                &   + f_j (vi-vk) x (vh-vk) \\
+                &   + f_k (vi-vh) x (vj-vh) \\
+                &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
 
     Parameters
     ----------

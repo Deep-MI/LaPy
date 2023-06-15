@@ -258,9 +258,13 @@ using only the first n smallest eigenvalues and eigenvectors.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.diffusion">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L74-L128"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L76-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the heat diffusion from initial vertices in vids.</p>
-<p>It uses the backward Euler solution: <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">m</span> <span class="pre">*</span> <span class="pre">avg_edge_length^2</span></code>.</p>
+<p>It uses the backward Euler solution:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[t = m * avg_edge_length^2\]</div>
+</div>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -296,11 +300,14 @@ using only the first n smallest eigenvalues and eigenvectors.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.kernel">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L44-L71"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.kernel" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L44-L73"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.kernel" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute heat kernel from all points to a fixed point (vfix).</p>
 <p>For a given time t (using only the first n smallest eigenvalues
-and eigenvectors):
-K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)</p>
+and eigenvectors):</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)\]</div>
+</div>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -410,5 +417,6 @@ K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)</p>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/design-tabs.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

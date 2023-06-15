@@ -66,6 +66,7 @@ doc = [
     'sphinx-design',
     'sphinx-gallery',
     'sphinx-issues',
+    'pandoc',
     'nbsphinx',
     'IPython', # For syntax highlighting in notebooks
     'ipykernel',

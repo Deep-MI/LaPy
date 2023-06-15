@@ -660,14 +660,15 @@ def tet_compute_gradient(tet, vfunc):
     r"""Compute gradient of a vertex function f (for each tetra).
 
     For a tetrahedron (vi,vj,vk,vh) with volume V we have:
+
     .. math::
         grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
-            &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
-            &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
-            &= [  f_i (?-?) x ( ? -?) \\
-            &   + f_j (vi-vk) x (vh-vk) \\
-            &   + f_k (vi-vh) x (vj-vh) \\
-            &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
+        &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
+        &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
+        &= [  f_i (?-?) x ( ? -?) \\
+        &   + f_j (vi-vk) x (vh-vk) \\
+        &   + f_k (vi-vh) x (vj-vh) \\
+        &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
 
     Parameters
     ----------

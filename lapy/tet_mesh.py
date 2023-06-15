@@ -1,27 +1,30 @@
-"""Dependency: Scipy 0.10 or later for sparse matrix support.
-
-Original Author: Martin Reuter
-Date: Feb-01-2019
-"""
-
 import numpy as np
 from scipy import sparse
 
-from . import tet_io as io
+from . import _tet_io as io
 
 
 class TetMesh:
-    """A class representing a tetraheral mesh.
+    """Class representing a tetraheral mesh.
+
+    This is an efficient implementation of a tetrahedral mesh data structure
+    with core functionality using sparse matrices internally (Scipy).
 
     Parameters
     ----------
     v : array_like
         List of lists of 3 float coordinates.
     t : array_like
-        List of lists of 4 int of indices (>=0) into v array
-        Ordering is important: so that t0,t1,t2 are oriented
+        List of lists of 4 int of indices (>=0) into ``v`` array.
+        Ordering is important: so that t0, t1, t2 are oriented
         counterclockwise when looking from above, and t3 is
         on top of that triangle.
+
+    Notes
+    -----
+    The class has static class methods to read tetrahera meshes from
+    `GMSH <https://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format>`_
+    and `VTK <https://examples.vtk.org/site/VTKFileFormats/>`_ files.
     """
 
     def __init__(self, v, t):

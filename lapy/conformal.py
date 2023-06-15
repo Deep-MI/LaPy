@@ -5,9 +5,12 @@ https://github.com/garyptchoi/spherical-conformal-map
 with this
 Copyright (c) 2013-2020, Gary Pui-Tung Choi
 https://math.mit.edu/~ptchoi
-and has been distributed with the Apache 2 License
+and has been distributed with the Apache 2 License.
 
+Notes
+-----
 If you use this code in your own work, please cite the following paper:
+
 [1] P. T. Choi, K. C. Lam, and L. M. Lui,
 "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0
 Closed Brain Surfaces."
@@ -40,21 +43,6 @@ def spherical_conformal_map(tria, use_cholmod=False):
     -------
     mapping: array
         Vertex coordinates (3d) of the spherical conformal parameterization.
-
-    Notes
-    -----
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
-    Adopted from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
     """
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
@@ -214,16 +202,10 @@ def mobius_area_correction_spherical(tria, mapping):
         Vertex coordinates (3d) of the updated spherical conformal parameterization.
     result: array
         Optimal parameters (x) for the Mobius transformation, where
-            f(z) = \frac{az+b}{cz+d}
-                 = ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)).
 
-    Notes
-    -----
-    Adapted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this Copyright (c) 2019-2020, Gary Pui-Tung Choi
-    https://scholar.harvard.edu/choi
-    and has been distributed with the Apache 2 License
+        .. math::
+            f(z) &= \frac{az+b}{cz+d}
+                 &= ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)).
     """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
@@ -286,21 +268,6 @@ def beltrami_coefficient(tria, mapping):
     -------
     mu : array
         Complex Beltrami coefficient per triangle.
-
-    Notes
-    -----
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
-    Adopted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -370,21 +337,6 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     -------
     mapping : array
         3d vertex coordinates of new mapping.
-
-    Notes
-    -----
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-
-    Adopted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -509,20 +461,6 @@ def stereographic(u):
     -------
     v: array of n complex numbers
        Stereographic map of u in complex plane.
-
-    Notes
-    -----
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-    Adopted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
     """
     x = u[:, 0]
     y = u[:, 1]
@@ -546,20 +484,6 @@ def inverse_stereographic(u):
     -------
     v: array of shape (n, 3)
         Coordinates on sphere in 3D.
-
-    Notes
-    -----
-    If you use this code in your own work, please cite the following paper:
-    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-    for Genus-0 Closed Brain Surfaces."
-    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
-    Adopted by Martin Reuter from Matlab code at
-    https://github.com/garyptchoi/spherical-conformal-map
-    with this
-    Copyright (c) 2013-2020, Gary Pui-Tung Choi
-    https://math.mit.edu/~ptchoi
-    and has been distributed with the Apache 2 License
     """
     if np.iscomplexobj(u):
         x = u.real

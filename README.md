@@ -19,10 +19,10 @@ loops are vectorized, drawing upon efficient and sparse mesh data structures.
 - **TetMesh**: a class for tetrahedral meshes (orientation, boundary, IO ...)
 - **Solver**: a class for linear FEM computation (Laplace stiffness and mass
   matrix, fast and sparse eigenvalue solver, anisotropic Laplace, Poisson)
-- **func_io**: module for IO of vertex functions and eigenvector files
-- **diff_geo**: module for gradients, divergence, mean curvature flow, etc.
+- **io**: module for IO of vertex functions and eigenvector files
+- **diffgeo**: module for gradients, divergence, mean curvature flow, etc.
 - **heat**: module for heat kernel and diffusion
-- **shape_dna**: module for the ShapeDNA descriptor of surfaces and solids
+- **shapedna**: module for the ShapeDNA descriptor of surfaces and solids
 - **plot**: module for interactive visualizations (wrapping plotly)
 
 ## Usage:

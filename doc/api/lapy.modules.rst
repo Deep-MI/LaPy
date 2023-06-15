@@ -6,9 +6,9 @@ Modules
 .. autosummary::
     :toctree: generated/
 
-    func_io
-    shape_dna
+    io
+    shapedna
     heat
-    diff_geo
+    diffgeo
     conformal
     plot

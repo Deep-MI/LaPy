@@ -155,7 +155,7 @@ def compute_distance(ev1, ev2, dist="euc"):
 
     Returns
     -------
-    * : double
+    * : float
         Distance between the eigenvalue arrays.
     """
     if dist == "euc":

@@ -33,7 +33,7 @@ def compute_gradient(geom, vfunc):
 
     Raises
     ------
-    ValueError: Unknown geometry type.
+    ValueError: If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_gradient(geom, vfunc)
@@ -60,7 +60,7 @@ def compute_divergence(geom, vfunc):
 
     Raises
     ------
-    ValueError: unknown geometry type.
+    ValueError: If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_divergence(geom, vfunc)
@@ -87,7 +87,7 @@ def compute_rotated_f(geom, vfunc):
 
     Raises
     ------
-    Value Error: Unknown geometry type.
+    Value Error: If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)

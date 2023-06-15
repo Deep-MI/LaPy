@@ -143,7 +143,7 @@ def _get_colorval(t, colormap):
     t : float
         Scalar must be 0...1.
     colormap : array_like
-        List of values and color code strings (should have entries at least for 0 and 1).
+        List of values and color code strings (with entries at least for 0 and 1).
 
     Returns
     -------
@@ -240,15 +240,15 @@ def plot_tet_mesh(
 
     Parameters
     ----------
-    tetra : lapy.TetMesh.TetMesh
+    tetra : lapy.TetMesh
         Tetraheral mesh to plot.
-    vfunc : function, Default=None
+    vfunc : array_like, Default=None
         Scalar function at vertices.
     plot_edges : bool, Default=False
         Whether to plot edges or not.
     plot_levels : bool, Default=False
         Whether to plot levels or not.
-    tfunc : function, Default=None
+    tfunc : array_like, Default=None
         3d vector function of gradient.
     cutting : str, Default=None
         To view the 'interior' of the tetra mesh, one or more cutting
@@ -392,7 +392,7 @@ def plot_tria_mesh(
 
     Parameters
     ----------
-    tria : lapy.TriaMesh.Triamesh
+    tria : lapy.TriaMesh
         Triangle mesh to plot.
     vfunc : array_like, Default=None
         Scalar function at vertices.
@@ -430,7 +430,7 @@ def plot_tria_mesh(
         Width of the plot (in px).
     height : int, Default=800
         Height  of the plot (in px).
-    camera : Camera object, Default=None
+    camera : dictionary, Default=None
         Camera describing center, eye and up direction.
     html_output : bool, Default=False
         Whether or not to give out as html output.

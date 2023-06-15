@@ -355,9 +355,9 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     tria : TriaMesh
         Genus-0 closed triangle mesh.
         Should be planar mapping on complex plane
-    mu : np.array
+    mu : array_like
         Complex Beltrami coefficients.
-    landmark : array
+    landmark : array_like
         Fixed vertex indices.
     target : array of shape (n, 3)
         2D landmark target coordinates (third coordinate is zero).
@@ -538,8 +538,8 @@ def inverse_stereographic(u):
 
     Parameters
     ----------
-    u : array
-        Can be complex array, or two columns (real,img)
+    u : array_like
+        Can be complex array, or two columns (real, img)
         for coordinates on complex plane.
 
     Returns

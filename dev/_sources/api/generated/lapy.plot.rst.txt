@@ -1,0 +1,5 @@
+﻿lapy.plot
+=========
+
+.. automodule:: lapy.plot
+    :members:

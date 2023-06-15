@@ -202,10 +202,9 @@ def mobius_area_correction_spherical(tria, mapping):
         Vertex coordinates (3d) of the updated spherical conformal parameterization.
     result: array
         Optimal parameters (x) for the Mobius transformation, where
-
         .. math::
             f(z) &= \frac{az+b}{cz+d} \\
-                 &= ((x(1)+x(2)*1j)*z+(x(3)+x(4)*1j))/((x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)).
+                 &= \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
     """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()

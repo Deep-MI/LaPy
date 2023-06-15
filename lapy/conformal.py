@@ -204,8 +204,7 @@ def mobius_area_correction_spherical(tria, mapping):
         Optimal parameters (x) for the Mobius transformation, where
 
         .. math::
-            f(z) &= \frac{az+b}{cz+d} \\
-                 &= \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
+            f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
     """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()

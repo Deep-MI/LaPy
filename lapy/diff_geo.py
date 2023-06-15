@@ -23,17 +23,18 @@ def compute_gradient(geom, vfunc):
     ----------
     geom : TriaMesh or TetMesh
         Mesh geometry.
-    vfunc : array of shape (n, 3)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    tfunc : array of shape (m, 3)
+    tfunc : array
         3d gradient vector at each element.
 
     Raises
     ------
-    ValueError: If unknown geometry type.
+    ValueError
+        If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_gradient(geom, vfunc)
@@ -50,17 +51,18 @@ def compute_divergence(geom, vfunc):
     ----------
     geom : TriaMesh or TetMesh
         Mesh geometry.
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function of divergence at vertices.
 
     Raises
     ------
-    ValueError: If unknown geometry type.
+    ValueError
+        If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_divergence(geom, vfunc)
@@ -77,17 +79,18 @@ def compute_rotated_f(geom, vfunc):
     ----------
     geom : TriaMesh
         Mesh geometry.
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Rotated function at vertices.
 
     Raises
     ------
-    Value Error: If unknown geometry type.
+    Value Error
+        If unknown geometry type.
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
@@ -106,12 +109,12 @@ def compute_geodesic_f(geom, vfunc):
     ----------
     geom : TriaMesh, TetMesh
         Mesh geometry.
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar geodesic function at vertices.
     """
     gradf = compute_gradient(geom, vfunc)
@@ -139,12 +142,12 @@ def tria_compute_geodesic_f(tria, vfunc):
     ----------
     tria : TriaMesh
         Triangle mesh.
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    vfunc: array of shape (n, 1)
+    vfunc: array
         Scalar geodesic function at vertices.
     """
     gradf = tria_compute_gradient(tria, vfunc)
@@ -175,13 +178,13 @@ def tria_compute_gradient(tria, vfunc):
     ----------
     tria : TriaMesh
         Triangle mesh.
-    vfunc : array of shape (n, 1)
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    tfunc: array of shape (m, 3)
-        3d gradient vector at triangles. 
+    tfunc: array
+        3d gradient vector at triangles.
 
     Notes
     -----
@@ -226,12 +229,12 @@ def tria_compute_divergence(tria, tfunc):
     ----------
     tria : TriaMesh
         Triangle mesh.
-    tfunc : array of shape (m, 3)
+    tfunc : array
         3d vector field on triangles.
 
     Returns
     -------
-    vfunc: array of shape (n, 1)
+    vfunc: array
         Scalar function of divergence at vertices.
 
     Notes
@@ -288,12 +291,12 @@ def tria_compute_divergence2(tria, tfunc):
     ----------
     tria : TriaMesh
         Triangle mesh.
-    tfunc : array of shape (m, 3)
+    tfunc : array
         3d vector field on triangles.
 
     Returns
     -------
-    vfunc: array of shape (n, 1)
+    vfunc: array
         Scalar function of divergence at vertices.
 
     Notes
@@ -337,13 +340,13 @@ def tria_compute_rotated_f(tria, vfunc):
     ----------
     tria : TriaMesh
         Triangle mesh.
-    vfunc : array of shape (n, 1)
-        Scalar function at triangles.
+    vfunc : array
+        Scalar function at vertices.
 
     Returns
     -------
-    vfunc: array of shape (n, 1)
-        Rotated function.
+    vfunc: array
+        Rotated scalar function at vertices.
 
     Notes
     -----
@@ -668,13 +671,13 @@ def tet_compute_gradient(tet, vfunc):
     Parameters
     ----------
     tet : TetMesh
-        Tetraheral mesh. 
-    vfunc : array of shape (n, 1)
+        Tetraheral mesh.
+    vfunc : array
         Scalar function at vertices.
 
     Returns
     -------
-    tfunc : array of shape (m, 3)
+    tfunc : array of shape (n, 3)
         3d gradient vector at tetras
 
     Notes
@@ -731,12 +734,12 @@ def tet_compute_divergence(tet, tfunc):
     ----------
     tet : TetMesh
         Tetrahedral mesh.
-    tfunc : array of shape (m, 3)
+    tfunc : array
         3d vector field on tets.
 
     Returns
     -------
-    vfunc: array of shape (n, 1)
+    vfunc: array
         Scalar function of divergence at vertices.
 
     Notes

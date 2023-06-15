@@ -38,8 +38,8 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
     Returns
     -------
-    mapping: array of shape (n,3)
-        Vertex coordinates of the spherical conformal parameterization.
+    mapping: array
+        Vertex coordinates (3d) of the spherical conformal parameterization.
 
     Notes
     -----
@@ -195,19 +195,21 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 
 def mobius_area_correction_spherical(tria, mapping):
-    r"""Find an optimal Mobius transformation for reducing the area distortion of a spherical conformal parameterization using the method in footcite:t:`conformal_parameterization_2020`.
+    r"""Find an optimal Mobius transformation for reducing the area distortion of
+    a spherical conformal parameterization using the method in
+    Choi et al, SIAM Journal on Imaging Sciences, 2020.
 
     Parameters
     ----------
     tria : TriaMesh
         Genus-0 closed triangle mesh.
-    mapping : array of shape (n, 3)
+    mapping : array
         Vertex coordinates of the spherical conformal parameterization.
 
     Returns
     -------
-    map_mobius: array of shape (n, 3)
-        Vertex coordinates of the updated spherical conformal parameterization.
+    map_mobius: array
+        Vertex coordinates (3d) of the updated spherical conformal parameterization.
     result: OptimizeResult
         Optimal parameters (x) for the Mobius transformation, where
             f(z) = \frac{az+b}{cz+d}
@@ -220,10 +222,6 @@ def mobius_area_correction_spherical(tria, mapping):
     with this Copyright (c) 2019-2020, Gary Pui-Tung Choi
     https://scholar.harvard.edu/choi
     and has been distributed with the Apache 2 License
-
-    References
-    ----------
-    .. footbibliography::
     """  # noqa: E501
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
@@ -279,8 +277,8 @@ def beltrami_coefficient(tria, mapping):
     tria : TriaMesh
         Genus-0 closed triangle mesh.
         Should be planar mapping on complex plane.
-    mapping : array of shape (n,3)
-        Coordinates of the spherical conformal parameterization.
+    mapping : array
+        3D coordinates of the spherical conformal parameterization.
 
     Returns
     -------
@@ -359,8 +357,8 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
         Complex Beltrami coefficients.
     landmark : array_like
         Fixed vertex indices.
-    target : array of shape (n, 3)
-        2D landmark target coordinates (third coordinate is zero).
+    target : array
+        3d array with 2d landmark target coordinates (3rd coordinate is zero).
     use_cholmod : bool, default=False
         Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod.
@@ -368,8 +366,8 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
     Returns
     -------
-    mapping : array of shape (n, 3)
-        Vertex coordinates of new mapping.
+    mapping : array
+        3d vertex coordinates of new mapping.
 
     Notes
     -----

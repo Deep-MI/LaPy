@@ -430,12 +430,12 @@ def plot_tria_mesh(
         Width of the plot (in px).
     height : int, Default=800
         Height  of the plot (in px).
-    camera : dictionary, Default=None
+    camera : dict of str, Default=None
         Camera describing center, eye and up direction.
     html_output : bool, Default=False
         Whether or not to give out as html output.
-    export_png : str or writeable, Default=None
-        Local file path or a writeable object to write the image on.
+    export_png : str or file, Default=None
+        Local file path or file object to write the image to.
     scale_png : int or float
         Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution.
     no_display : bool, Default=False

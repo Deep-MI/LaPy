@@ -1,25 +1,23 @@
-"""Dependency: Scipy 0.10 or later for sparse matrix support.
-
-Original Author: Martin Reuter
-Date: Feb-01-2019
-"""
 import sys
 
 import numpy as np
 from scipy import sparse
 
-from . import tria_io as io
+import ._tria_io as io
 
 
 class TriaMesh:
     """Class representing a triangle mesh.
+    
+    This is an efficient implementation of a triangle mesh data structure
+    with core functionality using sparse matrices internally (Scipy). 
 
     Parameters
     ----------
     v : array_like
         List of lists of 3 float coordinates.
     t : array_like
-        List of lists of 3 int of indices (``≥ 0``) into ``v`` array
+        List of lists of 3 int of indices (>= 0) into ``v`` array
         Ordering is important: All triangles should be
         oriented in the same way (counter-clockwise, when
         looking from above).
@@ -31,13 +29,18 @@ class TriaMesh:
     v : array_like
         List of lists of 3 float coordinates.
     t : array_like
-        List of lists of 4 int of indices (`` ≥ 0``) into ``v`` array.
+        List of lists of 3 int of indices (>= 0) into ``v`` array.
     adj_sym : csc_matrix
         Symmetric adjacency matrix as csc sparse matrix.
     adj_dir : csc_matrix
         Directed adjacency matrix as csc sparse matrix.
     fsinfo : dict | None
         FreeSurfer Surface Header Info.
+	
+    Notes
+    -----
+    The class has static class methods to read triangle meshes from FreeSurfer,
+    OFF, and VTK file formats.
     """
 
     def __init__(self, v, t, fsinfo=None):
@@ -243,14 +246,17 @@ class TriaMesh:
         return np.max(self.adj_dir.data) == 1
 
     def euler(self):
-        """Compute the Euler Characteristic (=#V-#E+#T).
+        """Compute the Euler Characteristic.
 
-        Operates only on triangles.
+        The Euler characteristic is the number of vertices minus the number
+	of edges plus the number of triangles  (= #V - #E + #T). For example,
+	it is 2 for the sphere and 0 for the torus.
+	This operates only on triangles array.
 
         Returns
         -------
         int
-            Euler Characteristic (2=sphere, 0=torus).
+            Euler characteristic.
         """
         # v can contain unused vertices so we get vnum from trias
         vnum = len(np.unique(self.t.reshape(-1)))
@@ -260,6 +266,9 @@ class TriaMesh:
 
     def tria_areas(self):
         """Compute the area of triangles using Heron's formula.
+	
+	`Heron's formula <https://en.wikipedia.org/wiki/Heron%27s_formula>`_
+	computes the area of a triangle by using the three edge lengths. 
 
         Returns
         -------

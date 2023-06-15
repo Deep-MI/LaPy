@@ -12,12 +12,12 @@ def read_fssurf(filename):
     Parameters
     ----------
     filename : str
-        filename to load
+        Filename to load.
 
     Returns
     -------
     TriaMesh
-        loaded triangle mesh
+        Loaded triangle mesh.
     """
     verbose = 1
     if verbose > 0:
@@ -26,7 +26,7 @@ def read_fssurf(filename):
         # here we use our copy to also support surfaces from dev (and maybe v7*?)
         # these have an empty line and mess up Nibabel
         # once this is fixed in nibabel we can switch back
-        from .read_geometry import read_geometry
+        from ._read_geometry import read_geometry
 
         surf = read_geometry(filename, read_metadata=True)
     except IOError:
@@ -43,12 +43,12 @@ def read_off(filename):
     Parameters
     ----------
     filename : str
-        filename to load
+        Filename to load.
 
     Returns
     -------
     TriaMesh
-        loaded triangle mesh
+        Loaded triangle mesh.
     """
     verbose = 1
     if verbose > 0:
@@ -99,12 +99,12 @@ def read_vtk(filename):
     Parameters
     ----------
     filename : str
-        filename to load
+        Filename to load.
 
     Returns
     -------
     TriaMesh
-        loaded triangle mesh
+        Loaded triangle mesh.
     """
     verbose = 1
     if verbose > 0:
@@ -210,20 +210,20 @@ def read_gmsh(filename):
     Parameters
     ----------
     filename : str
-        filename to load
+        Filename to load.
 
     Returns
     -------
     points : array
-        List of points
+        List of points.
     cells : array_like
-        List of cells
+        List of cells.
     point_data : array_like
-        data of points
+        Data of points.
     cell_data : aray_like
-        data of cells
+        Data of cells.
     field_data : array_like
-        data of fields
+        Data of fields.
 
     Notes
     -----
@@ -471,14 +471,12 @@ def read_gmsh(filename):
 def write_vtk(tria, filename):
     """Save VTK file.
 
-    usage: exportVTK(TriaMesh,filename)
-
     Parameters
     ----------
     tria : TriaMesh
-        Triangle mesh to save
+        Triangle mesh to save.
     filename : str
-        filename to save to
+        Filename to save to.
     """
     # open file
     try:
@@ -516,9 +514,9 @@ def write_fssurf(tria, filename):
     Parameters
     ----------
     tria : TriaMesh
-        Triangle mesh to save
+        Triangle mesh to save.
     filename : str
-        filename to save to
+        Filename to save to.
     """
     # open file
     try:

@@ -46,6 +46,8 @@ def kernel(t, vfix, evecs, evals, n):
 
     For a given time t (using only the first n smallest eigenvalues
     and eigenvectors):
+    
+    .. math::
     K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)
 
     Parameters
@@ -74,7 +76,10 @@ def kernel(t, vfix, evecs, evals, n):
 def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=False):
     """Compute the heat diffusion from initial vertices in vids.
 
-    It uses the backward Euler solution: ``t = m * avg_edge_length^2``.
+    It uses the backward Euler solution: 
+    
+    .. math::
+        t = m * avg_edge_length^2
 
     Parameters
     ----------

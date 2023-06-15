@@ -11,7 +11,7 @@ from .utils._imports import import_optional_dependency
 
 
 class Solver:
-    """A linear FEM solver for Laplace Eigenvalue problems and Poisson Equation.
+    """FEM solver for Laplace Eigenvalue and Poisson Equation.
 
     Inputs can be geometry classes which have vertices and elements.
     Currently `~lapy.TriaMesh` and `~lapy.TetMesh` are implemented.

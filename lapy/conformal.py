@@ -195,7 +195,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 
 def mobius_area_correction_spherical(tria, mapping):
-    r"""Find an imporved Mobius transformation to reduce distortion.
+    r"""Find an improved Mobius transformation to reduce distortion.
 
     This helps reducing the area distortion of
     a spherical conformal parameterization using the method in

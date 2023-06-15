@@ -659,6 +659,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 def tet_compute_gradient(tet, vfunc):
     """Compute gradient of a vertex function f (for each tetra).
 
+    For a tetrahedron (vi,vj,vk,vh) with volume V we have:
 .. math::
     grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
             &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
@@ -666,8 +667,7 @@ def tet_compute_gradient(tet, vfunc):
             &= [  f_i (?-?) x ( ? -?) \\
             &   + f_j (vi-vk) x (vh-vk) \\
             &   + f_k (vi-vh) x (vj-vh) \\
-            &   + f_h (vk-vi) x (vj-vi) ] / (2 V) 
-    for tetrahedron (vi,vj,vk,vh) with volume V.
+            &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
 
     Parameters
     ----------
@@ -688,7 +688,7 @@ def tet_compute_gradient(tet, vfunc):
     Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
     http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
     http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
-    Desbrun ...
+    Desbrun et al.
     """
     import sys
 

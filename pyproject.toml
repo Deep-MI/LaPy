@@ -66,8 +66,9 @@ doc = [
     'sphinx-design',
     'sphinx-gallery',
     'sphinx-issues',
-    "nbsphinx",
-    "IPython", # For syntax highlighting in notebooks
+    'nbsphinx',
+    'IPython', # For syntax highlighting in notebooks
+    'ipykernel',
 ]
 style = [
     'bibclean',

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
 
-import ._tet_io as io
+from . import _tet_io as io
 
 
 class TetMesh:

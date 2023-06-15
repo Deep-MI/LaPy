@@ -13,7 +13,7 @@ from .utils._imports import import_optional_dependency
 
 
 def diagonal(t, x, evecs, evals, n):
-    """Compute heat kernel diagonal ( `K(t,x,x,)` ).
+    """Compute heat kernel diagonal ( K(t,x,x,) ).
 
     For a given time t (can be a vector)
     using only the first n smallest eigenvalues and eigenvectors.
@@ -23,7 +23,7 @@ def diagonal(t, x, evecs, evals, n):
     t : float | array
         Time or a row vector of time values.
     x : array
-        Vertex ids for the positions of `K(t,x,x)`.
+        Vertex ids for the positions of K(t,x,x).
     evecs : array
         Eigenvectors (matrix: vnum x evecsnum).
     evals : array
@@ -76,7 +76,7 @@ def kernel(t, vfix, evecs, evals, n):
 def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=False):
     """Compute the heat diffusion from initial vertices in vids.
 
-    It uses the backward Euler solution :math:`t = m l^2`, where `l` describes
+    It uses the backward Euler solution :math:`t = m l^2`, where l describes
     the average edge length.
 
     Parameters

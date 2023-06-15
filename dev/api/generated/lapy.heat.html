@@ -258,13 +258,10 @@ using only the first n smallest eigenvalues and eigenvectors.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.diffusion">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L76-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L76-L130"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the heat diffusion from initial vertices in vids.</p>
-<p>It uses the backward Euler solution:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[t = m * avg_edge_length^2\]</div>
-</div>
+<p>It uses the backward Euler solution <span class="math notranslate nohighlight">\(t = m l^2\)</span>, where l describes
+the average edge length.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -272,10 +269,7 @@ using only the first n smallest eigenvalues and eigenvectors.</p>
 </dd>
 <dt><strong>vids</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Vertex index or indices where initial heat is applied.</p>
 </dd>
-<dt><strong>m</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1.0</span></dt><dd><dl class="simple">
-<dt>Factor to compute time of heat evolution:</dt><dd><p>t = m * avg_edge_length^2.</p>
-</dd>
-</dl>
+<dt><strong>m</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1.0</span></dt><dd><p>Factor to compute time of heat evolution.</p>
 </dd>
 <dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of smoothing iterations for curvature computation on vertices.</p>
 </dd>
@@ -306,7 +300,7 @@ using only the first n smallest eigenvalues and eigenvectors.</p>
 and eigenvectors):</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[K_t (p,q) = sum_j exp(-eval_j t) evec_j(p) evec_j(q)\]</div>
+\[K_t (p,q) = \sum_j \ exp(-eval_j \ t) \ evec_j(p) \ evec_j(q)\]</div>
 </div>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -315,7 +309,7 @@ and eigenvectors):</p>
 </dd>
 <dt><strong>vfix</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Fixed vertex index.</p>
 </dd>
-<dt><strong>evecs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Matrix of eigenvectors (M x N), M = #vertices, N=#eigenvectors.</p>
+<dt><strong>evecs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Matrix of eigenvectors (M x N), M=#vertices, N=#eigenvectors.</p>
 </dd>
 <dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Column vector of eigenvalues (N).</p>
 </dd>

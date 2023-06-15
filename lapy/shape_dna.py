@@ -146,9 +146,9 @@ def compute_distance(ev1, ev2, dist="euc"):
 
     Parameters
     ----------
-    ev1: array_like
+    ev1 : array_like
         First set of sorted eigenvalues.
-    ev2: array_like
+    ev2 : array_like
         Second set of sorted eigenvalues.
     dist : str
         Distance measure; currently only 'euc' (Euclidean).

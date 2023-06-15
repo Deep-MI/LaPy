@@ -45,9 +45,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
     -----
     If you use this code in your own work, please cite the following paper:
     [1] P. T. Choi, K. C. Lam, and L. M. Lui,
-       "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
-       for Genus-0 Closed Brain Surfaces."
-       SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization
+    for Genus-0 Closed Brain Surfaces."
+    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 
     Adopted from Matlab code at
     https://github.com/garyptchoi/spherical-conformal-map
@@ -195,7 +195,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 
 def mobius_area_correction_spherical(tria, mapping):
-    r"""Find an optimal Mobius transformation for reducing the area distortion of
+    r"""Find an imporved Mobius transformation to reduce distortion.
+
+    This helps reducing the area distortion of
     a spherical conformal parameterization using the method in
     Choi et al, SIAM Journal on Imaging Sciences, 2020.
 
@@ -352,7 +354,7 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     ----------
     tria : TriaMesh
         Genus-0 closed triangle mesh.
-        Should be planar mapping on complex plane
+        Should be planar mapping on complex plane.
     mu : array_like
         Complex Beltrami coefficients.
     landmark : array_like

@@ -659,13 +659,14 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 def tet_compute_gradient(tet, vfunc):
     """Compute gradient of a vertex function f (for each tetra).
 
-    grad(f) = [  (f_j - f_i) (vi-vk) x (vh-vk)
-               + (f_k - f_i) (vi-vh) x (vj-vh)
-               + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V)
-            = [  f_i (?-?) x ( ? -?)
-               + f_j (vi-vk) x (vh-vk)
-               + f_k (vi-vh) x (vj-vh)
-               + f_h (vk-vi) x (vj-vi) ] / (2 V)
+.. math::
+    grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
+            &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
+            &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
+            &= [  f_i (?-?) x ( ? -?) \\
+            &   + f_j (vi-vk) x (vh-vk) \\
+            &   + f_k (vi-vh) x (vj-vh) \\
+            &   + f_h (vk-vi) x (vj-vi) ] / (2 V) 
     for tetrahedron (vi,vj,vk,vh) with volume V.
 
     Parameters
@@ -678,7 +679,7 @@ def tet_compute_gradient(tet, vfunc):
     Returns
     -------
     tfunc : array of shape (n, 3)
-        3d gradient vector at tetras
+        3d gradient vector at tetras.
 
     Notes
     -----

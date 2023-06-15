@@ -1,0 +1,412 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+     "# Example for TetMesh Geodesics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "        <script type=\"text/javascript\">\n",
+       "        window.PlotlyConfig = {MathJaxConfig: 'local'};\n",
+       "        if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}\n",
+       "        if (typeof require !== 'undefined') {\n",
+       "        require.undef(\"plotly\");\n",
+       "        requirejs.config({\n",
+       "            paths: {\n",
+       "                'plotly': ['https://cdn.plot.ly/plotly-2.18.0.min']\n",
+       "            }\n",
+       "        });\n",
+       "        require(['plotly'], function(Plotly) {\n",
+       "            window._Plotly = Plotly;\n",
+       "        });\n",
+       "        }\n",
+       "        </script>\n",
+       "        "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "from lapy import TetMesh\n",
+    "\n",
+    "from lapy.plot import plot_tet_mesh\n",
+    "\n",
+    "import plotly\n",
+    "plotly.offline.init_notebook_mode(connected=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "--> VTK format         ... \n",
+      " --> DONE ( V: 9261 , T: 48000 )\n",
+      "\n",
+      "Flipped 24000 tetrahedra\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "24000"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "T = TetMesh.read_vtk('../data/cubeTetra.vtk')\n",
+    "#T.is_oriented()\n",
+    "T.orient_()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "TetMesh with regular Laplace\n",
+      "Solver: spsolve (LU decomposition) ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "from lapy import Solver\n",
+    "fem = Solver(T,lump=True)\n",
+    "\n",
+    "evals, evec = fem.eigs(10)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# also get A,B (lumped), and inverse of B (easy as it is diagonal)\n",
+    "A, B = fem.stiffness, fem.mass\n",
+    "Bi = B.copy()\n",
+    "Bi.data **= -1"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "evnum=1\n",
+    "cutting = ['x<0.5']\n",
+    "# also here we comment all plots to reduce file size\n",
+    "# uncomment and take a look\n",
+    "#plot_tet_mesh(T,vfunc=evals[evnum]*evec[:,evnum],plot_edges=None,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from lapy.diffgeo import compute_gradient\n",
+    "from lapy.diffgeo import compute_divergence\n",
+    "grad = compute_gradient(T,evec[:,evnum])\n",
+    "divx = -compute_divergence(T,grad)\n",
+    "vfunc = Bi*divx\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cutting = ['x<0.5']\n",
+    "#plot_tet_mesh(T,vfunc=vfunc,plot_edges=None,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.0059814453"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.max(np.abs(vfunc-(evals[evnum]*evec[:,evnum])))\n",
+    "dd = np.abs(vfunc-(evals[evnum]*evec[:,evnum]))\n",
+    "max(dd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Found 4800 triangles on boundary.\n",
+      "TetMesh with regular Laplace\n",
+      "Matrix Format now:  csc\n",
+      "Solver: spsolve (LU decomposition) ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "from lapy import heat\n",
+    "\n",
+    "tria = T.boundary_tria()\n",
+    "bvert = np.unique(tria.t)\n",
+    "\n",
+    "u = heat.diffusion(T,bvert,m=1)\n",
+    "cutting = ['x<0.5']\n",
+    "#plot_tet_mesh(T,vfunc=u,plot_edges=None,plot_levels=True,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# compute gradient of heat diffusion, normalize it, and compute the divergence of normalized gradient\n",
+    "tfunc = compute_gradient(T, u)\n",
+    "\n",
+    "# flip and normalize it\n",
+    "X = -tfunc / np.sqrt((tfunc ** 2).sum(1))[:, np.newaxis]\n",
+    "X = np.nan_to_num(X)\n",
+    "\n",
+    "# compute divergence\n",
+    "divx = compute_divergence(T, X)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Matrix Format now: csc\n",
+      "Solver: cholesky decomp - performance optimal ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "# compute distance\n",
+    "from scipy.sparse.linalg import splu\n",
+    "useCholmod = True\n",
+    "try:\n",
+    "    from sksparse.cholmod import cholesky\n",
+    "except ImportError:\n",
+    "    useCholmod = False\n",
+    "\n",
+    "A, B = fem.stiffness, fem.mass # computed above when creating Solver\n",
+    "\n",
+    "H=A\n",
+    "b0=-divx\n",
+    "        \n",
+    "# solve H x = b0\n",
+    "print(\"Matrix Format now: \"+H.getformat())\n",
+    "if useCholmod:\n",
+    "    print(\"Solver: cholesky decomp - performance optimal ...\")\n",
+    "    chol = cholesky(H)\n",
+    "    x = chol(b0)\n",
+    "else:\n",
+    "    print(\"Solver: spsolve (LU decomp) - performance not optimal ...\")\n",
+    "    lu = splu(H)\n",
+    "    x = lu.solve(b0)\n",
+    "\n",
+    "x = x - np.min(x)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(0.6993174268615026, 0.8660254037844386)"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cutting = ['x<0.5']\n",
+    "#plot_tet_mesh(T,vfunc=x,plot_edges=None,plot_levels=True,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)\n",
+    "max(x), 0.5*np.sqrt(3.0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#debug gradient\n",
+    "v1func =  T.v[:,0]* T.v[:,0] + T.v[:,1]* T.v[:,1] + T.v[:,2]* T.v[:,2]# x coord\n",
+    "\n",
+    "grad = compute_gradient(T,v1func)\n",
+    "glength = np.sqrt(np.sum(grad * grad, axis=1))\n",
+    "fcols=glength\n",
+    "fcols=grad[:,2]\n",
+    "cutting = ['x<0.5']\n",
+    "cutting = None\n",
+    "#plot_tet_mesh(T,vfunc=None,tfunc=fcols,plot_edges=None,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divx = compute_divergence(T, grad)\n",
+    "divx2 = Bi * divx\n",
+    "cutting = ['z<0.5']\n",
+    "#plot_tet_mesh(T,vfunc=divx2,plot_edges=True,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([5.9999948, 6.0000215, 6.0000215, 5.999988 , 6.000053 , 5.999975 ,\n",
+       "       5.9999676, 6.000024 , 6.000013 , 6.000008 ], dtype=float32)"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "divx2[5000:5010]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.06365621"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "T.avg_edge_length()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Found 4800 triangles on boundary.\n",
+      "TetMesh with regular Laplace\n",
+      "Matrix Format now:  csc\n",
+      "Solver: spsolve (LU decomposition) ...\n",
+      "TetMesh with regular Laplace\n",
+      "Matrix Format now: csc\n",
+      "Solver: spsolve (LU decomposition) ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "from lapy.diffgeo import compute_geodesic_f\n",
+    "from lapy import heat\n",
+    "\n",
+    "tria = T.boundary_tria()\n",
+    "bvert=np.unique(tria.t)\n",
+    "\n",
+    "# get heat diffusion\n",
+    "u = heat.diffusion(T,bvert, m=1)\n",
+    "\n",
+    "gu = compute_geodesic_f(T,u)\n",
+    "\n",
+    "cutting = ['x<0.5']\n",
+    "#plot_tet_mesh(T,vfunc=gu,plot_edges=None,plot_levels=True,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

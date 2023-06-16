@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Example for TriaMesh Geodesics" href="Test_TriaMesh_Geodesics.html" /><link rel="prev" title="Example for Plotting" href="Test_Plot.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.05.20 -->
-        <title>Example for ShapeDNA - LaPy</title>
+        <title>ShapeDNA - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -187,7 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Test_TriaMesh.html">Example for Triangle Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh.html">Example for Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Example for Plotting</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Example for ShapeDNA</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ShapeDNA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TriaMesh_Geodesics.html">Example for TriaMesh Geodesics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh_Geodesics.html">Example for TetMesh Geodesics</a></li>
 </ul>
@@ -230,10 +230,11 @@
           </label>
         </div>
         <article role="main">
-          <section id="Example-for-ShapeDNA">
-<h1>Example for ShapeDNA<a class="headerlink" href="#Example-for-ShapeDNA" title="Permalink to this heading">#</a></h1>
+          <section id="ShapeDNA">
+<h1>ShapeDNA<a class="headerlink" href="#ShapeDNA" title="Permalink to this heading">#</a></h1>
+<p>ShapeDNA is an n-dimensional intrinsic shape descriptor (see Reuter et al., CAD Journal, 2006). It can be used to compare two geometric objects independent of their pose or posture as the ShapeDNA is not affected by (near)-isometric deformations. This tutorial shows how you compute, normalize and re-weight Laplace-Beltrami spectra to obtain the ShapeDNA.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
@@ -242,8 +243,9 @@
 </pre></div>
 </div>
 </div>
+<p>First we load some data: a tria mesh representing the boundary of a cube and a tetrahedral mesh representing the full cube.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load data</span>
@@ -265,8 +267,9 @@
 
 </pre></div></div>
 </div>
+<p>Let’s compute the first three eigenvalues and eigenvectors of the triangle mesh…</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute eigenvalues and eigenvectors for tria mesh</span>
@@ -286,7 +289,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -294,8 +297,9 @@ Solver: spsolve (LU decomposition) ...
 array([-4.0165149e-05,  4.1696410e+00,  4.1704664e+00], dtype=float32)
 </pre></div></div>
 </div>
+<p>Now we perform a normalization of the eigenvalues using the method “geometry” which is equal to surface area normalization for 2d meshes. The resulting eigenvalues are the same as when computing them on the same shape with unit surface area (=1).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># volume / surface / geometry normalization of tria eigenvalues</span>
@@ -304,7 +308,7 @@ array([-4.0165149e-05,  4.1696410e+00,  4.1704664e+00], dtype=float32)
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -312,8 +316,9 @@ array([-4.0165149e-05,  4.1696410e+00,  4.1704664e+00], dtype=float32)
 array([-2.4099089e-04,  2.5017845e+01,  2.5022799e+01], dtype=float32)
 </pre></div></div>
 </div>
+<p>For 2d shapes, eigenvalues increase linear with their ordering. In order to reduce the influence of higher (and probably more noise affected) eigenvalues it is common practice to perform a linear re-weighting.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># linear reweighting of tria eigenvalues</span>
@@ -322,7 +327,7 @@ array([-2.4099089e-04,  2.5017845e+01,  2.5022799e+01], dtype=float32)
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -330,8 +335,9 @@ array([-2.4099089e-04,  2.5017845e+01,  2.5022799e+01], dtype=float32)
 array([-4.01651487e-05,  2.08482051e+00,  1.39015547e+00])
 </pre></div></div>
 </div>
+<p>The normalized and re-weighted eigenvalues are called the ShapeDNA. We can now compute the distance between two shapes by comparing their ShapeDNA. The default is the Euclidean distance between two ShapeDNA vectors.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute distance for tria eigenvalues (trivial case)</span>
@@ -340,7 +346,7 @@ array([-4.01651487e-05,  2.08482051e+00,  1.39015547e+00])
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -348,8 +354,10 @@ array([-4.01651487e-05,  2.08482051e+00,  1.39015547e+00])
 0.0
 </pre></div></div>
 </div>
+<p>Note, that usually more eigenvalues are used (in the order of 15 to 50) for shape comparison. Also you can do other analyses, e.g. find clusters in this shape space or project it via PCA for visualization.</p>
+<p>We now repeat the above steps for a tetrahedral mesh, again computing the first three eigenvalues and -vectors.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute eigenvalues and eigenvectors for tet mesh</span>
@@ -369,7 +377,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -377,8 +385,9 @@ Solver: spsolve (LU decomposition) ...
 array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 </pre></div></div>
 </div>
+<p>For 3d meshes the “geometry” normalization defaults to unit volume normalization.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># volume / surface / geometry normalization of tet eigenvalues</span>
@@ -396,7 +405,7 @@ Searched mesh after 79 flooding iterations (0.012834310531616211 sec).
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -404,8 +413,9 @@ Searched mesh after 79 flooding iterations (0.012834310531616211 sec).
 array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 </pre></div></div>
 </div>
+<p>Again we perform linear re-weighting. This is only meaningfull for small eigenvalues as the asymtotic trend of eigenvalues of 3d solids is not linear.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># linear reweighting of tet eigenvalues</span>
@@ -414,7 +424,7 @@ array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -422,8 +432,9 @@ array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 array([8.44402239e-05, 4.94489574e+00, 3.29662704e+00])
 </pre></div></div>
 </div>
+<p>Now that we have the ShapeDNA of the 3D solid cube, we can compute it to other ShapeDNA (or to itself, which of course yields zero).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute distance for tria eigenvalues (trivial case)</span>
@@ -432,21 +443,13 @@ array([8.44402239e-05, 4.94489574e+00, 3.29662704e+00])
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 0.0
 </pre></div></div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
 </div>
 </section>
 

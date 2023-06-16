@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Example for Plotting" href="Test_Plot.html" /><link rel="prev" title="Example for Triangle Mesh" href="Test_TriaMesh.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.05.20 -->
-        <title>Example for Tetrahedral Mesh - LaPy</title>
+        <title>Tetrahedral Mesh - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -185,7 +185,7 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Test_TriaMesh.html">Example for Triangle Mesh</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Example for Tetrahedral Mesh</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Example for Plotting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_ShapeDNA.html">ShapeDNA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TriaMesh_Geodesics.html">Example for TriaMesh Geodesics</a></li>
@@ -230,8 +230,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="Example-for-Tetrahedral-Mesh">
-<h1>Example for Tetrahedral Mesh<a class="headerlink" href="#Example-for-Tetrahedral-Mesh" title="Permalink to this heading">#</a></h1>
+          <section id="Tetrahedral-Mesh">
+<h1>Tetrahedral Mesh<a class="headerlink" href="#Tetrahedral-Mesh" title="Permalink to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -241,6 +241,7 @@
 </pre></div>
 </div>
 </div>
+<p>First, instead of loading, we define a small tetrahedral mesh represening a cube with a center vertex and twelve tetrahedra.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -256,6 +257,8 @@
 </pre></div>
 </div>
 </div>
+<p>Note, that we flipped the first tetrahedron vertex order on purpose (it should be 0,5,1,8) to test test and correct orientation below.</p>
+<p>We can check if our tet mesh has free vertices (these are vertices that are not used in any tetrahedron).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -273,6 +276,25 @@
 False
 </pre></div></div>
 </div>
+<p>No free vertices are found, so we cannot remove any and the attempt will keep all 9.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">rm_free_vertices_</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(array([0, 1, 2, 3, 4, 5, 6, 7, 8]), [])
+</pre></div></div>
+</div>
+<p>Let’s see next, if we have consistent orientations (this should fail).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -298,6 +320,7 @@ Orientations are not uniform
 False
 </pre></div></div>
 </div>
+<p>Some functions don’t care about the orientation, for example the average edge length computation.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -315,6 +338,7 @@ False
 1.0543647924813107
 </pre></div></div>
 </div>
+<p>We can also get the boundary of the tet mesh as a triangle mesh.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -331,6 +355,7 @@ False
 Found 12 triangles on boundary.
 </pre></div></div>
 </div>
+<p>But also the boundary is not oriented consistently (triangle normals of neighboring triangles point in oposite directions).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -348,23 +373,7 @@ Found 12 triangles on boundary.
 False
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">rm_free_vertices_</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(array([0, 1, 2, 3, 4, 5, 6, 7, 8]), [])
-</pre></div></div>
-</div>
+<p>Let’s repeat those steps after correcting the orientation in the tet mesh.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -392,6 +401,7 @@ All tet orientations are correct
 True
 </pre></div></div>
 </div>
+<p>When we extract the boundary surface now, we see it is also consistently oriented.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -418,6 +428,7 @@ Found 12 triangles on boundary.
 True
 </pre></div></div>
 </div>
+<p>Correct orientation is needed, e.g., to compute the volume of a surface mesh.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>

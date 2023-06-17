@@ -186,7 +186,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Triangle Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh.html">Tetrahedral Mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Example for Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_ShapeDNA.html">ShapeDNA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TriaMesh_Geodesics.html">Example for TriaMesh Geodesics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh_Geodesics.html">Example for TetMesh Geodesics</a></li>
@@ -241,7 +241,7 @@
 </pre></div>
 </div>
 </div>
-<p>First we create and initialize a TriaMesh of a cube. Note, this mesh is not oriented (some normals flip), so some functions below will complain until we fix the situation with .orient_() later. And is it consistently oriented (it won’t be)?</p>
+<p>First we create and initialize a TriaMesh of a cube. Note, this mesh is not oriented (some normals flip), so some functions below will complain until we fix the situation with .orient_() later.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -255,7 +255,7 @@
 </pre></div>
 </div>
 </div>
-<p>First we check a few properties of the mesh. Is it closed (no boundary)? Is it manifold (no edge has more than two triangles)?</p>
+<p>First we check a few properties of the mesh. Is it closed (no boundary)? Is it manifold (no edge has more than two triangles)? And is it consistently oriented (it won’t be)?</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -307,7 +307,7 @@ True
 False
 </pre></div></div>
 </div>
-<p>We can see this also by looking at the max entry of the directed adjacency matrix. It is a sparse matrix (mainly zeros) adding a 1 for an edge from i to j. If any position has a 2 it means that two half edges are oriented in the same direction, which can only happen if the mesh is not oriented consistently or if it is non-manifold.</p>
+<p>We can see that orientation is not OK also by looking at the max entry of the directed adjacency matrix. It is a sparse matrix (mainly zeros) adding a 1 for an edge from i to j. If any position has a 2 it means that two half edges are oriented in the same direction, which can only happen if the mesh is not oriented consistently or if it is non-manifold.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -324,7 +324,7 @@ False
 2.0
 </pre></div></div>
 </div>
-<p>A lot of functions work on non-oriented meshes. For example, we can compute the Euler characteristics (2 for spherical topology), the areas of the triangles and the total mesh area.</p>
+<p>Many functions work on non-oriented meshes. For example, we can compute the Euler characteristics (2 for spherical topology), the areas of the triangles and the total mesh area.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -480,7 +480,7 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 1.1380711874576983
 </pre></div></div>
 </div>
-<p>Also the normals, but some will point outwards and some inwards.</p>
+<p>And the triangle normals, but some will point outwards and some inwards.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>

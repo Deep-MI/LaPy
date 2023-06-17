@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Tetrahedral Mesh" href="Test_TetMesh.html" /><link rel="prev" title="Tutorials" href="../index.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.05.20 -->
-        <title>Example for Triangle Mesh - LaPy</title>
+        <title>Triangle Mesh - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -184,7 +184,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Example for Triangle Mesh</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Triangle Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh.html">Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Example for Plotting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_ShapeDNA.html">ShapeDNA</a></li>
@@ -230,10 +230,10 @@
           </label>
         </div>
         <article role="main">
-          <section id="Example-for-Triangle-Mesh">
-<h1>Example for Triangle Mesh<a class="headerlink" href="#Example-for-Triangle-Mesh" title="Permalink to this heading">#</a></h1>
+          <section id="Triangle-Mesh">
+<h1>Triangle Mesh<a class="headerlink" href="#Triangle-Mesh" title="Permalink to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -241,9 +241,9 @@
 </pre></div>
 </div>
 </div>
-<p>First we create and initialize a TriaMesh. Note, this mesh is not oriented (some normals flip), so some functions below will complain until we fix the situation with .orient_() later.</p>
+<p>First we create and initialize a TriaMesh of a cube. Note, this mesh is not oriented (some normals flip), so some functions below will complain until we fix the situation with .orient_() later. And is it consistently oriented (it won’t be)?</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
@@ -252,12 +252,12 @@
          <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TriaMesh</span><span class="p">(</span><span class="n">points</span><span class="p">,</span><span class="n">trias</span><span class="p">)</span>
-<span class="c1"># note, this mesh is not oriented, so some functions will complain below until we fix this</span>
 </pre></div>
 </div>
 </div>
+<p>First we check a few properties of the mesh. Is it closed (no boundary)? Is it manifold (no edge has more than two triangles)?</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_closed</span><span class="p">()</span>
@@ -265,6 +265,23 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_manifold</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
@@ -277,7 +294,7 @@ True
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_manifold</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_oriented</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -287,28 +304,12 @@ True
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-True
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_oriented</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 False
 </pre></div></div>
 </div>
+<p>We can see this also by looking at the max entry of the directed adjacency matrix. It is a sparse matrix (mainly zeros) adding a 1 for an edge from i to j. If any position has a 2 it means that two half edges are oriented in the same direction, which can only happen if the mesh is not oriented consistently or if it is non-manifold.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">adj_dir</span><span class="p">))</span>
@@ -323,8 +324,9 @@ False
 2.0
 </pre></div></div>
 </div>
+<p>A lot of functions work on non-oriented meshes. For example, we can compute the Euler characteristics (2 for spherical topology), the areas of the triangles and the total mesh area.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">euler</span><span class="p">()</span>
@@ -332,7 +334,7 @@ False
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -341,7 +343,7 @@ False
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">tria_areas</span><span class="p">()</span>
@@ -349,7 +351,7 @@ False
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -358,7 +360,7 @@ array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">area</span><span class="p">()</span>
@@ -366,7 +368,7 @@ array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -374,8 +376,9 @@ array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
 5.999999999999998
 </pre></div></div>
 </div>
+<p>The volume inside the closed mesh, however, requires the mesh to be correctly oriented.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">volume</span><span class="p">()</span>  <span class="c1"># will fail for non-oriented meshes</span>
@@ -404,8 +407,9 @@ File <span class="ansi-green-fg">~/Work/software/lapy/LaPy/examples/lapy/tria_me
 <span class="ansi-red-fg">ValueError</span>: Error: Can only compute volume for oriented triangle meshes!
 </pre></div></div>
 </div>
+<p>But we can get the vertex degrees (number of edges at each vertex).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">vertex_degrees</span><span class="p">()</span>
@@ -413,7 +417,7 @@ File <span class="ansi-green-fg">~/Work/software/lapy/LaPy/examples/lapy/tria_me
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -421,8 +425,9 @@ File <span class="ansi-green-fg">~/Work/software/lapy/LaPy/examples/lapy/tria_me
 array([6, 4, 4, 4, 4, 4, 6, 4])
 </pre></div></div>
 </div>
+<p>The area that a vertex represents is computed by summing the areas of all triangles at that vertex and dividing it by 3.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">vertex_areas</span><span class="p">()</span>
@@ -430,7 +435,7 @@ array([6, 4, 4, 4, 4, 4, 6, 4])
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -439,8 +444,9 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
        0.66666667, 1.        , 0.66666667])
 </pre></div></div>
 </div>
+<p>Of course their sum should be equal to the total surface area.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">vertex_areas</span><span class="p">())</span>
@@ -448,7 +454,7 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -456,8 +462,9 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 6.0
 </pre></div></div>
 </div>
+<p>Also the average edge length can be computed on non-oriented meshes easily.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">avg_edge_length</span><span class="p">()</span>
@@ -465,7 +472,7 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -473,8 +480,9 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 1.1380711874576983
 </pre></div></div>
 </div>
+<p>Also the normals, but some will point outwards and some inwards.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">tria_normals</span><span class="p">()</span>
@@ -482,7 +490,7 @@ array([1.        , 0.66666667, 0.66666667, 0.66666667, 0.66666667,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -501,8 +509,9 @@ array([[ 0.,  0., -1.],
        [-1.,  0., -0.]])
 </pre></div></div>
 </div>
+<p>Triangle qualities measure how close a triangle is to the equilateral triangle. Triangles with a very short edge (sliver) are usually numerically unstable when solving equations with FEM and therefore get a low quality. Here all triangles are similar and have the same quality.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">tria_qualities</span><span class="p">()</span>
@@ -510,7 +519,7 @@ array([[ 0.,  0., -1.],
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -519,8 +528,9 @@ array([0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254,
        0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254])
 </pre></div></div>
 </div>
+<p>Since all vertices are used in at least one triangle, we do not have free vertices. Usually free vertices exist if the mesh is obtained as the boundary of a tetrahedral mesh and the inner vertices are not removed. This keeps vertex indices fixed and allows mapping results from the surface back to the solid. Anyway, removing free vertices in our case will not change anything.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">has_free_vertices</span><span class="p">()</span>
@@ -528,7 +538,7 @@ array([0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254, 0.8660254,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -537,7 +547,7 @@ False
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">rm_free_vertices_</span><span class="p">()</span>
@@ -545,7 +555,7 @@ False
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -553,8 +563,9 @@ False
 (array([0, 1, 2, 3, 4, 5, 6, 7]), [])
 </pre></div></div>
 </div>
+<p>Let’s now orient the mesh consistently so that all triangle normals point outwards.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">orient_</span><span class="p">()</span>
@@ -570,7 +581,7 @@ Searched mesh after 3 flooding iterations (0.0007233619689941406 sec).
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -579,7 +590,7 @@ Searched mesh after 3 flooding iterations (0.0007233619689941406 sec).
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">is_oriented</span><span class="p">()</span>
@@ -587,7 +598,7 @@ Searched mesh after 3 flooding iterations (0.0007233619689941406 sec).
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -595,8 +606,9 @@ Searched mesh after 3 flooding iterations (0.0007233619689941406 sec).
 True
 </pre></div></div>
 </div>
+<p>Now we can also compute the enclosed volume.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute Volume (works only for oriented meshes)</span>
@@ -605,7 +617,7 @@ True
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -613,8 +625,9 @@ True
 1.0
 </pre></div></div>
 </div>
+<p>Once triangle normals are oriented we can also compute vertex normals (by aggregating the triangle normals at a vertex weighted by the angle).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Vertex normals averages tria normals (only oriented meshes)</span>
@@ -623,7 +636,7 @@ True
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -638,32 +651,36 @@ array([[-0.57735027, -0.57735027, -0.57735027],
        [ 0.40824829, -0.81649658,  0.40824829]])
 </pre></div></div>
 </div>
+<p>Vertex normals are important for rendering the mesh, or they can be used to shift vertices along the normals by an offset.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span><span class="o">.</span><span class="n">normal_offset_</span><span class="p">(</span><span class="mf">0.2</span><span class="o">*</span><span class="n">T</span><span class="o">.</span><span class="n">avg_edge_length</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
+<p>So far our mesh was closed, here we create one with a boundary by dropping triangles.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Tbdr</span> <span class="o">=</span> <span class="n">TriaMesh</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">v</span><span class="p">,</span><span class="n">T</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:])</span>
 </pre></div>
 </div>
 </div>
+<p>Meshes can be refined by subdividing each triangle into 4 similar smaller ones.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Tbdr</span><span class="o">.</span><span class="n">refine_</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<p>Finally, we print the boundary loops, these are the vertices oredered along the boundary. Here we only have one loop, but meshes can have many.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">Tbdr</span><span class="o">.</span><span class="n">boundary_loops</span><span class="p">())</span>

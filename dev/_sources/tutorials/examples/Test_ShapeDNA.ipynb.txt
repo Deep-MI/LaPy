@@ -126,7 +126,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "For 2d shapes, eigenvalues increase linear with their ordering. In order to reduce the influence of higher (and probably more noise affected) eigenvalues it is common practice to perform a linear re-weighting."
+    "For surfaces, eigenvalues increase linearly with their ordering. In order to reduce the influence of higher (and probably more noise affected) eigenvalues it is common practice to perform a linear re-weighting."
    ]
   },
   {
@@ -227,7 +227,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "For 3d meshes the \"geometry\" normalization defaults to unit volume normalization."
+    "For 3d meshes the \"geometry\" normalization defaults to unit volume normalization. Since the cube is already unit volume, nothing happens."
    ]
   },
   {

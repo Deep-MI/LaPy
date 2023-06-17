@@ -364,7 +364,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
-<p>This is the same as corresponding eigenvalue times the eigenfunction.</p>
+<p>This is the same as the corresponding eigenvalue times the eigenfunction.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -373,7 +373,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
-<p>Laplace is also defined as the -div(grad(f)). So first applying the gradient and then the divergence to an eigenfunction and then multiplying with inv(B) should yield the same result as above again. Note, that multiplying with inv(B) is necesarry to get back from the integrated divergence to the orginal function.</p>
+<p>Laplace is also defined as the -div(grad(f)). So first applying the gradient and then the divergence to an eigenfunction and then multiplying with inv(B) should yield the same result as above again. Note, that multiplying with inv(B) is necessary to get back from the integrated divergence to the original function.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -388,7 +388,7 @@ Solver: spsolve (LU decomposition) ...
 </div>
 <section id="Geodesics">
 <h2>Geodesics<a class="headerlink" href="#Geodesics" title="Permalink to this heading">#</a></h2>
-<p>Now we will replicate the idea of geodesics in heat, where first a heat diffusion is solved and massaged in the right way to yield an approximation of geodesics on the mesh. This also workes on curved meshes, but for simplicity we keep using the square here. So let’s start with computing the heat diffusion from the boundary (with default time factor m=1).</p>
+<p>Now we will replicate the idea of geodesics in heat, where first a heat diffusion is solved and massaged in the right way to yield an approximation of geodesics on the mesh. This also works on curved meshes, but for simplicity we keep using the square here. So let’s start with computing the heat diffusion from the boundary (with default time factor m=1).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -418,7 +418,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
-<p>Next step is to compute the gradient (vector field) of the head diffusion function and normalize all vectors to unit length.</p>
+<p>Next step is to compute the gradient (vector field) of the heat diffusion function and normalize all vectors to unit length.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -489,7 +489,7 @@ Matrix Format now: csc
 Solver: cholesky decomp - performance optimal ...
 </pre></div></div>
 </div>
-<p>In short, the idea is to first get a function (heat diffusion) that flows from a point or from a set of points (boundary) through the mesh, then normalize its gradient, compute the divergence and finally find step backward through the Laplace operator to find a function that has this normalized gradient. If we look at it, we actually notice that level sets are equally spaced now.</p>
+<p>In short, the idea is to first get a function (heat diffusion) that flows from a point or from a set of points (boundary) through the mesh, then normalize its gradient, compute the divergence and finally step backward through the Laplace operator to find a function that has this normalized gradient. If we look at it, we actually notice that level sets are equally spaced now.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
@@ -517,7 +517,7 @@ Solver: cholesky decomp - performance optimal ...
 (0.6049783117351546, 0.7071067811865476)
 </pre></div></div>
 </div>
-<p>Instead of computing the solution ourselves, we could simply emply the standard Poisson solver on inv(B) times divx.</p>
+<p>Instead of computing the solution ourselves, we could simply employ the standard Poisson solver on inv(B) times divx.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>

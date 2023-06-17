@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Example for TetMesh Geodesics" href="Test_TetMesh_Geodesics.html" /><link rel="prev" title="ShapeDNA" href="Test_ShapeDNA.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.05.20 -->
-        <title>Example for TriaMesh Geodesics - LaPy</title>
+        <title>TriaMesh Geodesics - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -141,7 +141,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -188,7 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh.html">Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_Plot.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_ShapeDNA.html">ShapeDNA</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Example for TriaMesh Geodesics</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">TriaMesh Geodesics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Test_TetMesh_Geodesics.html">Example for TetMesh Geodesics</a></li>
 </ul>
 </li>
@@ -224,23 +224,23 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="Example-for-TriaMesh-Geodesics">
-<h1>Example for TriaMesh Geodesics<a class="headerlink" href="#Example-for-TriaMesh-Geodesics" title="Permalink to this heading">#</a></h1>
+          <section id="TriaMesh-Geodesics">
+<h1>TriaMesh Geodesics<a class="headerlink" href="#TriaMesh-Geodesics" title="Permalink to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load a triangle mesh</span>
-<span class="kn">from</span> <span class="nn">lapy</span> <span class="kn">import</span> <span class="n">TriaMesh</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lapy</span> <span class="kn">import</span> <span class="n">TriaMesh</span>
 </pre></div>
 </div>
 </div>
+<p>Load a triangle mesh of a flat square (OFF file).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -300,17 +300,17 @@ require(['plotly'], function(Plotly) {
 }
 </script></div>
 </div>
+<p>We now plot the triangle mesh with a function overly of the triangle quality. Note, that this is a function attached to the triangles, not the vertices, so it is piecewise flat.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot the mesh (here with a triangle function overlay of tria quality)</span>
-<span class="n">q</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">tria_qualities</span><span class="p">()</span>
-<span class="c1"># we commented all plot calls, so that the notebook size remains small, uncomment and look at it</span>
-<span class="c1">#plot_tria_mesh(T,plot_edges=True, tfunc=q)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">tria_qualities</span><span class="p">()</span>
+<span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tfunc</span><span class="o">=</span><span class="n">q</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Next, we check a few properties of eigenfunctions. For this we get the first few and also the stiffness matrix (A) and the lumped mass matrix (B, reduced to a diagonal), of which we can easily compute the inverse.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -337,14 +337,12 @@ TriaMesh with regular Laplace-Beltrami
 Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
+<p>The mass matrix B represents the inner product so that the integral of the product of two functions x and y over the whole mesh is x B y’. The lumped mass matrix that we use here is a simplified version, as all off-diagonal elements are added to the diagonal. The entries on the diagonal represent the vertex areas and their sum is the total area of the mesh. For our unit square it will be 1.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note the mass matrix B can be used as inner product like x B x&#39;.</span>
-<span class="c1"># for a lumped matrix (diagonal) it has contains the vertex areas at the diagonal.</span>
-<span class="c1"># in any case, the sum of all elements is the total mesh area (1 in the case of the unit square)</span>
-<span class="n">B</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -357,44 +355,45 @@ Solver: spsolve (LU decomposition) ...
 1.0
 </pre></div></div>
 </div>
+<p>Let’s see what happens when we apply the Laplace operator to an eigenfunction. Eigenfunctions are solutions to Delta f = - lambda f, so we should obtain a scaled version of f.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># when applying the Laplace to an eigenfunction you get a scaled version of that function</span>
-<span class="c1">#plot_tria_mesh(T,Bi*(A*vfunc),plot_edges=True)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">Bi</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">vfunc</span><span class="p">),</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>This is the same as corresponding eigenvalue times the eigenfunction.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># so it is the same as the corresponding eigenvalue times the eigenfunction</span>
-<span class="c1">#plot_tria_mesh(T,eval[1]*vfunc,plot_edges=True)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="nb">eval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">vfunc</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Laplace is also defined as the -div(grad(f)). So first applying the gradient and then the divergence to an eigenfunction and then multiplying with inv(B) should yield the same result as above again. Note, that multiplying with inv(B) is necesarry to get back from the integrated divergence to the orginal function.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># individually applying first gradient and then - divergence (and inverse of B) gives the same function</span>
-<span class="c1"># inverse of B is used to get back from the integrated divergence to the function</span>
-<span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_gradient</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_gradient</span>
 <span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_divergence</span>
 <span class="n">grad</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">vfunc</span><span class="p">)</span>
 <span class="n">divx</span> <span class="o">=</span> <span class="o">-</span><span class="n">compute_divergence</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">grad</span><span class="p">)</span>
-<span class="c1">#plot_tria_mesh(T,Bi*divx,plot_edges=True)</span>
+<span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">Bi</span><span class="o">*</span><span class="n">divx</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<section id="Geodesics">
+<h2>Geodesics<a class="headerlink" href="#Geodesics" title="Permalink to this heading">#</a></h2>
+<p>Now we will replicate the idea of geodesics in heat, where first a heat diffusion is solved and massaged in the right way to yield an approximation of geodesics on the mesh. This also workes on curved meshes, but for simplicity we keep using the square here. So let’s start with computing the heat diffusion from the boundary (with default time factor m=1).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now we compute heat diffusion from boundary vertices with default m</span>
-<span class="kn">from</span> <span class="nn">lapy</span> <span class="kn">import</span> <span class="n">heat</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lapy</span> <span class="kn">import</span> <span class="n">heat</span>
 <span class="n">bvert</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">boundary_loops</span><span class="p">()</span>
 <span class="n">u</span> <span class="o">=</span> <span class="n">heat</span><span class="o">.</span><span class="n">diffusion</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">bvert</span><span class="p">,</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
@@ -410,15 +409,16 @@ Matrix Format now:  csc
 Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
+<p>We show some of the level sets. Note, that they are not evenly spaced and get steeper closer to the boundary.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show some of the level sets (not evenly spaced, steeper close to the boundary)</span>
-<span class="c1">#plot_tria_mesh(T,u,plot_edges=True,plot_levels=True)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">plot_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Next step is to compute the gradient (vector field) of the head diffusion function and normalize all vectors to unit length.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -434,15 +434,16 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
+<p>Then we get the integrated divergence of the normalized gradients.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute divergence of normalized gradient</span>
-<span class="n">divx</span> <span class="o">=</span> <span class="n">compute_divergence</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">divx</span> <span class="o">=</span> <span class="n">compute_divergence</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Finally, to obtain the distance function, we need to solve a Poisson equation. The solution can be shifted arbitrary, so we need to subtract the minimum, which should be along the boundary of the mesh.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
@@ -488,14 +489,16 @@ Matrix Format now: csc
 Solver: cholesky decomp - performance optimal ...
 </pre></div></div>
 </div>
+<p>In short, the idea is to first get a function (heat diffusion) that flows from a point or from a set of points (boundary) through the mesh, then normalize its gradient, compute the divergence and finally find step backward through the Laplace operator to find a function that has this normalized gradient. If we look at it, we actually notice that level sets are equally spaced now.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#plot_tria_mesh(T,x,plot_edges=True,plot_levels=True)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">plot_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Nice, but only an approximation.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
@@ -514,14 +517,14 @@ Solver: cholesky decomp - performance optimal ...
 (0.6049783117351546, 0.7071067811865476)
 </pre></div></div>
 </div>
+<p>Instead of computing the solution ourselves, we could simply emply the standard Poisson solver on inv(B) times divx.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can also use the standard Poisson solver on B inverse time divx</span>
-<span class="n">vf</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="o">-</span><span class="n">Bi</span><span class="o">*</span><span class="n">divx</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vf</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="o">-</span><span class="n">Bi</span><span class="o">*</span><span class="n">divx</span><span class="p">)</span>
 <span class="n">vf</span> <span class="o">=</span> <span class="n">vf</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">vf</span><span class="p">)</span>
-<span class="c1">#plot_tria_mesh(T,vf,plot_edges=True,plot_levels=True)</span>
+<span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">vf</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">plot_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -534,12 +537,12 @@ Matrix Format now: csc
 Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
+<p>This should give us the same result as what we had earlier.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># should be the same as what we had earlier</span>
-<span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">vf</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">vf</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -552,14 +555,14 @@ Solver: spsolve (LU decomposition) ...
 5.30470728232757e-07
 </pre></div></div>
 </div>
+<p>Or we can just call compute_geodesic_f which does all the work for us.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># or just call this, which does all the work for us</span>
-<span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_geodesic_f</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_geodesic_f</span>
 <span class="n">gf</span> <span class="o">=</span> <span class="n">compute_geodesic_f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">u</span><span class="p">)</span>
-<span class="c1">#plot_tria_mesh(T,gf,plot_edges=True,plot_levels=True)</span>
+<span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">gf</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">plot_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -573,6 +576,7 @@ Matrix Format now: csc
 Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
+<p>And verify it is still the same result.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
@@ -591,6 +595,7 @@ Solver: spsolve (LU decomposition) ...
 3.2569845126451114e-07
 </pre></div></div>
 </div>
+<p>Similar to normalizing the gradients of a function, we can see if we can rotate it.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
@@ -598,7 +603,7 @@ Solver: spsolve (LU decomposition) ...
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># testing if we can rotate the function</span>
 <span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">compute_rotated_f</span>
 <span class="n">gf</span> <span class="o">=</span> <span class="n">compute_rotated_f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">vf</span><span class="p">)</span>
-<span class="c1">#plot_tria_mesh(T,gf,plot_edges=True,plot_levels=True)</span>
+<span class="n">plot_tria_mesh</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">gf</span><span class="p">,</span><span class="n">plot_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">plot_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -612,13 +617,15 @@ Matrix Format now: csc
 Solver: spsolve (LU decomposition) ...
 </pre></div></div>
 </div>
+</section>
+<section id="Mean-Curvature-Mapping">
+<h2>Mean Curvature Mapping<a class="headerlink" href="#Mean-Curvature-Mapping" title="Permalink to this heading">#</a></h2>
+<p>To demonstrate the mean curvature mapping to a sphere, we need to have a closed mesh. It should not have too many flat regions (so not the cube) as there is no cuvature.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># To demonstrate the mean curvature mapping to a sphere</span>
-<span class="c1"># we need to have a closed mesh</span>
-<span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">tria_mean_curvature_flow</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lapy.diffgeo</span> <span class="kn">import</span> <span class="n">tria_mean_curvature_flow</span>
 <span class="kn">from</span> <span class="nn">lapy.plot</span> <span class="kn">import</span> <span class="n">plot_tria_mesh</span>
 <span class="c1"># load your mesh here and uncomment. The mesh should have not too many flat regions (not a cube)</span>
 <span class="c1">#T = TriaIO.import_off(&quot;../data/???&quot;)</span>
@@ -627,6 +634,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 
         </article>
@@ -678,8 +686,28 @@ Solver: spsolve (LU decomposition) ...
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">TriaMesh Geodesics</a><ul>
+<li><a class="reference internal" href="#Geodesics">Geodesics</a></li>
+<li><a class="reference internal" href="#Mean-Curvature-Mapping">Mean Curvature Mapping</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

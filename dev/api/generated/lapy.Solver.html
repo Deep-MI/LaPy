@@ -187,7 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TetMesh.html">Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_Plot.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_ShapeDNA.html">ShapeDNA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TriaMesh_Geodesics.html">Example for TriaMesh Geodesics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TriaMesh_Geodesics.html">TriaMesh Geodesics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TetMesh_Geodesics.html">Example for TetMesh Geodesics</a></li>
 </ul>
 </li>
@@ -297,10 +297,10 @@ than <code class="docutils literal notranslate"><span class="pre">N</span></code
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (k,)</span></dt><dd><p>Array of k eigenvalues. For closed meshes or Neumann boundary condition,
+<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (k,)</span></dt><dd><p>Array of k eigenvalues. For closed meshes or Neumann boundary condition,
 <code class="docutils literal notranslate"><span class="pre">0</span></code> will be the first eigenvalue (with constant eigenvector).</p>
 </dd>
-<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (N, k)</span></dt><dd><p>Array representing the k eigenvectors. The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is
+<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (N, k)</span></dt><dd><p>Array representing the k eigenvectors. The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is
 the eigenvector corresponding to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</span></code>.</p>
 </dd>
 </dl>
@@ -350,7 +350,7 @@ and <code class="docutils literal notranslate"><span class="pre">A</span></code>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Right hand side, can be constant or array with vertex values.
+<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Right hand side, can be constant or array with vertex values.
 The default <code class="docutils literal notranslate"><span class="pre">0</span></code> corresponds to Laplace equation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
 </dd>
 <dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a></span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and data arrays
@@ -365,7 +365,7 @@ boundaries.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>x</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array with vertex value of the solution.</p>
+<dt><strong>x</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array with vertex value of the solution.</p>
 </dd>
 </dl>
 </dd>

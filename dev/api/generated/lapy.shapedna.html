@@ -187,7 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TetMesh.html">Tetrahedral Mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_Plot.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_ShapeDNA.html">ShapeDNA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TriaMesh_Geodesics.html">Example for TriaMesh Geodesics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TriaMesh_Geodesics.html">TriaMesh Geodesics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/examples/Test_TetMesh_Geodesics.html">Example for TetMesh Geodesics</a></li>
 </ul>
 </li>
@@ -242,9 +242,9 @@ Laplace spectra.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>ev1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></span></dt><dd><p>First set of sorted eigenvalues.</p>
+<dt><strong>ev1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></span></dt><dd><p>First set of sorted eigenvalues.</p>
 </dd>
-<dt><strong>ev2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></span></dt><dd><p>Second set of sorted eigenvalues.</p>
+<dt><strong>ev2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></span></dt><dd><p>Second set of sorted eigenvalues.</p>
 </dd>
 <dt><strong>dist</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Distance measure; currently only ‘euc’ (Euclidean).</p>
 </dd>
@@ -310,7 +310,7 @@ If False, will use slower LU decomposition.</p>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
+<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
 </dd>
 <dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Either “surface”, “volume”, or “geometry”;
 “geometry” will perform surface normalization for
@@ -320,7 +320,7 @@ If False, will use slower LU decomposition.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
 </dd>
 </dl>
 </dd>
@@ -334,13 +334,13 @@ If False, will use slower LU decomposition.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
+<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>evals: <a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
+<dt>evals: <a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
 </dd>
 </dl>
 </dd>

@@ -300,7 +300,7 @@ require(['plotly'], function(Plotly) {
 }
 </script></div>
 </div>
-<p>We now plot the triangle mesh with a function overly of the triangle quality. Note, that this is a function attached to the triangles, not the vertices, so it is piecewise flat.</p>
+<p>We now plot the triangle mesh with a function overlay of the triangle quality. Note, that this is a function attached to the triangles, not the vertices, so it is piecewise flat.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -310,6 +310,8 @@ require(['plotly'], function(Plotly) {
 </pre></div>
 </div>
 </div>
+<section id="Laplace">
+<h2>Laplace<a class="headerlink" href="#Laplace" title="Permalink to this heading">#</a></h2>
 <p>Next, we check a few properties of eigenfunctions. For this we get the first few and also the stiffness matrix (A) and the lumped mass matrix (B, reduced to a diagonal), of which we can easily compute the inverse.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -386,6 +388,7 @@ Solver: spsolve (LU decomposition) ...
 </pre></div>
 </div>
 </div>
+</section>
 <section id="Geodesics">
 <h2>Geodesics<a class="headerlink" href="#Geodesics" title="Permalink to this heading">#</a></h2>
 <p>Now we will replicate the idea of geodesics in heat, where first a heat diffusion is solved and massaged in the right way to yield an approximation of geodesics on the mesh. This also works on curved meshes, but for simplicity we keep using the square here. So let’s start with computing the heat diffusion from the boundary (with default time factor m=1).</p>
@@ -699,6 +702,7 @@ Solver: spsolve (LU decomposition) ...
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">TriaMesh Geodesics</a><ul>
+<li><a class="reference internal" href="#Laplace">Laplace</a></li>
 <li><a class="reference internal" href="#Geodesics">Geodesics</a></li>
 <li><a class="reference internal" href="#Mean-Curvature-Mapping">Mean Curvature Mapping</a></li>
 </ul>

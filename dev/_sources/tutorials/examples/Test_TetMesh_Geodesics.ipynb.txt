@@ -429,7 +429,7 @@
     "divx = compute_divergence(T, grad)\n",
     "divx2 = Bi * divx\n",
     "cutting = ['z<0.5']\n",
-    "plot_tet_mesh(T,vfunc=divx2,plot_edges=True,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True)"
+    "plot_tet_mesh(T,vfunc=divx2,plot_edges=True,plot_levels=False,cutting=cutting,edge_color='rgb(50,50,50)',html_output=False,flatshading=True,caxis=[0, 8])"
    ]
   },
   {

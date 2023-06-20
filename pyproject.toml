@@ -62,6 +62,7 @@ doc = [
     'numpydoc',
     'sphinx',
     'sphinxcontrib-bibtex',
+    'sphinxcontrib-napoleon',
     'sphinx-copybutton',
     'sphinx-design',
     'sphinx-gallery',

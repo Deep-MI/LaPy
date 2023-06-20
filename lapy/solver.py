@@ -35,9 +35,9 @@ class Solver:
             curvature computation. (Default = 10)
             This is only relevant if aniso is not None.
         use_cholmod (bool): If True, attempts to use the Cholesky decomposition
-            for improved execution speed.
-	    Requires the ``scikit-sparse`` library. If it can not be found, an error will
-            be thrown. If False, will use slower LU decomposition. (Default: False)
+            for improved execution speed. Requires the ``scikit-sparse`` library.
+            If it can not be found, an error will be thrown. If False, will use
+            slower LU decomposition. (Default: False)
 
     Returns:
 

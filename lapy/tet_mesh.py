@@ -205,11 +205,13 @@ class TetMesh:
             may need some debugging, until then use tria.orient_() after this.
 
         Args:
-            tetfunc (array | None, optional): List of tetra function values (optional). (Default value = None)
+            tetfunc (array | None, optional): List of tetra function values (optional).
+                (Default value = None)
 
         Returns:
             TriaMesh: TriaMesh of boundary (potentially >1 components).
-            array: List of tria function values (only returned if ``tetfunc`` is provided).
+            array: List of tria function values (only returned if ``tetfunc`` is
+                provided).
 
         Raises:
 

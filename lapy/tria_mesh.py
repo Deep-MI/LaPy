@@ -646,10 +646,12 @@ class TriaMesh:
         """Compute vertices and adjacent triangle ids for each edge.
 
         Args:
-            with_boundary (bool, optional): Also work on boundary half edges, default ignore.
+            with_boundary (bool, optional): Also work on boundary half edges.
+                Default false: ignore.
 
         Returns:
-            array: Column array with starting and end vertex for each unique inner edge.
+            array: Column array with starting and end vertex for each unique
+                inner edge.
             array: 2 column array with triangle containing the half edge
                 from vids[0,:] to vids [1,:] in first column and the
                 neighboring triangle in the second column.
@@ -702,7 +704,8 @@ class TriaMesh:
             ACM Transactions on Graphics, 2003.
 
         Args:
-            smoothit (int, optional): Smoothing iterations on vertex functions. (Default value = 3)
+            smoothit (int, optional): Smoothing iterations on vertex functions.
+               (Default value = 3)
 
         Returns:
             array of shape (vnum, 3): Minimal curvature directions.
@@ -822,7 +825,8 @@ class TriaMesh:
         the triangle plane, and orthogonalized.
 
         Args:
-            smoothit (int, optional): Number of smoothing iterations for curvature computation on vertices. (Default value = 3)
+            smoothit (int, optional): Number of smoothing iterations for curvature
+                computation on vertices. (Default value = 3)
 
         Returns:
             array: Min curvature direction on triangles.
@@ -1104,12 +1108,12 @@ class TriaMesh:
 
         Args:
             tfunc (array): Float vector or matrix (#t x N) of values at vertices.
-            weighted (bool, default=False, optional): False, weigh only by 1/3, e.g. to compute
-        vertex areas from tria areas
-        True, weigh by triangle area / 3, e.g. to
-        integrate a function defined on the trias,
-        for example integrating the "one" function
-        will also yield the vertex areas. (Default value = False)
+            weighted (bool, optional): False, weigh only by 1/3, e.g. to
+                compute vertex areas from tria areas
+                True, weigh by triangle area / 3, e.g. to
+                integrate a function defined on the trias,
+                for example integrating the "one" function
+                will also yield the vertex areas. (Default value = False)
 
         Returns:
             array: Function on vertices vector or matrix (#v x N).
@@ -1160,8 +1164,10 @@ class TriaMesh:
         """Smooth the mesh or a vertex function iteratively.
 
         Args:
-            vfunc (array): Float vector of values at vertices, if empty, use vertex coordinates.
-            n (int, default=1, optional): Number of iterations for smoothing. (Default value = 1)
+            vfunc (array): Float vector of values at vertices, if empty, use vertex
+                coordinates.
+            n (int, default=1, optional): Number of iterations for smoothing.
+                (Default value = 1)
 
         Returns:
             array: Smoothed surface vertex function.

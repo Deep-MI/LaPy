@@ -172,9 +172,7 @@ class TetMesh:
 
         Returns:
             TriaMesh: TriaMesh of boundary (potentially >1 components).
-            array: List of tria function values (only returned if tetfunc is
-                provided).
-
+            array: List of tria function values (only if tetfunc is provided).
         """
         from . import TriaMesh
 

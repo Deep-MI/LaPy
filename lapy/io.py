@@ -5,7 +5,7 @@ import numpy as np
 
 def read_vfunc(filename):
     """Import vertex functions from txt file.
-    
+
     Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
     brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
     from ShapeDNA.
@@ -18,7 +18,7 @@ def read_vfunc(filename):
 
     Raises:
 
-    
+
     """
     import re
 
@@ -50,7 +50,7 @@ def read_ev(filename):
 
     Raises:
 
-    
+
     """
     # open file
     try:
@@ -185,7 +185,7 @@ def write_ev(filename, d):
 
     Raises:
 
-    
+
     """
     # open file
     try:
@@ -272,7 +272,7 @@ def write_ev(filename, d):
 
 def write_vfunc(filename, vfunc):
     """Save vertex in PSOL txt file.
-    
+
     First line "Solution:", "," separated values inside ()
 
     Args:
@@ -283,7 +283,7 @@ def write_vfunc(filename, vfunc):
 
     Raises:
 
-    
+
     """
     try:
         f = open(filename, "w")

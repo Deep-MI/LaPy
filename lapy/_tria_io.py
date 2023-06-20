@@ -17,7 +17,7 @@ def read_fssurf(filename):
 
     Raises:
 
-    
+
     """
     verbose = 1
     if verbose > 0:
@@ -48,7 +48,7 @@ def read_off(filename):
 
     Raises:
 
-    
+
     """
     verbose = 1
     if verbose > 0:
@@ -104,7 +104,7 @@ def read_vtk(filename):
 
     Raises:
 
-    
+
     """
     verbose = 1
     if verbose > 0:
@@ -473,7 +473,7 @@ def write_vtk(tria, filename):
 
     Raises:
 
-    
+
     """
     # open file
     try:
@@ -516,7 +516,7 @@ def write_fssurf(tria, filename):
 
     Raises:
 
-    
+
     """
     # open file
     try:

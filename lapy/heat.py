@@ -14,7 +14,7 @@ from .utils._imports import import_optional_dependency
 
 def diagonal(t, x, evecs, evals, n):
     """Compute heat kernel diagonal ( K(t,x,x,) ).
-    
+
     For a given time t (can be a vector)
     using only the first n smallest eigenvalues and eigenvectors.
 
@@ -30,7 +30,7 @@ def diagonal(t, x, evecs, evals, n):
 
     Raises:
 
-    
+
     """
     # maybe add code to check dimensions of input and flip axis if necessary
     h = np.matmul(evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t)))
@@ -39,10 +39,10 @@ def diagonal(t, x, evecs, evals, n):
 
 def kernel(t, vfix, evecs, evals, n):
     r"""Compute heat kernel from all points to a fixed point (vfix).
-    
+
     For a given time t (using only the first n smallest eigenvalues
     and eigenvectors):
-    
+
     .. math::
         K_t (p,q) = \sum_j \ exp(-eval_j \ t) \ evec_j(p) \ evec_j(q)
 
@@ -58,7 +58,7 @@ def kernel(t, vfix, evecs, evals, n):
 
     Raises:
 
-    
+
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
     h = np.matmul(evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n]))
@@ -67,7 +67,7 @@ def kernel(t, vfix, evecs, evals, n):
 
 def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=False):
     r"""Compute the heat diffusion from initial vertices in vids.
-    
+
     It uses the backward Euler solution :math:`t = m l^2`, where l describes
     the average edge length.
 
@@ -85,7 +85,7 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
 
     Raises:
 
-    
+
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)

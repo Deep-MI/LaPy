@@ -29,7 +29,7 @@ def compute_gradient(geom, vfunc):
     Raises:
         ValueError: If unknown geometry type.
 
-    
+
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_gradient(geom, vfunc)
@@ -52,7 +52,7 @@ def compute_divergence(geom, vfunc):
     Raises:
         ValueError: If unknown geometry type.
 
-    
+
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_divergence(geom, vfunc)
@@ -75,7 +75,7 @@ def compute_rotated_f(geom, vfunc):
     Raises:
         ValueError: If unknown geometry type.
 
-    
+
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
@@ -85,7 +85,7 @@ def compute_rotated_f(geom, vfunc):
 
 def compute_geodesic_f(geom, vfunc):
     """Compute function with normalized gradient (geodesic distance).
-    
+
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat" for triangles.
@@ -99,7 +99,7 @@ def compute_geodesic_f(geom, vfunc):
 
     Raises:
 
-    
+
     """
     gradf = compute_gradient(geom, vfunc)
     # normalize gradient
@@ -117,7 +117,7 @@ def compute_geodesic_f(geom, vfunc):
 
 def tria_compute_geodesic_f(tria, vfunc):
     """Compute function with normalized gradient (geodesic distance).
-    
+
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat".
@@ -131,7 +131,7 @@ def tria_compute_geodesic_f(tria, vfunc):
 
     Raises:
 
-    
+
     """
     gradf = tria_compute_gradient(tria, vfunc)
     # normalize gradient
@@ -202,7 +202,7 @@ def tria_compute_gradient(tria, vfunc):
 
 def tria_compute_divergence(tria, tfunc):
     r"""Compute integrated divergence of a 3d triangle function f (for each vertex).
-    
+
     Divergence is the flux density leaving or entering a point.
     Note: this is the integrated divergence, you may want to multiply
     with B^-1 to get back the function in some applications
@@ -258,7 +258,7 @@ def tria_compute_divergence(tria, tfunc):
 
 def tria_compute_divergence2(tria, tfunc):
     r"""Compute integrated divergence of a 3d triangle function f (for each vertex).
-    
+
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer edges of the 1-ring triangles
@@ -308,7 +308,7 @@ def tria_compute_divergence2(tria, tfunc):
 
 def tria_compute_rotated_f(tria, vfunc):
     r"""Compute function whose level sets are orthgonal to the ones of vfunc.
-    
+
     This is done by rotating the gradient around the normal by 90 degrees,
     then solving the Poisson equations with the divergence of rotated grad.
 
@@ -345,7 +345,7 @@ def tria_mean_curvature_flow(
     tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=False
 ):
     r"""Flow a triangle mesh along the mean curvature normal.
-    
+
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012).
     This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
@@ -416,7 +416,7 @@ def tria_mean_curvature_flow(
 
 def tria_spherical_project(tria, flow_iter=3, debug=False):
     r"""Compute the first 3 non-constant eigenfunctions and project the spectral embedding onto a sphere.
-    
+
     Computes the first three non-constant eigenfunctions
     and then projects the spectral embedding onto a sphere. This works
     when the first functions have a single closed zero level set,
@@ -450,13 +450,13 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         """
 
         Args:
-            triax: 
+            triax:
 
         Returns:
 
         Raises:
 
-        
+
         """
         vx1 = triax.v[triax.t[:, 0], :]
         vx2 = triax.v[triax.t[:, 1], :]
@@ -697,7 +697,7 @@ def tet_compute_gradient(tet, vfunc):
 
 def tet_compute_divergence(tet, tfunc):
     r"""Compute integrated divergence of a 3d tetra function f (for each vertex).
-    
+
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer faces of the 1-ring tetras

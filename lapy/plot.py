@@ -29,7 +29,7 @@ def _get_color_levels():
 
     Raises:
 
-    
+
     """
     color1 = "rgb(55, 155, 255)"
     color2 = "rgb(255, 255, 0)"
@@ -88,7 +88,7 @@ def _get_colorscale(vmin, vmax):
 
     Raises:
 
-    
+
     """
     if vmin > vmax:
         raise ValueError("incorrect relation between vmin and vmax")
@@ -150,7 +150,7 @@ def _get_colorval(t, colormap):
 
     Raises:
 
-    
+
     """
     if t == 0:
         return colormap[0][1]
@@ -191,7 +191,7 @@ def _map_z2color(zval, colormap, zmin, zmax):
 
     Raises:
 
-    
+
     """
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
@@ -233,7 +233,7 @@ def plot_tet_mesh(
     caxis=None,
 ):
     """Plot tetra meshes.
-    
+
     The tetra mesh will be converted to its tria boundary mesh,
     and only this will be plotted.
 
@@ -266,7 +266,7 @@ def plot_tet_mesh(
 
     Raises:
 
-    
+
     """
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
@@ -409,7 +409,7 @@ def plot_tria_mesh(
 
     Raises:
 
-    
+
     """
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/

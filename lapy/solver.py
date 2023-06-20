@@ -12,7 +12,7 @@ from .utils._imports import import_optional_dependency
 
 class Solver:
     """FEM solver for Laplace Eigenvalue and Poisson Equation.
-    
+
     Inputs can be geometry classes which have vertices and elements.
     Currently `~lapy.TriaMesh` and `~lapy.TetMesh` are implemented.
     FEM matrices (stiffness (or A) and mass matrix (or B)) are computed
@@ -20,15 +20,28 @@ class Solver:
     Poisson Solver (`lapy.Solver.poisson`) can be called.
 
     Args:
+        geometry (TriaMesh | TetMesh): Mesh geometry.
+        lump (bool, optional): If True, lump the mass matrix (diagonal). (Default value = False)
+        aniso (float | tuple of shape (2,), optional): Anisotropy for curvature based anisotopic Laplace.
+            If a tuple ``(a_min, a_max), differentially affects the minimum and maximum
+            curvature directions. e.g. ``(0, 50)`` will set scaling to 1 into the minimum
+            curvature direction, even if the maximum curvature is large in those regions (
+            i.e. isotropic in regions with large maximum curvature and minimum curvature
+            close to 0, i.e. a concave cylinder). (Default value = None)
+        aniso_smooth (int | None, optional): Number of smoothing iterations for curvature computation. (Default = 10)
+            This is only relevant if aniso is not None.
+        use_cholmod (bool): If True, attempts to use the Cholesky decomposition for improved execution speed.
+	    Requires the ``scikit-sparse`` library. If it can not be found, an error will be thrown.
+	    If False, will use slower LU decomposition. (Default: False)
 
     Returns:
 
     Raises:
+        ValueError: If geometry is neither of type TriaMesh nor TetMesh.
 
-    Notes
-    -----
-    The class has a static member to create the mass matrix of `~lapy.TriaMesh` for
-    external function that do not need stiffness.
+    Note:
+        The class has a static member `Solver.fem_tria_mass` to create the mass matrix of `~lapy.TriaMesh` for
+        external function that do not need stiffness.
     """
 
     def __init__(
@@ -80,7 +93,7 @@ class Solver:
     @staticmethod
     def _fem_tria(tria: TriaMesh, lump: bool = False):  # computeABtria(v,t)
         r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a triangle mesh.
-        
+
         The 2 sparse symmetric matrices are computed for a given triangle mesh using the
         linear finite element method (assuming a closed mesh or Neumann boundary
         condition).
@@ -93,15 +106,12 @@ class Solver:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
             csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
-        Raises:
-
-        Notes
-        -----
-        This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
-        * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
-        * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        Note:
+            This static method can be used to solve:
+            * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+            * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
+            * Laplace equation: ``A x = 0``
+            * or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """  # noqa: E501
         import sys
 
@@ -167,50 +177,23 @@ class Solver:
         linear finite element method (assuming a closed mesh or Neumann boundary
         condition).
 
-        Parameters
-        ----------
-        tria : TriaMesh
-            Triangle mesh.
-        u1 : array
-            Minimum curvature direction per triangle ((N, 3) floats).
-        u2 : array
-            Maximum curvature direction per triangle ((N, 3) floats).
-        aniso_mat : array
-            Anisotropy matrix. Diagonal elements in ``u1``, ``u2`` basis per triangle
-            ((N, 2) floats).
-        lump : bool
-            If True, ``B`` should be lumped (diagonal).
-
-
-        Returns
-        -------
-        A : csc_matrix of shape (n, n)
-            Sparse symmetric positive semi definite matrix.
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
-
-        Notes
-        -----
-        This static method can be used to solve:
-        """
-
         Args:
-            tria: 
-            u1: 
-            u2: 
-            aniso_mat: 
-            lump (bool, optional):  (Default value = False)
+            tria (TriaMesh): Triangle mesh.
+            u1 (array): Minimum curvature direction per triangle ((N, 3) floats).
+            u2 (array): Maximum curvature direction per triangle ((N, 3) floats).
+            aniso_mat (array): Anisotropy matrix. Diagonal elements in ``u1``, ``u2`` basis per triangle ((N, 2) floats).
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
 
         Returns:
+            csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
+            csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
-        Raises:
-
-        
-        """
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
-        * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
-        * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        Note:
+            This static method can be used to solve:
+            * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+            * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
+            * Laplace equation: ``A x = 0``
+            * or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """  # noqa: E501
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
@@ -278,7 +261,7 @@ class Solver:
     @staticmethod
     def fem_tria_mass(tria: TriaMesh, lump: bool = False):
         r"""Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.
-        
+
         The sparse symmetric matrix is computed for a given triangle mesh using the
         linear finite element method (assuming a closed mesh or Neumann boundary
         condition).
@@ -292,13 +275,9 @@ class Solver:
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
-        Raises:
-
-        Notes
-        -----
+        Note:
             This only returns the mass matrix ``B`` of the Eigenvalue problem:
-            ``A x = lambda B x``. The area of the surface mesh can be obtained via
-            ``B.sum()``.
+            ``A x = lambda B x``. The area of the surface mesh can be obtained via ``B.sum()``.
         """  # noqa: E501
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
@@ -340,7 +319,7 @@ class Solver:
     @staticmethod
     def _fem_tetra(tetra: TetMesh, lump: bool = False):
         r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a tetrahedral mesh.
-        
+
         The 2 sparse symmetric matrices are computed for a given tetrahedral mesh using
         the linear finite element method (Neumann boundary condition).
 
@@ -354,13 +333,12 @@ class Solver:
 
         Raises:
 
-        Notes
-        -----
-        This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
-        * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
-        * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        Note:
+            This static method can be used to solve:
+            * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+            * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
+            * Laplace equation: ``A x = 0``
+            * or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """  # noqa: E501
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tetra.t[:, 0]
@@ -483,7 +461,7 @@ class Solver:
     @staticmethod
     def _fem_voxels(vox, lump: bool = False):  # computeABvoxels(v,t)
         r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a voxel mesh.
-        
+
         The 2 sparse symmetric matrices are computed for a given voxel mesh using the
         linear finite element method (Neumann boundary condition).
 
@@ -497,13 +475,12 @@ class Solver:
 
         Raises:
 
-        Notes
-        -----
-        This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
-        * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
-        * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        Note:
+            This static method can be used to solve:
+            * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+            * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
+            * Laplace equation: ``A x = 0``
+            * or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """  # noqa: E501
         # Inputs:   v - vertices : list of lists of 3 floats
         #           t - voxels   : list of lists of 8 int of indices (>=0) into v array
@@ -604,17 +581,18 @@ class Solver:
 
         Args:
             k (int, optional): The number of eigenvalues and eigenvectors desired. ``k`` must be smaller
-        than ``N``. It is not possible to compute all eigenvectors of a matrix. (Default value = 10)
+                than ``N``. It is not possible to compute all eigenvectors of a matrix. (Default value = 10)
 
         Returns:
             array of shape (k,): Array of k eigenvalues. For closed meshes or Neumann boundary condition,
-            ``0`` will be the first eigenvalue (with constant eigenvector).
+                ``0`` will be the first eigenvalue (with constant eigenvector).
+
             array of shape (N, k): Array representing the k eigenvectors. The column ``eigenvectors[:, i]`` is
-            the eigenvector corresponding to ``eigenvalues[i]``.
+                the eigenvector corresponding to ``eigenvalues[i]``.
 
         Raises:
 
-        
+
         """
         from scipy.sparse.linalg import LinearOperator, eigsh
 
@@ -645,7 +623,7 @@ class Solver:
 
     def poisson(self, h=0.0, dtup=(), ntup=()):  # poissonSolver
         r"""Solver for the poisson equation with boundary conditions.
-        
+
         This solver is based on the ``A`` and ``B`` Laplace matrices where ``A x = B h``
         and ``A`` is a sparse symmetric positive semi definitive matrix of shape
         ``(n`, n)`` and B is a sparse symmetric positive definitive matrix of shape
@@ -653,23 +631,19 @@ class Solver:
 
         Args:
             h (float | array, optional): Right hand side, can be constant or array with vertex values.
-        The default ``0`` corresponds to Laplace equation ``A x = 0``.
+                The default ``0`` corresponds to Laplace equation ``A x = 0``.
             dtup (tuple, optional): Dirichlet boundary condition as a tuple containing the index and data arrays
-        of same length. The default, an empty tuple, corresponds to no Dirichlet
-        condition.
+                of same length. The default, an empty tuple, corresponds to no Dirichlet condition.
             ntup (tuple, optional): Neumann boundary condition as a tuple containing the index and data arrays
-        of same length. The default, an empty tuple, corresponds to Neumann on all
-        boundaries.
+                of same length. The default, an empty tuple, corresponds to Neumann on all boundaries.
 
         Returns:
             array: Array with vertex value of the solution.
 
         Raises:
 
-        Notes
-        -----
-        ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or tetraheral
-        mesh.
+        Note:
+            ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or tetraheral mesh.
         """
         # check matrices
         dim = self.stiffness.shape[0]

@@ -18,7 +18,7 @@ def import_optional_dependency(
     raise_error: bool = True,
 ):
     """Import an optional dependency.
-    
+
     By default, if a dependency is missing an ImportError with a nice message
     will be raised.
 
@@ -37,7 +37,7 @@ def import_optional_dependency(
     Raises:
         ImportError: dependency not found; see raise_error
 
-    
+
     """
 
     package_name = INSTALL_MAPPING.get(name)

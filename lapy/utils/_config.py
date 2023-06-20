@@ -20,7 +20,7 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 
     Raises:
 
-    
+
     """
 
     ljust = 26
@@ -82,7 +82,7 @@ def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
 
     Raises:
 
-    
+
     """
 
     for dep in dependencies:

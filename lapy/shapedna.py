@@ -35,7 +35,7 @@ def compute_shapedna(
 
     Raises:
 
-    
+
     """
     # get fem, evals, evecs
 
@@ -77,7 +77,7 @@ def normalize_ev(geom, evals, method="geometry"):
 
     Raises:
 
-    
+
     """
     if method == "surface":
         vol = geom.area()
@@ -126,7 +126,7 @@ def reweight_ev(evals):
 
     Raises:
 
-    
+
     """
     # evals[1:] = evals[1:] / np.arange(1, len(evals))
     evals = evals / np.arange(1, len(evals) + 1)
@@ -147,7 +147,7 @@ def compute_distance(ev1, ev2, dist="euc"):
 
     Raises:
 
-    
+
     """
     if dist == "euc":
         return di.euclidean(ev1, ev2)

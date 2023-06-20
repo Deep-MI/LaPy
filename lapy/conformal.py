@@ -41,7 +41,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
     Raises:
 
-    
+
     """
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
@@ -183,7 +183,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 def mobius_area_correction_spherical(tria, mapping):
     r"""Find an improved Mobius transformation to reduce distortion.
-    
+
     This helps reducing the area distortion of
     a spherical conformal parameterization using the method in
     Choi et al, SIAM Journal on Imaging Sciences, 2020.
@@ -197,11 +197,11 @@ def mobius_area_correction_spherical(tria, mapping):
         array: Optimal parameters (x) for the Mobius transformation, where
         .. math::
         f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
-        E501: 
+        E501:
 
     Raises:
 
-    
+
     """
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
@@ -213,13 +213,13 @@ def mobius_area_correction_spherical(tria, mapping):
         """
 
         Args:
-            xx: 
+            xx:
 
         Returns:
 
         Raises:
 
-        
+
         """
         v = inverse_stereographic(
             ((xx[0] + xx[1] * 1j) * z + (xx[2] + xx[3] * 1j))
@@ -233,13 +233,13 @@ def mobius_area_correction_spherical(tria, mapping):
         """
 
         Args:
-            xx: 
+            xx:
 
         Returns:
 
         Raises:
 
-        
+
         """
         a = np.abs(np.log(area_map(xx) / area_t))
         return (a[np.isfinite(a)]).mean()
@@ -284,7 +284,7 @@ def beltrami_coefficient(tria, mapping):
 
     Raises:
 
-    
+
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -349,7 +349,7 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
     Raises:
 
-    
+
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -440,7 +440,7 @@ def _sparse_symmetric_solve(A, b, use_cholmod=False):
 
     Raises:
 
-    
+
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -471,7 +471,7 @@ def stereographic(u):
 
     Raises:
 
-    
+
     """
     x = u[:, 0]
     y = u[:, 1]
@@ -494,7 +494,7 @@ def inverse_stereographic(u):
 
     Raises:
 
-    
+
     """
     if np.iscomplexobj(u):
         x = u.real

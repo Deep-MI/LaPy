@@ -50,7 +50,7 @@ def _fread3(fobj):
 
     Raises:
 
-    
+
     """
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
     return (b1 << 16) + (b2 << 8) + b3
@@ -67,7 +67,7 @@ def _read_volume_info(fobj):
 
     Raises:
 
-    
+
     """
     volume_info = OrderedDict()
     head = np.fromfile(fobj, ">i4", 1)
@@ -132,7 +132,7 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
 
     Raises:
 
-    
+
     """
     volume_info = OrderedDict()
 

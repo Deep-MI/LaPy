@@ -19,7 +19,7 @@ def read_gmsh(filename):
 
     Raises:
 
-    
+
     """
     extension = os.path.splitext(filename)[1]
     verbose = 1
@@ -120,7 +120,7 @@ def read_vtk(filename):
 
     Raises:
 
-    
+
     """
     verbose = 1
     if verbose > 0:
@@ -207,7 +207,7 @@ def write_vtk(tet, filename):
 
     Raises:
 
-    
+
     """
     # open file
     try:

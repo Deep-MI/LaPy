@@ -191,7 +191,6 @@ def mobius_area_correction_spherical(tria, mapping):
         array: Vertex coordinates (3d) of the updated spherical conformal
             parameterization.
         array: Optimal parameters (x) for the Mobius transformation, where
-
             .. math::
                 f(z) = \frac{az+b}{cz+d}
                      = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}
@@ -320,14 +319,15 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
     Args:
         tria (TriaMesh): Genus-0 closed triangle mesh.
-    Should be planar mapping on complex plane.
+            Should be planar mapping on complex plane.
         mu (array_like): Complex Beltrami coefficients.
         landmark (array_like): Fixed vertex indices.
-        target (array): 3d array with 2d landmark target coordinates
-            (3rd coordinate is zero).
+        target (array): 3d array with 2d landmark target coordinates,
+            3rd coordinate is zero.
         use_cholmod (bool, default=False, optional): Which solver to use:
             * True : Use Cholesky decomposition from scikit-sparse cholmod.
             * False: Use spsolve (LU decomposition).
+
             (Default value = False)
 
     Returns:

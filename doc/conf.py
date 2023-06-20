@@ -220,6 +220,12 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
     url = f"{gh_url}/blob/{branch}/{package}/{fname}#{lines}"
     return url
 
+# -- napoleon ----------------------------------------------------------------
+napoleon_use_param = True
+napoleon_type_aliases = {
+    'array-like': ':term:`array-like <array_like>`',
+    'array_like': ':term:`array_like`',
+}
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {

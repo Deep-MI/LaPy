@@ -16,31 +16,26 @@ def compute_shapedna(
 ):
     """Compute the shapeDNA descriptor for triangle or tetrahedral meshes.
 
-    Parameters
-    ----------
-    geom : TriaMesh or TetMesh
-        Mesh geometry.
-    k : int, default=50
-        Number of eigenfunctions / eigenvalues.
-    lump : bool, default=False
-        If True, lump the mass matrix (diagonal).
-            (See 'lapy.Solver.Solver' class).
-    aniso : float or tuple of shape (2,)
-        Anisotropy for curvature based anisotopic Laplace.
-            (See 'lapy.Solver.Solver' class).
-    aniso_smooth : int
-        Number of smoothing iterations for curvature computation on vertices.
-            (See 'lapy.Solver.Solver' class).
-    use_cholmod : bool, default: False
-        If True, attempts to use the Cholesky decomposition for improved execution
-        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
-        will be thrown.
-        If False, will use slower LU decomposition.
+    Args:
+        geom (TriaMesh or TetMesh): Mesh geometry.
+        k (int, default=50, optional): Number of eigenfunctions / eigenvalues. (Default value = 50)
+        lump (bool, default=False, optional): If True, lump the mass matrix (diagonal).
+    (See 'lapy.Solver.Solver' class). (Default value = False)
+        aniso (float or tuple of shape (2,), optional): Anisotropy for curvature based anisotopic Laplace.
+    (See 'lapy.Solver.Solver' class). (Default value = None)
+        aniso_smooth (int, optional): Number of smoothing iterations for curvature computation on vertices.
+    (See 'lapy.Solver.Solver' class). (Default value = 10)
+        use_cholmod (bool, default: False, optional): If True, attempts to use the Cholesky decomposition for improved execution
+    speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
+    will be thrown.
+    If False, will use slower LU decomposition. (Default value = False)
 
-    Returns
-    -------
-    ev : dict
-        A dictionary, including 'Eigenvalues' and 'Eigenvectors' fields.
+    Returns:
+        dict: A dictionary, including 'Eigenvalues' and 'Eigenvectors' fields.
+
+    Raises:
+
+    
     """
     # get fem, evals, evecs
 
@@ -70,21 +65,19 @@ def compute_shapedna(
 def normalize_ev(geom, evals, method="geometry"):
     """Normalize a surface or a volume.
 
-    Parameters
-    ----------
-    geom : TriaMesh or TetMesh
-        Mesh geometry.
-    evals : array_like
-        Set of sorted eigenvalues.
-    method : str
-        Either "surface", "volume", or "geometry";
-        "geometry" will perform surface normalization for
-        2D objects, and volume normalization for 3D objects.
+    Args:
+        geom (TriaMesh or TetMesh): Mesh geometry.
+        evals (array_like): Set of sorted eigenvalues.
+        method (str, optional): Either "surface", "volume", or "geometry";
+    "geometry" will perform surface normalization for
+    2D objects, and volume normalization for 3D objects. (Default value = "geometry")
 
-    Returns
-    -------
-    array_like
-        Vector of re-weighted eigenvalues.
+    Returns:
+        array_like: Vector of re-weighted eigenvalues.
+
+    Raises:
+
+    
     """
     if method == "surface":
         vol = geom.area()
@@ -125,15 +118,15 @@ def normalize_ev(geom, evals, method="geometry"):
 def reweight_ev(evals):
     """Apply linear re-weighting.
 
-    Parameters
-    ----------
-    evals : array_like
-        Set of sorted eigenvalues.
+    Args:
+        evals (array_like): Set of sorted eigenvalues.
 
-    Returns
-    -------
-    evals: array_like
-        Vector of re-weighted eigenvalues.
+    Returns:
+        array_like: Vector of re-weighted eigenvalues.
+
+    Raises:
+
+    
     """
     # evals[1:] = evals[1:] / np.arange(1, len(evals))
     evals = evals / np.arange(1, len(evals) + 1)
@@ -144,19 +137,17 @@ def reweight_ev(evals):
 def compute_distance(ev1, ev2, dist="euc"):
     """Compute the shape dissimilarity from two shapeDNA descriptors.
 
-    Parameters
-    ----------
-    ev1 : array_like
-        First set of sorted eigenvalues.
-    ev2 : array_like
-        Second set of sorted eigenvalues.
-    dist : str
-        Distance measure; currently only 'euc' (Euclidean).
+    Args:
+        ev1 (array_like): First set of sorted eigenvalues.
+        ev2 (array_like): Second set of sorted eigenvalues.
+        dist (str, optional): Distance measure; currently only 'euc' (Euclidean). (Default value = "euc")
 
-    Returns
-    -------
-    * : float
-        Distance between the eigenvalue arrays.
+    Returns:
+        float: Distance between the eigenvalue arrays.
+
+    Raises:
+
+    
     """
     if dist == "euc":
         return di.euclidean(ev1, ev2)

@@ -5,20 +5,20 @@ import numpy as np
 
 def read_vfunc(filename):
     """Import vertex functions from txt file.
-
+    
     Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
     brackets. Also first line can have the keyword "Solution:", i.e. the PSOL format
     from ShapeDNA.
 
-    Parameters
-    ----------
-    filename : str
-        Filename of input.
+    Args:
+        filename (str): Filename of input.
 
-    Returns
-    -------
-    vals : array
-        List of vfunc parameters.
+    Returns:
+        array: List of vfunc parameters.
+
+    Raises:
+
+    
     """
     import re
 
@@ -41,16 +41,16 @@ def read_vfunc(filename):
 def read_ev(filename):
     """Load EV file.
 
-    Parameters
-    ----------
-    filename : str
-        Filename of input.
+    Args:
+        filename (str): Filename of input.
 
-    Returns
-    -------
-    d: dict
-        Dictionary of eigenvalues, eigenvectors (optional), and associated
+    Returns:
+        dict: Dictionary of eigenvalues, eigenvectors (optional), and associated
         information.
+
+    Raises:
+
+    
     """
     # open file
     try:
@@ -176,13 +176,16 @@ def read_ev(filename):
 def write_ev(filename, d):
     """Save EV data structures as txt file (format from ShapeDNA).
 
-    Parameters
-    ----------
-    filename : str
-        Filename to save to.
-    d : dict
-        Dictionary of eigenvalues, eigenvectors (optional), and associated
-        information.
+    Args:
+        filename (str): Filename to save to.
+        d (dict): Dictionary of eigenvalues, eigenvectors (optional), and associated
+    information.
+
+    Returns:
+
+    Raises:
+
+    
     """
     # open file
     try:
@@ -269,15 +272,18 @@ def write_ev(filename, d):
 
 def write_vfunc(filename, vfunc):
     """Save vertex in PSOL txt file.
-
+    
     First line "Solution:", "," separated values inside ()
 
-    Parameters
-    ----------
-    filename : str
-        Filename to save to.
-    vfunc : array_like
-        List of vfunc parameters.
+    Args:
+        filename (str): Filename to save to.
+        vfunc (array_like): List of vfunc parameters.
+
+    Returns:
+
+    Raises:
+
+    
     """
     try:
         f = open(filename, "w")

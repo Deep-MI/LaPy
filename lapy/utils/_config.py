@@ -11,13 +11,16 @@ import psutil
 def sys_info(fid: Optional[IO] = None, developer: bool = False):
     """Print the system information for debugging.
 
-    Parameters
-    ----------
-    fid : file-like, default=None
-        The file to write to, passed to :func:`print`.
-        Can be None to use :data:`sys.stdout`.
-    developer : bool, default=False
-        If True, display information about optional dependencies.
+    Args:
+        fid (Optional[IO], optional): The file to write to, passed to :func:`print`.
+    Can be None to use :data:`sys.stdout`. (Default value = None)
+        developer (bool, optional): If True, display information about optional dependencies. (Default value = False)
+
+    Returns:
+
+    Raises:
+
+    
     """
 
     ljust = 26
@@ -70,15 +73,16 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
     """List dependencies names and versions.
 
-    Parameters
-    ----------
-    out : Callable
-        output function
-    ljust : int
-         length of returned string
-    dependencies : List[str]
-        list of dependencies
+    Args:
+        out (Callable): output function
+        ljust (int): length of returned string
+        dependencies (List[str]): list of dependencies
 
+    Returns:
+
+    Raises:
+
+    
     """
 
     for dep in dependencies:

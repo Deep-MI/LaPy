@@ -22,10 +22,14 @@ from . import TetMesh
 def _get_color_levels():
     """Return a pre-set colorscale.
 
-    Returns
-    -------
-    colorscale: array_like of shape (38, 2)
-        Vector color for different levels.
+    Args:
+
+    Returns:
+        array_like of shape (38, 2): Vector color for different levels.
+
+    Raises:
+
+    
     """
     color1 = "rgb(55, 155, 255)"
     color2 = "rgb(255, 255, 0)"
@@ -75,17 +79,16 @@ def _get_color_levels():
 def _get_colorscale(vmin, vmax):
     """Put together a colorscale map depending on the range of v-values.
 
-    Parameters
-    ----------
-    vmin : float
-        Minimum value.
-    vmax : float
-        Maximum value.
+    Args:
+        vmin (float): Minimum value.
+        vmax (float): Maximum value.
 
-    Returns
-    -------
-    colorscale: array_like of shape (2,2)
-        Colorscale map.
+    Returns:
+        array_like of shape (2,2): Colorscale map.
+
+    Raises:
+
+    
     """
     if vmin > vmax:
         raise ValueError("incorrect relation between vmin and vmax")
@@ -138,17 +141,16 @@ def _get_colorscale(vmin, vmax):
 def _get_colorval(t, colormap):
     """Turn a scalar value into a color value.
 
-    Parameters
-    ----------
-    t : float
-        Scalar must be 0...1.
-    colormap : array_like
-        List of values and color code strings (with entries at least for 0 and 1).
+    Args:
+        t (float): Scalar must be 0...1.
+        colormap (array_like): List of values and color code strings (with entries at least for 0 and 1).
 
-    Returns
-    -------
-    cstr/*: str
-        Interpolated color for this value of t.
+    Returns:
+        str: Interpolated color for this value of t.
+
+    Raises:
+
+    
     """
     if t == 0:
         return colormap[0][1]
@@ -178,21 +180,18 @@ def _get_colorval(t, colormap):
 def _map_z2color(zval, colormap, zmin, zmax):
     """Map the normalized value zval to a corresponding color in the colormap.
 
-    Parameters
-    ----------
-    zval : float
-        Value to be mapped.
-    colormap : matplotlib.colors.LinearSegmentedColormap | array
-        List of values and color code strings.
-    zmin : float
-        Minimum.
-    zmax : float
-        Maximum.
+    Args:
+        zval (float): Value to be mapped.
+        colormap (matplotlib.colors.LinearSegmentedColormap | array): List of values and color code strings.
+        zmin (float): Minimum.
+        zmax (float): Maximum.
 
-    Returns
-    -------
-    rgb : str
-        Corresponding color of the zval.
+    Returns:
+        str: Corresponding color of the zval.
+
+    Raises:
+
+    
     """
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
@@ -234,51 +233,40 @@ def plot_tet_mesh(
     caxis=None,
 ):
     """Plot tetra meshes.
-
+    
     The tetra mesh will be converted to its tria boundary mesh,
     and only this will be plotted.
 
-    Parameters
-    ----------
-    tetra : lapy.TetMesh
-        Tetraheral mesh to plot.
-    vfunc : array_like, Default=None
-        Scalar function at vertices.
-    plot_edges : bool, Default=False
-        Whether to plot edges or not.
-    plot_levels : bool, Default=False
-        Whether to plot levels or not.
-    tfunc : array_like, Default=None
-        3d vector function of gradient.
-    cutting : str, Default=None
-        To view the 'interior' of the tetra mesh, one or more cutting
-        criteria can be defined as input arguments to this function:
-        e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
-        where x,y,z represent dimensions 0,1,2 of the vertex array,
-        and f represents the vfunc (which cannot be None if f is used
-        to define a cutting criterion).
-    edge_color : str, Default="rgb(50,50,50)"
-        Color of the edge.
-    html_output : bool, Default=False
-        Whether or not to give out as html output.
-    width : int, Default=800
-        Width of the plot (in px).
-    height : int, Default=800
-        Height  of the plot (in px).
-    flatshading : bool, Default=False
-        Whether normal smoothing is applied to the meshes or not.
-    xrange : list or tuple of shape (2, 1)
-        Sets the range of the x-axis.
-    yrange : list or tuple of shape (2, 1)
-        Sets the range of the y-axis.
-    zrange : list or tuple of shape (2, 1)
-        Sets the range of the z-axis.
-    showcaxis : bool, Default=False
-        Whether a colorbar is displayed or not.
-    caxis : list or tuple of shape (2, 1):
-        Sets the bound of the color domain.
-        caxis[0] is lower bound caxis[1] upper bound.
-        Elements are int or float.
+    Args:
+        tetra (lapy.TetMesh): Tetraheral mesh to plot.
+        vfunc (array_like, Default=None, optional): Scalar function at vertices. (Default value = None)
+        plot_edges (bool, Default=False, optional): Whether to plot edges or not. (Default value = False)
+        plot_levels (bool, Default=False, optional): Whether to plot levels or not. (Default value = False)
+        tfunc (array_like, Default=None, optional): 3d vector function of gradient. (Default value = None)
+        cutting (str, Default=None, optional): To view the 'interior' of the tetra mesh, one or more cutting
+    criteria can be defined as input arguments to this function:
+    e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
+    where x,y,z represent dimensions 0,1,2 of the vertex array,
+    and f represents the vfunc (which cannot be None if f is used
+    to define a cutting criterion). (Default value = None)
+        edge_color (str, Default="rgb(50,50,50)", optional): Color of the edge. (Default value = "rgb(50,50,50)")
+        html_output (bool, Default=False, optional): Whether or not to give out as html output. (Default value = False)
+        width (int, Default=800, optional): Width of the plot (in px). (Default value = 800)
+        height (int, Default=800, optional): Height  of the plot (in px). (Default value = 800)
+        flatshading (bool, Default=False, optional): Whether normal smoothing is applied to the meshes or not. (Default value = False)
+        xrange (list or tuple of shape (2, 1), optional): Sets the range of the x-axis. (Default value = None)
+        yrange (list or tuple of shape (2, 1), optional): Sets the range of the y-axis. (Default value = None)
+        zrange (list or tuple of shape (2, 1), optional): Sets the range of the z-axis. (Default value = None)
+        showcaxis (bool, Default=False, optional): Whether a colorbar is displayed or not. (Default value = False)
+        caxis (list or tuple of shape (2, 1):, optional): Sets the bound of the color domain.
+    caxis[0] is lower bound caxis[1] upper bound.
+    Elements are int or float. (Default value = None)
+
+    Returns:
+
+    Raises:
+
+    
     """
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
@@ -390,56 +378,38 @@ def plot_tria_mesh(
 ):
     """Plot tria mesh.
 
-    Parameters
-    ----------
-    tria : lapy.TriaMesh
-        Triangle mesh to plot.
-    vfunc : array_like, Default=None
-        Scalar function at vertices.
-    tfunc : array_like, Default=None
-        3d vector function of gradient.
-    vcolor : list of str, Default=None
-        Sets the color of each vertex.
-    tcolor : list of str, Default=None
-         Sets the color of each face.
-    showcaxis : bool, Default=False
-        Whether a colorbar is displayed or not.
-    caxis : list or tuple of shape (2, 1):
-        Sets the bound of the color domain.
-        caxis[0] is lower bound caxis[1] upper bound.
-        Elements are int or float.
-    xrange : list or tuple of shape (2, 1)
-        Sets the range of the x-axis.
-    yrange : list or tuple of shape (2, 1)
-        Sets the range of the y-axis.
-    zrange : list or tuple of shape (2, 1)
-        Sets the range of the z-axis.
-    plot_edges : bool, Default=False
-        Whether to plot edges or not.
-    plot_levels : bool, Default=False
-        Whether to plot levels or not.
-    edge_color : str, Default="rgb(50,50,50)"
-        Color of the edges.
-    tic_color : str, Default="rgb(50,200,10)"
-        Color of the ticks.
-    background_color : str, Default=None
-        Color of background.
-    flatshading : bool, Default=False
-        Whether normal smoothing is applied to the meshes or not.
-    width : int, Default=800
-        Width of the plot (in px).
-    height : int, Default=800
-        Height  of the plot (in px).
-    camera : dict of str, Default=None
-        Camera describing center, eye and up direction.
-    html_output : bool, Default=False
-        Whether or not to give out as html output.
-    export_png : str, Default=None
-        Local file path or file object to write the image to.
-    scale_png : int or float
-        Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution.
-    no_display : bool, Default=False
-        Whether to plot on display or not.
+    Args:
+        tria (lapy.TriaMesh): Triangle mesh to plot.
+        vfunc (array_like, Default=None, optional): Scalar function at vertices. (Default value = None)
+        tfunc (array_like, Default=None, optional): 3d vector function of gradient. (Default value = None)
+        vcolor (list of str, Default=None, optional): Sets the color of each vertex. (Default value = None)
+        tcolor (list of str, Default=None, optional): Sets the color of each face. (Default value = None)
+        showcaxis (bool, Default=False, optional): Whether a colorbar is displayed or not. (Default value = False)
+        caxis (list or tuple of shape (2, 1):, optional): Sets the bound of the color domain.
+    caxis[0] is lower bound caxis[1] upper bound.
+    Elements are int or float. (Default value = None)
+        xrange (list or tuple of shape (2, 1), optional): Sets the range of the x-axis. (Default value = None)
+        yrange (list or tuple of shape (2, 1), optional): Sets the range of the y-axis. (Default value = None)
+        zrange (list or tuple of shape (2, 1), optional): Sets the range of the z-axis. (Default value = None)
+        plot_edges (bool, Default=False, optional): Whether to plot edges or not. (Default value = False)
+        plot_levels (bool, Default=False, optional): Whether to plot levels or not. (Default value = False)
+        edge_color (str, Default="rgb(50,50,50)", optional): Color of the edges. (Default value = "rgb(50,50,50)")
+        tic_color (str, Default="rgb(50,200,10)", optional): Color of the ticks. (Default value = "rgb(50,200,10)")
+        background_color (str, Default=None, optional): Color of background. (Default value = None)
+        flatshading (bool, Default=False, optional): Whether normal smoothing is applied to the meshes or not. (Default value = False)
+        width (int, Default=800, optional): Width of the plot (in px). (Default value = 800)
+        height (int, Default=800, optional): Height  of the plot (in px). (Default value = 800)
+        camera (dict of str, Default=None, optional): Camera describing center, eye and up direction. (Default value = None)
+        html_output (bool, Default=False, optional): Whether or not to give out as html output. (Default value = False)
+        export_png (str, Default=None, optional): Local file path or file object to write the image to. (Default value = None)
+        scale_png (int or float, optional): Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution. (Default value = 1.0)
+        no_display (bool, Default=False, optional): Whether to plot on display or not. (Default value = False)
+
+    Returns:
+
+    Raises:
+
+    
     """
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/

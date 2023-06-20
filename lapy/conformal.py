@@ -30,19 +30,18 @@ from .utils._imports import import_optional_dependency
 def spherical_conformal_map(tria, use_cholmod=False):
     """Linear method for computing spherical conformal map of a genus-0 closed surface.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        use_cholmod (bool, default=False, optional): Which solver to use:
+    * True : Use Cholesky decomposition from scikit-sparse cholmod.
+    * False: Use spsolve (LU decomposition). (Default value = False)
 
-    Returns
-    -------
-    mapping: array
-        Vertex coordinates (3d) of the spherical conformal parameterization.
+    Returns:
+        array: Vertex coordinates (3d) of the spherical conformal parameterization.
+
+    Raises:
+
+    
     """
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
@@ -184,28 +183,26 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
 def mobius_area_correction_spherical(tria, mapping):
     r"""Find an improved Mobius transformation to reduce distortion.
-
+    
     This helps reducing the area distortion of
     a spherical conformal parameterization using the method in
     Choi et al, SIAM Journal on Imaging Sciences, 2020.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Genus-0 closed triangle mesh.
-    mapping : array
-        Vertex coordinates of the spherical conformal parameterization.
+    Args:
+        tria (TriaMesh): Genus-0 closed triangle mesh.
+        mapping (array): Vertex coordinates of the spherical conformal parameterization.
 
-    Returns
-    -------
-    map_mobius: array
-        Vertex coordinates (3d) of the updated spherical conformal parameterization.
-    result: array
-        Optimal parameters (x) for the Mobius transformation, where
-
+    Returns:
+        array: Vertex coordinates (3d) of the updated spherical conformal parameterization.
+        array: Optimal parameters (x) for the Mobius transformation, where
         .. math::
-            f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
-    """  # noqa: E501
+        f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
+        E501: 
+
+    Raises:
+
+    
+    """
     # Compute the tria areas with normalization
     area_t = tria.tria_areas()
     area_t = area_t / area_t.sum()
@@ -213,6 +210,17 @@ def mobius_area_correction_spherical(tria, mapping):
     z = stereographic(mapping)
 
     def area_map(xx):
+        """
+
+        Args:
+            xx: 
+
+        Returns:
+
+        Raises:
+
+        
+        """
         v = inverse_stereographic(
             ((xx[0] + xx[1] * 1j) * z + (xx[2] + xx[3] * 1j))
             / ((xx[4] + xx[5] * 1j) * z + (xx[6] + xx[7] * 1j))
@@ -222,6 +230,17 @@ def mobius_area_correction_spherical(tria, mapping):
 
     # objective function: mean(abs(log(area_map/area_t)))
     def d_area(xx):
+        """
+
+        Args:
+            xx: 
+
+        Returns:
+
+        Raises:
+
+        
+        """
         a = np.abs(np.log(area_map(xx) / area_t))
         return (a[np.isfinite(a)]).mean()
 
@@ -253,20 +272,19 @@ def mobius_area_correction_spherical(tria, mapping):
 
 
 def beltrami_coefficient(tria, mapping):
-    """Compute the Beltrami coefficient of a mapping.
+    r"""Compute the Beltrami coefficient of a mapping.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Genus-0 closed triangle mesh.
-        Should be planar mapping on complex plane.
-    mapping : array
-        3D coordinates of the spherical conformal parameterization.
+    Args:
+        tria (TriaMesh): Genus-0 closed triangle mesh.
+    Should be planar mapping on complex plane.
+        mapping (array): 3D coordinates of the spherical conformal parameterization.
 
-    Returns
-    -------
-    mu : array
-        Complex Beltrami coefficient per triangle.
+    Returns:
+        array: Complex Beltrami coefficient per triangle.
+
+    Raises:
+
+    
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -314,28 +332,24 @@ def beltrami_coefficient(tria, mapping):
 
 
 def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
-    """Linear Beltrami solver.
+    r"""Linear Beltrami solver.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Genus-0 closed triangle mesh.
-        Should be planar mapping on complex plane.
-    mu : array_like
-        Complex Beltrami coefficients.
-    landmark : array_like
-        Fixed vertex indices.
-    target : array
-        3d array with 2d landmark target coordinates (3rd coordinate is zero).
-    use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+    Args:
+        tria (TriaMesh): Genus-0 closed triangle mesh.
+    Should be planar mapping on complex plane.
+        mu (array_like): Complex Beltrami coefficients.
+        landmark (array_like): Fixed vertex indices.
+        target (array): 3d array with 2d landmark target coordinates (3rd coordinate is zero).
+        use_cholmod (bool, default=False, optional): Which solver to use:
+    * True : Use Cholesky decomposition from scikit-sparse cholmod.
+    * False: Use spsolve (LU decomposition). (Default value = False)
 
-    Returns
-    -------
-    mapping : array
-        3d vertex coordinates of new mapping.
+    Returns:
+        array: 3d vertex coordinates of new mapping.
+
+    Raises:
+
+    
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -412,23 +426,21 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
 
 def _sparse_symmetric_solve(A, b, use_cholmod=False):
-    """Sparse symmetric solver for ``A x = b``.
+    r"""Sparse symmetric solver for ``A x = b``.
 
-    Parameters
-    ----------
-    A : csc_matrix of shape (n, n)
-        Sparse symmetric matrix.
-    b : array of length n
-        Vector for right hand side of equation.
-    use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+    Args:
+        A (csc_matrix of shape (n, n)): Sparse symmetric matrix.
+        b (array of length n): Vector for right hand side of equation.
+        use_cholmod (bool, default=False, optional): Which solver to use:
+    * True : Use Cholesky decomposition from scikit-sparse cholmod.
+    * False: Use spsolve (LU decomposition). (Default value = False)
 
-    Returns
-    -------
-    x: array of length n
-        Solution to  ``A x = b``.
+    Returns:
+        array of length n: Solution to  ``A x = b``.
+
+    Raises:
+
+    
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -449,17 +461,17 @@ def _sparse_symmetric_solve(A, b, use_cholmod=False):
 
 
 def stereographic(u):
-    """Map sphere to complex plane via stereographic projection.
+    r"""Map sphere to complex plane via stereographic projection.
 
-    Parameters
-    ----------
-    u : array of shape (n, 3)
-        Represents the three vertex coordinates.
+    Args:
+        u (array of shape (n, 3)): Represents the three vertex coordinates.
 
-    Returns
-    -------
-    v: array of n complex numbers
-       Stereographic map of u in complex plane.
+    Returns:
+        array of n complex numbers: Stereographic map of u in complex plane.
+
+    Raises:
+
+    
     """
     x = u[:, 0]
     y = u[:, 1]
@@ -471,18 +483,18 @@ def stereographic(u):
 
 
 def inverse_stereographic(u):
-    """Map from complex plane to sphere via inverse stereographic projection.
+    r"""Map from complex plane to sphere via inverse stereographic projection.
 
-    Parameters
-    ----------
-    u : array_like
-        Can be complex array, or two columns (real, img)
-        for coordinates on complex plane.
+    Args:
+        u (array_like): Can be complex array, or two columns (real, img)
+    for coordinates on complex plane.
 
-    Returns
-    -------
-    v: array of shape (n, 3)
-        Coordinates on sphere in 3D.
+    Returns:
+        array of shape (n, 3): Coordinates on sphere in 3D.
+
+    Raises:
+
+    
     """
     if np.iscomplexobj(u):
         x = u.real

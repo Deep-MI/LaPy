@@ -11,15 +11,15 @@ import numpy as np
 def read_gmsh(filename):
     """Load GMSH tetrahedron mesh.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    tet : TetMesh
-        Object of loaded  GMSH tetrahedron mesh.
+    Returns:
+        TetMesh: Object of loaded  GMSH tetrahedron mesh.
+
+    Raises:
+
+    
     """
     extension = os.path.splitext(filename)[1]
     verbose = 1
@@ -112,15 +112,15 @@ def read_gmsh(filename):
 def read_vtk(filename):
     """Load VTK tetrahedron mesh.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    tet : TetMesh
-        Object of loaded  VTK tetrahedron mesh.
+    Returns:
+        TetMesh: Object of loaded  VTK tetrahedron mesh.
+
+    Raises:
+
+    
     """
     verbose = 1
     if verbose > 0:
@@ -199,12 +199,15 @@ def read_vtk(filename):
 def write_vtk(tet, filename):
     """Save VTK file.
 
-    Parameters
-    ----------
-    tet : TetMesh
-        Tetrahedron mesh to save.
-    filename : str
-        Filename to save to.
+    Args:
+        tet (TetMesh): Tetrahedron mesh to save.
+        filename (str): Filename to save to.
+
+    Returns:
+
+    Raises:
+
+    
     """
     # open file
     try:

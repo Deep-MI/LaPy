@@ -19,22 +19,17 @@ from .utils._imports import import_optional_dependency
 def compute_gradient(geom, vfunc):
     """Compute gradient of a vertex function f.
 
-    Parameters
-    ----------
-    geom : TriaMesh or TetMesh
-        Mesh geometry.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        geom (TriaMesh or TetMesh): Mesh geometry.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    tfunc : array
-        3d gradient vector at each element.
+    Returns:
+        array: 3d gradient vector at each element.
 
-    Raises
-    ------
-    ValueError
-        If unknown geometry type.
+    Raises:
+        ValueError: If unknown geometry type.
+
+    
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_gradient(geom, vfunc)
@@ -47,22 +42,17 @@ def compute_gradient(geom, vfunc):
 def compute_divergence(geom, vfunc):
     """Compute divergence of a vertex function f.
 
-    Parameters
-    ----------
-    geom : TriaMesh or TetMesh
-        Mesh geometry.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        geom (TriaMesh or TetMesh): Mesh geometry.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    vfunc : array
-        Scalar function of divergence at vertices.
+    Returns:
+        array: Scalar function of divergence at vertices.
 
-    Raises
-    ------
-    ValueError
-        If unknown geometry type.
+    Raises:
+        ValueError: If unknown geometry type.
+
+    
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_divergence(geom, vfunc)
@@ -75,22 +65,17 @@ def compute_divergence(geom, vfunc):
 def compute_rotated_f(geom, vfunc):
     """Compute function whose level sets are orthgonal to the ones of vfunc.
 
-    Parameters
-    ----------
-    geom : TriaMesh
-        Mesh geometry.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        geom (TriaMesh): Mesh geometry.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    vfunc : array
-        Rotated function at vertices.
+    Returns:
+        array: Rotated function at vertices.
 
-    Raises
-    ------
-    ValueError
-        If unknown geometry type.
+    Raises:
+        ValueError: If unknown geometry type.
+
+    
     """
     if type(geom).__name__ == "TriaMesh":
         return tria_compute_rotated_f(geom, vfunc)
@@ -100,22 +85,21 @@ def compute_rotated_f(geom, vfunc):
 
 def compute_geodesic_f(geom, vfunc):
     """Compute function with normalized gradient (geodesic distance).
-
+    
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat" for triangles.
 
-    Parameters
-    ----------
-    geom : TriaMesh, TetMesh
-        Mesh geometry.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        geom (TriaMesh, TetMesh): Mesh geometry.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    vfunc : array
-        Scalar geodesic function at vertices.
+    Returns:
+        array: Scalar geodesic function at vertices.
+
+    Raises:
+
+    
     """
     gradf = compute_gradient(geom, vfunc)
     # normalize gradient
@@ -133,22 +117,21 @@ def compute_geodesic_f(geom, vfunc):
 
 def tria_compute_geodesic_f(tria, vfunc):
     """Compute function with normalized gradient (geodesic distance).
-
+    
     Computes gradient, normalizes it and computes function with this normalized
     gradient by solving the Poisson equation with the divergence of grad.
     This idea is also described in the paper "Geodesics in Heat".
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    vfunc: array
-        Scalar geodesic function at vertices.
+    Returns:
+        array: Scalar geodesic function at vertices.
+
+    Raises:
+
+    
     """
     gradf = tria_compute_gradient(tria, vfunc)
     # normalize gradient
@@ -168,25 +151,22 @@ def tria_compute_geodesic_f(tria, vfunc):
 # note , numexpr could speed up the following functions if necessary
 def tria_compute_gradient(tria, vfunc):
     r"""Compute gradient of a vertex function f (for each triangle).
-
+    
     .. math::
         grad(f) &= [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A) \\
                 &= [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
-
+    
     for triangle (vi,vj,vk) with area A, where (.)' is 90 degrees rotated
     edge, which is equal to cross(n,vec).
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    tfunc: array
-        3d gradient vector at triangles.
+    Returns:
+        array: 3d gradient vector at triangles.
+
+    Raises:
 
     Notes
     -----
@@ -221,23 +201,20 @@ def tria_compute_gradient(tria, vfunc):
 
 
 def tria_compute_divergence(tria, tfunc):
-    """Compute integrated divergence of a 3d triangle function f (for each vertex).
-
+    r"""Compute integrated divergence of a 3d triangle function f (for each vertex).
+    
     Divergence is the flux density leaving or entering a point.
     Note: this is the integrated divergence, you may want to multiply
     with B^-1 to get back the function in some applications
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    tfunc : array
-        3d vector field on triangles.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        tfunc (array): 3d vector field on triangles.
 
-    Returns
-    -------
-    vfunc: array
-        Scalar function of divergence at vertices.
+    Returns:
+        array: Scalar function of divergence at vertices.
+
+    Raises:
 
     Notes
     -----
@@ -280,8 +257,8 @@ def tria_compute_divergence(tria, tfunc):
 
 
 def tria_compute_divergence2(tria, tfunc):
-    """Compute integrated divergence of a 3d triangle function f (for each vertex).
-
+    r"""Compute integrated divergence of a 3d triangle function f (for each vertex).
+    
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer edges of the 1-ring triangles
@@ -289,17 +266,14 @@ def tria_compute_divergence2(tria, tfunc):
     Note: this is the integrated divergence, you may want to multiply
     with B^-1 to get back the function in some applications
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    tfunc : array
-        3d vector field on triangles.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        tfunc (array): 3d vector field on triangles.
 
-    Returns
-    -------
-    vfunc: array
-        Scalar function of divergence at vertices.
+    Returns:
+        array: Scalar function of divergence at vertices.
+
+    Raises:
 
     Notes
     -----
@@ -333,22 +307,19 @@ def tria_compute_divergence2(tria, tfunc):
 
 
 def tria_compute_rotated_f(tria, vfunc):
-    """Compute function whose level sets are orthgonal to the ones of vfunc.
-
+    r"""Compute function whose level sets are orthgonal to the ones of vfunc.
+    
     This is done by rotating the gradient around the normal by 90 degrees,
     then solving the Poisson equations with the divergence of rotated grad.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    vfunc: array
-        Rotated scalar function at vertices.
+    Returns:
+        array: Rotated scalar function at vertices.
+
+    Raises:
 
     Notes
     -----
@@ -373,8 +344,8 @@ def tria_compute_rotated_f(tria, vfunc):
 def tria_mean_curvature_flow(
     tria, max_iter=30, stop_eps=1e-13, step=1.0, use_cholmod=False
 ):
-    """Flow a triangle mesh along the mean curvature normal.
-
+    r"""Flow a triangle mesh along the mean curvature normal.
+    
     mean_curvature_flow iteratively flows a triangle mesh along mean curvature
     normal (non-singular, see Kazhdan 2012).
     This uses the algorithm described in Kazhdan 2012 "Can mean curvature flow be
@@ -383,25 +354,19 @@ def tria_mean_curvature_flow(
     steps. It will normalize surface area of the mesh and translate the barycenter
     to the origin. Closed meshes will map to the unit sphere.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    max_iter : int, default=30
-        Maximal number of steps.
-    stop_eps : float, default=1e-13
-        Stopping threshold.
-    step : float, default=1.0
-        Euler step size.
-    use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        max_iter (int, default=30, optional): Maximal number of steps. (Default value = 30)
+        stop_eps (float, default=1e-13, optional): Stopping threshold. (Default value = 1e-13)
+        step (float, default=1.0, optional): Euler step size. (Default value = 1.0)
+        use_cholmod (bool, default=False, optional): Which solver to use:
+    * True : Use Cholesky decomposition from scikit-sparse cholmod.
+    * False: Use spsolve (LU decomposition). (Default value = False)
 
-    Returns
-    -------
-    tria : TriaMesh
-        Triangle mesh after flow.
+    Returns:
+        TriaMesh: Triangle mesh after flow.
+
+    Raises:
 
     Notes
     -----
@@ -450,8 +415,8 @@ def tria_mean_curvature_flow(
 
 
 def tria_spherical_project(tria, flow_iter=3, debug=False):
-    """Compute the first 3 non-constant eigenfunctions and project the spectral embedding onto a sphere.
-
+    r"""Compute the first 3 non-constant eigenfunctions and project the spectral embedding onto a sphere.
+    
     Computes the first three non-constant eigenfunctions
     and then projects the spectral embedding onto a sphere. This works
     when the first functions have a single closed zero level set,
@@ -460,19 +425,15 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     according to the axes that they are aligned with for the special
     case of brain surfaces in FreeSurfer coordinates.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh.
-    flow_iter : int, default=3
-        Mean curv flow iterations (3 should be enough).
-    debug : bool, default=False
-        Prints debug values if True.
+    Args:
+        tria (TriaMesh): Triangle mesh.
+        flow_iter (int, default=3, optional): Mean curv flow iterations (3 should be enough). (Default value = 3)
+        debug (bool, default=False, optional): Prints debug values if True. (Default value = False)
 
-    Returns
-    -------
-    tria: TriaMesh
-        Triangle mesh.
+    Returns:
+        TriaMesh: Triangle mesh.
+
+    Raises:
 
     Notes
     -----
@@ -486,6 +447,17 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     # sub-function to compute flipped area of trias where normal
     # points towards origin, meaningful for the sphere, centered at zero
     def get_flipped_area(triax):
+        """
+
+        Args:
+            triax: 
+
+        Returns:
+
+        Raises:
+
+        
+        """
         vx1 = triax.v[triax.t[:, 0], :]
         vx2 = triax.v[triax.t[:, 1], :]
         vx3 = triax.v[triax.t[:, 2], :]
@@ -660,7 +632,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
 def tet_compute_gradient(tet, vfunc):
     r"""Compute gradient of a vertex function f (for each tetra).
-
+    
     For a tetrahedron (vi,vj,vk,vh) with volume V we have:
     
     .. math::
@@ -672,17 +644,14 @@ def tet_compute_gradient(tet, vfunc):
                 &   + f_k (vi-vh) x (vj-vh) \\
                 &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
 
-    Parameters
-    ----------
-    tet : TetMesh
-        Tetraheral mesh.
-    vfunc : array
-        Scalar function at vertices.
+    Args:
+        tet (TetMesh): Tetraheral mesh.
+        vfunc (array): Scalar function at vertices.
 
-    Returns
-    -------
-    tfunc : array of shape (n, 3)
-        3d gradient vector at tetras.
+    Returns:
+        array of shape (n, 3): 3d gradient vector at tetras.
+
+    Raises:
 
     Notes
     -----
@@ -727,24 +696,21 @@ def tet_compute_gradient(tet, vfunc):
 
 
 def tet_compute_divergence(tet, tfunc):
-    """Compute integrated divergence of a 3d tetra function f (for each vertex).
-
+    r"""Compute integrated divergence of a 3d tetra function f (for each vertex).
+    
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer faces of the 1-ring tetras
     around a vertex. Summing < tfunc , n_tria_oposite_v >
 
-    Parameters
-    ----------
-    tet : TetMesh
-        Tetrahedral mesh.
-    tfunc : array
-        3d vector field on tets.
+    Args:
+        tet (TetMesh): Tetrahedral mesh.
+        tfunc (array): 3d vector field on tets.
 
-    Returns
-    -------
-    vfunc: array
-        Scalar function of divergence at vertices.
+    Returns:
+        array: Scalar function of divergence at vertices.
+
+    Raises:
 
     Notes
     -----

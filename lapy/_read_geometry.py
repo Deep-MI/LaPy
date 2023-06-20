@@ -42,15 +42,15 @@ import numpy as np
 def _fread3(fobj):
     """Read a 3-byte int from an open binary file object.
 
-    Parameters
-    ----------
-    fobj : file
-        File descriptor
+    Args:
+        fobj (file): File descriptor
 
-    Returns
-    -------
-    n : int
-        A 3 byte int
+    Returns:
+        int: A 3 byte int
+
+    Raises:
+
+    
     """
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
     return (b1 << 16) + (b2 << 8) + b3
@@ -59,15 +59,15 @@ def _fread3(fobj):
 def _read_volume_info(fobj):
     """Read the footer from a surface file.
 
-    Parameters
-    ----------
-    fobj : file
-        File descriptor
+    Args:
+        fobj (file): File descriptor
 
-    Returns
-    -------
-    volume_info : array
-        Key-value pairs found in the file.
+    Returns:
+        array: Key-value pairs found in the file.
+
+    Raises:
+
+    
     """
     volume_info = OrderedDict()
     head = np.fromfile(fobj, ">i4", 1)
@@ -107,37 +107,32 @@ def _read_volume_info(fobj):
 def read_geometry(filepath, read_metadata=False, read_stamp=False):
     """Read a triangular format Freesurfer surface mesh.
 
-    Parameters
-    ----------
-    filepath : str
-        Path to surface file.
-    read_metadata : bool, optional
-        If True, read and return metadata as key-value pairs.
-        Valid keys:
-        * 'head' : array of int
-        * 'valid' : str
-        * 'filename' : str
-        * 'volume' : array of int, shape (3,)
-        * 'voxelsize' : array of float, shape (3,)
-        * 'xras' : array of float, shape (3,)
-        * 'yras' : array of float, shape (3,)
-        * 'zras' : array of float, shape (3,)
-        * 'cras' : array of float, shape (3,)
-    read_stamp : bool, optional
-        Return the comment from the file
+    Args:
+        filepath (str): Path to surface file.
+        read_metadata (bool, optional, optional): If True, read and return metadata as key-value pairs.
+    Valid keys:
+    * 'head' : array of int
+    * 'valid' : str
+    * 'filename' : str
+    * 'volume' : array of int, shape (3,)
+    * 'voxelsize' : array of float, shape (3,)
+    * 'xras' : array of float, shape (3,)
+    * 'yras' : array of float, shape (3,)
+    * 'zras' : array of float, shape (3,)
+    * 'cras' : array of float, shape (3,) (Default value = False)
+        read_stamp (bool, optional, optional): Return the comment from the file (Default value = False)
 
-    Returns
-    -------
-    coords : numpy array
-        nvtx x 3 array of vertex (x, y, z) coordinates.
-    faces : numpy array
-        nfaces x 3 array of defining mesh triangles.
-    volume_info : OrderedDict
-        Returned only if `read_metadata` is True.  Key-value pairs found in the
+    Returns:
+        numpy array: nvtx x 3 array of vertex (x, y, z) coordinates.
+        numpy array: nfaces x 3 array of defining mesh triangles.
+        OrderedDict: Returned only if `read_metadata` is True.  Key-value pairs found in the
         geometry file.
-    create_stamp : str
-        Returned only if `read_stamp` is True.  The comment added by the
+        str: Returned only if `read_stamp` is True.  The comment added by the
         program that saved the file.
+
+    Raises:
+
+    
     """
     volume_info = OrderedDict()
 

@@ -9,15 +9,15 @@ import numpy as np
 def read_fssurf(filename):
     """Load triangle mesh from FreeSurfer surface geometry file.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    TriaMesh
-        Loaded triangle mesh.
+    Returns:
+        TriaMesh: Loaded triangle mesh.
+
+    Raises:
+
+    
     """
     verbose = 1
     if verbose > 0:
@@ -40,15 +40,15 @@ def read_fssurf(filename):
 def read_off(filename):
     """Load triangle mesh from OFF txt file.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    TriaMesh
-        Loaded triangle mesh.
+    Returns:
+        TriaMesh: Loaded triangle mesh.
+
+    Raises:
+
+    
     """
     verbose = 1
     if verbose > 0:
@@ -96,15 +96,15 @@ def read_off(filename):
 def read_vtk(filename):
     """Load triangle mesh from VTK txt file.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    TriaMesh
-        Loaded triangle mesh.
+    Returns:
+        TriaMesh: Loaded triangle mesh.
+
+    Raises:
+
+    
     """
     verbose = 1
     if verbose > 0:
@@ -207,23 +207,17 @@ def read_vtk(filename):
 def read_gmsh(filename):
     """Load GMSH tetra mesh ASCII Format.
 
-    Parameters
-    ----------
-    filename : str
-        Filename to load.
+    Args:
+        filename (str): Filename to load.
 
-    Returns
-    -------
-    points : array
-        List of points.
-    cells : array_like
-        List of cells.
-    point_data : array_like
-        Data of points.
-    cell_data : aray_like
-        Data of cells.
-    field_data : array_like
-        Data of fields.
+    Returns:
+        array: List of points.
+        array_like: List of cells.
+        array_like: Data of points.
+        aray_like: Data of cells.
+        array_like: Data of fields.
+
+    Raises:
 
     Notes
     -----
@@ -471,12 +465,15 @@ def read_gmsh(filename):
 def write_vtk(tria, filename):
     """Save VTK file.
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh to save.
-    filename : str
-        Filename to save to.
+    Args:
+        tria (TriaMesh): Triangle mesh to save.
+        filename (str): Filename to save to.
+
+    Returns:
+
+    Raises:
+
+    
     """
     # open file
     try:
@@ -511,12 +508,15 @@ def write_vtk(tria, filename):
 def write_fssurf(tria, filename):
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 
-    Parameters
-    ----------
-    tria : TriaMesh
-        Triangle mesh to save.
-    filename : str
-        Filename to save to.
+    Args:
+        tria (TriaMesh): Triangle mesh to save.
+        filename (str): Filename to save to.
+
+    Returns:
+
+    Raises:
+
+    
     """
     # open file
     try:

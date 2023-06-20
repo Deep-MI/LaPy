@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
-    "numpydoc",
+    "sphinxcontrib.napoleon",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_design",

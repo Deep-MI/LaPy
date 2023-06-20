@@ -31,9 +31,9 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
     Args:
         tria (TriaMesh): Triangle mesh.
-        use_cholmod (bool, default=False, optional): Which solver to use:
-    * True : Use Cholesky decomposition from scikit-sparse cholmod.
-    * False: Use spsolve (LU decomposition). (Default value = False)
+        use_cholmod (bool, optional): Which solver to use:
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition). (Default value = False)
 
     Returns:
         array: Vertex coordinates (3d) of the spherical conformal parameterization.
@@ -264,7 +264,7 @@ def beltrami_coefficient(tria, mapping):
 
     Args:
         tria (TriaMesh): Genus-0 closed triangle mesh.
-    Should be planar mapping on complex plane.
+            Should be planar mapping on complex plane.
         mapping (array): 3D coordinates of the spherical conformal parameterization.
 
     Returns:
@@ -461,7 +461,7 @@ def inverse_stereographic(u):
 
     Args:
         u (array_like): Can be complex array, or two columns (real, img)
-    for coordinates on complex plane.
+            for coordinates on complex plane.
 
     Returns:
         array of shape (n, 3): Coordinates on sphere in 3D.

@@ -27,10 +27,6 @@ def diagonal(t, x, evecs, evals, n):
 
     Returns:
         array: Matrix, rows: vertices selected in x, cols: times in t.
-
-    Raises:
-
-
     """
     # maybe add code to check dimensions of input and flip axis if necessary
     h = np.matmul(evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t)))
@@ -55,10 +51,6 @@ def kernel(t, vfix, evecs, evals, n):
 
     Returns:
         array: Matrix m rows: all vertices, cols: times in t.
-
-    Raises:
-
-
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
     h = np.matmul(evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n]))
@@ -84,10 +76,6 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
 
     Returns:
         array of shape (n, 1): Heat diffusion at vertices.
-
-    Raises:
-
-
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)

@@ -42,10 +42,6 @@ class TetMesh:
 
         Returns:
             TetMesh: Object of loaded GMSH tetrahedron mesh.
-
-        Raises:
-
-
         """
         return io.read_gmsh(filename)
 
@@ -58,10 +54,6 @@ class TetMesh:
 
         Returns:
             TetMesh: Object of loaded VTK tetrahedron mesh.
-
-        Raises:
-
-
         """
         return io.read_vtk(filename)
 
@@ -70,12 +62,6 @@ class TetMesh:
 
         Args:
             filename (str): Filename to save to.
-
-        Returns:
-
-        Raises:
-
-
         """
         io.write_vtk(self, filename)
 
@@ -87,14 +73,8 @@ class TetMesh:
         Inner edges are usually 3 or larger, boundary, 2 or 1.
         Works on tetras only.
 
-        Args:
-
         Returns:
             csc_matrix: Symmetric adjacency matrix as csc sparse matrix.
-
-        Raises:
-
-
         """
         t1 = self.t[:, 0]
         t2 = self.t[:, 1]
@@ -114,14 +94,8 @@ class TetMesh:
 
         (same implementation as in `~lapy.TriaMesh`)
 
-        Args:
-
         Returns:
             bool: Whether vertex list has more vertices than tetra or not.
-
-        Raises:
-
-
         """
         vnum = np.max(self.v.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
@@ -134,14 +108,8 @@ class TetMesh:
         so that v0,v1,v2 are oriented counterclockwise when looking from above,
         and v3 is on top of that triangle.
 
-        Args:
-
         Returns:
             bool: True if ``max(adj_directed)=1``.
-
-        Raises:
-
-
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t0 = self.t[:, 0]
@@ -174,14 +142,8 @@ class TetMesh:
     def avg_edge_length(self):
         """Get average edge lengths in tet mesh.
 
-        Args:
-
         Returns:
             float: Average edge length.
-
-        Raises:
-
-
         """
         # get only upper off-diag elements from symmetric adj matrix
         triadj = sparse.triu(self.adj_sym, 1, format="coo")
@@ -212,10 +174,6 @@ class TetMesh:
             TriaMesh: TriaMesh of boundary (potentially >1 components).
             array: List of tria function values (only returned if ``tetfunc`` is
                 provided).
-
-        Raises:
-
-
         """
         from . import TriaMesh
 
@@ -253,15 +211,9 @@ class TetMesh:
         Will update v and t in mesh.
         Same implementation as in `~lapy.TriaMesh`.
 
-        Args:
-
         Returns:
             array: Indices (from original list) of kept vertices.
             array: Indices of deleted (unused) vertices.
-
-        Raises:
-
-
         """
         tflat = self.t.reshape(-1)
         vnum = np.max(self.v.shape)
@@ -294,14 +246,8 @@ class TetMesh:
         v0,v1,v2 are oriented counterclockwise when looking from above,
         and v3 is on top of that triangle.
 
-        Args:
-
         Returns:
             int: Number of re-oriented tetras.
-
-        Raises:
-
-
         """
         # Compute vertex coordinates and a difference vector for each tetra:
         t0 = self.t[:, 0]

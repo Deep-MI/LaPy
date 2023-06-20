@@ -15,10 +15,6 @@ def read_vfunc(filename):
 
     Returns:
         array: List of vfunc parameters.
-
-    Raises:
-
-
     """
     import re
 
@@ -46,11 +42,7 @@ def read_ev(filename):
 
     Returns:
         dict: Dictionary of eigenvalues, eigenvectors (optional), and associated
-        information.
-
-    Raises:
-
-
+            information.
     """
     # open file
     try:
@@ -179,13 +171,7 @@ def write_ev(filename, d):
     Args:
         filename (str): Filename to save to.
         d (dict): Dictionary of eigenvalues, eigenvectors (optional), and associated
-    information.
-
-    Returns:
-
-    Raises:
-
-
+            information.
     """
     # open file
     try:
@@ -278,12 +264,6 @@ def write_vfunc(filename, vfunc):
     Args:
         filename (str): Filename to save to.
         vfunc (array_like): List of vfunc parameters.
-
-    Returns:
-
-    Raises:
-
-
     """
     try:
         f = open(filename, "w")

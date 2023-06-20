@@ -205,7 +205,7 @@ def mobius_area_correction_spherical(tria, mapping):
     z = stereographic(mapping)
 
     def area_map(xx):
-        """Compute normalized areas for inverse stereographic projection
+        """Compute normalized areas for inverse stereographic projection.
 
         Args:
             xx: Parameters of projection.

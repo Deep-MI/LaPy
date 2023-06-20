@@ -22,14 +22,8 @@ from . import TetMesh
 def _get_color_levels():
     """Return a pre-set colorscale.
 
-    Args:
-
     Returns:
         array_like of shape (38, 2): Vector color for different levels.
-
-    Raises:
-
-
     """
     color1 = "rgb(55, 155, 255)"
     color2 = "rgb(255, 255, 0)"
@@ -85,10 +79,6 @@ def _get_colorscale(vmin, vmax):
 
     Returns:
         array_like of shape (2,2): Colorscale map.
-
-    Raises:
-
-
     """
     if vmin > vmax:
         raise ValueError("incorrect relation between vmin and vmax")
@@ -148,10 +138,6 @@ def _get_colorval(t, colormap):
 
     Returns:
         str: Interpolated color for this value of t.
-
-    Raises:
-
-
     """
     if t == 0:
         return colormap[0][1]
@@ -190,10 +176,6 @@ def _map_z2color(zval, colormap, zmin, zmax):
 
     Returns:
         str: Corresponding color of the zval.
-
-    Raises:
-
-
     """
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
@@ -274,12 +256,6 @@ def plot_tet_mesh(
         caxis (list or tuple of shape (2, 1):, optional): Sets the bound of the color
             domain. caxis[0] is lower bound caxis[1] upper bound. Elements are int or
             float. (Default value = None)
-
-    Returns:
-
-    Raises:
-
-
     """
     if type(tetra).__name__ != "TetMesh":
         raise ValueError("plot_tet_mesh works only on TetMesh class")
@@ -433,12 +409,6 @@ def plot_tria_mesh(
             >1.0 increase resolution; <1.0 decrease resolution. (Default value = 1.0)
         no_display (bool, optional): Whether to plot on display or not.
             (Default value = False)
-
-    Returns:
-
-    Raises:
-
-
     """
     # interesting example codes:
     # https://plot.ly/~empet/14749/mesh3d-with-intensities-and-flatshading/#/

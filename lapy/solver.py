@@ -39,8 +39,6 @@ class Solver:
             If it can not be found, an error will be thrown. If False, will use
             slower LU decomposition. (Default: False)
 
-    Returns:
-
     Raises:
         ValueError: If geometry is neither of type TriaMesh nor TetMesh.
 
@@ -342,8 +340,6 @@ class Solver:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
             csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
-        Raises:
-
         Note:
             This static method can be used to solve:
             * sparse generalized Eigenvalue problem: ``A x = lambda B x``
@@ -604,10 +600,6 @@ class Solver:
             array of shape (N, k): Array representing the k eigenvectors. The column
                 ``eigenvectors[:, i]`` is the eigenvector corresponding to
                 ``eigenvalues[i]``.
-
-        Raises:
-
-
         """
         from scipy.sparse.linalg import LinearOperator, eigsh
 
@@ -657,8 +649,6 @@ class Solver:
 
         Returns:
             array: Array with vertex value of the solution.
-
-        Raises:
 
         Note:
             ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or

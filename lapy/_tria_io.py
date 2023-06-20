@@ -14,10 +14,6 @@ def read_fssurf(filename):
 
     Returns:
         TriaMesh: Loaded triangle mesh.
-
-    Raises:
-
-
     """
     verbose = 1
     if verbose > 0:
@@ -45,10 +41,6 @@ def read_off(filename):
 
     Returns:
         TriaMesh: Loaded triangle mesh.
-
-    Raises:
-
-
     """
     verbose = 1
     if verbose > 0:
@@ -101,10 +93,6 @@ def read_vtk(filename):
 
     Returns:
         TriaMesh: Loaded triangle mesh.
-
-    Raises:
-
-
     """
     verbose = 1
     if verbose > 0:
@@ -217,14 +205,11 @@ def read_gmsh(filename):
         aray_like: Data of cells.
         array_like: Data of fields.
 
-    Raises:
-
-    Notes
-    -----
-    http://geuz.org/gmsh/doc/texinfo/gmsh.html#MSH-ASCII-file-format
-    .. moduleauthor:: Nico Schloemer <nico.schloemer@gmail.com>
-    LICENSE MIT
-    https://github.com/nschloe/meshio
+    Note:
+        http://geuz.org/gmsh/doc/texinfo/gmsh.html#MSH-ASCII-file-format
+        .. moduleauthor:: Nico Schloemer <nico.schloemer@gmail.com>
+        LICENSE MIT
+        https://github.com/nschloe/meshio
     """
     import logging
     import struct
@@ -468,12 +453,6 @@ def write_vtk(tria, filename):
     Args:
         tria (TriaMesh): Triangle mesh to save.
         filename (str): Filename to save to.
-
-    Returns:
-
-    Raises:
-
-
     """
     # open file
     try:
@@ -511,12 +490,6 @@ def write_fssurf(tria, filename):
     Args:
         tria (TriaMesh): Triangle mesh to save.
         filename (str): Filename to save to.
-
-    Returns:
-
-    Raises:
-
-
     """
     # open file
     try:

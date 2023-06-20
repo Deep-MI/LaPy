@@ -38,7 +38,6 @@ def import_optional_dependency(
     Raises:
         ImportError: dependency not found; see raise_error
 
-
     """
 
     package_name = INSTALL_MAPPING.get(name)

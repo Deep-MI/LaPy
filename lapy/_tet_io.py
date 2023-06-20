@@ -16,10 +16,6 @@ def read_gmsh(filename):
 
     Returns:
         TetMesh: Object of loaded  GMSH tetrahedron mesh.
-
-    Raises:
-
-
     """
     extension = os.path.splitext(filename)[1]
     verbose = 1
@@ -117,10 +113,6 @@ def read_vtk(filename):
 
     Returns:
         TetMesh: Object of loaded  VTK tetrahedron mesh.
-
-    Raises:
-
-
     """
     verbose = 1
     if verbose > 0:
@@ -202,12 +194,6 @@ def write_vtk(tet, filename):
     Args:
         tet (TetMesh): Tetrahedron mesh to save.
         filename (str): Filename to save to.
-
-    Returns:
-
-    Raises:
-
-
     """
     # open file
     try:

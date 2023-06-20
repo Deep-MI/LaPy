@@ -47,10 +47,6 @@ def _fread3(fobj):
 
     Returns:
         int: A 3 byte int
-
-    Raises:
-
-
     """
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
     return (b1 << 16) + (b2 << 8) + b3
@@ -64,10 +60,6 @@ def _read_volume_info(fobj):
 
     Returns:
         array: Key-value pairs found in the file.
-
-    Raises:
-
-
     """
     volume_info = OrderedDict()
     head = np.fromfile(fobj, ">i4", 1)
@@ -131,10 +123,6 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
             found in the geometry file.
         str: Returned only if `read_stamp` is True.  The comment added by the
             program that saved the file.
-
-    Raises:
-
-
     """
     volume_info = OrderedDict()
 

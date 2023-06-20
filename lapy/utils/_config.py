@@ -16,12 +16,6 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
             Can be None to use :data:`sys.stdout`. (Default value = None)
         developer (bool, optional): If True, display information about optional
             dependencies. (Default value = False)
-
-    Returns:
-
-    Raises:
-
-
     """
 
     ljust = 26
@@ -78,12 +72,6 @@ def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
         out (Callable): output function
         ljust (int): length of returned string
         dependencies (List[str]): list of dependencies
-
-    Returns:
-
-    Raises:
-
-
     """
 
     for dep in dependencies:

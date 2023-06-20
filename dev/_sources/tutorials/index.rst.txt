@@ -4,7 +4,7 @@ Tutorials
 Here you can find Notebooks with examples highlighting some of LaPy's functionality.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     examples/Test_TriaMesh.ipynb
     examples/Test_TetMesh.ipynb

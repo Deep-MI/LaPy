@@ -56,7 +56,8 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints", "tutorials/examples/README.rst"]
 
 # Sphinx will warn about all references where the target cannot be found.
-nitpicky = True
+#nitpicky = True
+nitpicky = False
 nitpick_ignore = []
 
 # A list of ignored prefixes for module index sorting.

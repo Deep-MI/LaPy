@@ -37,10 +37,6 @@ def spherical_conformal_map(tria, use_cholmod=False):
 
     Returns:
         array: Vertex coordinates (3d) of the spherical conformal parameterization.
-
-    Raises:
-
-
     """
     # Check whether the input mesh is spherical topology (genus-0)
     if tria.euler() != 2:
@@ -195,13 +191,11 @@ def mobius_area_correction_spherical(tria, mapping):
         array: Vertex coordinates (3d) of the updated spherical conformal
             parameterization.
         array: Optimal parameters (x) for the Mobius transformation, where
-        .. math::
-            f(z) = \frac{az+b}{cz+d}
-                 = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}
+
+            .. math::
+                f(z) = \frac{az+b}{cz+d}
+                     = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}
                         {(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
-
-    Raises:
-
 
     """
     # Compute the tria areas with normalization
@@ -211,16 +205,13 @@ def mobius_area_correction_spherical(tria, mapping):
     z = stereographic(mapping)
 
     def area_map(xx):
-        """
+        """Compute normalized areas for inverse stereographic projection
 
         Args:
-            xx:
+            xx: Parameters of projection.
 
         Returns:
-
-        Raises:
-
-
+            array: Normalized area map.
         """
         v = inverse_stereographic(
             ((xx[0] + xx[1] * 1j) * z + (xx[2] + xx[3] * 1j))
@@ -229,18 +220,14 @@ def mobius_area_correction_spherical(tria, mapping):
         area_v = TriaMesh(v, tria.t).tria_areas()
         return area_v / area_v.sum()
 
-    # objective function: mean(abs(log(area_map/area_t)))
     def d_area(xx):
-        """
+        """Objective function: mean(abs(log(area_map/area_t))).
 
         Args:
-            xx:
+            xx: Parameters of projection.
 
         Returns:
-
-        Raises:
-
-
+            float: Mean of abs log normalized area map.
         """
         a = np.abs(np.log(area_map(xx) / area_t))
         return (a[np.isfinite(a)]).mean()
@@ -282,10 +269,6 @@ def beltrami_coefficient(tria, mapping):
 
     Returns:
         array: Complex Beltrami coefficient per triangle.
-
-    Raises:
-
-
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -349,10 +332,6 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
 
     Returns:
         array: 3d vertex coordinates of new mapping.
-
-    Raises:
-
-
     """
     # here we should be in the plane
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
@@ -440,10 +419,6 @@ def _sparse_symmetric_solve(A, b, use_cholmod=False):
 
     Returns:
         array of length n: Solution to  ``A x = b``.
-
-    Raises:
-
-
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -471,10 +446,6 @@ def stereographic(u):
 
     Returns:
         array of n complex numbers: Stereographic map of u in complex plane.
-
-    Raises:
-
-
     """
     x = u[:, 0]
     y = u[:, 1]
@@ -494,10 +465,6 @@ def inverse_stereographic(u):
 
     Returns:
         array of shape (n, 3): Coordinates on sphere in 3D.
-
-    Raises:
-
-
     """
     if np.iscomplexobj(u):
         x = u.real

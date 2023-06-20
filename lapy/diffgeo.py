@@ -97,9 +97,6 @@ def compute_geodesic_f(geom, vfunc):
     Returns:
         array: Scalar geodesic function at vertices.
 
-    Raises:
-
-
     """
     gradf = compute_gradient(geom, vfunc)
     # normalize gradient
@@ -129,9 +126,6 @@ def tria_compute_geodesic_f(tria, vfunc):
     Returns:
         array: Scalar geodesic function at vertices.
 
-    Raises:
-
-
     """
     gradf = tria_compute_gradient(tria, vfunc)
     # normalize gradient
@@ -152,6 +146,8 @@ def tria_compute_geodesic_f(tria, vfunc):
 def tria_compute_gradient(tria, vfunc):
     r"""Compute gradient of a vertex function f (for each triangle).
     
+    The gradient is computed as:
+
     .. math::
         grad(f) &= [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A) \\
                 &= [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
@@ -165,8 +161,6 @@ def tria_compute_gradient(tria, vfunc):
 
     Returns:
         array: 3d gradient vector at triangles.
-
-    Raises:
 
     Note:
         Numexpr could speed up this functions if necessary.
@@ -212,8 +206,6 @@ def tria_compute_divergence(tria, tfunc):
 
     Returns:
         array: Scalar function of divergence at vertices.
-
-    Raises:
 
     Note:
         Numexpr could speed up this functions if necessary.
@@ -271,8 +263,6 @@ def tria_compute_divergence2(tria, tfunc):
     Returns:
         array: Scalar function of divergence at vertices.
 
-    Raises:
-
     Note:
         Numexpr could speed-up this functions if necessary.
     """
@@ -315,8 +305,6 @@ def tria_compute_rotated_f(tria, vfunc):
 
     Returns:
         array: Rotated scalar function at vertices.
-
-    Raises:
 
     Note:
         Numexpr could speed up this functions if necessary.
@@ -363,8 +351,6 @@ def tria_mean_curvature_flow(
 
     Returns:
         TriaMesh: Triangle mesh after flow.
-
-    Raises:
 
     Note:
         Numexpr could speed up this functions if necessary.
@@ -432,8 +418,6 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     Returns:
         TriaMesh: Triangle mesh.
 
-    Raises:
-
     Note:
         Numexpr could speed up this functions if necessary.
     """  # noqa: E501
@@ -442,19 +426,16 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if not tria.is_closed():
         raise ValueError("Error: Can only project closed meshes!")
 
-    # sub-function to compute flipped area of trias where normal
-    # points towards origin, meaningful for the sphere, centered at zero
     def get_flipped_area(triax):
-        """
+        """Compute flipped area of trias where normal points towards origin.
+
+        Meaningful for the sphere, centered at zero.
 
         Args:
-            triax:
+            triax: TriaMesh
 
         Returns:
-
-        Raises:
-
-
+            array: list of tria areas
         """
         vx1 = triax.v[triax.t[:, 0], :]
         vx2 = triax.v[triax.t[:, 1], :]
@@ -649,8 +630,6 @@ def tet_compute_gradient(tet, vfunc):
     Returns:
         array of shape (n, 3): 3d gradient vector at tetras.
 
-    Raises:
-
     Note:
         Numexpr could speed up this functions if necessary.
         Good background to read:
@@ -706,8 +685,6 @@ def tet_compute_divergence(tet, tfunc):
 
     Returns:
         array: Scalar function of divergence at vertices.
-
-    Raises:
 
     Note:
         This is the integrated divergence, you may want to multiply

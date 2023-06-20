@@ -142,7 +142,7 @@ extend_skip_glob = [
 ]
 
 [tool.pydocstyle]
-convention = 'numpy'
+convention = 'google'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
 match = '^(?!setup|__init__|test_).*\.py'
 match-dir = '^lapy.*'

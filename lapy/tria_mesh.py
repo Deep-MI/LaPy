@@ -86,10 +86,6 @@ class TriaMesh:
 
         Returns:
             TriaMesh: Loaded triangle mesh.
-
-        Raises:
-
-
         """
         return io.read_vtk(filename)
 
@@ -98,12 +94,6 @@ class TriaMesh:
 
         Args:
             filename (str): Filename to save to.
-
-        Returns:
-
-        Raises:
-
-
         """
         io.write_vtk(self, filename)
 

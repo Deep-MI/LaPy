@@ -481,8 +481,6 @@ class Solver:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
             csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
-        Raises:
-
         Note:
             This static method can be used to solve:
             * sparse generalized Eigenvalue problem: ``A x = lambda B x``

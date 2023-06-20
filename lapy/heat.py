@@ -13,7 +13,7 @@ from .utils._imports import import_optional_dependency
 
 
 def diagonal(t, x, evecs, evals, n):
-    """Compute heat kernel diagonal ( K(t,x,x,) ).
+    """Compute diagnoal of the heat kernel: K(t,x,x,).
 
     For a given time t (can be a vector)
     using only the first n smallest eigenvalues and eigenvectors.

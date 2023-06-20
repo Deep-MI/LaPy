@@ -11,16 +11,16 @@ class TetMesh:
     with core functionality using sparse matrices internally (Scipy).
 
     Args:
+        v (array_like): List of lists of 3 float coordinates.
+        t (array_like): List of lists of 4 int of indices (>=0) into ``v`` array.
+            Ordering is important: so that t0, t1, t2 are oriented
+            counterclockwise when looking from above, and t3 is
+            on top of that triangle.
 
-    Returns:
-
-    Raises:
-
-    Notes
-    -----
-    The class has static class methods to read tetrahera meshes from
-    `GMSH <https://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format>`_
-    and `VTK <https://examples.vtk.org/site/VTKFileFormats/>`_ files.
+    Note:
+        The class has static class methods to read tetrahera meshes from
+        `GMSH <https://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format>`_
+        and `VTK <https://examples.vtk.org/site/VTKFileFormats/>`_ files.
     """
 
     def __init__(self, v, t):

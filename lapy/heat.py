@@ -74,11 +74,13 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     Args:
         geometry (TriaMesh | TetMesh): Geometric object on which to run diffusion.
         vids (array): Vertex index or indices where initial heat is applied.
-        m (float, default=1.0, optional): Factor to compute time of heat evolution. (Default value = 1.0)
-        aniso (Optional[int], optional): Number of smoothing iterations for curvature computation on vertices. (Default value = None)
+        m (float, default=1.0, optional): Factor to compute time of heat evolution.
+            (Default value = 1.0)
+        aniso (Optional[int], optional): Number of smoothing iterations for curvature
+            computation on vertices. (Default value = None)
         use_cholmod (bool, default=False, optional): Which solver to use:
-    * True : Use Cholesky decomposition from scikit-sparse cholmod.
-    * False: Use spsolve (LU decomposition). (Default value = False)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition). (Default value = False)
 
     Returns:
         array of shape (n, 1): Heat diffusion at vertices.

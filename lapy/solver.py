@@ -21,18 +21,23 @@ class Solver:
 
     Args:
         geometry (TriaMesh | TetMesh): Mesh geometry.
-        lump (bool, optional): If True, lump the mass matrix (diagonal). (Default value = False)
-        aniso (float | tuple of shape (2,), optional): Anisotropy for curvature based anisotopic Laplace.
+        lump (bool, optional): If True, lump the mass matrix (diagonal).
+            (Default value = False)
+        aniso (float | tuple of shape (2,), optional): Anisotropy for curvature based
+            anisotopic Laplace.
             If a tuple ``(a_min, a_max), differentially affects the minimum and maximum
-            curvature directions. e.g. ``(0, 50)`` will set scaling to 1 into the minimum
-            curvature direction, even if the maximum curvature is large in those regions (
-            i.e. isotropic in regions with large maximum curvature and minimum curvature
-            close to 0, i.e. a concave cylinder). (Default value = None)
-        aniso_smooth (int | None, optional): Number of smoothing iterations for curvature computation. (Default = 10)
+            curvature directions. e.g. ``(0, 50)`` will set scaling to 1 into the
+            minimum curvature direction, even if the maximum curvature is large in
+            those regions (i.e. isotropic in regions with large maximum curvature and
+            minimum curvature close to 0, i.e. a concave cylinder).
+            (Default value = None)
+        aniso_smooth (int | None, optional): Number of smoothing iterations for
+            curvature computation. (Default = 10)
             This is only relevant if aniso is not None.
-        use_cholmod (bool): If True, attempts to use the Cholesky decomposition for improved execution speed.
-	    Requires the ``scikit-sparse`` library. If it can not be found, an error will be thrown.
-	    If False, will use slower LU decomposition. (Default: False)
+        use_cholmod (bool): If True, attempts to use the Cholesky decomposition
+            for improved execution speed.
+	    Requires the ``scikit-sparse`` library. If it can not be found, an error will
+            be thrown. If False, will use slower LU decomposition. (Default: False)
 
     Returns:
 
@@ -40,8 +45,8 @@ class Solver:
         ValueError: If geometry is neither of type TriaMesh nor TetMesh.
 
     Note:
-        The class has a static member `Solver.fem_tria_mass` to create the mass matrix of `~lapy.TriaMesh` for
-        external function that do not need stiffness.
+        The class has a static member `Solver.fem_tria_mass` to create the mass matrix
+        of `~lapy.TriaMesh` for external function that do not need stiffness.
     """
 
     def __init__(
@@ -100,7 +105,8 @@ class Solver:
 
         Args:
             tria (TriaMesh): Triangle mesh.
-            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal).
+                (Default value = False)
 
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
@@ -181,8 +187,10 @@ class Solver:
             tria (TriaMesh): Triangle mesh.
             u1 (array): Minimum curvature direction per triangle ((N, 3) floats).
             u2 (array): Maximum curvature direction per triangle ((N, 3) floats).
-            aniso_mat (array): Anisotropy matrix. Diagonal elements in ``u1``, ``u2`` basis per triangle ((N, 2) floats).
-            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
+            aniso_mat (array): Anisotropy matrix. Diagonal elements in ``u1``, ``u2``
+                basis per triangle ((N, 2) floats).
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal).
+                (Default value = False)
 
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
@@ -270,14 +278,16 @@ class Solver:
 
         Args:
             tria (TriaMesh): Triangle mesh.
-            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal).
+                (Default value = False)
 
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive definite matrix.
 
         Note:
             This only returns the mass matrix ``B`` of the Eigenvalue problem:
-            ``A x = lambda B x``. The area of the surface mesh can be obtained via ``B.sum()``.
+            ``A x = lambda B x``. The area of the surface mesh can be obtained via
+            ``B.sum()``.
         """  # noqa: E501
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
@@ -325,7 +335,8 @@ class Solver:
 
         Args:
             tetra (TetMesh): Tetrahedral mesh.
-            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal).
+                (Default value = False)
 
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
@@ -467,7 +478,8 @@ class Solver:
 
         Args:
             vox (array): Voxel mesh.
-            lump (bool, optional): If True, ``B`` should be lumped (diagonal). (Default value = False)
+            lump (bool, optional): If True, ``B`` should be lumped (diagonal).
+                (Default value = False)
 
         Returns:
             csc_matrix of shape (n, n): Sparse symmetric positive semi definite matrix.
@@ -580,15 +592,18 @@ class Solver:
         r"""Compute the linear finite-element method Laplace-Beltrami spectrum.
 
         Args:
-            k (int, optional): The number of eigenvalues and eigenvectors desired. ``k`` must be smaller
-                than ``N``. It is not possible to compute all eigenvectors of a matrix. (Default value = 10)
+            k (int, optional): The number of eigenvalues and eigenvectors desired.
+                ``k`` must be smaller than ``N``. It is not possible to compute all
+                eigenvectors of a matrix. (Default value = 10)
 
         Returns:
-            array of shape (k,): Array of k eigenvalues. For closed meshes or Neumann boundary condition,
-                ``0`` will be the first eigenvalue (with constant eigenvector).
+            array of shape (k,): Array of k eigenvalues. For closed meshes or Neumann
+                boundary condition, ``0`` will be the first eigenvalue (with constant
+                eigenvector).
 
-            array of shape (N, k): Array representing the k eigenvectors. The column ``eigenvectors[:, i]`` is
-                the eigenvector corresponding to ``eigenvalues[i]``.
+            array of shape (N, k): Array representing the k eigenvectors. The column
+                ``eigenvectors[:, i]`` is the eigenvector corresponding to
+                ``eigenvalues[i]``.
 
         Raises:
 
@@ -630,12 +645,15 @@ class Solver:
         ``(n, n)``.
 
         Args:
-            h (float | array, optional): Right hand side, can be constant or array with vertex values.
-                The default ``0`` corresponds to Laplace equation ``A x = 0``.
-            dtup (tuple, optional): Dirichlet boundary condition as a tuple containing the index and data arrays
-                of same length. The default, an empty tuple, corresponds to no Dirichlet condition.
-            ntup (tuple, optional): Neumann boundary condition as a tuple containing the index and data arrays
-                of same length. The default, an empty tuple, corresponds to Neumann on all boundaries.
+            h (float | array, optional): Right hand side, can be constant or array with
+                vertex values. The default ``0`` corresponds to Laplace equation
+                ``A x = 0``.
+            dtup (tuple, optional): Dirichlet boundary condition as a tuple containing
+                the index and data arrays of same length. The default, an empty tuple,
+                corresponds to no Dirichlet condition.
+            ntup (tuple, optional): Neumann boundary condition as a tuple containing
+                the index and data arrays of same length. The default, an empty tuple,
+                corresponds to Neumann on all boundaries.
 
         Returns:
             array: Array with vertex value of the solution.
@@ -643,7 +661,8 @@ class Solver:
         Raises:
 
         Note:
-            ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or tetraheral mesh.
+            ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or
+            tetraheral mesh.
         """
         # check matrices
         dim = self.stiffness.shape[0]

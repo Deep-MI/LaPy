@@ -109,26 +109,28 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
 
     Args:
         filepath (str): Path to surface file.
-        read_metadata (bool, optional, optional): If True, read and return metadata as key-value pairs.
-    Valid keys:
-    * 'head' : array of int
-    * 'valid' : str
-    * 'filename' : str
-    * 'volume' : array of int, shape (3,)
-    * 'voxelsize' : array of float, shape (3,)
-    * 'xras' : array of float, shape (3,)
-    * 'yras' : array of float, shape (3,)
-    * 'zras' : array of float, shape (3,)
-    * 'cras' : array of float, shape (3,) (Default value = False)
-        read_stamp (bool, optional, optional): Return the comment from the file (Default value = False)
+        read_metadata (bool, optional): If True, read and return metadata as
+            key-value pairs. (Default value = False)
+            Valid keys:
+            * 'head' : array of int
+            * 'valid' : str
+            * 'filename' : str
+            * 'volume' : array of int, shape (3,)
+            * 'voxelsize' : array of float, shape (3,)
+            * 'xras' : array of float, shape (3,)
+            * 'yras' : array of float, shape (3,)
+            * 'zras' : array of float, shape (3,)
+            * 'cras' : array of float, shape (3,)
+        read_stamp (bool, optional): Return the comment from the file.
+            (Default value = False)
 
     Returns:
         numpy array: nvtx x 3 array of vertex (x, y, z) coordinates.
         numpy array: nfaces x 3 array of defining mesh triangles.
-        OrderedDict: Returned only if `read_metadata` is True.  Key-value pairs found in the
-        geometry file.
+        OrderedDict: Returned only if `read_metadata` is True.  Key-value pairs
+            found in the geometry file.
         str: Returned only if `read_stamp` is True.  The comment added by the
-        program that saved the file.
+            program that saved the file.
 
     Raises:
 

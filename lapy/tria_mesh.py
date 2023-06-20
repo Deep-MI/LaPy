@@ -13,27 +13,23 @@ class TriaMesh:
     with core functionality using sparse matrices internally (Scipy).
 
     Args:
+        v (array_like): List of lists of 3 float coordinates.
+        t (array_like): List of lists of 3 int of indices (>= 0) into ``v`` array.
+            Ordering is important: All triangles should be
+            oriented in the same way (counter-clockwise, when
+            looking from above).
+        fsinfo (dict | None): FreeSurfer Surface Header Info.
 
-    Returns:
+    Attributes:
+        v (array_like): List of lists of 3 float coordinates.
+        t (array_like): List of lists of 3 int of indices (>= 0) into ``v`` array.
+        adj_sym (csc_matrix): Symmetric adjacency matrix as csc sparse matrix.
+        adj_dir (csc_matrix): Directed adjacency matrix as csc sparse matrix.
+        fsinfo (dict | None): FreeSurfer Surface Header Info.
 
-    Raises:
-
-    Attributes
-    ----------
-    v : array_like
-        List of lists of 3 float coordinates.
-    t : array_like
-        List of lists of 3 int of indices (>= 0) into ``v`` array.
-    adj_sym : csc_matrix
-        Symmetric adjacency matrix as csc sparse matrix.
-    adj_dir : csc_matrix
-        Directed adjacency matrix as csc sparse matrix.
-    fsinfo : dict | None
-        FreeSurfer Surface Header Info.
-    Notes
-    -----
-    The class has static class methods to read triangle meshes from FreeSurfer,
-    OFF, and VTK file formats.
+    Note:
+        The class has static class methods to read triangle meshes from FreeSurfer,
+        OFF, and VTK file formats.
     """
 
     def __init__(self, v, t, fsinfo=None):
@@ -655,12 +651,12 @@ class TriaMesh:
         Returns:
             array: Column array with starting and end vertex for each unique inner edge.
             array: 2 column array with triangle containing the half edge
-            from vids[0,:] to vids [1,:] in first column and the
-            neighboring triangle in the second column.
+                from vids[0,:] to vids [1,:] in first column and the
+                neighboring triangle in the second column.
             array: If with_boundary is true: 2 column array with each
-            boundary half-edge.
+                boundary half-edge.
             array: If with_boundary is true: 1 column array with the
-            associated triangle to each boundary edge.
+                associated triangle to each boundary edge.
 
         Raises:
 

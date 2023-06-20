@@ -18,17 +18,19 @@ def compute_shapedna(
 
     Args:
         geom (TriaMesh or TetMesh): Mesh geometry.
-        k (int, default=50, optional): Number of eigenfunctions / eigenvalues. (Default value = 50)
+        k (int, optional): Number of eigenfunctions / eigenvalues. (Default value = 50)
         lump (bool, default=False, optional): If True, lump the mass matrix (diagonal).
-    (See 'lapy.Solver.Solver' class). (Default value = False)
-        aniso (float or tuple of shape (2,), optional): Anisotropy for curvature based anisotopic Laplace.
-    (See 'lapy.Solver.Solver' class). (Default value = None)
-        aniso_smooth (int, optional): Number of smoothing iterations for curvature computation on vertices.
-    (See 'lapy.Solver.Solver' class). (Default value = 10)
-        use_cholmod (bool, default: False, optional): If True, attempts to use the Cholesky decomposition for improved execution
-    speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
-    will be thrown.
-    If False, will use slower LU decomposition. (Default value = False)
+            (See 'lapy.Solver.Solver' class). (Default value = False)
+        aniso (float or tuple of shape (2,), optional): Anisotropy for curvature based
+            anisotopic Laplace.
+            (See 'lapy.Solver.Solver' class). (Default value = None)
+        aniso_smooth (int, optional): Number of smoothing iterations for curvature
+            computation on vertices.
+            (See 'lapy.Solver.Solver' class). (Default value = 10)
+        use_cholmod (bool, optional): If True, attempts to use the Cholesky
+            decomposition for improved execution speed. Requires the ``scikit-sparse``
+            library. If it can not be found, an error will be thrown.
+            If False, will use slower LU decomposition. (Default value = False)
 
     Returns:
         dict: A dictionary, including 'Eigenvalues' and 'Eigenvectors' fields.
@@ -140,7 +142,8 @@ def compute_distance(ev1, ev2, dist="euc"):
     Args:
         ev1 (array_like): First set of sorted eigenvalues.
         ev2 (array_like): Second set of sorted eigenvalues.
-        dist (str, optional): Distance measure; currently only 'euc' (Euclidean). (Default value = "euc")
+        dist (str, optional): Distance measure; currently only 'euc' (Euclidean).
+            (Default value = "euc")
 
     Returns:
         float: Distance between the eigenvalue arrays.

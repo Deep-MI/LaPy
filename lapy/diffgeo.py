@@ -168,14 +168,13 @@ def tria_compute_gradient(tria, vfunc):
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
-    Good background to read:
-    http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
-    Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
-    http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
-    Desbrun ...
+    Note:
+        Numexpr could speed up this functions if necessary.
+        Good background to read:
+        http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions/
+        Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
+        http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
+        Desbrun ...
     """
     import sys
 
@@ -216,9 +215,8 @@ def tria_compute_divergence(tria, tfunc):
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
+    Note:
+        Numexpr could speed up this functions if necessary.
     """
     import sys
 
@@ -275,9 +273,8 @@ def tria_compute_divergence2(tria, tfunc):
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed-up this functions if necessary.
+    Note:
+        Numexpr could speed-up this functions if necessary.
     """
     import sys
 
@@ -321,9 +318,8 @@ def tria_compute_rotated_f(tria, vfunc):
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
+    Note:
+        Numexpr could speed up this functions if necessary.
     """
     gradf = tria_compute_gradient(tria, vfunc)
     tn = tria.tria_normals()
@@ -356,8 +352,10 @@ def tria_mean_curvature_flow(
 
     Args:
         tria (TriaMesh): Triangle mesh.
-        max_iter (int, default=30, optional): Maximal number of steps. (Default value = 30)
-        stop_eps (float, default=1e-13, optional): Stopping threshold. (Default value = 1e-13)
+        max_iter (int, default=30, optional): Maximal number of steps.
+            (Default value = 30)
+        stop_eps (float, default=1e-13, optional): Stopping threshold.
+            (Default value = 1e-13)
         step (float, default=1.0, optional): Euler step size. (Default value = 1.0)
         use_cholmod (bool, default=False, optional): Which solver to use:
     * True : Use Cholesky decomposition from scikit-sparse cholmod.
@@ -368,9 +366,8 @@ def tria_mean_curvature_flow(
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
+    Note:
+        Numexpr could speed up this functions if necessary.
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -427,17 +424,18 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     Args:
         tria (TriaMesh): Triangle mesh.
-        flow_iter (int, default=3, optional): Mean curv flow iterations (3 should be enough). (Default value = 3)
-        debug (bool, default=False, optional): Prints debug values if True. (Default value = False)
+        flow_iter (int, default=3, optional): Mean curv flow iterations (3 should be
+            enough). (Default value = 3)
+        debug (bool, default=False, optional): Prints debug values if True.
+            (Default value = False)
 
     Returns:
         TriaMesh: Triangle mesh.
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
+    Note:
+        Numexpr could speed up this functions if necessary.
     """  # noqa: E501
     import math
 
@@ -653,14 +651,13 @@ def tet_compute_gradient(tet, vfunc):
 
     Raises:
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
-    Good background to read:
-    Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
-    http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
-    http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions
-    Desbrun et al.
+    Note:
+        Numexpr could speed up this functions if necessary.
+        Good background to read:
+        Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
+        http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
+        http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions
+        Desbrun et al.
     """
     import sys
 
@@ -712,10 +709,9 @@ def tet_compute_divergence(tet, tfunc):
 
     Raises:
 
-    Notes
-    -----
-    This is the integrated divergence, you may want to multiply
-    with B^-1 to get back the function in some applications.
+    Note:
+        This is the integrated divergence, you may want to multiply
+        with B^-1 to get back the function in some applications.
     """
     v0 = tet.v[tet.t[:, 0], :]
     v1 = tet.v[tet.t[:, 1], :]

@@ -24,10 +24,11 @@ def import_optional_dependency(
 
     Args:
         name (str): The module name.
-        extra (str, optional): Additional text to include in the ImportError message. (Default value = "")
+        extra (str, optional): Additional text to include in the ImportError message.
+            (Default value = "")
         raise_error (bool, optional): What to do when a dependency is not found.
-    * True : Raise an ImportError.
-    * False: Return None. (Default value = True)
+            * True : Raise an ImportError.
+            * False: Return None. (Default value = True)
 
     Returns:
         Optional[ModuleType]: The imported module when found.

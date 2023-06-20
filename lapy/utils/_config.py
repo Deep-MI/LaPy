@@ -13,8 +13,9 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
 
     Args:
         fid (Optional[IO], optional): The file to write to, passed to :func:`print`.
-    Can be None to use :data:`sys.stdout`. (Default value = None)
-        developer (bool, optional): If True, display information about optional dependencies. (Default value = False)
+            Can be None to use :data:`sys.stdout`. (Default value = None)
+        developer (bool, optional): If True, display information about optional
+            dependencies. (Default value = False)
 
     Returns:
 

@@ -7,14 +7,13 @@ Copyright (c) 2013-2020, Gary Pui-Tung Choi
 https://math.mit.edu/~ptchoi
 and has been distributed with the Apache 2 License.
 
-Notes
------
-If you use this code in your own work, please cite the following paper:
+Note:
+    If you use this code in your own work, please cite the following paper:
 
-[1] P. T. Choi, K. C. Lam, and L. M. Lui,
-"FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0
-Closed Brain Surfaces."
-SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
+    [1] P. T. Choi, K. C. Lam, and L. M. Lui,
+    "FLASH: Fast Landmark Aligned Spherical Harmonic Parameterization for Genus-0
+    Closed Brain Surfaces."
+    SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
 
 import importlib
@@ -193,11 +192,13 @@ def mobius_area_correction_spherical(tria, mapping):
         mapping (array): Vertex coordinates of the spherical conformal parameterization.
 
     Returns:
-        array: Vertex coordinates (3d) of the updated spherical conformal parameterization.
+        array: Vertex coordinates (3d) of the updated spherical conformal
+            parameterization.
         array: Optimal parameters (x) for the Mobius transformation, where
         .. math::
-        f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
-        E501:
+            f(z) = \frac{az+b}{cz+d}
+                 = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}
+                        {(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
 
     Raises:
 
@@ -339,10 +340,12 @@ def linear_beltrami_solver(tria, mu, landmark, target, use_cholmod=False):
     Should be planar mapping on complex plane.
         mu (array_like): Complex Beltrami coefficients.
         landmark (array_like): Fixed vertex indices.
-        target (array): 3d array with 2d landmark target coordinates (3rd coordinate is zero).
+        target (array): 3d array with 2d landmark target coordinates
+            (3rd coordinate is zero).
         use_cholmod (bool, default=False, optional): Which solver to use:
-    * True : Use Cholesky decomposition from scikit-sparse cholmod.
-    * False: Use spsolve (LU decomposition). (Default value = False)
+            * True : Use Cholesky decomposition from scikit-sparse cholmod.
+            * False: Use spsolve (LU decomposition).
+            (Default value = False)
 
     Returns:
         array: 3d vertex coordinates of new mapping.

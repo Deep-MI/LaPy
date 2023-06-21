@@ -226,7 +226,10 @@ napoleon_use_param = True
 napoleon_type_aliases = {
     'array-like': ':term:`array-like <array_like>`',
     'array_like': ':term:`array_like`',
+    'csc_matrix': ':term:`scipy.sparse.csc_matrix`',
 }
+napoleon_use_rtype = False
+
 
 # -- sphinx-gallery ----------------------------------------------------------
 sphinx_gallery_conf = {

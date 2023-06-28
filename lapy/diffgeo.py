@@ -511,9 +511,9 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         data["Elements"] = tria.t.shape[0]
         data["DoF"] = evecs.shape[0]
         data["NumEW"] = 4
-        from .io import export_ev
+        from .io import write_ev
 
-        export_ev(data, "debug.ev")
+        write_ev(data, "debug.ev")
 
     # flip efuncs to align to coordinates consistently
     ev1 = evecs[:, 1]

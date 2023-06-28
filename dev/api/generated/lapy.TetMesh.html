@@ -233,7 +233,7 @@
 <h1>lapy.TetMesh<a class="headerlink" href="#lapy-tetmesh" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.TetMesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TetMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L7-L310"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TetMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh" title="Permalink to this definition">#</a></dt>
 <dd><p>Class representing a tetraheral mesh.</p>
 <p>This is an efficient implementation of a tetrahedral mesh data structure
 with core functionality using sparse matrices internally (Scipy).</p>
@@ -293,7 +293,7 @@ and <a class="reference external" href="https://examples.vtk.org/site/VTKFileFor
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.avg_edge_length">
-<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L162-L175"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.avg_edge_length" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.avg_edge_length" title="Permalink to this definition">#</a></dt>
 <dd><p>Get average edge lengths in tet mesh.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -307,7 +307,7 @@ and <a class="reference external" href="https://examples.vtk.org/site/VTKFileFor
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.boundary_tria">
-<span class="sig-name descname"><span class="pre">boundary_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tetfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L177-L228"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.boundary_tria" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">boundary_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tetfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.boundary_tria" title="Permalink to this definition">#</a></dt>
 <dd><p>Get boundary triangle mesh of tetrahedra.</p>
 <p>It can have multiple connected components.
 Tria will have same vertices (including free vertices),
@@ -339,7 +339,7 @@ may need some debugging, until then use tria.orient_() after this.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.construct_adj_sym">
-<span class="sig-name descname"><span class="pre">construct_adj_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L82-L106"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.construct_adj_sym" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">construct_adj_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.construct_adj_sym" title="Permalink to this definition">#</a></dt>
 <dd><p>Create adjacency symmetric matrix.</p>
 <p>The adjacency matrix will be symmetric. Each inner
 edge will get the number of tetrahedra that contain this edge.
@@ -357,7 +357,7 @@ Works on tetras only.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.has_free_vertices">
-<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L108-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.has_free_vertices" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.has_free_vertices" title="Permalink to this definition">#</a></dt>
 <dd><p>Check if the vertex list has more vertices than what is used in tetra.</p>
 <p>(same implementation as in <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a>)</p>
 <dl class="field-list simple">
@@ -372,7 +372,7 @@ Works on tetras only.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.is_oriented">
-<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L122-L160"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.is_oriented" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.is_oriented" title="Permalink to this definition">#</a></dt>
 <dd><p>Check if tet mesh is oriented.</p>
 <p>True if all tetrahedra are oriented
 so that v0,v1,v2 are oriented counterclockwise when looking from above,
@@ -389,7 +389,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.orient_">
-<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L270-L310"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.orient_" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.orient_" title="Permalink to this definition">#</a></dt>
 <dd><p>Ensure that tet mesh is oriented.</p>
 <p>Re-orient tetras so that
 v0,v1,v2 are oriented counterclockwise when looking from above,
@@ -406,7 +406,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.read_gmsh">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_gmsh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L40-L54"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_gmsh" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_gmsh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.read_gmsh" title="Permalink to this definition">#</a></dt>
 <dd><p>Load GMSH tetrahedron mesh.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -426,7 +426,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.read_vtk">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L56-L70"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_vtk" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.read_vtk" title="Permalink to this definition">#</a></dt>
 <dd><p>Load VTK tetrahedron mesh.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -446,7 +446,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.rm_free_vertices_">
-<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L230-L268"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.rm_free_vertices_" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.rm_free_vertices_" title="Permalink to this definition">#</a></dt>
 <dd><p>Remove unused (free) vertices from v and t.</p>
 <p>These are vertices that are not used in any triangle. They can produce problems
 when constructing, e.g., Laplace matrices.</p>
@@ -466,7 +466,7 @@ Same implementation as in <a class="reference internal" href="lapy.TriaMesh.html
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.write_vtk">
-<span class="sig-name descname"><span class="pre">write_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L72-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.write_vtk" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">write_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TetMesh.write_vtk" title="Permalink to this definition">#</a></dt>
 <dd><p>Save as VTK file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

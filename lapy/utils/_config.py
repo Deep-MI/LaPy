@@ -52,6 +52,7 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
         keys = (
             "build",
             "chol",
+            "doc",
             "test",
             "style",
         )

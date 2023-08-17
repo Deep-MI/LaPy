@@ -69,6 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
+doc/bin
 doc/_build/
 doc/generated/
 doc/api/generated/

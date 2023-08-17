@@ -53,7 +53,13 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints", "tutorials/examples/README.rst"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "**.ipynb_checkpoints",
+    "tutorials/examples/README.rst",
+]
 
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
@@ -70,6 +76,9 @@ default_role = "py:obj"
 # -- options for HTML output -------------------------------------------------
 html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = [
+    "css/style.css",
+]
 html_title = project
 html_show_sphinx = False
 

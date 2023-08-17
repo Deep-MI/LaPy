@@ -3,9 +3,6 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 
 import inspect
 from datetime import date
@@ -15,6 +12,9 @@ from typing import Dict, Optional
 from sphinx_gallery.sorting import FileNameSortKey
 
 import lapy
+
+# -- project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "LaPy"
 author = "Martin Reuter"
@@ -53,13 +53,7 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = [
-    "_build",
-    "Thumbs.db",
-    ".DS_Store",
-    "**.ipynb_checkpoints",
-    "tutorials/examples/README.rst",
-]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints", "tutorials/examples/README.rst"]
 
 # Sphinx will warn about all references where the target cannot be found.
 nitpicky = True
@@ -73,8 +67,7 @@ modindex_common_prefix = [f"{package}."]
 # make `filter` a cross-reference to the Python function “filter”.
 default_role = "py:obj"
 
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# -- options for HTML output -------------------------------------------------
 html_theme = "furo"
 html_static_path = ["_static"]
 html_title = project

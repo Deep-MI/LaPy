@@ -286,7 +286,7 @@ def plot_tet_mesh(
     # evaluate cutting criteria
     if cutting is not None:
         # check inputs
-        if type(cutting) is not list:
+        if not isinstance(cutting, list):
             cutting = [cutting]
 
         # check if vfunc is defined when functional thresholds are used, otherwise exit

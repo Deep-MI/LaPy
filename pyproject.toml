@@ -56,11 +56,11 @@ chol = [
     'scikit-sparse',
 ]
 doc = [
-    'furo',
+    'furo!=2023.8.17',
     'matplotlib',
     'memory-profiler',
     'numpydoc',
-    'sphinx<=7.0.1',
+    'sphinx!=7.2.*',
     'sphinxcontrib-bibtex',
     'sphinx-copybutton',
     'sphinx-design',

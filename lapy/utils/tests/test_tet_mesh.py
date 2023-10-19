@@ -203,7 +203,7 @@ def test_correct_orientations_and_boundary(tet_mesh_fixture):
 
 def test_boundary_surface_volume(tet_mesh_fixture):
     """
-    Test orientation correction and boundary surface orientation.
+    Testing computation of volume for the boundary surface mesh
     """
     mesh = tet_mesh_fixture
 

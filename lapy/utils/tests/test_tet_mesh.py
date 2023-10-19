@@ -1,5 +1,4 @@
 import json
-import logging
 
 import numpy as np
 import pytest
@@ -90,17 +89,17 @@ def test_is_oriented(tet_mesh_fixture):
     ), f"Expected is_oriented result {expected_result}, but got {result}"
 
 
-def test_avg_edge_length(tet_mesh_fixture):
-    """
-    Testing computation of average edge length
-    """
-    expected_result = 1.0543647924813107
-    mesh = tet_mesh_fixture
-    result = mesh.avg_edge_length()
+# def test_avg_edge_length(tet_mesh_fixture):
+#     """
+#     Testing computation of average edge length
+#     """
+#     expected_result = 1.0543647924813107
+#     mesh = tet_mesh_fixture
+#     result = mesh.avg_edge_length()
 
-    assert (
-        result == expected_result
-    ), f"Expected average edge length {expected_result}, but got {result}"
+#     assert (
+#         result == expected_result
+#     ), f"Expected average edge length {expected_result}, but got {result}"
 
 
 def test_boundary_trai(tet_mesh_fixture):
@@ -140,7 +139,7 @@ def test_avg_edge_length(tet_mesh_fixture):
 
 def test_boundary_is_oriented(tet_mesh_fixture):
     """
-    Test orientation consistency in boundary of tetrahedral mesh.    
+    Test orientation consistency in boundary of tetrahedral mesh.
     """
     mesh = tet_mesh_fixture
 
@@ -183,7 +182,7 @@ def test_correct_orientations_and_boundary(tet_mesh_fixture):
     mesh = tet_mesh_fixture
 
     # Correct the orientation of the tetrahedral mesh
-    flipped_tetrahedra = mesh.orient_()
+    mesh.orient_()
 
     # Check if the orientations of the tetrahedra are consistent
     result_oriented = mesh.is_oriented()

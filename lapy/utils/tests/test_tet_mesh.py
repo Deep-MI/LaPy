@@ -45,10 +45,7 @@ def tet_mesh_fixture():
 @pytest.fixture
 def loaded_data():
     """
-    Load and provide the expected outcomes data from a JSON file.
-
-    Returns:
-        dict: Dictionary containing the expected outcomes data.
+    Load expected outcomes data from a JSON file as a dictionary.
     """
     with open("expected_outcomes.json", "r") as f:
         expected_outcomes = json.load(f)
@@ -108,15 +105,10 @@ def test_avg_edge_length(tet_mesh_fixture):
 
 def test_boundary_trai(tet_mesh_fixture):
     """
-    Testing computation of boundary triangles from tet mesh
+    Test computation of boundary triangles from tet mesh.
 
-    The .t attribute of a mesh object is often used to
-    represent the triangles of the mesh. BT.t would thus be the array of triangles
-    in the boundary mesh.
-
-    .shape[0] is used to retrieve the number of rows
-    (or the length along the first dimension) of the array. In this context,
-    it's used to count the number of triangles in the boundary mesh.
+    - `BT.t` represents the array of boundary triangles.
+    - `.shape[0]` counts the number of boundary triangles.
     """
     mesh = tet_mesh_fixture
     boundary_tria_mesh = mesh.boundary_tria()
@@ -148,7 +140,7 @@ def test_avg_edge_length(tet_mesh_fixture):
 
 def test_boundary_is_oriented(tet_mesh_fixture):
     """
-    Testing the consistency of orientations in the boundary of a tetrahedral mesh
+    Test orientation consistency in boundary of tetrahedral mesh.    
     """
     mesh = tet_mesh_fixture
 
@@ -165,7 +157,7 @@ def test_boundary_is_oriented(tet_mesh_fixture):
 
 def test_orient_and_check_oriented(tet_mesh_fixture):
     """
-    Testing orienting the tetrahedral mesh and checking if orientations are consistent
+    Test orienting the tetrahedral mesh for consistency.
     """
     mesh = tet_mesh_fixture
 
@@ -211,7 +203,7 @@ def test_correct_orientations_and_boundary(tet_mesh_fixture):
 
 def test_boundary_surface_volume(tet_mesh_fixture):
     """
-    Testing computation of volume for the boundary surface mesh
+    Test orientation correction and boundary surface orientation.
     """
     mesh = tet_mesh_fixture
 

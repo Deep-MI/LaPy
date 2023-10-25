@@ -134,7 +134,7 @@ def test_volume(tria_mesh_fixture):
     """
     # Assuming that tria_mesh_fixture is unoriented
     try:
-        result = tria_mesh_fixture.volume()
+        tria_mesh_fixture.volume()
     except ValueError as e:
         assert "Can only compute volume for oriented triangle meshes!" in str(e)
     else:
@@ -265,7 +265,7 @@ def test_orient(tria_mesh_fixture, loaded_data):
     assert flipped == expected_flips
 
 
-def test_is_oriented(tria_mesh_fixture):
+def test_is_oriented_(tria_mesh_fixture):
     """
     Testing the check for mesh orientation
     """
@@ -282,7 +282,7 @@ def test_is_oriented(tria_mesh_fixture):
 ## Compute volume (works only for oriented meshes)
 
 
-def test_volume(tria_mesh_fixture):
+def test_volume_(tria_mesh_fixture):
     """
     Testing the computation of enclosed volume for oriented mesh
     """
@@ -324,7 +324,7 @@ def test_normal_offset(tria_mesh_fixture, loaded_data):
     mesh.orient_()
 
     # Get the initial vertex coordinates
-    initial_vertices = mesh.v.copy()
+    mesh.v.copy()
 
     # Calculate the distance 'd' for the offset
     d = 0.2 * mesh.avg_edge_length()

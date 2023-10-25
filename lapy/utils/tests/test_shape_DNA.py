@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from ...shapedna import *
+from ...shapedna import compute_distance, compute_shapedna, normalize_ev, reweight_ev
 from ...tet_mesh import TetMesh
 from ...tria_mesh import TriaMesh
 

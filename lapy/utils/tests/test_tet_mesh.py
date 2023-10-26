@@ -89,19 +89,6 @@ def test_is_oriented(tet_mesh_fixture):
     ), f"Expected is_oriented result {expected_result}, but got {result}"
 
 
-# def test_avg_edge_length(tet_mesh_fixture):
-#     """
-#     Testing computation of average edge length
-#     """
-#     expected_result = 1.0543647924813107
-#     mesh = tet_mesh_fixture
-#     result = mesh.avg_edge_length()
-
-#     assert (
-#         result == expected_result
-#     ), f"Expected average edge length {expected_result}, but got {result}"
-
-
 def test_boundary_trai(tet_mesh_fixture):
     """
     Test computation of boundary triangles from tet mesh.

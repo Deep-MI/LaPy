@@ -70,15 +70,14 @@ def test_evals_evec_dimension(load_tet_mesh, loaded_data):
 
 # Geodesics
 
-T = TetMesh.read_vtk("data/cubeTetra.vtk")
-tria = T.boundary_tria()
-bvert = np.unique(tria.t)
-u = diffusion(T, bvert, m=1)
-
 
 def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
-    # Compute gradients
     T = load_tet_mesh
+    tria = T.boundary_tria()
+    bvert = np.unique(tria.t)
+    u = diffusion(T, bvert, m=1)
+
+    # Compute gradients
     tfunc = compute_gradient(T, u)
 
     # Define the expected shape of tfunc (gradient)
@@ -119,56 +118,7 @@ def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
     assert divx.shape == expected_divx_shape
 
 
-# get gradients
-tfunc = compute_gradient(T, u)
-# flip and normalize
-X = -tfunc / np.sqrt((tfunc**2).sum(1))[:, np.newaxis]
-X = np.nan_to_num(X)
-# compute divergence
-divx = compute_divergence(T, X)
-
-# compute distance
-useCholmod = True
-try:
-    from sksparse.cholmod import cholesky
-except ImportError:
-    useCholmod = False
-
-
-fem = Solver(T, lump=True)
-A, B = fem.stiffness, fem.mass  # computed above when creating Solver
-
-H = A
-b0 = -divx
-
-# solve H x = b0
-# print("Matrix Format now: "+H.getformat())
-if useCholmod:
-    print("Solver: cholesky decomp - performance optimal ...")
-    chol = cholesky(H)
-    x = chol(b0)
-else:
-    print("Solver: spsolve (LU decomp) - performance not optimal ...")
-    lu = splu(H)
-    x = lu.solve(b0)
-
-x = x - np.min(x)
-
-
-# get heat diffusion
-gu = compute_geodesic_f(T, u)
-
-v1func = T.v[:, 0] * T.v[:, 0] + T.v[:, 1] * T.v[:, 1] + T.v[:, 2] * T.v[:, 2]
-grad = compute_gradient(T, v1func)
-glength = np.sqrt(np.sum(grad * grad, axis=1))
-# fcols=glength
-A, B = fem.stiffness, fem.mass
-Bi = B.copy()
-Bi.data **= -1
-divx2 = Bi * divx
-
-
-def test_tetMesh_Geodesics_format(loaded_data):
+def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     """
     Test if matrix format, solver settings, max distance,
     and computed values match the expected outcomes.
@@ -179,6 +129,58 @@ def test_tetMesh_Geodesics_format(loaded_data):
     Raises:
     - AssertionError: If any test condition is not met.
     """
+
+    T = load_tet_mesh
+    tria = T.boundary_tria()
+    bvert = np.unique(tria.t)
+    u = diffusion(T, bvert, m=1)
+
+    # get gradients
+    tfunc = compute_gradient(T, u)
+    # flip and normalize
+    X = -tfunc / np.sqrt((tfunc**2).sum(1))[:, np.newaxis]
+    X = np.nan_to_num(X)
+    # compute divergence
+    divx = compute_divergence(T, X)
+
+    # compute distance
+    useCholmod = True
+    try:
+        from sksparse.cholmod import cholesky
+    except ImportError:
+        useCholmod = False
+
+    fem = Solver(T, lump=True)
+    A, B = fem.stiffness, fem.mass  # computed above when creating Solver
+
+    H = A
+    b0 = -divx
+
+    # solve H x = b0
+    # print("Matrix Format now: "+H.getformat())
+    if useCholmod:
+        print("Solver: cholesky decomp - performance optimal ...")
+        chol = cholesky(H)
+        x = chol(b0)
+    else:
+        print("Solver: spsolve (LU decomp) - performance not optimal ...")
+        lu = splu(H)
+        x = lu.solve(b0)
+
+    x = x - np.min(x)
+
+    # get heat diffusion
+    gu = compute_geodesic_f(T, u)
+
+    v1func = T.v[:, 0] * T.v[:, 0] + T.v[:, 1] * T.v[:, 1] + T.v[:, 2] * T.v[:, 2]
+    grad = compute_gradient(T, v1func)
+    glength = np.sqrt(np.sum(grad * grad, axis=1))
+    # fcols=glength
+    A, B = fem.stiffness, fem.mass
+    Bi = B.copy()
+    Bi.data **= -1
+    divx2 = Bi * divx
+
     expected_matrix_format = loaded_data["expected_outcomes"]["test_TetMesh_Geodesics"][
         "expected_matrix_format"
     ]

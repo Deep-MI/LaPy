@@ -122,7 +122,7 @@
         "test_TriaMesh_Geodesics": {
             "real_img_checksum": "8166f546e6630f017d3ec1f655c0ac85"
         },
-        "test_Laplase_Geodesics": {
+        "test_Laplace_Geodesics": {
             "real_img_checksum": "25f9b10a5d417de3854cf8b8faf77001"
         },
         "test_Geodesics_format": {

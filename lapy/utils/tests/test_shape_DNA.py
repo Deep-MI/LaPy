@@ -10,10 +10,6 @@ from ...tria_mesh import TriaMesh
 tria = TriaMesh.read_vtk("data/cubeTria.vtk")
 tet = TetMesh.read_vtk("data/cubeTetra.vtk")
 
-ev = compute_shapedna(tria, k=3)
-ev["Eigenvectors"]
-ev["Eigenvalues"]
-
 
 @pytest.fixture
 def loaded_data():
@@ -36,6 +32,8 @@ def test_compute_shapedna(loaded_data):
         AssertionError: If computed eigenvalues don't match expected values within tolerance.
         AssertionError: If eigenvalues' dtype isn't float32.
     """
+    ev = compute_shapedna(tria, k=3)
+
     expected_Eigenvalues = np.array(
         loaded_data["expected_outcomes"]["test_compute_shapedna"][
             "expected_eigenvalues"
@@ -57,6 +55,8 @@ def test_normalize_ev_geometry(loaded_data):
         AssertionError: If normalized eigenvalues don't match expected values within tolerance.
         AssertionError: If normalized eigenvalues' dtype isn't float32.
     """
+    ev = compute_shapedna(tria, k=3)
+
     expected_normalized_values = np.array(
         loaded_data["expected_outcomes"]["test_normalize_ev_geometry"][
             "expected_normalized_values"
@@ -83,6 +83,8 @@ def test_reweight_ev(loaded_data):
         AssertionError: If reweighted eigenvalues don't match expected values within tolerance.
         AssertionError: If reweighted eigenvalues' dtype isn't float32.
     """
+    ev = compute_shapedna(tria, k=3)
+
     expected_reweighted_values = np.array(
         loaded_data["expected_outcomes"]["test_reweight_ev"][
             "expected_reweighted_values"
@@ -106,6 +108,8 @@ def test_compute_distance(loaded_data):
     Raises:
         AssertionError: If computed distance doesn't match the expected value.
     """
+    ev = compute_shapedna(tria, k=3)
+
     expected_compute_distance = loaded_data["expected_outcomes"][
         "test_compute_distance"
     ]["expected_compute_distance"]
@@ -114,11 +118,7 @@ def test_compute_distance(loaded_data):
     assert computed_distance == expected_compute_distance
 
 
-# Repeat testing steps for a tetrahedral mesh
-# compute eigenvalues and eigenvectors for tet mesh
-evTet = compute_shapedna(tet, k=3)
-evTet["Eigenvectors"]
-evTet["Eigenvalues"]
+# Repeating test steps for a tetrahedral mesh
 
 
 def test_compute_shapedna_tet(loaded_data):
@@ -132,6 +132,8 @@ def test_compute_shapedna_tet(loaded_data):
         AssertionError: If computed eigenvalues don't match expected values within tolerance.
         AssertionError: If eigenvalues' dtype isn't float32.
     """
+    evTet = compute_shapedna(tet, k=3)
+
     expected_eigen_values = np.array(
         loaded_data["expected_outcomes"]["test_compute_shapedna_tet"][
             "expected_eigen_values"
@@ -156,6 +158,8 @@ def test_normalize_ev_geometry_tet(loaded_data):
         AssertionError: If normalized eigenvalues don't match expected values within tolerance.
         AssertionError: If normalized eigenvalues' dtype isn't float32.
     """
+    evTet = compute_shapedna(tet, k=3)
+
     expected_normalized_values = np.array(
         loaded_data["expected_outcomes"]["test_normalize_ev_geometry_tet"][
             "expected_normalized_values"
@@ -183,6 +187,8 @@ def test_reweight_ev_tet(loaded_data):
     Raises:
         AssertionError: If reweighted eigenvalues don't match expected values within tolerance.
     """
+    evTet = compute_shapedna(tet, k=3)
+
     expected_reweighted_values = np.array(
         loaded_data["expected_outcomes"]["test_reweight_ev_tet"][
             "expected_reweighted_values"
@@ -206,6 +212,8 @@ def test_compute_distance_tet(loaded_data):
     Raises:
         AssertionError: If computed distance doesn't match the expected value.
     """
+    evTet = compute_shapedna(tet, k=3)
+
     # compute distance for tria eigenvalues (trivial case)
     computed_distance = compute_distance(evTet["Eigenvalues"], evTet["Eigenvalues"])
     expected_compute_distance = loaded_data["expected_outcomes"][

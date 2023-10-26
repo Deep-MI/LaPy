@@ -519,7 +519,7 @@ class TriaMesh:
         firstcol = np.nonzero(adj.indptr)[0][0] - 1
         loops = []
         # loop while we have more first columns:
-        while not firstcol == []:
+        while np.size(firstcol) > 0:
             # start the new loop with this index
             loop = [firstcol]
             # delete this entry from matrix (visited)

@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pytest
+from scipy.sparse.linalg import splu
 
 from ...diffgeo import compute_divergence, compute_geodesic_f, compute_gradient
 from ...heat import diffusion
@@ -32,14 +33,14 @@ def loaded_data():
 # Test if the mesh is oriented
 def test_is_oriented(load_tet_mesh):
     T = load_tet_mesh
-    assert T.is_oriented() == False, "Mesh is already oriented"
+    assert not T.is_oriented(), "Mesh is already oriented"
 
 
 # Test orienting the mesh
 def test_orient_mesh(load_tet_mesh):
     T = load_tet_mesh
     T.orient_()
-    assert T.is_oriented() == True, "Mesh is not oriented"
+    assert T.is_oriented(), "Mesh is not oriented"
 
 
 # Test solving the Laplace eigenvalue problem
@@ -127,8 +128,6 @@ X = np.nan_to_num(X)
 divx = compute_divergence(T, X)
 
 # compute distance
-from scipy.sparse.linalg import splu
-
 useCholmod = True
 try:
     from sksparse.cholmod import cholesky
@@ -168,6 +167,7 @@ Bi = B.copy()
 Bi.data **= -1
 divx2 = Bi * divx
 
+
 def test_tetMesh_Geodesics_format(loaded_data):
     """
     Test if matrix format, solver settings, max distance,
@@ -184,7 +184,7 @@ def test_tetMesh_Geodesics_format(loaded_data):
     ]
     assert H.getformat() == expected_matrix_format
     assert np.shape(x) == (9261,)
-    assert useCholmod == False, "Solver: cholesky decomp - performance optimal ..."
+    assert not useCholmod, "Solver: cholesky decomp - performance optimal ..."
     expected_max_x = loaded_data["expected_outcomes"]["test_TetMesh_Geodesics"][
         "max_distance"
     ]

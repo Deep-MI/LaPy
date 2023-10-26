@@ -170,7 +170,6 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     x = x - np.min(x)
 
     # get heat diffusion
-    gu = compute_geodesic_f(T, u)
 
     v1func = T.v[:, 0] * T.v[:, 0] + T.v[:, 1] * T.v[:, 1] + T.v[:, 2] * T.v[:, 2]
     grad = compute_gradient(T, v1func)

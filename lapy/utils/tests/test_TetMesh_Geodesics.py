@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from scipy.sparse.linalg import splu
 
-from ...diffgeo import compute_divergence, compute_geodesic_f, compute_gradient
+from ...diffgeo import compute_divergence, compute_gradient
 from ...heat import diffusion
 from ...solver import Solver
 from ...tet_mesh import TetMesh

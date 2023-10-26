@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-     "# TriaMesh Geodesics"
+    "# TriaMesh Geodesics"
    ]
   },
   {
@@ -352,7 +352,7 @@
     "b0=divx\n",
     "        \n",
     "# solve H x = b0\n",
-    "# we don't need the B matrix here, as divx is the intgrated divergence \n",
+    "# we don't need the B matrix here, as divx is the integrated divergence \n",
     "print(\"Matrix Format now: \"+H.getformat())\n",
     "if useCholmod:\n",
     "    print(\"Solver: cholesky decomp - performance optimal ...\")\n",
@@ -593,7 +593,7 @@
    "version": "3"
   },
   "nbsphinx": {
-    "execute": "always"
+   "execute": "always"
   }
  },
  "nbformat": 4,

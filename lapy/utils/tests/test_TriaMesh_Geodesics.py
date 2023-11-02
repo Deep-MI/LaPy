@@ -153,7 +153,7 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
     b0 = divx
 
     # solve H x = b0
-    # we don't need the B matrix here, as divx is the intgrated divergence
+    # we don't need the B matrix here, as divx is the integrated divergence
     print("Matrix Format now: " + H.getformat())
     if useCholmod:
         print("Solver: cholesky decomp - performance optimal ...")

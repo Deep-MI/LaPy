@@ -1,6 +1,5 @@
 import json
 
-import cv2
 import numpy as np
 import pytest
 from scipy.sparse.linalg import splu
@@ -52,7 +51,7 @@ def test_Laplace_Geodesics(load_square_mesh):
     # compute first eigenfunction
     fem = Solver(T, lump=True)
     eval, evec = fem.eigs()
-    vfunc = evec[:, 1]
+    # vfunc = evec[:, 1]
 
     # Get A,B (lumped), and inverse of B (as it is diagonal due to lumping)
     A, B = fem.stiffness, fem.mass
@@ -66,6 +65,9 @@ def test_Laplace_Geodesics(load_square_mesh):
 
     # Assert that A is symmetric
     assert (A_dense == A_dense.T).all()
+
+    expected_eval_length = 10
+    assert len(eval) == expected_eval_length
 
 
 # Geodesics
@@ -173,7 +175,7 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
         "expected_matrix_format"
     ]
     assert H.getformat() == expected_matrix_format
-    assert useCholmod == False, "Solver: cholesky decomp - performance optimal ..."
+    assert not useCholmod, "Solver: cholesky decomp - performance optimal ..."
     expected_max_x = loaded_data["expected_outcomes"]["test_Geodesics_format"][
         "max_distance"
     ]

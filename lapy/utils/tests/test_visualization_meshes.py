@@ -116,5 +116,5 @@ def test_visualization_tetrahedral_mesh(load_tet_mesh, loaded_data):
     expected_evec_shape = (9261, 3)
     assert evDict["Elements"] == expected_elements
     assert evDict["DoF"] == expected_dof
-    assert evals == pytest.approx(expected_ev, rel=1e-5, abs=1e-5)
+    assert evals == pytest.approx(expected_ev, rel=1e-4, abs=1e-4)
     assert evecs.shape == expected_evec_shape

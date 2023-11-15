@@ -297,7 +297,7 @@ def test_volume_(tria_mesh_fixture):
 
 def test_vertex_normals(tria_mesh_fixture, loaded_data):
     """
-    Testing the computation of vertex normals for oriented mesh
+    Testing the computation of vertex normals for oriented mesh.
     """
 
     # Calling tria_mesh_fixture.orient_() will modify the tria_mesh_fixture in-place and
@@ -348,7 +348,7 @@ def test_boundary_mesh(tria_mesh_fixture):
 
 def test_refine_and_boundary_loops(tria_mesh_fixture, loaded_data):
     """
-    Testing boundary loops after refining the mesh
+    Testing boundary loops after refining the mesh.
     """
     # Create a boundary mesh by dropping triangles
     tria_mesh_fixture.orient_()

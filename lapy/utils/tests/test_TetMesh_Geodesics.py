@@ -72,6 +72,16 @@ def test_evals_evec_dimension(load_tet_mesh, loaded_data):
 
 
 def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
+    """
+    Test the computation of gradients, normalization, and divergence for a TetMesh.
+
+    Parameters:
+        load_tet_mesh (fixture): Fixture to load a TetMesh for testing.
+        loaded_data (dict): Dictionary containing loaded test data.
+
+    Raises:
+        AssertionError: If any test condition is not met.
+    """
     T = load_tet_mesh
     tria = T.boundary_tria()
     bvert = np.unique(tria.t)
@@ -157,7 +167,6 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     b0 = -divx
 
     # solve H x = b0
-    # print("Matrix Format now: "+H.getformat())
     if useCholmod:
         print("Solver: cholesky decomp - performance optimal ...")
         chol = cholesky(H)
@@ -174,7 +183,6 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     v1func = T.v[:, 0] * T.v[:, 0] + T.v[:, 1] * T.v[:, 1] + T.v[:, 2] * T.v[:, 2]
     grad = compute_gradient(T, v1func)
     glength = np.sqrt(np.sum(grad * grad, axis=1))
-    # fcols=glength
     A, B = fem.stiffness, fem.mass
     Bi = B.copy()
     Bi.data **= -1

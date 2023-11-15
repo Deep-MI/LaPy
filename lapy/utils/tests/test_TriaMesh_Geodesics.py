@@ -30,7 +30,7 @@ def load_square_mesh():
     return T
 
 
-def test_tra_qualities(load_square_mesh):
+def test_tria_qualities(load_square_mesh):
     """
     Test triangle mesh quality computation.
     """

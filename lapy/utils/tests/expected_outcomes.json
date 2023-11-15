@@ -115,15 +115,8 @@
             ],
             "tolerance": 1e-4
         },
-        "test_compute_distance_tet": {"exp_compute_distance": 0.0},
-        "test_triangle_mesh_visualization_using_checksum": {
-            "real_img_checksum": "abaaa757a1e5c1f42a8302fbfe068f49"
-        },
-        "test_TriaMesh_Geodesics": {
-            "real_img_checksum": "8166f546e6630f017d3ec1f655c0ac85"
-        },
-        "test_Laplace_Geodesics": {
-            "real_img_checksum": "25f9b10a5d417de3854cf8b8faf77001"
+        "test_compute_distance_tet": {
+            "exp_compute_distance": 0.0
         },
         "test_Geodesics_format": {
             "expected_matrix_format": "csc",

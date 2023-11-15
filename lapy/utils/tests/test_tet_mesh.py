@@ -89,20 +89,18 @@ def test_is_oriented(tet_mesh_fixture):
     ), f"Expected is_oriented result {expected_result}, but got {result}"
 
 
-def test_boundary_trai(tet_mesh_fixture):
+def test_boundary_tria(tet_mesh_fixture):
     """
     Test computation of boundary triangles from tet mesh.
 
-    - `BT.t` represents the array of boundary triangles.
-    - `.shape[0]` counts the number of boundary triangles.
+    `BT.t` represents the array of boundary triangles.
+    `.shape[0]` counts the number of boundary triangles.
     """
     mesh = tet_mesh_fixture
     boundary_tria_mesh = mesh.boundary_tria()
 
     expected_num_traingles = 12
     assert boundary_tria_mesh.t.shape[0] == expected_num_traingles
-
-    # print(f"Found {boundary_tria_mesh.t.shape[0]} triangles on boundary.")
 
     # Check if the boundary triangle mesh is not oriented (this should fail)
     result = boundary_tria_mesh.is_oriented()

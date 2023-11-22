@@ -32,7 +32,7 @@ jobs:
       - name: Display system information
         run: lapy-sys_info --developer
       - name: Build doc
-        run: sphinx-build ./main/doc ./doc-build/dev -W --keep-going
+        run: TZ=UTC sphinx-build ./main/doc ./doc-build/dev -W --keep-going
       - name: Upload documentation
         uses: actions/upload-artifact@v3
         with:

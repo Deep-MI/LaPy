@@ -1,4 +1,4 @@
-"""Read FreeSurfer geometry (fix for dev, ll 126-128).
+"""Read FreeSurfer geometry (fix for dev, ll 151-153).
 
 Code was taken from nibabel.freesurfer package
 (https://github.com/nipy/nibabel/blob/master/nibabel/freesurfer/io.py).

@@ -34,7 +34,7 @@ jobs:
       - name: Build doc
         run: TZ=UTC sphinx-build ./main/doc ./doc-build/dev -W --keep-going
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: doc-dev
           path: ./doc-build/dev

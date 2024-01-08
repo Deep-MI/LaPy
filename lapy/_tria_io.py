@@ -131,8 +131,10 @@ def read_vtk(filename):
     if not line.startswith("DATASET POLYDATA") and not line.startswith(
         "DATASET UNSTRUCTURED_GRID"
     ):
-        msg = (f"[read: {line} expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] "
-               f"--> FAILED\n")
+        msg = (
+            f"[read: {line} expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] "
+            f"--> FAILED\n"
+        )
         print(msg)
         raise IOError(msg)
     # read number of points
@@ -488,13 +490,7 @@ def write_vtk(tria, filename):
     for i in range(np.shape(tria.v)[0]):
         f.write(" ".join(map(str, tria.v[i, :])))
         f.write("\n")
-    f.write(
-        "POLYGONS "
-        + str(np.shape(tria.t)[0])
-        + " "
-        + str(4 * np.shape(tria.t)[0])
-        + "\n"
-    )
+    f.write(f"POLYGONS {np.shape(tria.t)[0]} {4 * np.shape(tria.t)[0]}\n")
     for i in range(np.shape(tria.t)[0]):
         f.write(" ".join(map(str, np.append(3, tria.t[i, :]))))
         f.write("\n")

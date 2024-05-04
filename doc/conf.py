@@ -65,6 +65,13 @@ exclude_patterns = [
 nitpicky = True
 nitpick_ignore = []
 
+show_warning_types = True
+suppress_warnings = [
+    # Ignore new warning in Sphinx 7.3.0 while pickling environment:
+    #   WARNING: cannot cache unpickable configuration value: 'sphinx_gallery_conf'
+    "config.cache",
+]
+
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = [f"{package}."]
 

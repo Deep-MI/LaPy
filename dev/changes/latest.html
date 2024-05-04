@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Changelog" href="index.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
         <title>Version 1.0 - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
@@ -118,6 +118,8 @@
 <label class="overlay toc-overlay" for="__toc">
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
 
 
@@ -229,11 +231,11 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <section id="version-1-0">
-<span id="latest"></span><h1>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this heading">#</a></h1>
+<span id="latest"></span><h1>Version 1.0<a class="headerlink" href="#version-1-0" title="Link to this heading">¶</a></h1>
 <section id="api-changes">
-<h2>API changes<a class="headerlink" href="#api-changes" title="Permalink to this heading">#</a></h2>
+<h2>API changes<a class="headerlink" href="#api-changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Classes: TriaMesh, TetMesh, and Solver are still available directly at top level and imported directly from lapy.</p></li>
 <li><p>Mesh IO: mesh classes have been extended with IO class member functions and TriaIO and TetIO have been deprecated. Use read_* and write_* class members to load and write mehses, for example, TriaMesh.read_vtk() to import a VTK triangle mesh file. This simplifies IO greatly.</p></li>
@@ -241,20 +243,20 @@
 </ul>
 </section>
 <section id="bugs">
-<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this heading">#</a></h2>
+<h2>Bugs<a class="headerlink" href="#bugs" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed numpy deprecation issue in import_vfunc and import_ev functions.</p></li>
 </ul>
 </section>
 <section id="enhancements">
-<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">#</a></h2>
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Comply with the numpy convention for docstrings (by <a class="reference external" href="https://github.com/agirodi">Andreas Girodi</a>, <a class="reference external" href="https://github.com/kdiers">Kersten Diers</a> and <a class="reference external" href="https://github.com/m-reuter">Martin Reuter</a> in <a class="reference external" href="https://github.com/Deep-MI/LaPy/pull/19">#19</a> and <a class="reference external" href="https://github.com/Deep-MI/LaPy/pull/21">#21</a>)</p></li>
 <li><p>Add initial documentation build (by <a class="reference external" href="https://github.com/mscheltienne">Mathieu Scheltienne</a> in <a class="reference external" href="https://github.com/Deep-MI/LaPy/pull/22">#22</a>)</p></li>
 </ul>
 </section>
 <section id="authors">
-<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this heading">#</a></h2>
+<h2>Authors<a class="headerlink" href="#authors" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/agirodi">Andreas Girodi</a></p></li>
 <li><p><a class="reference external" href="https://github.com/kdiers">Kersten Diers</a></p></li>
@@ -333,10 +335,10 @@
       
     </aside>
   </div>
-</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=892f40e5"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+</div><script src="../_static/documentation_options.js?v=1c471e8e"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=36754332"></script>

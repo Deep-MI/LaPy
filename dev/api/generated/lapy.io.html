@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="lapy.shapedna" href="lapy.shapedna.html" /><link rel="prev" title="Modules" href="../lapy.modules.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
         <title>lapy.io - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
@@ -118,6 +118,8 @@
 <label class="overlay toc-overlay" for="__toc">
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
 
 
@@ -229,13 +231,13 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <section id="module-lapy.io">
-<span id="lapy-io"></span><h1>lapy.io<a class="headerlink" href="#module-lapy.io" title="Permalink to this heading">#</a></h1>
+<span id="lapy-io"></span><h1>lapy.io<a class="headerlink" href="#module-lapy.io" title="Link to this heading">¶</a></h1>
 <p>Functions to read and write spectra and vertex functions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L41-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_ev" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L41-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Load EV file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -256,7 +258,7 @@ information.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L6-L38"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_vfunc" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L6-L38"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Import vertex functions from txt file.</p>
 <p>Values can be separated by <code class="docutils literal notranslate"><span class="pre">;</span></code> or <code class="docutils literal notranslate"><span class="pre">,</span></code> and surrounded by <code class="docutils literal notranslate"><span class="pre">{}</span></code> or <code class="docutils literal notranslate"><span class="pre">()</span></code>
 brackets. Also first line can have the keyword “Solution:”, i.e. the PSOL format
@@ -279,7 +281,7 @@ from ShapeDNA.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L176-L267"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_ev" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L176-L267"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Save EV data structures as txt file (format from ShapeDNA).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -296,7 +298,7 @@ information.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L270-L289"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_vfunc" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L270-L289"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Save vertex in PSOL txt file.</p>
 <p>First line “Solution:”, “,” separated values inside ()</p>
 <dl class="field-list">
@@ -390,10 +392,10 @@ information.</p>
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=892f40e5"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+</div><script src="../../_static/documentation_options.js?v=1c471e8e"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=4e2eecee"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=36754332"></script>

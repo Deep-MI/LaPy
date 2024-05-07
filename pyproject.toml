@@ -44,7 +44,7 @@ dependencies = [
     'numpy>=1.21',
     'plotly',
     'psutil',
-    'scipy',
+    'scipy==1.12',
 ]
 
 [project.optional-dependencies]

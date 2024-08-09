@@ -856,7 +856,7 @@ class TriaMesh:
         # convert vkeep to index list
         vkeep = np.nonzero(vkeep)[0]
         # set new vertices and tria and re-init adj matrices
-        self.__init__(vnew, tnew)
+        self.__init__(vnew, tnew, self.fsinfo)
         return vkeep, vdel
 
     def refine_(self, it=1):
@@ -893,7 +893,7 @@ class TriaMesh:
             t4 = np.column_stack((e1, e2, e3))
             tnew = np.reshape(np.concatenate((t1, t2, t3, t4), axis=1), (-1, 3))
             # set new vertices and tria and re-init adj matrices
-            self.__init__(vnew, tnew)
+            self.__init__(vnew, tnew, self.fsinfo)
 
     def normal_offset_(self, d):
         """Move vertices along normal by distance ``d``.
@@ -1006,12 +1006,12 @@ class TriaMesh:
             idx = idx.reshape(-1)
             tnew = self.t
             tnew[np.ix_(idx, [1, 0])] = tnew[np.ix_(idx, [0, 1])]
-            self.__init__(self.v, tnew)
+            self.__init__(self.v, tnew, self.fsinfo)
             flipped = idx.sum()
         # flip orientation on all trias if volume is negative:
         if self.volume() < 0:
             tnew[:, [1, 2]] = tnew[:, [2, 1]]
-            self.__init__(self.v, tnew)
+            self.__init__(self.v, tnew, self.fsinfo)
             flipped = tnew.shape[0] - flipped
         return flipped
 

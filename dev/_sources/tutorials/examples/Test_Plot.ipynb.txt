@@ -20,7 +20,6 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "import lapy\n",
     "from lapy import TriaMesh, TetMesh, Solver, plot, io\n",
     "import plotly.io as pio\n",
     "pio.renderers.default = \"sphinx_gallery\""

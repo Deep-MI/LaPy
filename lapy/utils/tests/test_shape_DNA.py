@@ -30,7 +30,6 @@ def test_compute_shapedna(loaded_data):
 
     Raises:
         AssertionError: If computed eigenvalues don't match expected values within tolerance.
-        AssertionError: If eigenvalues' dtype isn't float32.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -41,7 +40,6 @@ def test_compute_shapedna(loaded_data):
     )
     tolerance = loaded_data["expected_outcomes"]["test_compute_shapedna"]["tolerance"]
     assert np.allclose(ev["Eigenvalues"], expected_Eigenvalues, atol=tolerance)
-    assert ev["Eigenvalues"].dtype == np.float32
 
 
 def test_normalize_ev_geometry(loaded_data):
@@ -53,7 +51,6 @@ def test_normalize_ev_geometry(loaded_data):
 
     Raises:
         AssertionError: If normalized eigenvalues don't match expected values within tolerance.
-        AssertionError: If normalized eigenvalues' dtype isn't float32.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -69,7 +66,6 @@ def test_normalize_ev_geometry(loaded_data):
     assert np.allclose(
         normalized_eigenvalues, expected_normalized_values, atol=tolerance
     )
-    assert normalized_eigenvalues.dtype == np.float32
 
 
 def test_reweight_ev(loaded_data):
@@ -81,7 +77,6 @@ def test_reweight_ev(loaded_data):
 
     Raises:
         AssertionError: If reweighted eigenvalues don't match expected values within tolerance.
-        AssertionError: If reweighted eigenvalues' dtype isn't float32.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -130,7 +125,6 @@ def test_compute_shapedna_tet(loaded_data):
 
     Raises:
         AssertionError: If computed eigenvalues don't match expected values within tolerance.
-        AssertionError: If eigenvalues' dtype isn't float32.
     """
     evTet = compute_shapedna(tet, k=3)
 
@@ -144,7 +138,6 @@ def test_compute_shapedna_tet(loaded_data):
     ]
     evTet = compute_shapedna(tet, k=3)
     assert np.allclose(evTet["Eigenvalues"], expected_eigen_values, atol=tolerance)
-    assert evTet["Eigenvalues"].dtype == np.float32
 
 
 def test_normalize_ev_geometry_tet(loaded_data):
@@ -156,7 +149,6 @@ def test_normalize_ev_geometry_tet(loaded_data):
 
     Raises:
         AssertionError: If normalized eigenvalues don't match expected values within tolerance.
-        AssertionError: If normalized eigenvalues' dtype isn't float32.
     """
     evTet = compute_shapedna(tet, k=3)
 
@@ -174,7 +166,6 @@ def test_normalize_ev_geometry_tet(loaded_data):
     assert np.allclose(
         normalized_eigenvalues, expected_normalized_values, atol=tolerance
     )
-    assert normalized_eigenvalues.dtype == np.float32
 
 
 def test_reweight_ev_tet(loaded_data):

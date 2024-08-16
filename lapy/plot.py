@@ -194,11 +194,12 @@ def _map_z2color(zval, colormap, zmin, zmax):
     rgb : str
         Corresponding color of the zval.
     """
+    from matplotlib.colors import LinearSegmentedColormap
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
 
     t = (zval - zmin) / float((zmax - zmin))  # normalize val
-    if type(colormap) == "matplotlib.colors.LinearSegmentedColormap":
+    if isinstance(colormap, LinearSegmentedColormap):
         r, g, b, alpha = colormap(t)
         rgb = (
             "rgb("

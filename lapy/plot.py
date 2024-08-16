@@ -194,7 +194,6 @@ def _map_z2color(zval, colormap, zmin, zmax):
     rgb : str
         Corresponding color of the zval.
     """
-
     from matplotlib.colors import LinearSegmentedColormap
 
     if zmin > zmax:

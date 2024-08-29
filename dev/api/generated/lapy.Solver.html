@@ -348,10 +348,10 @@ than <code class="docutils literal notranslate"><span class="pre">N</span></code
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (k,)</span></dt><dd><p>Array of k eigenvalues. For closed meshes or Neumann boundary condition,
+<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (k,)</span></dt><dd><p>Array of k eigenvalues. For closed meshes or Neumann boundary condition,
 <code class="docutils literal notranslate"><span class="pre">0</span></code> will be the first eigenvalue (with constant eigenvector).</p>
 </dd>
-<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (N, k)</span></dt><dd><p>Array representing the k eigenvectors. The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is
+<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (N, k)</span></dt><dd><p>Array representing the k eigenvectors. The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is
 the eigenvector corresponding to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</span></code>.</p>
 </dd>
 </dl>
@@ -379,7 +379,7 @@ mass matrix is needed.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>B</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.14.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a> of shape (n, n)</span></dt><dd><p>Sparse symmetric positive definite matrix.</p>
+<dt><strong>B</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.14.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a> of shape (n, n)</span></dt><dd><p>Sparse symmetric positive definite matrix.</p>
 </dd>
 </dl>
 </dd>
@@ -401,7 +401,7 @@ and <code class="docutils literal notranslate"><span class="pre">A</span></code>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Right hand side, can be constant or array with vertex values.
+<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Right hand side, can be constant or array with vertex values.
 The default <code class="docutils literal notranslate"><span class="pre">0</span></code> corresponds to Laplace equation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
 </dd>
 <dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a></span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and data arrays
@@ -416,7 +416,7 @@ boundaries.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>x</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array with vertex value of the solution.</p>
+<dt><strong>x</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array with vertex value of the solution.</p>
 </dd>
 </dl>
 </dd>

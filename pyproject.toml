@@ -154,6 +154,9 @@ extend-exclude = [
     "setup.py",
 ]
 
+[tool.ruff.lint]
+select = ["NPY201"]
+
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 

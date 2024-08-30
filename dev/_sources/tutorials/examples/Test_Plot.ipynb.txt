@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-     "# Visualization"
+    "# Visualization"
    ]
   },
   {
@@ -20,8 +20,10 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from lapy import TriaMesh, TetMesh, Solver, plot, io\n",
     "import plotly.io as pio\n",
+    "\n",
+    "from lapy import Solver, TetMesh, TriaMesh, io, plot\n",
+    "\n",
     "pio.renderers.default = \"sphinx_gallery\""
    ]
   },

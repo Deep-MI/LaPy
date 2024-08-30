@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-     "# TetMesh Geodesics"
+    "# TetMesh Geodesics"
    ]
   },
   {
@@ -39,11 +39,14 @@
    ],
    "source": [
     "import numpy as np\n",
-    "from lapy import TetMesh\n",
-    "from lapy.plot import plot_tet_mesh\n",
+    "\n",
     "# import plotly\n",
     "# plotly.offline.init_notebook_mode(connected=True)\n",
     "import plotly.io as pio\n",
+    "\n",
+    "from lapy import TetMesh\n",
+    "from lapy.plot import plot_tet_mesh\n",
+    "\n",
     "pio.renderers.default = \"sphinx_gallery\""
    ]
   },
@@ -116,6 +119,7 @@
    ],
    "source": [
     "from lapy import Solver\n",
+    "\n",
     "fem = Solver(T,lump=True)\n",
     "\n",
     "evals, evec = fem.eigs(10)\n"
@@ -168,8 +172,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from lapy.diffgeo import compute_gradient\n",
-    "from lapy.diffgeo import compute_divergence\n",
+    "from lapy.diffgeo import compute_divergence, compute_gradient\n",
+    "\n",
     "grad = compute_gradient(T,evec[:,evnum])\n",
     "divx = -compute_divergence(T,grad)\n",
     "vfunc = Bi*divx\n"
@@ -299,6 +303,7 @@
    "source": [
     "# compute distance\n",
     "from scipy.sparse.linalg import splu\n",
+    "\n",
     "useCholmod = True\n",
     "try:\n",
     "    from sksparse.cholmod import cholesky\n",
@@ -373,8 +378,8 @@
     }
    ],
    "source": [
-    "from lapy.diffgeo import compute_geodesic_f\n",
     "from lapy import heat\n",
+    "from lapy.diffgeo import compute_geodesic_f\n",
     "\n",
     "tria = T.boundary_tria()\n",
     "bvert=np.unique(tria.t)\n",
@@ -473,7 +478,7 @@
    "version": "3"
   },
   "nbsphinx": {
-    "execute": "always"
+   "execute": "always"
   }
  },
  "nbformat": 4,

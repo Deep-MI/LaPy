@@ -124,7 +124,7 @@ line-length = 88
 extend-exclude = [
     "doc",
     "setup.py",
-    "tutorials",
+    "examples",
 ]
 
 [tool.ruff.lint]

@@ -288,7 +288,7 @@ problem as well as functions for normalization and comparison of
 Laplace spectra.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.compute_distance">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L144-L165"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the shape dissimilarity from two shapeDNA descriptors.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -312,7 +312,7 @@ Laplace spectra.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.compute_shapedna">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_shapedna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L14-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_shapedna" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_shapedna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.shapedna.compute_shapedna" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the shapeDNA descriptor for triangle or tetrahedral meshes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -354,7 +354,7 @@ If False, will use slower LU decomposition.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.normalize_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L70-L122"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Normalize a surface or a volume.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -380,7 +380,7 @@ If False, will use slower LU decomposition.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.reweight_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L125-L141"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Apply linear re-weighting.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -477,7 +477,7 @@ If False, will use slower LU decomposition.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=9912e11f"></script>
+</div><script src="../../_static/documentation_options.js?v=58fbf978"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

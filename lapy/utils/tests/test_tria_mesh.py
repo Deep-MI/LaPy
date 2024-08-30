@@ -51,7 +51,7 @@ def loaded_data():
     Returns:
         dict: Dictionary containing the expected outcomes data.
     """
-    with open("lapy/utils/tests/expected_outcomes.json", "r") as f:
+    with open("lapy/utils/tests/expected_outcomes.json") as f:
         expected_outcomes = json.load(f)
     return expected_outcomes
 
@@ -104,8 +104,8 @@ def test_euler(tria_mesh_fixture, loaded_data):
 
 def test_tria_areas(tria_mesh_fixture, loaded_data):
     """
-    np.testing.assert_array_almost_equal raises an AssertionError if two objects i.e tria_areas and expected_area
-    are not equal up to desired precision.
+    np.testing.assert_array_almost_equal raises an AssertionError if two objects
+    i.e tria_areas and expected_area are not equal up to desired precision.
     """
     expected_area = np.array(
         loaded_data["expected_outcomes"]["test_tria_mesh"]["expected_area"]
@@ -128,26 +128,13 @@ def test_area(tria_mesh_fixture, loaded_data):
     assert result == pytest.approx(expected_mesh_area)
 
 
-def test_volume(tria_mesh_fixture):
-    """
-    Testing the volume calculation of the mesh for an unoriented mesh
-    """
-    # Assuming that tria_mesh_fixture is unoriented
-    try:
-        tria_mesh_fixture.volume()
-    except ValueError as e:
-        assert "Can only compute volume for oriented triangle meshes!" in str(e)
-    else:
-        assert False  # The function should raise a ValueError
-
-
 # Define the test case for non-oriented mesh
 def test_volume_oriented(tria_mesh_fixture):
     """
     This test is verifying that the T.volume() function raises a ValueError
     with the error message when the input TriaMesh object is not correctly oriented.
-    The test will always pass by matching an error because the volume inside the closed mesh,
-    however, requires the mesh to be correctly oriented
+    The test will always pass by matching an error because the volume inside the
+    closed mesh,however, requires the mesh to be correctly oriented
     """
     # Use the appropriate exception that T.volume() raises
     with pytest.raises(
@@ -178,7 +165,7 @@ def test_vertex_areas(tria_mesh_fixture, loaded_data):
     mesh = tria_mesh_fixture
     result = mesh.vertex_areas()
     np.testing.assert_almost_equal(result, expected_vertex_area)
-    # Verify that the sum of vertex areas is approximately equal to the total surface area
+    # Verify that the sum of vertex areas is close to the total surface area
     vertex_areas_sum = np.sum(mesh.vertex_areas())
     total_surface_area = mesh.area()
     assert np.isclose(vertex_areas_sum, total_surface_area)
@@ -301,8 +288,9 @@ def test_vertex_normals(tria_mesh_fixture, loaded_data):
     """
 
     # Calling tria_mesh_fixture.orient_() will modify the tria_mesh_fixture in-place and
-    # return the number of flipped triangles. However, it won't return a new instance of TriaMesh, so assigning
-    # the result to mesh like mesh = tria_mesh_fixture.orient_() would not work as expected.
+    # return the number of flipped triangles. However, it won't return a new instance of
+    # TriaMesh, so assigning the result to mesh like mesh = tria_mesh_fixture.orient_()
+    # would not work as expected.
 
     # Ensure the mesh is oriented before computing vertex normals
     tria_mesh_fixture.orient_()

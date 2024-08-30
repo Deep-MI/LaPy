@@ -25,7 +25,7 @@ def read_vfunc(filename):
     try:
         with open(filename) as f:
             txt = f.readlines()
-    except IOError:
+    except OSError:
         print("[File " + filename + " not found or not readable]")
         return
     txt = [x.strip() for x in txt]
@@ -54,8 +54,8 @@ def read_ev(filename):
     """
     # open file
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[File " + filename + " not found or not readable]")
         return
     # read file (and get rid of all \n)
@@ -120,7 +120,7 @@ def read_ev(filename):
             if ll[i].find("}") >= 0:  # '{' and '}' on the same line
                 evals = ll[i].strip().replace("{", "").replace("}", "")
             else:
-                evals = str()
+                evals = ""
                 while ll[i].find("}") < 0:
                     evals = evals + ll[i].strip().replace("{", "").replace("}", "")
                     i = i + 1
@@ -141,7 +141,7 @@ def read_ev(filename):
             if ll[i].find("}") >= 0:  # '{' and '}' on the same line
                 evecs = ll[i].strip().replace("{", "").replace("}", "")
             else:
-                evecs = str()
+                evecs = ""
                 while ll[i].find("}") < 0:
                     evecs = evecs + ll[i].strip().replace("{", "").replace(
                         "}", ""
@@ -187,7 +187,7 @@ def write_ev(filename, d):
     # open file
     try:
         f = open(filename, "w")
-    except IOError:
+    except OSError:
         print("[File " + filename + " not writable]")
         return
     # check data structure
@@ -281,7 +281,7 @@ def write_vfunc(filename, vfunc):
     """
     try:
         f = open(filename, "w")
-    except IOError:
+    except OSError:
         print("[File " + filename + " not writable]")
         return
     f.write("Solution:\n")

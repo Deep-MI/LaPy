@@ -81,7 +81,7 @@ def _read_volume_info(fobj):
         if not np.array_equal(head, [2, 0, 20]) and not np.array_equal(
             head, [2, 1, 20]
         ):
-            warnings.warn("Unknown extension code.")
+            warnings.warn("Unknown extension code.", stacklevel=2)
             return volume_info
         head = [2, 0, 20]
 
@@ -98,7 +98,7 @@ def _read_volume_info(fobj):
     ]:
         pair = fobj.readline().decode("utf-8").split("=")
         if pair[0].strip() != key or len(pair) != 2:
-            raise IOError("Error parsing volume info.")
+            raise OSError("Error parsing volume info.")
         if key in ("valid", "filename"):
             volume_info[key] = pair[1].strip()
         elif key == "volume":
@@ -176,7 +176,7 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
     ret = (coords, faces)
     if read_metadata:
         if len(volume_info) == 0:
-            warnings.warn("No volume information contained in the file")
+            warnings.warn("No volume information contained in the file", stacklevel=2)
         ret += (volume_info,)
     if read_stamp:
         ret += (create_stamp,)

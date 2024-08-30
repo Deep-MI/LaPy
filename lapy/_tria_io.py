@@ -29,7 +29,7 @@ def read_fssurf(filename):
         from ._read_geometry import read_geometry
 
         surf = read_geometry(filename, read_metadata=True)
-    except IOError:
+    except OSError:
         print("[file not found or not readable]\n")
         raise
     from . import TriaMesh
@@ -52,8 +52,8 @@ def read_off(filename):
     """
     getLogger(__name__).debug("--> OFF format         ... ")
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[file not found or not readable]\n")
         raise
     line = f.readline()
@@ -63,7 +63,7 @@ def read_off(filename):
         msg = "[OFF keyword not found] --> FAILED\n"
         print(msg)
         f.close()
-        raise IOError(msg)
+        raise OSError(msg)
     # expect tria and vertex sizes after OFF line:
     line = f.readline()
     larr = line.split()
@@ -84,7 +84,7 @@ def read_off(filename):
         msg = "[no triangle data] --> FAILED\n"
         print(msg)
         f.close()
-        raise IOError(msg)
+        raise OSError(msg)
     t = t[:, 1:]
     f.close()
     getLogger(__name__).info(f" --> DONE ( V: {v.shape[0]} , T: {t.shape[0]} )\n")
@@ -108,8 +108,8 @@ def read_vtk(filename):
     """
     getLogger(__name__).debug("--> VTK format         ... ")
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[file not found or not readable]\n")
         raise
     # skip comments
@@ -125,7 +125,7 @@ def read_vtk(filename):
     if not line.startswith("ASCII"):
         msg = "[ASCII keyword not found] --> FAILED\n"
         print(msg)
-        raise IOError(msg)
+        raise OSError(msg)
     # expect Dataset Polydata line after ASCII:
     line = f.readline()
     if not line.startswith("DATASET POLYDATA") and not line.startswith(
@@ -136,14 +136,14 @@ def read_vtk(filename):
             f"--> FAILED\n"
         )
         print(msg)
-        raise IOError(msg)
+        raise OSError(msg)
     # read number of points
     line = f.readline()
     larr = line.split()
     if larr[0] != "POINTS" or (larr[2] != "float" and larr[2] != "double"):
         msg = f"[read: {line} expected POINTS # float or POINTS # double ] --> FAILED\n"
         print(msg)
-        raise IOError(msg)
+        raise OSError(msg)
     pnum = int(larr[1])
     # read points as chunk
     v = np.fromfile(f, "float32", 3 * pnum, " ")
@@ -158,29 +158,29 @@ def read_vtk(filename):
         if npt != 4.0:
             msg = f"[having: {npt} data per tria, expected trias 3+1] --> FAILED\n"
             print(msg)
-            raise IOError(msg)
+            raise OSError(msg)
         t = np.fromfile(f, "int", ttnum, " ")
         t.shape = (tnum, 4)
         if t[tnum - 1][0] != 3:
             msg = "[can only read triangles] --> FAILED\n"
             print(msg)
-            raise IOError(msg)
+            raise OSError(msg)
         t = np.delete(t, 0, 1)
     elif larr[0] == "TRIANGLE_STRIPS":
         tnum = int(larr[1])
         # ttnum = int(larr[2])
         tt = []
-        for i in range(tnum):
+        for _i in range(tnum):
             larr = f.readline().split()
             if len(larr) == 0:
                 msg = "[error reading triangle strip (i)] --> FAILED\n"
                 print(msg)
-                raise IOError(msg)
+                raise OSError(msg)
             n = int(larr[0])
             if len(larr) != n + 1:
                 msg = "[error reading triangle strip (ii)] --> FAILED\n"
                 print(msg)
-                raise IOError(msg)
+                raise OSError(msg)
             # create triangles from strip
             # note that larr tria info starts at index 1
             for ii in range(2, n):
@@ -193,7 +193,7 @@ def read_vtk(filename):
     else:
         msg = f"[read: {line} expected POLYGONS or TRIANGLE_STRIPS] --> FAILED\n"
         print(msg)
-        raise IOError(msg)
+        raise OSError(msg)
     f.close()
     getLogger(__name__).info(f" --> DONE ( V: {v.shape[0]} , T: {t.shape[0]} )\n")
     from . import TriaMesh
@@ -281,8 +281,8 @@ def read_gmsh(filename):
     getLogger(__name__).debug("--> GMSH format         ... ")
 
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[file not found or not readable]\n")
         raise
 
@@ -359,7 +359,7 @@ def read_gmsh(filename):
             line = f.readline()
             assert line.strip() == "$EndNodes"
         else:
-            assert environ == "Elements", "Unknown environment '{}'.".format(environ)
+            assert environ == "Elements", f"Unknown environment '{environ}'."
             # The first line is the number of elements
             line = f.readline()
             total_num_cells = int(line)
@@ -476,7 +476,7 @@ def write_vtk(tria, filename):
     # open file
     try:
         f = open(filename, "w")
-    except IOError:
+    except OSError:
         print("[File " + filename + " not writable]")
         raise
     # check data structure
@@ -512,6 +512,6 @@ def write_fssurf(tria, filename):
         from nibabel.freesurfer.io import write_geometry
 
         write_geometry(filename, tria.v, tria.t, volume_info=tria.fsinfo)
-    except IOError:
+    except OSError:
         print("[File " + filename + " not writable]")
         raise

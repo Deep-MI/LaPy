@@ -56,7 +56,7 @@ def import_optional_dependency(
             raise ImportError(
                 f"Missing optional dependency '{install_name}'. {extra} "
                 f"Use pip or conda to install {install_name}."
-            )
+            ) from None
         else:
             return None
 

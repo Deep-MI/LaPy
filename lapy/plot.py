@@ -160,8 +160,8 @@ def _get_colorval(t, colormap):
     pos = bisect(columns[0], t)
     # compute param between pos-1 and pos values
     if len(columns[0]) < pos + 1 or pos == 0:
-        print("pos: {}".format(pos))
-        print("t: {}".format(t))
+        print(f"pos: {pos}")
+        print(f"t: {t}")
         print(columns[0])
         raise ValueError("t not in range?")
     tt = (t - columns[0][pos - 1]) / (columns[0][pos] - columns[0][pos - 1])
@@ -199,16 +199,16 @@ def _map_z2color(zval, colormap, zmin, zmax):
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
 
-    t = (zval - zmin) / float((zmax - zmin))  # normalize val
+    t = (zval - zmin) / float(zmax - zmin)  # normalize val
     if isinstance(colormap, LinearSegmentedColormap):
         r, g, b, alpha = colormap(t)
         rgb = (
             "rgb("
-            + "{:d}".format(int(r * 255 + 0.5))
+            + f"{int(r * 255 + 0.5):d}"
             + ","
-            + "{:d}".format(int(g * 255 + 0.5))
+            + f"{int(g * 255 + 0.5):d}"
             + ","
-            + "{:d}".format(int(b * 255 + 0.5))
+            + f"{int(b * 255 + 0.5):d}"
             + ")"
         )
     else:

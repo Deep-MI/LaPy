@@ -442,9 +442,9 @@ def tria_mean_curvature_flow(
         # compute difference
         dv = trianorm.v - vlast
         diff = np.trace(np.square(np.matmul(np.transpose(dv), mass.dot(dv))))
-        print("Step {} delta: {}".format(x + 1, diff))
+        print(f"Step {x + 1} delta: {diff}")
         if diff < stop_eps:
-            print("Converged after {} iterations.".format(x + 1))
+            print(f"Converged after {x + 1} iterations.")
             break
     return trianorm
 
@@ -536,12 +536,12 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     l31 = abs(cmax3[1] - cmin3[1])
     if l11 < l21 or l11 < l31:
         print("ERROR: direction 1 should be (anterior -posterior) but is not!")
-        print("  debug info: {} {} {} ".format(l11, l21, l31))
+        print(f"  debug info: {l11} {l21} {l31} ")
         # sys.exit(1)
         raise ValueError("Direction 1 should be anterior - posterior")
 
     # only flip direction if necessary
-    print("ev1 min: {}  max {} ".format(cmin1, cmax1))
+    print(f"ev1 min: {cmin1}  max {cmax1} ")
     # axis 1 = y is aligned with this function (for brains in FS space)
     v1 = cmax1 - cmin1
     if cmax1[1] < cmin1[1]:
@@ -563,7 +563,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if l33 < l23:
         print("WARNING: direction 3 wants to swap with 2, but cannot")
 
-    print("ev2 min: {}  max {} ".format(cmin2, cmax2))
+    print(f"ev2 min: {cmin2}  max {cmax2} ")
     # axis 2 = z is aligned with this function (for brains in FS space)
     v2 = cmax2 - cmin2
     if cmax2[2] < cmin2[2]:
@@ -571,7 +571,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         print("inverting direction 2 (superior - inferior)")
     l2 = abs(cmax2[2] - cmin2[2])
 
-    print("ev3 min: {}  max {} ".format(cmin3, cmax3))
+    print(f"ev3 min: {cmin3}  max {cmax3} ")
     # axis 0 = x is aligned with this function (for brains in FS space)
     v3 = cmax3 - cmin3
     if cmax3[0] < cmin3[0]:
@@ -583,13 +583,13 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     v2 = v2 * (1.0 / np.sqrt(np.sum(v2 * v2)))
     v3 = v3 * (1.0 / np.sqrt(np.sum(v3 * v3)))
     spatvol = abs(np.dot(v1, np.cross(v2, v3)))
-    print("spat vol: {}".format(spatvol))
+    print(f"spat vol: {spatvol}")
 
     mvol = tria.volume()
-    print("orig mesh vol {}".format(mvol))
+    print(f"orig mesh vol {mvol}")
     bvol = l1 * l2 * l3
-    print("box {}, {}, {} volume: {} ".format(l1, l2, l3, bvol))
-    print("box coverage: {}".format(bvol / mvol))
+    print(f"box {l1}, {l2}, {l3} volume: {bvol} ")
+    print(f"box coverage: {bvol / mvol}")
 
     # we map evN to -1..0..+1 (keep zero level fixed)
     # I have the feeling that this helps a little with the stretching
@@ -627,7 +627,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     trianew = TriaMesh(vn, tria.t)
     svol = trianew.area() / (4.0 * math.pi * 10000)
-    print("sphere area fraction: {} ".format(svol))
+    print(f"sphere area fraction: {svol} ")
 
     flippedarea = get_flipped_area(trianew) / (4.0 * math.pi * 10000)
     if flippedarea > 0.95:
@@ -635,7 +635,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         # sys.exit(1)
         raise ValueError("global normal flip")
 
-    print("flipped area fraction: {} ".format(flippedarea))
+    print(f"flipped area fraction: {flippedarea} ")
 
     if svol < 0.99:
         print("ERROR: sphere area fraction should be above .99, exiting ..")

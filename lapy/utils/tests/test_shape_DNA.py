@@ -16,7 +16,7 @@ def loaded_data():
     """
     Load expected outcomes data from a JSON file as a dictionary.
     """
-    with open("lapy/utils/tests/expected_outcomes.json", "r") as f:
+    with open("lapy/utils/tests/expected_outcomes.json") as f:
         expected_outcomes = json.load(f)
     return expected_outcomes
 
@@ -29,7 +29,7 @@ def test_compute_shapedna(loaded_data):
         loaded_data (dict): Expected outcomes loaded from a JSON file.
 
     Raises:
-        AssertionError: If computed eigenvalues don't match expected values within tolerance.
+        AssertionError: If computed eigenvalues don't match within tolerance.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -50,7 +50,7 @@ def test_normalize_ev_geometry(loaded_data):
         loaded_data (dict): Expected outcomes from a JSON file.
 
     Raises:
-        AssertionError: If normalized eigenvalues don't match expected values within tolerance.
+        AssertionError: If normalized eigenvalues don't match within tolerance.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -76,7 +76,7 @@ def test_reweight_ev(loaded_data):
         loaded_data (dict): Expected outcomes from a JSON file.
 
     Raises:
-        AssertionError: If reweighted eigenvalues don't match expected values within tolerance.
+        AssertionError: If reweighted eigenvalues don't match within tolerance.
     """
     ev = compute_shapedna(tria, k=3)
 
@@ -124,7 +124,7 @@ def test_compute_shapedna_tet(loaded_data):
         loaded_data (dict): Expected outcomes from a JSON file.
 
     Raises:
-        AssertionError: If computed eigenvalues don't match expected values within tolerance.
+        AssertionError: If computed eigenvalues don't match within tolerance.
     """
     evTet = compute_shapedna(tet, k=3)
 
@@ -148,7 +148,7 @@ def test_normalize_ev_geometry_tet(loaded_data):
         loaded_data (dict): Expected outcomes from a JSON file.
 
     Raises:
-        AssertionError: If normalized eigenvalues don't match expected values within tolerance.
+        AssertionError: If normalized eigenvalues don't match within tolerance.
     """
     evTet = compute_shapedna(tet, k=3)
 
@@ -170,13 +170,13 @@ def test_normalize_ev_geometry_tet(loaded_data):
 
 def test_reweight_ev_tet(loaded_data):
     """
-    Test reweighted_ev() for tetrahedral meshes and validate reweighted eigenvalues' data type.
+    Test reweighted_ev() for tetrahedral meshes and validate data type.
 
     Args:
         loaded_data (dict): Expected outcomes from a JSON file.
 
     Raises:
-        AssertionError: If reweighted eigenvalues don't match expected values within tolerance.
+        AssertionError: If reweighted eigenvalues don't match within tolerance.
     """
     evTet = compute_shapedna(tet, k=3)
 
@@ -195,7 +195,7 @@ def test_reweight_ev_tet(loaded_data):
 
 def test_compute_distance_tet(loaded_data):
     """
-    Test compute_distance() for eigenvalues of tetrahedral meshes and validate computed distance.
+    Test compute_distance() for eigenvalues of tetrahedral meshes.
 
     Args:
         loaded_data (dict): Expected outcomes from a JSON file.

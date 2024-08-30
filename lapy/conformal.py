@@ -83,7 +83,7 @@ def spherical_conformal_map(tria, use_cholmod=False):
     b = tria.v[p2, :] - tria.v[p0, :]
     sin1 = np.linalg.norm(np.cross(a, b)) / (np.linalg.norm(a) * np.linalg.norm(b))
     ori_h = np.linalg.norm(b) * sin1
-    ratio = np.sqrt(((x0 - x1) ** 2 + (y0 - y1) ** 2)) / np.linalg.norm(a)
+    ratio = np.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / np.linalg.norm(a)
     y2 = ori_h * ratio  # compute the coordinates of the third vertex
     x2 = np.sqrt(np.linalg.norm(b) ** 2 * ratio**2 - y2**2)
     # should be around (0.5, sqrt(3)/2) if we found an equilateral bigtri

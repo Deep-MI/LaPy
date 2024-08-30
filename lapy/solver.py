@@ -1,6 +1,6 @@
 import importlib
 import sys
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
 from scipy import sparse
@@ -50,7 +50,7 @@ class Solver:
         self,
         geometry: Union[TriaMesh, TetMesh],
         lump: bool = False,
-        aniso: Optional[Union[float, Tuple[float, float]]] = None,
+        aniso: Optional[Union[float, tuple[float, float]]] = None,
         aniso_smooth: int = 10,
         use_cholmod: bool = False,
     ) -> None:

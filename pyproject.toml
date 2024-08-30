@@ -116,7 +116,7 @@ exclude = ['lapy*tests']
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py310']
 include = '\.pyi?$'
 extend-exclude = '''
 (
@@ -134,7 +134,7 @@ extend-exclude = '''
 profile = 'black'
 multi_line_output = 3
 line_length = 88
-py_version = 38
+py_version = 310
 extend_skip_glob = [
     'setup.py',
     'data/*',

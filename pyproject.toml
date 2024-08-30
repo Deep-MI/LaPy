@@ -124,7 +124,24 @@ line-length = 88
 extend-exclude = [
     "doc",
     "setup.py",
-    "tutorials/*",
+    "tutorials",
+]
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/linter/#rule-selection
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    # "SIM",
+    # isort
+    "I",
 ]
 
 [tool.ruff.lint.per-file-ignores]

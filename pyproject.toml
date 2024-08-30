@@ -1,5 +1,8 @@
 [build-system]
-requires = ['setuptools >= 61.0.0']
+requires = [
+    'setuptools >= 61.0.0',
+    'numpy>=2',
+]
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -8,7 +11,7 @@ version = '1.2.0-dev'
 description = 'A package for differential geometry on meshes (Laplace, FEM)'
 readme = 'README.md'
 license = {file = 'LICENSE'}
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 authors = [
     {name = 'Martin Reuter', email = 'martin.reuter@dzne.de'},
 ]
@@ -31,10 +34,10 @@ classifiers = [
     'Operating System :: Unix',
     'Operating System :: MacOS',
     'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Natural Language :: English',
     'License :: OSI Approved :: MIT License',
     'Intended Audience :: Science/Research',

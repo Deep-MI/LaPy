@@ -123,7 +123,8 @@ add_ignore = 'D100,D104,D107'
 line-length = 88
 extend-exclude = [
     "doc",
-    "setup.py",
+    ".github",
+    "data",
 ]
 
 [tool.ruff.lint]

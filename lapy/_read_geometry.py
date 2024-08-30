@@ -146,7 +146,8 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
     """
     volume_info = OrderedDict()
 
-    # See comment in _fread3 on why 
+    # See comment in _fread3() on why we have changed the
+    # comparison
     #TRIANGLE_MAGIC = 16777214
     TRIANGLE_MAGIC = (np.uint8(255), np.uint8(255), np.uint8(254))
 

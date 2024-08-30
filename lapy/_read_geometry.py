@@ -53,11 +53,11 @@ def _fread3(fobj):
         A 3 byte int
     """
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
-    # the bit-shifting operator does not return 
+    # the bit-shifting operator does not return
     # identical results on all platforms, therefore
-    # we disable it and return / compare the first 
+    # we disable it and return / compare the first
     # three bytes separately
-    #return (b1 << 16) + (b2 << 8) + b3
+    # return (b1 << 16) + (b2 << 8) + b3
     return b1, b2, b3
 
 
@@ -148,7 +148,7 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
 
     # See comment in _fread3() on why we have changed the
     # comparison
-    #TRIANGLE_MAGIC = 16777214
+    # TRIANGLE_MAGIC = 16777214
     TRIANGLE_MAGIC = (np.uint8(255), np.uint8(255), np.uint8(254))
 
     with open(filepath, "rb") as fobj:

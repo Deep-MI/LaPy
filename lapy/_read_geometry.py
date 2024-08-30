@@ -148,7 +148,7 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
 
     # See comment in _fread3 on why 
     #TRIANGLE_MAGIC = 16777214
-    TRIANGLE_MAGIC = [np.uint8(255), np.uint8(255), np.uint8(254)]
+    TRIANGLE_MAGIC = (np.uint8(255), np.uint8(255), np.uint8(254))
 
     with open(filepath, "rb") as fobj:
         magic = _fread3(fobj)

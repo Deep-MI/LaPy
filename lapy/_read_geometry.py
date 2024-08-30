@@ -53,7 +53,12 @@ def _fread3(fobj):
         A 3 byte int
     """
     b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
-    return (b1 << 16) + (b2 << 8) + b3
+    # the bit-shifting operator does not return 
+    # identical results on all platforms, therefore
+    # we disable it and return / compare the first 
+    # three bytes separately
+    #return (b1 << 16) + (b2 << 8) + b3
+    return b1, b2, b3
 
 
 def _read_volume_info(fobj):
@@ -141,7 +146,9 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
     """
     volume_info = OrderedDict()
 
-    TRIANGLE_MAGIC = 16777214
+    # See comment in _fread3 on why 
+    #TRIANGLE_MAGIC = 16777214
+    TRIANGLE_MAGIC = [255, 255, 254]
 
     with open(filepath, "rb") as fobj:
         magic = _fread3(fobj)

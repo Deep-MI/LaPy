@@ -153,9 +153,6 @@ def read_geometry(filepath, read_metadata=False, read_stamp=False):
 
     with open(filepath, "rb") as fobj:
         magic = _fread3(fobj)
-        print("magic")
-        print(magic)
-        print(magic)
 
         if magic == TRIANGLE_MAGIC:  # Triangle file
             create_stamp = fobj.readline().rstrip(b"\n").decode("utf-8")

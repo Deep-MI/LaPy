@@ -124,7 +124,6 @@ line-length = 88
 extend-exclude = [
     "doc",
     "setup.py",
-    "examples",
 ]
 
 [tool.ruff.lint]
@@ -146,6 +145,7 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"examples" = ["E501"]   # ignore too long lines in example ipynb
 
 [tool.pytest.ini_options]
 minversion = '6.0'

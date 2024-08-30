@@ -870,7 +870,7 @@ class TriaMesh:
         it : int
             Number of iterations.
         """
-        for x in range(it):
+        for _x in range(it):
             # make symmetric adj matrix to upper triangle
             adjtriu = sparse.triu(self.adj_sym, 0, format="csr")
             # create new vertex index for each edge
@@ -997,9 +997,7 @@ class TriaMesh:
                 v.data = np.sign(v.data)
             endt = time.time()
             print(
-                "Searched mesh after {} flooding iterations ({} sec).".format(
-                    count, endt - startt
-                )
+                f"Searched mesh after {count} flood iterations ({endt - startt} sec)."
             )
             # get tria indices that need flipping:
             idx = v.toarray() == -1
@@ -1107,7 +1105,7 @@ class TriaMesh:
         adj2 = adj2.multiply(1.0 / rowsum)
         # apply sparse matrix n times (fast in spite of loop)
         vout = adj2.dot(vfunc)
-        for i in range(n - 1):
+        for _i in range(n - 1):
             vout = adj2.dot(vout)
         return vout
 

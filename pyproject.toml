@@ -76,9 +76,7 @@ doc = [
 ]
 style = [
     'bibclean',
-    'black',
     'codespell',
-    'isort',
     'pydocstyle[toml]',
     'ruff',
 ]
@@ -114,35 +112,6 @@ include-package-data = false
 include = ['lapy*']
 exclude = ['lapy*tests']
 
-[tool.black]
-line-length = 88
-target-version = ['py310']
-include = '\.pyi?$'
-extend-exclude = '''
-(
-      __pycache__
-    | .github
-    | setup.py
-    | data/
-    | doc/
-    | examples/
-    | tutorials/
-)
-'''
-
-[tool.isort]
-profile = 'black'
-multi_line_output = 3
-line_length = 88
-py_version = 310
-extend_skip_glob = [
-    'setup.py',
-    'data/*',
-    'doc/*',
-    'examples/*',
-    'tutorials/*',
-]
-
 [tool.pydocstyle]
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot|Slot)'
@@ -155,6 +124,7 @@ line-length = 88
 extend-exclude = [
     "doc",
     "setup.py",
+    "tutorials/*",
 ]
 
 [tool.ruff.lint.per-file-ignores]

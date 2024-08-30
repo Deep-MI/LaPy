@@ -3,7 +3,7 @@ import re
 import sys
 from functools import partial
 from importlib.metadata import requires, version
-from typing import IO, Callable, List, Optional
+from typing import IO, Callable, Optional
 
 import psutil
 
@@ -68,7 +68,7 @@ def sys_info(fid: Optional[IO] = None, developer: bool = False):
             _list_dependencies_info(out, ljust, dependencies)
 
 
-def _list_dependencies_info(out: Callable, ljust: int, dependencies: List[str]):
+def _list_dependencies_info(out: Callable, ljust: int, dependencies: list[str]):
     """List dependencies names and versions.
 
     Parameters

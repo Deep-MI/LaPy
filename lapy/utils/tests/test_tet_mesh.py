@@ -46,7 +46,7 @@ def loaded_data():
     """
     Load expected outcomes data from a JSON file as a dictionary.
     """
-    with open("lapy/utils/tests/expected_outcomes.json", "r") as f:
+    with open("lapy/utils/tests/expected_outcomes.json") as f:
         expected_outcomes = json.load(f)
     return expected_outcomes
 

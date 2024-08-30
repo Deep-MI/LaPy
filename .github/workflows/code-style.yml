@@ -25,13 +25,6 @@ jobs:
           python -m pip install --progress-bar off .[style]
       - name: Run Ruff
         run: ruff check .
-      - name: Run isort
-        uses: isort/isort-action@master
-      - name: Run black
-        uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          version: "23.10.1"
       - name: Run codespell
         uses: codespell-project/actions-codespell@master
         with:

@@ -29,8 +29,8 @@ def read_gmsh(filename):
         print("[no .msh file] --> FAILED\n")
         return
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[file not found or not readable]\n")
         return
     line = f.readline()
@@ -126,8 +126,8 @@ def read_vtk(filename):
     if verbose > 0:
         print("--> VTK format         ... ")
     try:
-        f = open(filename, "r")
-    except IOError:
+        f = open(filename)
+    except OSError:
         print("[file not found or not readable]\n")
         return
     # skip comments
@@ -209,7 +209,7 @@ def write_vtk(tet, filename):
     # open file
     try:
         f = open(filename, "w")
-    except IOError:
+    except OSError:
         print("[File " + filename + " not writable]")
         return
     # check data structure

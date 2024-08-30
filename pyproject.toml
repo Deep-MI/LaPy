@@ -123,12 +123,30 @@ add_ignore = 'D100,D104,D107'
 line-length = 88
 extend-exclude = [
     "doc",
-    "setup.py",
-    "tutorials/*",
+    ".github",
+    "data",
+]
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/linter/#rule-selection
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    # "SIM",
+    # isort
+    "I",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"examples/*" = ["E501"]   # ignore too long lines in example ipynb
 
 [tool.pytest.ini_options]
 minversion = '6.0'

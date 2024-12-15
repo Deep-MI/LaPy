@@ -289,20 +289,20 @@ mean curvature flow etc.</p>
 tet and tria versions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.compute_divergence">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L47-L72"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.compute_divergence" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.compute_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Compute divergence of a vertex function f.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -317,7 +317,7 @@ tet and tria versions.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.compute_geodesic_f">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_geodesic_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L101-L131"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.compute_geodesic_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_geodesic_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.compute_geodesic_f" title="Link to this definition">¶</a></dt>
 <dd><p>Compute function with normalized gradient (geodesic distance).</p>
 <p>Computes gradient, normalizes it and computes function with this normalized
 gradient by solving the Poisson equation with the divergence of grad.
@@ -327,13 +327,13 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a>, <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar geodesic function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar geodesic function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -342,20 +342,20 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.compute_gradient">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L19-L44"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.compute_gradient" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.compute_gradient" title="Link to this definition">¶</a></dt>
 <dd><p>Compute gradient of a vertex function f.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d gradient vector at each element.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d gradient vector at each element.</p>
 </dd>
 </dl>
 </dd>
@@ -370,20 +370,20 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.compute_rotated_f">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_rotated_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L75-L98"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.compute_rotated_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">compute_rotated_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.compute_rotated_f" title="Link to this definition">¶</a></dt>
 <dd><p>Compute function whose level sets are orthgonal to the ones of vfunc.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Rotated function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Rotated function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -398,7 +398,7 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tet_compute_divergence">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L729-L784"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_divergence" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tet_compute_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Compute integrated divergence of a 3d tetra function f (for each vertex).</p>
 <p>Divergence is the flux density leaving or entering a point.
 It can be measured by summing the dot product of the vector
@@ -409,13 +409,13 @@ around a vertex. Summing &lt; tfunc , n_tria_oposite_v &gt;</p>
 <dd class="field-odd"><dl>
 <dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Tetrahedral mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on tets.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on tets.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -427,7 +427,7 @@ with B^-1 to get back the function in some applications.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tet_compute_gradient">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L661-L726"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_gradient" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tet_compute_gradient" title="Link to this definition">¶</a></dt>
 <dd><p>Compute gradient of a vertex function f (for each tetra).</p>
 <p>For a tetrahedron (vi,vj,vk,vh) with volume V we have:</p>
 <div class="math-wrapper docutils container">
@@ -445,13 +445,13 @@ with B^-1 to get back the function in some applications.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Tetraheral mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (n, 3)</span></dt><dd><p>3d gradient vector at tetras.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (n, 3)</span></dt><dd><p>3d gradient vector at tetras.</p>
 </dd>
 </dl>
 </dd>
@@ -467,7 +467,7 @@ Desbrun et al.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_compute_divergence">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L223-L279"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_compute_divergence" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_compute_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Compute integrated divergence of a 3d triangle function f (for each vertex).</p>
 <p>Divergence is the flux density leaving or entering a point.
 Note: this is the integrated divergence, you may want to multiply
@@ -477,13 +477,13 @@ with B^-1 to get back the function in some applications</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -494,7 +494,7 @@ with B^-1 to get back the function in some applications</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_compute_divergence2">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_divergence2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L282-L332"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_compute_divergence2" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_divergence2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_compute_divergence2" title="Link to this definition">¶</a></dt>
 <dd><p>Compute integrated divergence of a 3d triangle function f (for each vertex).</p>
 <p>Divergence is the flux density leaving or entering a point.
 It can be measured by summing the dot product of the vector
@@ -507,13 +507,13 @@ with B^-1 to get back the function in some applications</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -524,7 +524,7 @@ with B^-1 to get back the function in some applications</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_compute_geodesic_f">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_geodesic_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L134-L165"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_compute_geodesic_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_geodesic_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_compute_geodesic_f" title="Link to this definition">¶</a></dt>
 <dd><p>Compute function with normalized gradient (geodesic distance).</p>
 <p>Computes gradient, normalizes it and computes function with this normalized
 gradient by solving the Poisson equation with the divergence of grad.
@@ -534,13 +534,13 @@ This idea is also described in the paper “Geodesics in Heat”.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar geodesic function at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar geodesic function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -549,7 +549,7 @@ This idea is also described in the paper “Geodesics in Heat”.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_compute_gradient">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L169-L220"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_compute_gradient" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_compute_gradient" title="Link to this definition">¶</a></dt>
 <dd><p>Compute gradient of a vertex function f (for each triangle).</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -563,13 +563,13 @@ edge, which is equal to cross(n,vec).</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>tfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>3d gradient vector at triangles.</p>
+<dt>tfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>3d gradient vector at triangles.</p>
 </dd>
 </dl>
 </dd>
@@ -585,7 +585,7 @@ Desbrun …</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_compute_rotated_f">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_rotated_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L335-L370"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_compute_rotated_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_compute_rotated_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_compute_rotated_f" title="Link to this definition">¶</a></dt>
 <dd><p>Compute function whose level sets are orthgonal to the ones of vfunc.</p>
 <p>This is done by rotating the gradient around the normal by 90 degrees,
 then solving the Poisson equations with the divergence of rotated grad.</p>
@@ -594,13 +594,13 @@ then solving the Poisson equations with the divergence of rotated grad.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Rotated scalar function at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Rotated scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -611,7 +611,7 @@ then solving the Poisson equations with the divergence of rotated grad.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_mean_curvature_flow">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_mean_curvature_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L373-L449"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_mean_curvature_flow" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_mean_curvature_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_mean_curvature_flow" title="Link to this definition">¶</a></dt>
 <dd><p>Flow a triangle mesh along the mean curvature normal.</p>
 <p>mean_curvature_flow iteratively flows a triangle mesh along mean curvature
 normal (non-singular, see Kazhdan 2012).
@@ -654,7 +654,7 @@ to the origin. Closed meshes will map to the unit sphere.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_spherical_project">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_spherical_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L452-L658"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_spherical_project" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_spherical_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.diffgeo.tria_spherical_project" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the first 3 non-constant eigenfunctions and project the spectral embedding onto a sphere.</p>
 <p>Computes the first three non-constant eigenfunctions
 and then projects the spectral embedding onto a sphere. This works
@@ -773,7 +773,7 @@ case of brain surfaces in FreeSurfer coordinates.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=9912e11f"></script>
+</div><script src="../../_static/documentation_options.js?v=6f037312"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

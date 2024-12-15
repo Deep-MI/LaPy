@@ -285,7 +285,7 @@
 <p>Functions to read and write spectra and vertex functions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L41-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.read_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Load EV file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -306,7 +306,7 @@ information.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L6-L38"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.read_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Import vertex functions from txt file.</p>
 <p>Values can be separated by <code class="docutils literal notranslate"><span class="pre">;</span></code> or <code class="docutils literal notranslate"><span class="pre">,</span></code> and surrounded by <code class="docutils literal notranslate"><span class="pre">{}</span></code> or <code class="docutils literal notranslate"><span class="pre">()</span></code>
 brackets. Also first line can have the keyword “Solution:”, i.e. the PSOL format
@@ -320,7 +320,7 @@ from ShapeDNA.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>List of vfunc parameters.</p>
+<dt><strong>vals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>List of vfunc parameters.</p>
 </dd>
 </dl>
 </dd>
@@ -329,7 +329,7 @@ from ShapeDNA.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L176-L267"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.write_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Save EV data structures as txt file (format from ShapeDNA).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -346,7 +346,7 @@ information.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L270-L289"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.write_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Save vertex in PSOL txt file.</p>
 <p>First line “Solution:”, “,” separated values inside ()</p>
 <dl class="field-list">
@@ -354,7 +354,7 @@ information.</p>
 <dd class="field-odd"><dl>
 <dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Filename to save to.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.1)"><span>array_like</span></a></span></dt><dd><p>List of vfunc parameters.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.2)"><span>array_like</span></a></span></dt><dd><p>List of vfunc parameters.</p>
 </dd>
 </dl>
 </dd>
@@ -440,7 +440,7 @@ information.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=9912e11f"></script>
+</div><script src="../../_static/documentation_options.js?v=6f037312"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

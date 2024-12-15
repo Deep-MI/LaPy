@@ -7,7 +7,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'lapy'
-version = '1.2.0-dev'
+version = '1.1.2'
 description = 'A package for differential geometry on meshes (Laplace, FEM)'
 readme = 'README.md'
 license = {file = 'LICENSE'}

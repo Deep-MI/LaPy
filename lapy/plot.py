@@ -171,7 +171,7 @@ def _get_colorval(t, colormap):
     # compute new color via linear interpolation
     cval = np.rint(rv1 + tt * (rv2 - rv1)).astype(int)
     # format as string again
-    cstr = "rgb(%d, %d, %d)" % (cval[0], cval[1], cval[2])
+    cstr = f"rgb({cval[0]:d}, {cval[1]:d}, {cval[2]:d})"
     return cstr
 
 

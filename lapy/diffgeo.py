@@ -367,7 +367,7 @@ def tria_compute_rotated_f(tria, vfunc):
     # div is the integrated divergence (so it is already B*div)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     # since the solution is ill defined (addition of constant)
-    # we specify an arbitary boundary condition at a single vertex to
+    # we specify an arbitrary boundary condition at a single vertex to
     # remove that degree of freedom
     dtup = ( np.array([0]), np.array([0.0]))
     vf = fem.poisson(divf,dtup)

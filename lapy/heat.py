@@ -1,7 +1,7 @@
 """Functions for computing heat kernel and diffusion.
 
 Inputs are eigenvalues and eigenvectors (for heat kernel) and the
-mesh geometries (tet or tria mesh) for heat diffusion. 
+mesh geometries (tet or tria mesh) for heat diffusion.
 """
 
 import importlib

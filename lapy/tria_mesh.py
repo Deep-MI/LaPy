@@ -5,6 +5,7 @@ from scipy import sparse
 
 from . import _tria_io as io
 
+
 class TriaMesh:
     """Class representing a triangle mesh.
 
@@ -1136,42 +1137,53 @@ class TriaMesh:
             Length of level set (or array of lengths).
         """
         if vfunc.ndim > 1:
-            raise ValueError(f'vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!')
+            raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
         levels = np.atleast_1d(level)
-        ll = np.empty((levels.size,0))
-        for l in levels:
+        ll = np.empty((levels.size, 0))
+        for lnext in levels:
             # get intersecting triangles
-            intersect = vfunc[self.t] > l
-            t_idx = np.where(np.logical_or(np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2))[0]
+            intersect = vfunc[self.t] > lnext
+            t_idx = np.where(
+                np.logical_or(
+                    np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2
+                )
+            )[0]
             # reduce to triangles that intersect with level:
-            t_level = self.t[t_idx,:]
-            intersect = intersect[t_idx,:]
-            # trias have one vertex on one side and two on the other side of the level set
-            # invert trias with two true values, so that single vertex is true
-            intersect[np.sum(intersect,axis=1)>1,:] = np.logical_not(intersect[np.sum(intersect,axis=1)>1,:])
+            t_level = self.t[t_idx, :]
+            intersect = intersect[t_idx, :]
+            # trias have one vertex on one side and two on the other side of the
+            # level set. Here we invert trias with two true values, so that single
+            # vertex is true
+            intersect[np.sum(intersect, axis=1) > 1, :] = np.logical_not(
+                intersect[np.sum(intersect, axis=1) > 1, :]
+            )
             # get idx within tria with single vertex:
-            idx_single = np.argmax(intersect,axis=1)
+            idx_single = np.argmax(intersect, axis=1)
             idx_o1 = (idx_single + 1) % 3
             idx_o2 = (idx_single + 2) % 3
             # get global idx
-            gidx0 = t_level[np.arange(t_level.shape[0]),idx_single]
-            gidx1 = t_level[np.arange(t_level.shape[0]),idx_o1]
-            gidx2 = t_level[np.arange(t_level.shape[0]),idx_o2]
+            gidx0 = t_level[np.arange(t_level.shape[0]), idx_single]
+            gidx1 = t_level[np.arange(t_level.shape[0]), idx_o1]
+            gidx2 = t_level[np.arange(t_level.shape[0]), idx_o2]
             # determine fraction along edges (for each triangle)
-            xl1 = (l - vfunc[gidx0]) / (vfunc[gidx1] - vfunc[gidx0])
-            xl2 = (l - vfunc[gidx0]) / (vfunc[gidx2] - vfunc[gidx0])
+            xl1 = (lnext - vfunc[gidx0]) / (vfunc[gidx1] - vfunc[gidx0])
+            xl2 = (lnext - vfunc[gidx0]) / (vfunc[gidx2] - vfunc[gidx0])
             # determine points on the two edges (for each triangle)
-            p1 = (1 - xl1)[:, np.newaxis] * self.v[gidx0] + xl1[:, np.newaxis] * self.v[gidx1]
-            p2 = (1 - xl2)[:, np.newaxis] * self.v[gidx0] + xl2[:, np.newaxis] * self.v[gidx2]
+            p1 = (1 - xl1)[:, np.newaxis] * self.v[gidx0] + xl1[:, np.newaxis] * self.v[
+                gidx1
+            ]
+            p2 = (1 - xl2)[:, np.newaxis] * self.v[gidx0] + xl2[:, np.newaxis] * self.v[
+                gidx2
+            ]
             # compute edge length between the points
-            lls = np.sqrt( ((p1-p2) ** 2).sum(1))
-            ll = np.append(ll,lls.sum())
+            lls = np.sqrt(((p1 - p2) ** 2).sum(1))
+            ll = np.append(ll, lls.sum())
         if ll.size > 1:
             return ll
         elif ll.size > 0:
             return ll[0]
         else:
-            raise ValueError('No lengths computed, should never get here.')
+            raise ValueError("No lengths computed, should never get here.")
 
     @staticmethod
     def reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
@@ -1202,6 +1214,7 @@ class TriaMesh:
             path segment. Ony passed if get_edges_idx is True.
         """
         from scipy.sparse.csgraph import shortest_path
+
         # Extract node indices and create a sparse adjacency matrix
         edges = np.array(edges)
         i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
@@ -1209,31 +1222,41 @@ class TriaMesh:
         dat = np.ones(i.shape)
         n = edges.max() + 1
         adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
-        # Find the degree of each node
-        degrees = np.asarray(adj_matrix.sum(axis=1)).ravel() # Sum over rows to get degree
+        # Find the degree of each node, sum over rows to get degree
+        degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
         endpoints = np.where(degrees == 1)[0]
         if len(endpoints) != 2:
-            raise ValueError("The graph does not have exactly two endpoints; invalid input.")
+            raise ValueError(
+                "The graph does not have exactly two endpoints; invalid input."
+            )
         if not start_idx:
             start_idx = endpoints[0]
         else:
             if not np.isin(start_idx, endpoints):
-                raise ValueError(f"start_idx {start_idx} must be one of the endpoints {endpoints}.")
+                raise ValueError(
+                    f"start_idx {start_idx} must be one of the endpoints {endpoints}."
+                )
         # Traverse the graph by computing shortest path
-        dist_matrix = shortest_path(csgraph=adj_matrix, directed=False, indices=start_idx,
-                                    return_predecessors=False)
+        dist_matrix = shortest_path(
+            csgraph=adj_matrix,
+            directed=False,
+            indices=start_idx,
+            return_predecessors=False,
+        )
         if np.isinf(dist_matrix).any():
-            raise ValueError("Ensure indices range from 0 to max_idx without gaps and graph is connected.")
+            raise ValueError(
+                "Ensure connected graph with indices from 0 to max_idx without gaps."
+            )
         # sort indices according to distance form start
         path = dist_matrix.argsort()
         # get edge idx of each segment from original list
         enum = edges.shape[0]
-        dat = np.arange(enum)+1
+        dat = np.arange(enum) + 1
         dat = np.column_stack((dat, dat)).reshape(-1)
         eidx_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
         ei = path[0:-1]
-        ej = path[(np.arange(path.size-1)+1)]
-        eidx = np.asarray((eidx_matrix[ei,ej] - 1)).ravel()
+        ej = path[(np.arange(path.size - 1) + 1)]
+        eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
         if get_edge_idx:
             return path, eidx
         else:
@@ -1250,15 +1273,18 @@ class TriaMesh:
         xy_interp = np.c_[
             np.interp(d_sampled, d, path3d[:, 0]),
             np.interp(d_sampled, d, path3d[:, 1]),
-            np.interp(d_sampled, d, path3d[:, 2])
+            np.interp(d_sampled, d, path3d[:, 2]),
         ]
         return xy_interp
 
     @staticmethod
-    def iterative_resample_polygon(path3d: np.ndarray, n_points: int = 100, n_iter: int = 3) -> np.ndarray:
-        # Helper: resample multiple times to numerically stabilize the result to be truly equidistant
+    def iterative_resample_polygon(
+        path3d: np.ndarray, n_points: int = 100, n_iter: int = 3
+    ) -> np.ndarray:
+        # Helper: resample multiple times to numerically stabilize the result to be
+        # truly equidistant
         path3d_resampled = TriaMesh.resample_polygon(path3d, n_points)
-        for _ in range(n_iter-1):
+        for _ in range(n_iter - 1):
             path3d_resampled = TriaMesh.resample_polygon(path3d_resampled, n_points)
         return path3d_resampled
 
@@ -1276,7 +1302,8 @@ class TriaMesh:
             Level set value.
         get_tria_idx : bool, default: False
             Also return a list of triangle indices for each edge, default False.
-        n_points: resample level set into n equidistant points. Cannot be combined
+        n_points : int
+            Resample level set into n equidistant points. Cannot be combined
             with get_tria_idx=True.
 
         Returns
@@ -1290,60 +1317,83 @@ class TriaMesh:
             if path is langth n). Will only be returned if get_tria_idx is True.
         """
         if vfunc.ndim > 1:
-            raise ValueError(f'vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!')
+            raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
         # get intersecting triangles
         intersect = vfunc[self.t] > level
-        t_idx = np.where(np.logical_or(np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2))[0]
+        t_idx = np.where(
+            np.logical_or(
+                np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2
+            )
+        )[0]
         # reduce to triangles that intersect with level:
-        t_level = self.t[t_idx,:]
-        intersect = intersect[t_idx,:]
+        t_level = self.t[t_idx, :]
+        intersect = intersect[t_idx, :]
         # trias have one vertex on one side and two on the other side of the level set
         # invert trias with two true values, so that single vertex is true
-        intersect[np.sum(intersect,axis=1)>1,:] = np.logical_not(intersect[np.sum(intersect,axis=1)>1,:])
+        intersect[np.sum(intersect, axis=1) > 1, :] = np.logical_not(
+            intersect[np.sum(intersect, axis=1) > 1, :]
+        )
         # get idx within tria with single vertex:
-        idx_single = np.argmax(intersect,axis=1)
+        idx_single = np.argmax(intersect, axis=1)
         idx_o1 = (idx_single + 1) % 3
         idx_o2 = (idx_single + 2) % 3
         # get global idx
-        gidx0 = t_level[np.arange(t_level.shape[0]),idx_single]
-        gidx1 = t_level[np.arange(t_level.shape[0]),idx_o1]
-        gidx2 = t_level[np.arange(t_level.shape[0]),idx_o2]
+        gidx0 = t_level[np.arange(t_level.shape[0]), idx_single]
+        gidx1 = t_level[np.arange(t_level.shape[0]), idx_o1]
+        gidx2 = t_level[np.arange(t_level.shape[0]), idx_o2]
         # sort edge indices (rows are trias, cols are the two vertex ids)
-        gg1 = np.sort(np.concatenate((gidx0[:,np.newaxis],gidx1[:,np.newaxis]), axis=1))
-        gg2 = np.sort(np.concatenate((gidx0[:,np.newaxis],gidx2[:,np.newaxis]), axis=1))
+        gg1 = np.sort(
+            np.concatenate((gidx0[:, np.newaxis], gidx1[:, np.newaxis]), axis=1)
+        )
+        gg2 = np.sort(
+            np.concatenate((gidx0[:, np.newaxis], gidx2[:, np.newaxis]), axis=1)
+        )
         # concatenate all and get unique ones
-        gg = np.concatenate((gg1,gg2), axis=0)
-        gg_unique = np.unique(gg,axis=0)
+        gg = np.concatenate((gg1, gg2), axis=0)
+        gg_unique = np.unique(gg, axis=0)
         # generate level set intersection points for unique edges
-        xl = (level - vfunc[gg_unique[:,0]]) / (vfunc[gg_unique[:,1]] - vfunc[gg_unique[:,0]])
-        p = (1 - xl)[:, np.newaxis] * self.v[gg_unique[:,0]] + xl[:, np.newaxis] * self.v[gg_unique[:,1]]
+        xl = (level - vfunc[gg_unique[:, 0]]) / (
+            vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]
+        )
+        p = (1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]] + xl[
+            :, np.newaxis
+        ] * self.v[gg_unique[:, 1]]
         # fill sparse matrix with new point indices (+1 to distinguish from zero)
-        A = sparse.csc_matrix((np.arange(gg_unique.shape[0])+1, (gg_unique[:,0], gg_unique[:,1])))
+        A = sparse.csc_matrix(
+            (np.arange(gg_unique.shape[0]) + 1, (gg_unique[:, 0], gg_unique[:, 1]))
+        )
         # for each tria create one edge via lookup in matrix
-        edge_idxs = np.concatenate( (A[gg1[:,0], gg1[:,1]],A[gg2[:,0], gg2[:,1]]), axis=0).T - 1
+        edge_idxs = (
+            np.concatenate((A[gg1[:, 0], gg1[:, 1]], A[gg2[:, 0], gg2[:, 1]]), axis=0).T
+            - 1
+        )
         # lengths computation
-        p1 = np.squeeze(p[edge_idxs[:,0]])
-        p2 = np.squeeze(p[edge_idxs[:,1]])
-        llength =  np.sqrt( ((p1-p2) ** 2).sum(1)).sum()
+        p1 = np.squeeze(p[edge_idxs[:, 0]])
+        p2 = np.squeeze(p[edge_idxs[:, 1]])
+        llength = np.sqrt(((p1 - p2) ** 2).sum(1)).sum()
         # compute path from undordered, not-directed edge list
         # and return path as list of points, and path length
         if get_tria_idx:
-            path, edge_idx = TriaMesh.reduce_edges_to_path(edge_idxs, get_edge_idx=get_tria_idx)
+            path, edge_idx = TriaMesh.reduce_edges_to_path(
+                edge_idxs, get_edge_idx=get_tria_idx
+            )
             # translate local edge id to global tria id
             tria_idx = t_idx[edge_idx]
         else:
-            path = TriaMesh.reduce_edges_to_path(edge_idxs,get_tria_idx)
-        # remove dupliacte vertices (happens when levelset hits a vertex almost perfectly)
-        path3d=p[path,:]
-        dd=((path3d[0:-1,:] - path3d[1:,:]) ** 2).sum(1)
-        # append 1 (never delete last node, if identical to the one before, we delete the one before)
-        dd=np.append(dd,1)
-        eps=0.000001
-        path3d = path3d[dd>eps,:]
+            path = TriaMesh.reduce_edges_to_path(edge_idxs, get_tria_idx)
+        # remove dupliacte vertices (happens when levelset hits a vertex almost
+        # perfectly)
+        path3d = p[path, :]
+        dd = ((path3d[0:-1, :] - path3d[1:, :]) ** 2).sum(1)
+        # append 1 (never delete last node, if identical to the one before, we delete
+        # the one before)
+        dd = np.append(dd, 1)
+        eps = 0.000001
+        path3d = path3d[dd > eps, :]
         if get_tria_idx:
             if n_points:
                 raise ValueError("n_points cannot be combined wiht get_tria_idx=True.")
-            tria_idx = tria_idx[dd[:-1]>eps]
+            tria_idx = tria_idx[dd[:-1] > eps]
             return path3d, llength, tria_idx
         else:
             if n_points:

@@ -1173,7 +1173,6 @@ class TriaMesh:
         else:
             raise ValueError('No lengths computed, should never get here.')
 
-
     @staticmethod
     def reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
         """Static helper to reduce undirected unsorted edges to path.
@@ -1240,7 +1239,30 @@ class TriaMesh:
         else:
             return path
 
-    def level_path(self, vfunc, level, get_tria_idx=False):
+    @staticmethod
+    def resample_polygon(path3d: np.ndarray, n_points: int = 100) -> np.ndarray:
+        # Helper: Cumulative Euclidean distance between successive polygon points.
+        # This will be the "x" for interpolation
+        d = np.cumsum(np.r_[0, np.sqrt((np.diff(path3d, axis=0) ** 2).sum(axis=1))])
+        # get linearly spaced points along the cumulative Euclidean distance
+        d_sampled = np.linspace(0, d.max(), n_points)
+        # interpolate x and y coordinates
+        xy_interp = np.c_[
+            np.interp(d_sampled, d, path3d[:, 0]),
+            np.interp(d_sampled, d, path3d[:, 1]),
+            np.interp(d_sampled, d, path3d[:, 2])
+        ]
+        return xy_interp
+
+    @staticmethod
+    def iterative_resample_polygon(path3d: np.ndarray, n_points: int = 100, n_iter: int = 3) -> np.ndarray:
+        # Helper: resample multiple times to numerically stabilize the result to be truly equidistant
+        path3d_resampled = TriaMesh.resample_polygon(path3d, n_points)
+        for _ in range(n_iter-1):
+            path3d_resampled = TriaMesh.resample_polygon(path3d_resampled, n_points)
+        return path3d_resampled
+
+    def level_path(self, vfunc, level, get_tria_idx=False, n_points=None):
         """Extract levelset as a path.
 
         Note: Only works for level sets that represent a single path with
@@ -1254,12 +1276,14 @@ class TriaMesh:
             Level set value.
         get_tria_idx : bool, default: False
             Also return a list of triangle indices for each edge, default False.
+        n_points: resample level set into n equidistant points. Cannot be combined
+            with get_tria_idx=True.
 
         Returns
         -------
         path: array
             Array of shape (n,3) containing coordinates of vertices on level path.
-        length : float 
+        length : float
             Length of level set.
         tria_idx : array
             Array of triangle index for each edge segment on the path (length n-1
@@ -1317,7 +1341,11 @@ class TriaMesh:
         eps=0.000001
         path3d = path3d[dd>eps,:]
         if get_tria_idx:
+            if n_points:
+                raise ValueError("n_points cannot be combined wiht get_tria_idx=True.")
             tria_idx = tria_idx[dd[:-1]>eps]
             return path3d, llength, tria_idx
         else:
+            if n_points:
+                path3d = TriaMesh.iterative_resample_polygon(path3d, n_points)
             return path3d, llength

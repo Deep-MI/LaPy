@@ -1210,8 +1210,8 @@ class TriaMesh:
             Array of length n+1 containing indices as single path from start to
             endpoint.
         edge_idx: array
-            Array of length n containing coresponding edge idx into edges for each
-            path segment. Ony passed if get_edges_idx is True.
+            Array of length n containing corresponding edge idx into edges for each
+            path segment. Only passed if get_edges_idx is True.
         """
         from scipy.sparse.csgraph import shortest_path
 
@@ -1314,7 +1314,7 @@ class TriaMesh:
             Length of level set.
         tria_idx : array
             Array of triangle index for each edge segment on the path (length n-1
-            if path is langth n). Will only be returned if get_tria_idx is True.
+            if path is length n). Will only be returned if get_tria_idx is True.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
@@ -1371,7 +1371,7 @@ class TriaMesh:
         p1 = np.squeeze(p[edge_idxs[:, 0]])
         p2 = np.squeeze(p[edge_idxs[:, 1]])
         llength = np.sqrt(((p1 - p2) ** 2).sum(1)).sum()
-        # compute path from undordered, not-directed edge list
+        # compute path from unordered, not-directed edge list
         # and return path as list of points, and path length
         if get_tria_idx:
             path, edge_idx = TriaMesh.reduce_edges_to_path(
@@ -1381,7 +1381,7 @@ class TriaMesh:
             tria_idx = t_idx[edge_idx]
         else:
             path = TriaMesh.reduce_edges_to_path(edge_idxs, get_tria_idx)
-        # remove dupliacte vertices (happens when levelset hits a vertex almost
+        # remove duplicate vertices (happens when levelset hits a vertex almost
         # perfectly)
         path3d = p[path, :]
         dd = ((path3d[0:-1, :] - path3d[1:, :]) ** 2).sum(1)
@@ -1392,7 +1392,7 @@ class TriaMesh:
         path3d = path3d[dd > eps, :]
         if get_tria_idx:
             if n_points:
-                raise ValueError("n_points cannot be combined wiht get_tria_idx=True.")
+                raise ValueError("n_points cannot be combined with get_tria_idx=True.")
             tria_idx = tria_idx[dd[:-1] > eps]
             return path3d, llength, tria_idx
         else:

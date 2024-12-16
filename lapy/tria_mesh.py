@@ -5,7 +5,6 @@ from scipy import sparse
 
 from . import _tria_io as io
 
-
 class TriaMesh:
     """Class representing a triangle mesh.
 
@@ -1120,3 +1119,205 @@ class TriaMesh:
         vfunc = self.smooth_vfunc(self.v, n)
         self.v = vfunc
         return
+
+    def level_length(self, vfunc, level):
+        """Compute the length of level sets.
+
+        Parameters
+        ----------
+        vfunc : array
+            Float vector of values at vertices (here only scalar function 1D).
+        level : float | array
+            Level set value or array of level values.
+
+        Returns
+        -------
+        length : float | array
+            Length of level set (or array of lengths).
+        """
+        if vfunc.ndim > 1:
+            raise ValueError(f'vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!')
+        levels = np.atleast_1d(level)
+        ll = np.empty((levels.size,0))
+        for l in levels:
+            # get intersecting triangles
+            intersect = vfunc[self.t] > l
+            t_idx = np.where(np.logical_or(np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2))[0]
+            # reduce to triangles that intersect with level:
+            t_level = self.t[t_idx,:]
+            intersect = intersect[t_idx,:]
+            # trias have one vertex on one side and two on the other side of the level set
+            # invert trias with two true values, so that single vertex is true
+            intersect[np.sum(intersect,axis=1)>1,:] = np.logical_not(intersect[np.sum(intersect,axis=1)>1,:])
+            # get idx within tria with single vertex:
+            idx_single = np.argmax(intersect,axis=1)
+            idx_o1 = (idx_single + 1) % 3
+            idx_o2 = (idx_single + 2) % 3
+            # get global idx
+            gidx0 = t_level[np.arange(t_level.shape[0]),idx_single]
+            gidx1 = t_level[np.arange(t_level.shape[0]),idx_o1]
+            gidx2 = t_level[np.arange(t_level.shape[0]),idx_o2]
+            # determine fraction along edges (for each triangle)
+            xl1 = (l - vfunc[gidx0]) / (vfunc[gidx1] - vfunc[gidx0])
+            xl2 = (l - vfunc[gidx0]) / (vfunc[gidx2] - vfunc[gidx0])
+            # determine points on the two edges (for each triangle)
+            p1 = (1 - xl1)[:, np.newaxis] * self.v[gidx0] + xl1[:, np.newaxis] * self.v[gidx1]
+            p2 = (1 - xl2)[:, np.newaxis] * self.v[gidx0] + xl2[:, np.newaxis] * self.v[gidx2]
+            # compute edge length between the points
+            lls = np.sqrt( ((p1-p2) ** 2).sum(1))
+            ll = np.append(ll,lls.sum())
+        if ll.size > 1:
+            return ll
+        elif ll.size > 0:
+            return ll[0]
+        else:
+            raise ValueError('No lengths computed, should never get here.')
+
+
+    @staticmethod
+    def reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
+        """Static helper to reduce undirected unsorted edges to path.
+
+        Parameters
+        ----------
+        edges : list of shape (n, 2)
+            Pairs of positive integer node indices representing a undirected edges.
+            All indices from 0 to max(edges) must be used and graph needs to be
+            connected. Nodes cannot have more than 2 neighbors. Also needs exactly
+            two endnodes (nodes with only one neighbor). Tip for closed loops, cut
+            it open before passing to this function by removing one edge.
+        start_idx : int, default: None
+            Node with only one neighbor to start path. Optional, if not passed the
+            node with the smaller index will be selected as start point.
+        get_edge_idx : bool, default: False
+            Also return index of edge into edges for each path segment. This list
+            has length n, while path has length n+1.
+
+        Returns
+        -------
+        path: array
+            Array of length n+1 containing indices as single path from start to
+            endpoint.
+        edge_idx: array
+            Array of length n containing coresponding edge idx into edges for each
+            path segment. Ony passed if get_edges_idx is True.
+        """
+        from scipy.sparse.csgraph import shortest_path
+        # Extract node indices and create a sparse adjacency matrix
+        edges = np.array(edges)
+        i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
+        j = np.column_stack((edges[:, 1], edges[:, 0])).reshape(-1)
+        dat = np.ones(i.shape)
+        n = edges.max() + 1
+        adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
+        # Find the degree of each node
+        degrees = np.asarray(adj_matrix.sum(axis=1)).ravel() # Sum over rows to get degree
+        endpoints = np.where(degrees == 1)[0]
+        if len(endpoints) != 2:
+            raise ValueError("The graph does not have exactly two endpoints; invalid input.")
+        if not start_idx:
+            start_idx = endpoints[0]
+        else:
+            if not np.isin(start_idx, endpoints):
+                raise ValueError(f"start_idx {start_idx} must be one of the endpoints {endpoints}.")
+        # Traverse the graph by computing shortest path
+        dist_matrix = shortest_path(csgraph=adj_matrix, directed=False, indices=start_idx,
+                                    return_predecessors=False)
+        if np.isinf(dist_matrix).any():
+            raise ValueError("Ensure indices range from 0 to max_idx without gaps and graph is connected.")
+        # sort indices according to distance form start
+        path = dist_matrix.argsort()
+        # get edge idx of each segment from original list
+        enum = edges.shape[0]
+        dat = np.arange(enum)+1
+        dat = np.column_stack((dat, dat)).reshape(-1)
+        eidx_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
+        ei = path[0:-1]
+        ej = path[(np.arange(path.size-1)+1)]
+        eidx = np.asarray((eidx_matrix[ei,ej] - 1)).ravel()
+        if get_edge_idx:
+            return path, eidx
+        else:
+            return path
+
+    def level_path(self, vfunc, level, get_tria_idx=False):
+        """Extract levelset as a path.
+
+        Note: Only works for level sets that represent a single path with
+        exactly one start and one endpoint.
+
+        Parameters
+        ----------
+        vfunc : array
+            Float vector of values at vertices (here only scalar function 1D).
+        level : float
+            Level set value.
+        get_tria_idx : bool, default: False
+            Also return a list of triangle indices for each edge, default False.
+
+        Returns
+        -------
+        path: array
+            Array of shape (n,3) containing coordinates of vertices on level path.
+        length : float 
+            Length of level set.
+        tria_idx : array
+            Array of triangle index for each edge segment on the path (length n-1
+            if path is langth n). Will only be returned if get_tria_idx is True.
+        """
+        if vfunc.ndim > 1:
+            raise ValueError(f'vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!')
+        # get intersecting triangles
+        intersect = vfunc[self.t] > level
+        t_idx = np.where(np.logical_or(np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2))[0]
+        # reduce to triangles that intersect with level:
+        t_level = self.t[t_idx,:]
+        intersect = intersect[t_idx,:]
+        # trias have one vertex on one side and two on the other side of the level set
+        # invert trias with two true values, so that single vertex is true
+        intersect[np.sum(intersect,axis=1)>1,:] = np.logical_not(intersect[np.sum(intersect,axis=1)>1,:])
+        # get idx within tria with single vertex:
+        idx_single = np.argmax(intersect,axis=1)
+        idx_o1 = (idx_single + 1) % 3
+        idx_o2 = (idx_single + 2) % 3
+        # get global idx
+        gidx0 = t_level[np.arange(t_level.shape[0]),idx_single]
+        gidx1 = t_level[np.arange(t_level.shape[0]),idx_o1]
+        gidx2 = t_level[np.arange(t_level.shape[0]),idx_o2]
+        # sort edge indices (rows are trias, cols are the two vertex ids)
+        gg1 = np.sort(np.concatenate((gidx0[:,np.newaxis],gidx1[:,np.newaxis]), axis=1))
+        gg2 = np.sort(np.concatenate((gidx0[:,np.newaxis],gidx2[:,np.newaxis]), axis=1))
+        # concatenate all and get unique ones
+        gg = np.concatenate((gg1,gg2), axis=0)
+        gg_unique = np.unique(gg,axis=0)
+        # generate level set intersection points for unique edges
+        xl = (level - vfunc[gg_unique[:,0]]) / (vfunc[gg_unique[:,1]] - vfunc[gg_unique[:,0]])
+        p = (1 - xl)[:, np.newaxis] * self.v[gg_unique[:,0]] + xl[:, np.newaxis] * self.v[gg_unique[:,1]]
+        # fill sparse matrix with new point indices (+1 to distinguish from zero)
+        A = sparse.csc_matrix((np.arange(gg_unique.shape[0])+1, (gg_unique[:,0], gg_unique[:,1])))
+        # for each tria create one edge via lookup in matrix
+        edge_idxs = np.concatenate( (A[gg1[:,0], gg1[:,1]],A[gg2[:,0], gg2[:,1]]), axis=0).T - 1
+        # lengths computation
+        p1 = np.squeeze(p[edge_idxs[:,0]])
+        p2 = np.squeeze(p[edge_idxs[:,1]])
+        llength =  np.sqrt( ((p1-p2) ** 2).sum(1)).sum()
+        # compute path from undordered, not-directed edge list
+        # and return path as list of points, and path length
+        if get_tria_idx:
+            path, edge_idx = TriaMesh.reduce_edges_to_path(edge_idxs, get_edge_idx=get_tria_idx)
+            # translate local edge id to global tria id
+            tria_idx = t_idx[edge_idx]
+        else:
+            path = TriaMesh.reduce_edges_to_path(edge_idxs,get_tria_idx)
+        # remove dupliacte vertices (happens when levelset hits a vertex almost perfectly)
+        path3d=p[path,:]
+        dd=((path3d[0:-1,:] - path3d[1:,:]) ** 2).sum(1)
+        # append 1 (never delete last node, if identical to the one before, we delete the one before)
+        dd=np.append(dd,1)
+        eps=0.000001
+        path3d = path3d[dd>eps,:]
+        if get_tria_idx:
+            tria_idx = tria_idx[dd[:-1]>eps]
+            return path3d, llength, tria_idx
+        else:
+            return path3d, llength

@@ -1187,7 +1187,7 @@ class TriaMesh:
 
     @staticmethod
     def __reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
-        """Static helper to reduce undirected unsorted edges to path.
+        """Reduce undirected unsorted edges (index pairs) to path (index array).
 
         Parameters
         ----------

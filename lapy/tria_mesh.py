@@ -1186,7 +1186,7 @@ class TriaMesh:
             raise ValueError("No lengths computed, should never get here.")
 
     @staticmethod
-    def reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
+    def __reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
         """Static helper to reduce undirected unsorted edges to path.
 
         Parameters
@@ -1263,7 +1263,7 @@ class TriaMesh:
             return path
 
     @staticmethod
-    def resample_polygon(path3d: np.ndarray, n_points: int = 100) -> np.ndarray:
+    def __resample_polygon(path3d: np.ndarray, n_points: int = 100) -> np.ndarray:
         # Helper: Cumulative Euclidean distance between successive polygon points.
         # This will be the "x" for interpolation
         d = np.cumsum(np.r_[0, np.sqrt((np.diff(path3d, axis=0) ** 2).sum(axis=1))])
@@ -1278,14 +1278,13 @@ class TriaMesh:
         return xy_interp
 
     @staticmethod
-    def iterative_resample_polygon(
-        path3d: np.ndarray, n_points: int = 100, n_iter: int = 3
-    ) -> np.ndarray:
+    def __iterative_resample_polygon(
+        path3d: np.ndarray, n_points: int = 100, n_iter: int = 3) -> np.ndarray:
         # Helper: resample multiple times to numerically stabilize the result to be
         # truly equidistant
-        path3d_resampled = TriaMesh.resample_polygon(path3d, n_points)
+        path3d_resampled = TriaMesh.__resample_polygon(path3d, n_points)
         for _ in range(n_iter - 1):
-            path3d_resampled = TriaMesh.resample_polygon(path3d_resampled, n_points)
+            path3d_resampled = TriaMesh.__resample_polygon(path3d_resampled, n_points)
         return path3d_resampled
 
     def level_path(self, vfunc, level, get_tria_idx=False, n_points=None):
@@ -1374,13 +1373,13 @@ class TriaMesh:
         # compute path from unordered, not-directed edge list
         # and return path as list of points, and path length
         if get_tria_idx:
-            path, edge_idx = TriaMesh.reduce_edges_to_path(
+            path, edge_idx = TriaMesh.__reduce_edges_to_path(
                 edge_idxs, get_edge_idx=get_tria_idx
             )
             # translate local edge id to global tria id
             tria_idx = t_idx[edge_idx]
         else:
-            path = TriaMesh.reduce_edges_to_path(edge_idxs, get_tria_idx)
+            path = TriaMesh.__reduce_edges_to_path(edge_idxs, get_tria_idx)
         # remove duplicate vertices (happens when levelset hits a vertex almost
         # perfectly)
         path3d = p[path, :]
@@ -1397,5 +1396,5 @@ class TriaMesh:
             return path3d, llength, tria_idx
         else:
             if n_points:
-                path3d = TriaMesh.iterative_resample_polygon(path3d, n_points)
+                path3d = TriaMesh.__iterative_resample_polygon(path3d, n_points)
             return path3d, llength

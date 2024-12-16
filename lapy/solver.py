@@ -706,7 +706,7 @@ class Solver:
                 "h should be either scalar or column vector with row num of A"
             )
         if h.ndim == 1:
-            h = h[:,np.newaxis]
+            h = h[:, np.newaxis]
         # create vector d
         didx = []
         dvec = []

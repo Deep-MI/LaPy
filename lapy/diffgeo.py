@@ -1,7 +1,7 @@
 """Differential Geometry Functions for meshes.
 
 This module includes gradient, divergence, curvature, geodesics,
-mean curvature flow etc. 
+mean curvature flow etc.
 
 Note, the interface is not yet final, some functions are split into
 tet and tria versions.
@@ -369,8 +369,8 @@ def tria_compute_rotated_f(tria, vfunc):
     # since the solution is ill defined (addition of constant)
     # we specify an arbitrary boundary condition at a single vertex to
     # remove that degree of freedom
-    dtup = ( np.array([0]), np.array([0.0]))
-    vf = fem.poisson(divf,dtup)
+    dtup = (np.array([0]), np.array([0.0]))
+    vf = fem.poisson(divf, dtup)
     return vf
 
 

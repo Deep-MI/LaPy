@@ -403,7 +403,9 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 <p>Divergence is the flux density leaving or entering a point.
 It can be measured by summing the dot product of the vector
 field with the normals to the outer faces of the 1-ring tetras
-around a vertex. Summing &lt; tfunc , n_tria_oposite_v &gt;</p>
+around a vertex. Summing <span class="math notranslate nohighlight">\(&lt; tfunc , n_tria_oposite_v &gt;\)</span>,
+this is the integrated divergence, you may want to multiply
+with <span class="math notranslate nohighlight">\(B^-1\)</span> to get back the function in some applications.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -420,9 +422,6 @@ around a vertex. Summing &lt; tfunc , n_tria_oposite_v &gt;</p>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>This is the integrated divergence, you may want to multiply
-with B^-1 to get back the function in some applications.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -490,9 +489,9 @@ with B^-1 to get back the function in some applications</p>
 <p>Divergence is the flux density leaving or entering a point.
 It can be measured by summing the dot product of the vector
 field with the normals to the outer edges of the 1-ring triangles
-around a vertex. Summing &lt; tfunc , e_ij cross n &gt;
-Note: this is the integrated divergence, you may want to multiply
-with B^-1 to get back the function in some applications</p>
+around a vertex. Summing <span class="math notranslate nohighlight">\(&lt; tfunc , e_ij cross n &gt;\)</span>,
+this is the integrated divergence, you may want to multiply
+with <span class="math notranslate nohighlight">\(B^-1\)</span> to get back the function in some applications.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>

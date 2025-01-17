@@ -668,7 +668,7 @@ def tet_compute_gradient(tet, vfunc):
     For a tetrahedron :math:`(v_i, v_j, v_k, v_h)` with volume V we have:
     
     .. math::
-        grad(f) = \left[ &  (f_j - f_i) (v_i-v_k) \times (v_h-v_k) \\
+        grad(f) &= \left[ (f_j - f_i) (v_i-v_k) \times (v_h-v_k) \\
                 &   + (f_k - f_i) (v_i-v_h) \times (v_j-v_h) \\
                 &   + (f_h - f_i) (v_k-v_i) \times (v_j-v_i) \right] / (6 V).
 

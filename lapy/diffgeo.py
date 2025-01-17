@@ -170,10 +170,10 @@ def tria_compute_gradient(tria, vfunc):
     r"""Compute gradient of a vertex function f (for each triangle).
 
     .. math::
-        grad(f) &= [ (f_j - f_i) (vi-vk)' + (f_k - f_i) (vj-vi)' ] / (2 A) \\
-                &= [ f_i (vk-vj)' + f_j (vi-vk)' +  f_k (vj-vi)' ] / (2 A)
+        grad(f) &= [ (f_j - f_i) (v_i-v_k)' + (f_k - f_i) (v_j-v_i)' ] / (2 A) \\
+                &= [ f_i (v_k-v_j)' + f_j (v_i-v_k)' +  f_k (v_j-v_i)' ] / (2 A)
 
-    for triangle (vi,vj,vk) with area A, where (.)' is 90 degrees rotated
+    for triangle :math:`(v_i,v_j,v_k)` with area :math:`A`, where (.)' is 90 degrees rotated
     edge, which is equal to cross(n,vec).
 
     Parameters
@@ -225,7 +225,7 @@ def tria_compute_divergence(tria, tfunc):
 
     Divergence is the flux density leaving or entering a point.
     Note: this is the integrated divergence, you may want to multiply
-    with B^-1 to get back the function in some applications
+    with :math:`B^{-1}` to get back the function in some applications
 
     Parameters
     ----------
@@ -285,9 +285,9 @@ def tria_compute_divergence2(tria, tfunc):
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer edges of the 1-ring triangles
-    around a vertex. Summing :math:`< tfunc , e_ij cross n >`,
+    around a vertex. Summing < tfunc , e_ij cross n >,
     this is the integrated divergence, you may want to multiply
-    with :math:`B^-1` to get back the function in some applications.
+    with :math:`B^{-1}` to get back the function in some applications.
 
     Parameters
     ----------
@@ -727,9 +727,9 @@ def tet_compute_divergence(tet, tfunc):
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer faces of the 1-ring tetras
-    around a vertex. Summing :math:`< tfunc , n_tria_oposite_v >`,
+    around a vertex. Summing < tfunc , n_tria_oposite_v >,
     this is the integrated divergence, you may want to multiply
-    with :math:`B^-1` to get back the function in some applications.
+    with :math:`B^{-1}` to get back the function in some applications.
 
     Parameters
     ----------

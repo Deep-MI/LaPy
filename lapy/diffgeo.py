@@ -285,9 +285,9 @@ def tria_compute_divergence2(tria, tfunc):
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer edges of the 1-ring triangles
-    around a vertex. Summing < tfunc , e_ij cross n >
-    Note: this is the integrated divergence, you may want to multiply
-    with B^-1 to get back the function in some applications
+    around a vertex. Summing :math:`< tfunc , e_ij cross n >`,
+    this is the integrated divergence, you may want to multiply
+    with :math:`B^-1` to get back the function in some applications.
 
     Parameters
     ----------
@@ -727,7 +727,9 @@ def tet_compute_divergence(tet, tfunc):
     Divergence is the flux density leaving or entering a point.
     It can be measured by summing the dot product of the vector
     field with the normals to the outer faces of the 1-ring tetras
-    around a vertex. Summing < tfunc , n_tria_oposite_v >
+    around a vertex. Summing :math:`< tfunc , n_tria_oposite_v >`,
+    this is the integrated divergence, you may want to multiply
+    with :math:`B^-1` to get back the function in some applications.
 
     Parameters
     ----------
@@ -740,11 +742,6 @@ def tet_compute_divergence(tet, tfunc):
     -------
     vfunc: array
         Scalar function of divergence at vertices.
-
-    Notes
-    -----
-    This is the integrated divergence, you may want to multiply
-    with B^-1 to get back the function in some applications.
     """
     v0 = tet.v[tet.t[:, 0], :]
     v1 = tet.v[tet.t[:, 1], :]

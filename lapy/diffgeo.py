@@ -173,8 +173,8 @@ def tria_compute_gradient(tria, vfunc):
         grad(f) &= [ (f_j - f_i) (v_i-v_k)' + (f_k - f_i) (v_j-v_i)' ] / (2 A) \\
                 &= [ f_i (v_k-v_j)' + f_j (v_i-v_k)' +  f_k (v_j-v_i)' ] / (2 A)
 
-    for triangle :math:`(v_i,v_j,v_k)` with area :math:`A`, where (.)' is 90 degrees rotated
-    edge, which is equal to cross(n,vec).
+    for triangle :math:`(v_i,v_j,v_k)` with area :math:`A`, where (.)' is 90 degrees
+    rotated edge, which is equal to cross(n,vec).
 
     Parameters
     ----------

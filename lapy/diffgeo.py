@@ -670,11 +670,7 @@ def tet_compute_gradient(tet, vfunc):
     .. math::
         grad(f) &= [  (f_j - f_i) (vi-vk) x (vh-vk) \\
                 &   + (f_k - f_i) (vi-vh) x (vj-vh) \\
-                &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (2 V) \\
-                &= [  f_i (?-?) x ( ? -?) \\
-                &   + f_j (vi-vk) x (vh-vk) \\
-                &   + f_k (vi-vh) x (vj-vh) \\
-                &   + f_h (vk-vi) x (vj-vi) ] / (2 V).
+                &   + (f_h - f_i) (vk-vi) x (vj-vi) ] / (6 V).
 
     Parameters
     ----------
@@ -691,11 +687,6 @@ def tet_compute_gradient(tet, vfunc):
     Notes
     -----
     Numexpr could speed up this functions if necessary.
-    Good background to read:
-    Mancinelli, Livesu, Puppo, Gradient Field Estimation on Triangle Meshes
-    http://pers.ge.imati.cnr.it/livesu/papers/MLP18/MLP18.pdf
-    http://dgd.service.tu-berlin.de/wordpress/vismathws10/2012/10/17/gradient-of-scalar-functions
-    Desbrun et al.
     """
     import sys
 
@@ -709,7 +700,7 @@ def tet_compute_gradient(tet, vfunc):
     e3 = v3 - v0
     e4 = v3 - v1
     e5 = v3 - v2
-    # Compute cross product and  1 / (2 * vol) for each triangle:
+    # Compute cross product and  1 / (6 * vol) for each tetrahedron:
     cr = np.cross(e0, e2)
     vol = np.abs(np.sum(e3 * cr, axis=1))
     vol[vol < sys.float_info.epsilon] = 1  # avoid division by zero

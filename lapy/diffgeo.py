@@ -665,12 +665,12 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 def tet_compute_gradient(tet, vfunc):
     r"""Compute gradient of a vertex function f (for each tetra).
 
-    For a tetrahedron (vi,vj,vk,vh) with volume V we have:
+    For a tetrahedron :math:`(v_i, v_j, v_k, v_h)` with volume V we have:
     
     .. math::
-        grad(f) &= [  (f_j - f_i) (vi-vk) \times (vh-vk) \\
-                &   + (f_k - f_i) (vi-vh) \times (vj-vh) \\
-                &   + (f_h - f_i) (vk-vi) \times (vj-vi) ] / (6 V).
+        grad(f) = \left[ &  (f_j - f_i) (v_i-v_k) \times (v_h-v_k) \\
+                &   + (f_k - f_i) (v_i-v_h) \times (v_j-v_h) \\
+                &   + (f_h - f_i) (v_k-v_i) \times (v_j-v_i) \right] / (6 V).
 
     Parameters
     ----------

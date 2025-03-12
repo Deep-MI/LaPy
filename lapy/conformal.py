@@ -205,7 +205,7 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
 
     def area_map(xx: np.ndarray) -> np.ndarray:
         """
-        Computes the area distribution from the Möbius-transformed mapping.
+        Compute the area distribution from the Möbius-transformed mapping.
 
         Parameters:
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
@@ -255,7 +255,7 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
 
 def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
     """
-    Computes the Beltrami coefficient of a given mapping.
+    Compute the Beltrami coefficient of a given mapping.
 
     The Beltrami coefficient is a complex-valued function that characterizes the
     distortion of a mapping in terms of conformality.
@@ -332,8 +332,7 @@ def linear_beltrami_solver(
         use_cholmod=False
 ) -> np.ndarray:
     """
-    Solves the Linear Beltrami equation for a given triangulation, distortion parameter,
-    and constraints to compute a mapping with landmark alignment.
+    Solve the Linear Beltrami equation for a given mesh and target.
 
     Parameters
     ----------
@@ -442,7 +441,7 @@ def _sparse_symmetric_solve(
         use_cholmod: bool = False
 ) -> np.ndarray:
     """
-    Solves a sparse symmetric linear system of equations Ax = b.
+    Solve a sparse symmetric linear system of equations Ax = b.
 
     Depending on the availability of the `scikit-sparse` package, it uses either:
     - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
@@ -484,11 +483,11 @@ def _sparse_symmetric_solve(
 
 def stereographic(u: np.ndarray) -> np.ndarray:
     """
-    Maps points on a sphere to the complex plane using the stereographic projection.
+    Map points on a sphere to the complex plane using the stereographic projection.
 
     Parameters
     ----------
-    u (np.ndarray):
+    u : np.ndarray
         A numpy array of shape (n, 3), where each row represents a point on the sphere
         as (x, y, z) coordinates.
 
@@ -512,12 +511,11 @@ def stereographic(u: np.ndarray) -> np.ndarray:
 
 def inverse_stereographic(u: np.ndarray) -> np.ndarray:
     """
-    Computes the mapping from the complex plane to the sphere
-    using the inverse stereographic projection.
+    Compute mapping from the complex plane to the sphere using the inverse stereographic projection.
 
     Parameters
     ----------
-    u (Union[np.ndarray, list[complex], list[tuple[float, float]]]):
+    u: Union[np.ndarray, list[complex], list[tuple[float, float]]]
         Input points in the complex plane. Can be:
             - A numpy array of shape (n, 2), representing real and imaginary parts.
             - A list of complex numbers.

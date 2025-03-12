@@ -207,10 +207,12 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
         """
         Compute the area distribution from the Möbius-transformed mapping.
 
-        Parameters:
+        Parameters
+        ==========
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
 
-        Returns:
+        Returns
+        =======
             np.ndarray: Normalized triangle areas after applying the transformation.
         """
         v = inverse_stereographic(((xx[0] + xx[1] * 1j) * z + (xx[2] + xx[3] * 1j)) /
@@ -222,10 +224,12 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
         """
         Objective function: Mean absolute log area distortion after the Möbius transformation.
 
-        Parameters:
+        Parameters
+        ==========
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
 
-        Returns:
+        Returns
+        =======
             float: Mean of the absolute log area distortion where finite.
         """
         a = np.abs(np.log(area_map(xx) / area_t))
@@ -447,7 +451,7 @@ def _sparse_symmetric_solve(
     - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
     - LU decomposition (via SciPy) if scikit-sparse is not available.
 
-    Parameters:
+    Parameters
     ----------
     A : csc_matrix of shape (n, n)
         The sparse, symmetric coefficient matrix (in CSR format).
@@ -515,7 +519,7 @@ def inverse_stereographic(u: np.ndarray) -> np.ndarray:
 
     Parameters
     ----------
-    u: Union[np.ndarray, list[complex], list[tuple[float, float]]]
+    u : Union[np.ndarray, list[complex], list[tuple[float, float]]]
         Input points in the complex plane. Can be:
             - A numpy array of shape (n, 2), representing real and imaginary parts.
             - A list of complex numbers.

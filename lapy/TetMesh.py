@@ -15,7 +15,7 @@ from scipy import sparse
 
 
 class TetMesh:
-    """A class representing a tetraheral mesh"""
+    """A class representing a tetrahedral mesh"""
 
     def __init__(self, v, t):
         """

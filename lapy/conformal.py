@@ -17,9 +17,8 @@ Closed Brain Surfaces."
 SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
 
-from typing import Any, Union
-
 import importlib
+from typing import Any, Union
 
 import numpy as np
 from scipy import sparse
@@ -45,7 +44,8 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     Returns
     -------
     mapping: np.ndarray
-        Vertex coordinates as NumPy array of shape (n, 3) of the spherical conformal parameterization.
+        Vertex coordinates as NumPy array of shape (n, 3) of the spherical conformal
+        parameterization.
     """
     # Ensure the input mesh has genus-0 topology
     if tria.euler() != 2:
@@ -220,7 +220,7 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
 
     def d_area(xx: np.ndarray) -> float:
         """
-        Objective function: Mean absolute log area distortion after applying the Möbius transformation.
+        Objective function: Mean absolute log area distortion after the Möbius transformation.
 
         Parameters:
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
@@ -247,7 +247,7 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
     x = result.x
 
     # Apply the optimized Möbius transformation
-    fz = ((x[0] + x[1] * 1j) * z + (x[2] + x[3] * 1j)) / ((x[4] + x[5] * 1j) * z + (x[6] + x[7] * 1j))
+    fz = ((x[0] + x[1]* 1j) * z + (x[2] + x[3]* 1j)) / ((x[4] + x[5]* 1j)* z + (x[6] + x[7]* 1j))
     map_mobius = inverse_stereographic(fz)
 
     return map_mobius, x
@@ -266,7 +266,8 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
         Genus-0 closed triangle mesh.
         Should be planar mapping on complex plane.
     mapping : np.ndarray
-        A numpy array of shape (n, 3) representing the coordinates of the spherical conformal parameterization.
+        A numpy array of shape (n, 3) representing the coordinates of the spherical conformal
+        parameterization.
 
     Returns
     -------
@@ -435,7 +436,11 @@ def linear_beltrami_solver(
     return mapping
 
 
-def _sparse_symmetric_solve(A: csr_matrix, b: Union[np.ndarray, csr_matrix], use_cholmod: bool = False) -> np.ndarray:
+def _sparse_symmetric_solve(
+        A: csr_matrix,
+        b: Union[np.ndarray, csr_matrix],
+        use_cholmod: bool = False
+) -> np.ndarray:
     """
     Solves a sparse symmetric linear system of equations Ax = b.
 
@@ -521,7 +526,8 @@ def inverse_stereographic(u: np.ndarray) -> np.ndarray:
     Returns
     -------
     np.ndarray:
-        A numpy array of shape (n, 3) containing the mapped points on the sphere as (x, y, z) coordinates.
+        A numpy array of shape (n, 3) containing the mapped points on the sphere as
+        (x, y, z) coordinates.
     """
     if np.iscomplexobj(u):
         x = u.real

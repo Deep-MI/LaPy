@@ -17,13 +17,14 @@ Closed Brain Surfaces."
 SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
 
+from typing import Any, Union
+
 import importlib
 
 import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
 from scipy.sparse import csr_matrix
-from typing import Tuple, Any, Union, List
 
 from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
@@ -170,7 +171,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     return mapping
 
 
-def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> Tuple[np.ndarray, Any]:
+def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tuple[np.ndarray, Any]:
     r"""
     Find an improved Mobius transformation to reduce distortion.
 
@@ -511,7 +512,7 @@ def inverse_stereographic(u: np.ndarray) -> np.ndarray:
 
     Parameters
     ----------
-    u (Union[np.ndarray, List[complex], List[Tuple[float, float]]]):
+    u (Union[np.ndarray, list[complex], list[tuple[float, float]]]):
         Input points in the complex plane. Can be:
             - A numpy array of shape (n, 2), representing real and imaginary parts.
             - A list of complex numbers.

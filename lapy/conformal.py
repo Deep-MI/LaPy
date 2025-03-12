@@ -208,11 +208,11 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
         Compute the area distribution from the Möbius-transformed mapping.
 
         Parameters
-        ==========
+        ----------
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
 
         Returns
-        =======
+        -------
             np.ndarray: Normalized triangle areas after applying the transformation.
         """
         v = inverse_stereographic(((xx[0] + xx[1] * 1j) * z + (xx[2] + xx[3] * 1j)) /
@@ -225,11 +225,11 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
         Objective function: Mean absolute log area distortion after the Möbius transformation.
 
         Parameters
-        ==========
+        ----------
             xx (np.ndarray): A length-8 array of Möbius transformation parameters.
 
         Returns
-        =======
+        -------
             float: Mean of the absolute log area distortion where finite.
         """
         a = np.abs(np.log(area_map(xx) / area_t))

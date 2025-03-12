@@ -5,7 +5,7 @@ from . import _tet_io as io
 
 
 class TetMesh:
-    """Class representing a tetraheral mesh.
+    """Class representing a tetrahedral mesh.
 
     This is an efficient implementation of a tetrahedral mesh data structure
     with core functionality using sparse matrices internally (Scipy).

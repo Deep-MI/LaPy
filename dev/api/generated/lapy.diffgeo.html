@@ -5,17 +5,17 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="lapy.conformal" href="lapy.conformal.html" /><link rel="prev" title="lapy.heat" href="lapy.heat.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
         <title>lapy.diffgeo - LaPy</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/style.css?v=0bd98ae2" />
     
     
@@ -23,20 +23,20 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -196,7 +196,6 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  
   <span class="sidebar-brand-text">LaPy</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
@@ -296,13 +295,13 @@ tet and tria versions.</p>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -327,13 +326,13 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a>, <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar geodesic function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar geodesic function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -349,13 +348,13 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d gradient vector at each element.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d gradient vector at each element.</p>
 </dd>
 </dl>
 </dd>
@@ -377,13 +376,13 @@ This idea is also described in the paper “Geodesics in Heat” for triangles.<
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Rotated function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Rotated function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -411,13 +410,13 @@ with <span class="math notranslate nohighlight">\(B^{-1}\)</span> to get back th
 <dd class="field-odd"><dl>
 <dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Tetrahedral mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on tets.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on tets.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -440,13 +439,13 @@ with <span class="math notranslate nohighlight">\(B^{-1}\)</span> to get back th
 <dd class="field-odd"><dl>
 <dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Tetraheral mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (n, 3)</span></dt><dd><p>3d gradient vector at tetras.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (n, 3)</span></dt><dd><p>3d gradient vector at tetras.</p>
 </dd>
 </dl>
 </dd>
@@ -467,13 +466,13 @@ with <span class="math notranslate nohighlight">\(B^{-1}\)</span> to get back th
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -497,13 +496,13 @@ with <span class="math notranslate nohighlight">\(B^{-1}\)</span> to get back th
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
+<dt><strong>tfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>3d vector field on triangles.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar function of divergence at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -524,13 +523,13 @@ This idea is also described in the paper “Geodesics in Heat”.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar geodesic function at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Scalar geodesic function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -553,13 +552,13 @@ rotated edge, which is equal to cross(n,vec).</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>tfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>3d gradient vector at triangles.</p>
+<dt>tfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>3d gradient vector at triangles.</p>
 </dd>
 </dl>
 </dd>
@@ -584,13 +583,13 @@ then solving the Poisson equations with the divergence of rotated grad.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
+<dt><strong>vfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Rotated scalar function at vertices.</p>
+<dt>vfunc: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Rotated scalar function at vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -766,7 +765,7 @@ case of brain surfaces in FreeSurfer coordinates.</p>
 </div><script src="../../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>

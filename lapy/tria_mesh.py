@@ -755,7 +755,7 @@ class TriaMesh:
         """Compute min and max curvature and directions (orthogonal and in tria plane).
 
         First we compute these values on vertices and then smooth
-        there. Finally they get mapped to the trias (averaging) and projected onto
+        there. Finally, they get mapped to the trias (averaging) and projected onto
         the triangle plane, and orthogonalized.
 
         Parameters
@@ -1287,11 +1287,32 @@ class TriaMesh:
             path3d_resampled = TriaMesh.__resample_polygon(path3d_resampled, n_points)
         return path3d_resampled
 
-    def level_path(self, vfunc, level, get_tria_idx=False, n_points=None):
-        """Extract levelset as a path.
+    def level_path(self, vfunc, level, get_tria_idx=False, get_edges=False,
+                   n_points=None):
+        """Extract levelset of vfund at specific level as a path of 3D points.
 
-        Note: Only works for level sets that represent a single path with
-        exactly one start and one endpoint.
+        For a given real valued scalar map on the surface mesh (vfunc) this
+        function computes the edges that intersect with a given level set (level).
+        It then finds the point on each mesh edge where the level set intersects.
+        The points are sorted and returned as an ordered array of 3D coordinates
+        together with the length of the level set path.
+
+        Note: Only works for level sets that represent a single non-intersecting
+        path with exactly one start and one endpoint!
+
+        Additional options: get_tria_idx and get_edges when True will also
+        return an array of triangle ids for each path segment, defining the
+        triangle i, where the path from i to i+1 passes through (so for a path
+        with n points, these will be n-1 triangle ids). Furthermore, an array
+        of edge vertex indices of shape (n,2) can be obtained defining the two
+        vertices of the intersecting edge in the original mesh for each 3D point
+        on the path. A second array is returned, defining the relative position
+        of the intersecting point along this edge as a float from 0 (start vertex)
+        to 1 (end vertex). This information can, for example, be useful for
+        interpolating a second surface map at the new path point coordinates.
+        Neither of this information is available when n_points is used to resample
+        the path into n_points equidistant new points as the association to edges
+        or triangles in the original mesh is lost.
 
         Parameters
         ----------
@@ -1301,19 +1322,33 @@ class TriaMesh:
             Level set value.
         get_tria_idx : bool, default: False
             Also return a list of triangle indices for each edge, default False.
+        get_edges: bool, default: False
+            Also return a list of two vertex indices (i,j) for each 3D point and
+            a list of the relative position defining the 3D point along that
+            edge (i,j) from the original mesh, default False.
         n_points : int
             Resample level set into n equidistant points. Cannot be combined
-            with get_tria_idx=True.
+            with get_tria_idx=True nor with get_vertex_idx=True.
 
         Returns
         -------
         path: array
-            Array of shape (n,3) containing coordinates of vertices on level path.
+            Array of shape (n,3) containing 3D coordinates of vertices on level path.
         length : float
             Length of level set.
         tria_idx : array
-            Array of triangle index for each edge segment on the path (length n-1
+            Array of triangle index for each segment on the path (length n-1
             if path is length n). Will only be returned if get_tria_idx is True.
+        edges_vidxs : array
+            Array of shape (n,2) of vertex indices (i,j) for each 3D point, defining
+            the vertices of the original mesh of the edge intersecting the level set
+            at this point. Will only be returned if get_edges is True.
+        edges_relpos: array
+            Array of floats defining the relative position for each 3D point along
+            the edges of the original mesh (defined by the two points in edges_vidxs).
+            Float value 0 defines first point, and 1 defines end point. So the 3D
+            point of the path is computed (1 - relpos) v_i + relpos v_j.
+            Will only be returned if get_edges is True.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
@@ -1351,21 +1386,17 @@ class TriaMesh:
         gg = np.concatenate((gg1, gg2), axis=0)
         gg_unique = np.unique(gg, axis=0)
         # generate level set intersection points for unique edges
-        xl = (level - vfunc[gg_unique[:, 0]]) / (
-            vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]
-        )
-        p = (1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]] + xl[
-            :, np.newaxis
-        ] * self.v[gg_unique[:, 1]]
+        xl = ((level - vfunc[gg_unique[:, 0]])
+              / ( vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]))
+        p = ((1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]]
+             + xl[:, np.newaxis] * self.v[gg_unique[:, 1]])
         # fill sparse matrix with new point indices (+1 to distinguish from zero)
-        A = sparse.csc_matrix(
+        a_mat = sparse.csc_matrix(
             (np.arange(gg_unique.shape[0]) + 1, (gg_unique[:, 0], gg_unique[:, 1]))
         )
         # for each tria create one edge via lookup in matrix
-        edge_idxs = (
-            np.concatenate((A[gg1[:, 0], gg1[:, 1]], A[gg2[:, 0], gg2[:, 1]]), axis=0).T
-            - 1
-        )
+        edge_idxs = ( np.concatenate((a_mat[gg1[:, 0], gg1[:, 1]],
+                                      a_mat[gg2[:, 0], gg2[:, 1]]), axis=0).T - 1 )
         # lengths computation
         p1 = np.squeeze(p[edge_idxs[:, 0]])
         p2 = np.squeeze(p[edge_idxs[:, 1]])
@@ -1388,13 +1419,26 @@ class TriaMesh:
         # the one before)
         dd = np.append(dd, 1)
         eps = 0.000001
-        path3d = path3d[dd > eps, :]
+        keep_ids = dd > eps
+        path3d = path3d[keep_ids, :]
+        edges_vidxs = gg_unique[path, :]
+        edges_vidxs = edges_vidxs[keep_ids, :]
+        edges_relpos = xl[path]
+        edges_relpos = edges_relpos[keep_ids]
         if get_tria_idx:
             if n_points:
                 raise ValueError("n_points cannot be combined with get_tria_idx=True.")
             tria_idx = tria_idx[dd[:-1] > eps]
-            return path3d, llength, tria_idx
+            if get_edges:
+                return path3d, llength, edges_vidxs, edges_relpos, tria_idx
+            else:
+                return path3d, llength, tria_idx
         else:
             if n_points:
+                if get_edges:
+                    raise ValueError("n_points cannot be combined with get_edges=True.")
                 path3d = TriaMesh.__iterative_resample_polygon(path3d, n_points)
-            return path3d, llength
+            if get_edges:
+                return path3d, llength, edges_vidxs, edges_relpos
+            else:
+                return path3d, llength

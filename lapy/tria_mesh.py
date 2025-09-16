@@ -1328,7 +1328,7 @@ class TriaMesh:
             edge (i,j) from the original mesh, default False.
         n_points : int
             Resample level set into n equidistant points. Cannot be combined
-            with get_tria_idx=True nor with get_vertex_idx=True.
+            with get_tria_idx=True nor with get_edges=True.
 
         Returns
         -------

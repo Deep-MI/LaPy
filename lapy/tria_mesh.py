@@ -1322,7 +1322,7 @@ class TriaMesh:
             Level set value.
         get_tria_idx : bool, default: False
             Also return a list of triangle indices for each edge, default False.
-        get_edges: bool, default: False
+        get_edges : bool, default: False
             Also return a list of two vertex indices (i,j) for each 3D point and
             a list of the relative position defining the 3D point along that
             edge (i,j) from the original mesh, default False.

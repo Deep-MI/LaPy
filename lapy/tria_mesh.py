@@ -1430,7 +1430,7 @@ class TriaMesh:
                 raise ValueError("n_points cannot be combined with get_tria_idx=True.")
             tria_idx = tria_idx[dd[:-1] > eps]
             if get_edges:
-                return path3d, llength, edges_vidxs, edges_relpos, tria_idx
+                return path3d, llength, tria_idx, edges_vidxs, edges_relpos
             else:
                 return path3d, llength, tria_idx
         else:

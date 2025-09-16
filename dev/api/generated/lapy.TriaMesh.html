@@ -371,7 +371,7 @@ looking from above).</p>
 <td><p>Compute the length of level sets.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lapy.TriaMesh.level_path" title="lapy.TriaMesh.level_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">level_path</span></code></a>(vfunc, level[, get_tria_idx, ...])</p></td>
-<td><p>Extract levelset as a path.</p></td>
+<td><p>Extract levelset of vfund at specific level as a path of 3D points.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lapy.TriaMesh.map_tfunc_to_vfunc" title="lapy.TriaMesh.map_tfunc_to_vfunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_tfunc_to_vfunc</span></code></a>(tfunc[, weighted])</p></td>
 <td><p>Map tria function to vertices by attributing 1/3 to each vertex of triangle.</p></td>
@@ -517,7 +517,7 @@ non-manifold meshes). Operates only on triangles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a></dt><dd><p>Similar to adj_dir, but stores the tria idx+1 instead
+<dt><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a></dt><dd><p>Similar to adj_dir, but stores the tria idx+1 instead
 of one in the matrix (allows lookup of vertex to tria).</p>
 </dd>
 </dl>
@@ -570,7 +570,7 @@ ACM Transactions on Graphics, 2003.</p>
 <span class="sig-name descname"><span class="pre">curvature_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TriaMesh.curvature_tria" title="Link to this definition">¶</a></dt>
 <dd><p>Compute min and max curvature and directions (orthogonal and in tria plane).</p>
 <p>First we compute these values on vertices and then smooth
-there. Finally they get mapped to the trias (averaging) and projected onto
+there. Finally, they get mapped to the trias (averaging) and projected onto
 the triangle plane, and orthogonalized.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -726,10 +726,28 @@ above. Operates only on triangles.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.level_path">
-<span class="sig-name descname"><span class="pre">level_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_tria_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TriaMesh.level_path" title="Link to this definition">¶</a></dt>
-<dd><p>Extract levelset as a path.</p>
-<p>Note: Only works for level sets that represent a single path with
-exactly one start and one endpoint.</p>
+<span class="sig-name descname"><span class="pre">level_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_tria_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.TriaMesh.level_path" title="Link to this definition">¶</a></dt>
+<dd><p>Extract levelset of vfund at specific level as a path of 3D points.</p>
+<p>For a given real valued scalar map on the surface mesh (vfunc) this
+function computes the edges that intersect with a given level set (level).
+It then finds the point on each mesh edge where the level set intersects.
+The points are sorted and returned as an ordered array of 3D coordinates
+together with the length of the level set path.</p>
+<p>Note: Only works for level sets that represent a single non-intersecting
+path with exactly one start and one endpoint!</p>
+<p>Additional options: get_tria_idx and get_edges when True will also
+return an array of triangle ids for each path segment, defining the
+triangle i, where the path from i to i+1 passes through (so for a path
+with n points, these will be n-1 triangle ids). Furthermore, an array
+of edge vertex indices of shape (n,2) can be obtained defining the two
+vertices of the intersecting edge in the original mesh for each 3D point
+on the path. A second array is returned, defining the relative position
+of the intersecting point along this edge as a float from 0 (start vertex)
+to 1 (end vertex). This information can, for example, be useful for
+interpolating a second surface map at the new path point coordinates.
+Neither of this information is available when n_points is used to resample
+the path into n_points equidistant new points as the association to edges
+or triangles in the original mesh is lost.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -739,19 +757,33 @@ exactly one start and one endpoint.</p>
 </dd>
 <dt><strong>get_tria_idx</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a></span></dt><dd><p>Also return a list of triangle indices for each edge, default False.</p>
 </dd>
+<dt><strong>get_edges</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a></span></dt><dd><p>Also return a list of two vertex indices (i,j) for each 3D point and
+a list of the relative position defining the 3D point along that
+edge (i,j) from the original mesh, default False.</p>
+</dd>
 <dt><strong>n_points</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Resample level set into n equidistant points. Cannot be combined
-with get_tria_idx=True.</p>
+with get_tria_idx=True nor with get_edges=True.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt>path: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Array of shape (n,3) containing coordinates of vertices on level path.</p>
+<dt>path: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Array of shape (n,3) containing 3D coordinates of vertices on level path.</p>
 </dd>
 <dt><strong>length</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Length of level set.</p>
 </dd>
-<dt><strong>tria_idx</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array of triangle index for each edge segment on the path (length n-1
+<dt><strong>tria_idx</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array of triangle index for each segment on the path (length n-1
 if path is length n). Will only be returned if get_tria_idx is True.</p>
+</dd>
+<dt><strong>edges_vidxs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array of shape (n,2) of vertex indices (i,j) for each 3D point, defining
+the vertices of the original mesh of the edge intersecting the level set
+at this point. Will only be returned if get_edges is True.</p>
+</dd>
+<dt>edges_relpos: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Array of floats defining the relative position for each 3D point along
+the edges of the original mesh (defined by the two points in edges_vidxs).
+Float value 0 defines first point, and 1 defines end point. So the 3D
+point of the path is computed (1 - relpos) v_i + relpos v_j.
+Will only be returned if get_edges is True.</p>
 </dd>
 </dl>
 </dd>

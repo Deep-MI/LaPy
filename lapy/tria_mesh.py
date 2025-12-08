@@ -53,7 +53,7 @@ class TriaMesh:
             self.t = self.t.T
         # Check a few things
         vnum = np.max(self.v.shape)
-        if np.max(self.t) >= vnum:
+        if self.t.size >0 and np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         if self.t.shape[1] != 3:
             raise ValueError("Triangles should have 3 vertices")
@@ -71,7 +71,7 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            Filename to load.
+            Filename to load, supporting .pial, .white, .sphere etc.
 
         Returns
         -------
@@ -556,9 +556,10 @@ class TriaMesh:
             Number of connected components.
         labels : array
             Label array of shape (n_vertices,) where labels[i] is the component
-            ID of vertex i.
+            ID of vertex i. Component IDs are integers from 0 to n_components-1.
         """
         from scipy.sparse.csgraph import connected_components
+
         return connected_components(self.adj_sym, directed=False)
 
     def keep_largest_connected_component(self, clean=True):
@@ -760,6 +761,7 @@ class TriaMesh:
         np.add.at(vdeg, vids[:, 0], 1)
         np.add.at(vdeg, vids[:, 1], 1)
         # divide by vertex degree (maybe better by edge length sum??)
+        # handle division by zero (for isolated vertices)
         vdeg[vdeg == 0] = 1
         vv = vv / vdeg.reshape(-1, 1)
         # smooth vertex functions
@@ -772,9 +774,8 @@ class TriaMesh:
         mats[:, 2, 1] = vv[:, 4]
         mats[:, 2, 2] = vv[:, 5]
         # compute eigendecomposition (real for symmetric matrices)
-        evals, evecs = np.linalg.eig(mats)
-        evals = np.real(evals)
-        evecs = np.real(evecs)
+        # eigh is better for symmetric matrices
+        evals, evecs = np.linalg.eigh(mats)
         # sort evals ascending
         # this is instable in perfectly planar regions
         #  (normal can lie in tangential plane)

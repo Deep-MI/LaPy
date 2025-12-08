@@ -547,6 +547,60 @@ class TriaMesh:
                 firstcol = []
         return loops
 
+    def connected_components(self):
+        """Compute connected components of the mesh.
+
+        Returns
+        -------
+        n_components : int
+            Number of connected components.
+        labels : array
+            Label array of shape (n_vertices,) where labels[i] is the component
+            ID of vertex i.
+        """
+        from scipy.sparse.csgraph import connected_components
+        return connected_components(self.adj_sym, directed=False)
+
+    def keep_largest_connected_component(self, clean=True):
+        """Keep only the largest connected component of the mesh.
+
+        Modifies the mesh in-place.
+
+        Parameters
+        ----------
+        clean : bool, default=True
+            If True, remove vertices that are not used in the largest component.
+            If False, vertices are kept but triangles from other components are removed,
+            creating free vertices.
+
+        Returns
+        -------
+        vkeep : array or None
+            Indices (from original list) of kept vertices if clean=True, else None.
+        vdel : array or None
+            Indices of deleted (unused) vertices if clean=True, else None.
+        """
+        n_components, labels = self.connected_components()
+        if n_components <= 1:
+            if clean:
+                return self.rm_free_vertices_()
+            else:
+                return None, None
+        # Count vertices in each component
+        counts = np.bincount(labels)
+        # Get label of largest component
+        largest_comp_label = np.argmax(counts)
+        # Filter triangles: check which component the first vertex of each triangle
+        # belongs to (all vertices of a triangle are in the same component)
+        t_mask = labels[self.t[:, 0]] == largest_comp_label
+        self.t = self.t[t_mask]
+        if clean:
+            return self.rm_free_vertices_()
+        else:
+            # Re-init to update adjacency matrices with new t
+            self.__init__(self.v, self.t, self.fsinfo)
+            return None, None
+
     def centroid(self):
         """Compute centroid of triangle mesh as a weighted average of triangle centers.
 
@@ -832,7 +886,7 @@ class TriaMesh:
         Free vertices are vertices that are not used in any triangle.
         They can produce problems when constructing, e.g., Laplace matrices.
 
-        Will update v and t in mesh.
+        Modifies the mesh in-place.
 
         Returns
         -------
@@ -842,7 +896,7 @@ class TriaMesh:
             Indices of deleted (unused) vertices.
         """
         tflat = self.t.reshape(-1)
-        vnum = np.max(self.v.shape)
+        vnum = self.v.shape[0]
         if np.max(tflat) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
@@ -852,7 +906,7 @@ class TriaMesh:
         vdel = np.nonzero(~vkeep)[0]
         # if nothing to delete return
         if len(vdel) == 0:
-            return np.arange(vnum), []
+            return np.arange(vnum), np.array([], dtype=int)
         # delete unused vertices
         vnew = self.v[vkeep, :]
         # create lookup table

@@ -360,3 +360,80 @@ def test_refine_and_boundary_loops(tria_mesh_fixture, loaded_data):
     ]
 
     assert boundary_loops[0] == expected_boundary_loop
+
+
+def test_connected_components(tria_mesh_fixture):
+    """
+    Test the connected_components method.
+    """
+    # Create a mesh with two disconnected components
+    # Component 1: Original fixture (vertices 0-7)
+    v1 = tria_mesh_fixture.v
+    t1 = tria_mesh_fixture.t
+
+    # Component 2: Shifted copy (vertices 8-15)
+    v2 = v1 + 5.0  # Shift by 5 in x, y, z
+    t2 = t1 + v1.shape[0]
+
+    # Combine
+    v_combined = np.vstack((v1, v2))
+    t_combined = np.vstack((t1, t2))
+
+    mesh = TriaMesh(v_combined, t_combined)
+
+    n_components, labels = mesh.connected_components()
+
+    assert n_components == 2
+    # Verify labels: first 8 vertices should be 0 (or 1), next 8 should be 1 (or 0)
+    # Since labeling order isn't strictly guaranteed, check if they are split correctly
+    assert len(np.unique(labels[:8])) == 1
+    assert len(np.unique(labels[8:])) == 1
+    assert labels[0] != labels[8]
+
+
+def test_keep_largest_connected_component(tria_mesh_fixture):
+    """
+    Test the keep_largest_connected_component method.
+    """
+    # Create a mesh with two disconnected components of different sizes
+    # Component 1: Original fixture (8 vertices, 12 triangles) - larger
+    v1 = tria_mesh_fixture.v
+    t1 = tria_mesh_fixture.t
+
+    # Component 2: A single triangle (3 vertices, 1 triangle) - smaller
+    v2 = np.array([[10.0, 0.0, 0.0], [11.0, 0.0, 0.0], [10.0, 1.0, 0.0]])
+    t2 = np.array([[0, 1, 2]]) + v1.shape[0]
+
+    # Combine
+    v_combined = np.vstack((v1, v2))
+    t_combined = np.vstack((t1, t2))
+
+    mesh = TriaMesh(v_combined, t_combined)
+
+    # Test with clean=True (default)
+    # Should keep only the larger component and remove unused vertices
+    vkeep, vdel = mesh.keep_largest_connected_component(clean=True)
+
+    assert mesh.v.shape[0] == 8
+    assert mesh.t.shape[0] == 12
+    # Verify we kept the original vertices
+    np.testing.assert_array_equal(mesh.v, v1)
+    np.testing.assert_array_equal(mesh.t, t1)
+    # Check return values
+    assert len(vkeep) == 8
+    assert len(vdel) == 3
+
+    # Reset mesh
+    mesh = TriaMesh(v_combined, t_combined)
+
+    # Test with clean=False
+    # Should keep only triangles of larger component but keep all vertices
+    vkeep, vdel = mesh.keep_largest_connected_component(clean=False)
+
+    assert mesh.v.shape[0] == 11
+    assert mesh.t.shape[0] == 12
+    # Should result in free vertices
+    assert mesh.has_free_vertices() is True
+    # Return values should be None
+    assert vkeep is None
+    assert vdel is None

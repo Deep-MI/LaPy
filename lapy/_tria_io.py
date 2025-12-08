@@ -497,7 +497,7 @@ def write_vtk(tria, filename):
     f.close()
 
 
-def write_fssurf(tria, filename):
+def write_fssurf(tria, filename, image=None):
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 
     Parameters
@@ -506,12 +506,30 @@ def write_fssurf(tria, filename):
         Triangle mesh to save.
     filename : str
         Filename to save to.
+    image : str | nibabel.spatialimages.SpatialImage | None, optional
+        Path to image or image object. If specified, the vertices
+        are assumed to be in voxel coordinates and are converted
+        to surface RAS (tkr) coordinates before saving.
+        The expected order of coordinates is (x, y, z) matching
+        the image voxel indices.
     """
     # open file
     try:
         from nibabel.freesurfer.io import write_geometry
-
-        write_geometry(filename, tria.v, tria.t, volume_info=tria.fsinfo)
+        v = tria.v
+        if image is not None:
+            import nibabel as nib
+            from nibabel.affines import apply_affine
+            from nibabel.freesurfer.mghformat import MGHHeader
+            if isinstance(image, str):
+                img = nib.load(image)
+            else:
+                img = image
+            header = img.header
+            if isinstance(img, nib.Nifti1Image):
+                header = MGHHeader.from_header(header)
+            v = apply_affine(header.get_vox2ras_tkr(), v)
+        write_geometry(filename, v, tria.t, volume_info=tria.fsinfo)
     except OSError:
         print("[File " + filename + " not writable]")
         raise

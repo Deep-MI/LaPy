@@ -122,15 +122,21 @@ class TriaMesh:
         """
         io.write_vtk(self, filename)
 
-    def write_fssurf(self, filename):
+    def write_fssurf(self, filename, image=None):
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
 
         Parameters
         ----------
         filename : str
             Filename to save to.
+        image : str | nibabel.spatialimages.SpatialImage | None, optional
+            Path to image or image object. If specified, the vertices
+            are assumed to be in voxel coordinates and are converted
+            to surface RAS (tkr) coordinates before saving.
+            The expected order of coordinates is (x, y, z) matching
+            the image voxel indices.
         """
-        io.write_fssurf(self, filename)
+        io.write_fssurf(self, filename, image=image)
 
     def _construct_adj_sym(self):
         """Construct symmetric adjacency matrix (edge graph) of triangle mesh.

@@ -1207,7 +1207,7 @@ class TriaMesh:
             Diffusion speed parameter. lambda=1 reduces to the most simple case
             of a weighted average of the values at neighboring vertices,
             while smaller lambdas will include the value at the current vertex.
-        mat : csc_matrix, optional
+        mat : csc_matrix, None
             Precomputed smoothing matrix.
 
         Returns
@@ -1241,7 +1241,7 @@ class TriaMesh:
         lambda_ : float
             Shrinking factor (0 < lambda < 1).
         mu : float
-            Expanding factor (negative, |mu| > lambda).
+            Expanding factor (negative, ``|mu| > lambda``).
 
         Returns
         -------

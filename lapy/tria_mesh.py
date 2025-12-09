@@ -1116,7 +1116,7 @@ class TriaMesh:
     def map_vfunc_to_tfunc(self, vfunc):
         """Map vertex function to triangles by attributing 1/3 to each.
 
-        Uses number of vertices and trias
+        Uses number of vertices and trias.
 
         Parameters
         ----------
@@ -1134,8 +1134,37 @@ class TriaMesh:
         tfunc = np.sum(vfunc[self.t], axis=1)
         return tfunc
 
+    def _construct_smoothing_matrix(self):
+        """Construct the row-stochastic matrix for smoothing.
+
+        Returns
+        -------
+        csc_matrix
+            Sparse matrix for smoothing.
+        """
+        areas = self.vertex_areas()[:, np.newaxis]
+        adj = self.adj_sym.copy()
+        # binarize:
+        adj.data = np.ones(adj.data.shape)
+        # adjust columns to contain areas of vertex i
+        adj2 = adj.multiply(areas)
+        # rowsum is the area sum of 1-ring neighbors
+        rowsum = np.sum(adj2, axis=1)
+        # normalize rows to sum = 1, handling division by zero
+        rowsum[rowsum == 0] = 1.0
+        adj2 = adj2.multiply(1.0 / rowsum)
+        return adj2
+
     def smooth_vfunc(self, vfunc, n=1):
         """Smooth the mesh or a vertex function iteratively.
+
+        This is the most simple smoothing approach of a weighted
+        average of the neighbors.
+
+        .. deprecated::1.4.0
+            `smooth_vfunc` will be removed in LaPy 2.0.0, use `smooth_laplace`
+            or `smooth_taubin` instead. `smooth_laplace` with `lambda_=1`
+            replicates this function.
 
         Parameters
         ----------
@@ -1149,36 +1178,96 @@ class TriaMesh:
         vfunc : array
             Smoothed surface vertex function.
         """
+        print("TriaMesh.smooth_vfunc is deprecated, use smooth_laplace or smooth_taubin instead.")
         if vfunc is None:
             vfunc = self.v
         vfunc = np.array(vfunc)
         if self.v.shape[0] != vfunc.shape[0]:
             raise ValueError("Error: length of vfunc needs to match number of vertices")
-        areas = self.vertex_areas()[:, np.newaxis]
-        adj = self.adj_sym.copy()
-        # binarize:
-        adj.data = np.ones(adj.data.shape)
-        # adjust columns to contain areas of vertex i
-        adj2 = adj.multiply(areas)
-        # rowsum is the area sum of 1-ring neighbors
-        rowsum = np.sum(adj2, axis=1)
-        # normalize rows to sum = 1
-        adj2 = adj2.multiply(1.0 / rowsum)
+        adj2 = self._construct_smoothing_matrix()
         # apply sparse matrix n times (fast in spite of loop)
         vout = adj2.dot(vfunc)
-        for _i in range(n - 1):
+        for _ in range(n - 1):
             vout = adj2.dot(vout)
         return vout
 
+    def smooth_laplace(self, vfunc=None, n=1, lambda_=0.5, mat=None):
+        """Smooth the mesh or a vertex function using Laplace smoothing.
+
+        Applies v_new = (1-lambda)*v + lambda * M*v
+        where M is the vertex-area weighted adjacency matrix.
+
+        Parameters
+        ----------
+        vfunc : array or None
+            Float vector of values at vertices, if None, use vertex coordinates.
+        n : int
+            Number of iterations.
+        lambda_ : float
+            Diffusion speed parameter. lambda=1 reduces to the most simple case
+            of a weighted average of the values at neighboring vertices,
+            while smaller lambdas will include the value at the current vertex.
+        mat : csc_matrix, optional
+            Precomputed smoothing matrix.
+
+        Returns
+        -------
+        vfunc : array
+            Smoothed surface vertex function.
+        """
+        if vfunc is None:
+            vfunc = self.v
+        vfunc = np.array(vfunc)
+        if self.v.shape[0] != vfunc.shape[0]:
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
+        if mat is None:
+            mat = self._construct_smoothing_matrix()
+        for _ in range(n):
+            vfunc = (1.0 - lambda_) * vfunc + lambda_ * mat.dot(vfunc)
+        return vfunc
+
+    def smooth_taubin(self, vfunc=None, n=1, lambda_=0.5, mu=-0.53):
+        """Smooth the mesh or a vertex function using Taubin smoothing.
+
+        Taubin smoothing alternates between shrinking (positive lambda) and
+        expanding (negative mu) steps to avoid shrinkage of the mesh.
+
+        Parameters
+        ----------
+        vfunc : array or None
+            Float vector of values at vertices, if None, use vertex coordinates.
+        n : int
+            Number of iterations (each iteration includes one shrink and one expand step).
+        lambda_ : float
+            Shrinking factor (0 < lambda < 1).
+        mu : float
+            Expanding factor (negative, |mu| > lambda).
+
+        Returns
+        -------
+        vfunc : array
+            Smoothed surface vertex function.
+        """
+        if vfunc is None:
+            vfunc = self.v
+        vfunc = np.array(vfunc)
+        if self.v.shape[0] != vfunc.shape[0]:
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
+        mat = self._construct_smoothing_matrix()
+        for _ in range(n):
+            vfunc = self.smooth_laplace(vfunc, n=1, lambda_=lambda_, mat=mat)
+            vfunc = self.smooth_laplace(vfunc, n=1, lambda_=mu, mat=mat)
+        return vfunc
+
     def smooth_(self, n=1):
-        """Smooth the mesh iteratively in-place.
+        """Smooth the mesh iteratively in-place using Taubin smoothing.
 
         Parameters
         ----------
         n : int
             Smoothing iterations.
         """
-        vfunc = self.smooth_vfunc(self.v, n)
+        vfunc = self.smooth_taubin(self.v, n=n)
         self.v = vfunc
         return
 

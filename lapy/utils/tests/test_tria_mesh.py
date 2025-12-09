@@ -437,3 +437,71 @@ def test_keep_largest_connected_component(tria_mesh_fixture):
     # Return values should be None
     assert vkeep is None
     assert vdel is None
+
+
+def test_smooth_laplace(tria_mesh_fixture):
+    """Test Laplace smoothing."""
+    mesh = tria_mesh_fixture
+    v_orig = mesh.v.copy()
+
+    # Smooth with default parameters
+    v_smooth = mesh.smooth_laplace(n=1, lambda_=0.5)
+
+    # Vertices should change
+    assert not np.allclose(v_orig, v_smooth)
+    assert v_smooth.shape == v_orig.shape
+
+    # Check shrinkage (distance to centroid should decrease for a convex-like cube)
+    centroid = np.mean(v_orig, axis=0)
+    dist_orig = np.linalg.norm(v_orig - centroid, axis=1)
+    dist_smooth = np.linalg.norm(v_smooth - centroid, axis=1)
+    assert np.mean(dist_smooth) < np.mean(dist_orig)
+
+    # Equivalence check with old smooth_vfunc (which corresponds to lambda=1)
+    # Note: smooth_vfunc applies M*v. smooth_laplace applies (1-l)v + l*M*v.
+    # If l=1, result is M*v.
+    v_old = mesh.smooth_vfunc(v_orig, n=1)
+    v_new = mesh.smooth_laplace(v_orig, n=1, lambda_=1.0)
+    np.testing.assert_allclose(v_old, v_new)
+
+
+def test_smooth_taubin(tria_mesh_fixture):
+    """Test Taubin smoothing."""
+    mesh = tria_mesh_fixture
+    v_orig = mesh.v.copy()
+
+    # Smooth
+    v_smooth = mesh.smooth_taubin(n=1, lambda_=0.5, mu=-0.53)
+
+    # Vertices should change
+    assert not np.allclose(v_orig, v_smooth)
+    assert v_smooth.shape == v_orig.shape
+
+    # Check volume preservation (rough check compared to laplace)
+    # Laplace with same lambda and 2 steps (one shrink, one shrink) would shrink a lot.
+    # Taubin (one shrink, one grow) should shrink less.
+    v_laplace_2 = mesh.smooth_laplace(n=2, lambda_=0.5)
+
+    centroid = np.mean(v_orig, axis=0)
+    dist_taubin = np.linalg.norm(v_smooth - centroid, axis=1)
+    dist_laplace = np.linalg.norm(v_laplace_2 - centroid, axis=1)
+
+    # Taubin should maintain size better than double laplace
+    assert np.mean(dist_taubin) > np.mean(dist_laplace)
+
+
+def test_smooth_functions_custom_vfunc(tria_mesh_fixture):
+    """Test smoothing on a custom scalar function."""
+    mesh = tria_mesh_fixture
+    # Scalar function (e.g., x-coordinate)
+    vfunc = mesh.v[:, 0].copy()
+
+    # Laplace
+    vfunc_smooth = mesh.smooth_laplace(vfunc, n=1, lambda_=0.5)
+    assert not np.allclose(vfunc, vfunc_smooth)
+    assert vfunc_smooth.shape == vfunc.shape
+
+    # Taubin
+    vfunc_taubin = mesh.smooth_taubin(vfunc, n=1, lambda_=0.5, mu=-0.53)
+    assert not np.allclose(vfunc, vfunc_taubin)
+    assert vfunc_taubin.shape == vfunc.shape

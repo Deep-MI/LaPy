@@ -6,8 +6,6 @@ from scipy import sparse
 
 from . import _tria_io as io
 
-if TYPE_CHECKING:
-    import nibabel
 
 class TriaMesh:
     """Class representing a triangle mesh.
@@ -132,8 +130,8 @@ class TriaMesh:
         ----------
         filename : str
             Filename to save to.
-        image : str, nibabel image, optional
-            Path to image or image object. If specified, the vertices
+        image : str, obj, None
+            Path to image or nibabel image object. If specified, the vertices
             are assumed to be in voxel coordinates and are converted
             to surface RAS (tkr) coordinates before saving.
             The expected order of coordinates is (x, y, z) matching

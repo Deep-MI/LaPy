@@ -433,7 +433,7 @@ def test_keep_largest_connected_component(tria_mesh_fixture):
     assert mesh.v.shape[0] == 11
     assert mesh.t.shape[0] == 12
     # Should result in free vertices
-    assert mesh.has_free_vertices() is True
+    assert mesh.has_free_vertices()
     # Return values should be None
     assert vkeep is None
     assert vdel is None

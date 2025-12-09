@@ -1,5 +1,4 @@
 import sys
-from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy import sparse
@@ -130,7 +129,7 @@ class TriaMesh:
         ----------
         filename : str
             Filename to save to.
-        image : str, obj, None
+        image : str, object, None
             Path to image or nibabel image object. If specified, the vertices
             are assumed to be in voxel coordinates and are converted
             to surface RAS (tkr) coordinates before saving.

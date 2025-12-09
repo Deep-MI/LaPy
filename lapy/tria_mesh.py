@@ -1,10 +1,13 @@
 import sys
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy import sparse
 
 from . import _tria_io as io
 
+if TYPE_CHECKING:
+    import nibabel
 
 class TriaMesh:
     """Class representing a triangle mesh.
@@ -129,7 +132,7 @@ class TriaMesh:
         ----------
         filename : str
             Filename to save to.
-        image : str | nibabel.spatialimages.SpatialImage | None, optional
+        image : str, nibabel image, optional
             Path to image or image object. If specified, the vertices
             are assumed to be in voxel coordinates and are converted
             to surface RAS (tkr) coordinates before saving.

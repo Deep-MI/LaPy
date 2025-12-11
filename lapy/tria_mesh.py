@@ -53,7 +53,7 @@ class TriaMesh:
             self.t = self.t.T
         # Check a few things
         vnum = np.max(self.v.shape)
-        if np.max(self.t) >= vnum:
+        if self.t.size >0 and np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         if self.t.shape[1] != 3:
             raise ValueError("Triangles should have 3 vertices")
@@ -71,7 +71,7 @@ class TriaMesh:
         Parameters
         ----------
         filename : str
-            Filename to load.
+            Filename to load, supporting .pial, .white, .sphere etc.
 
         Returns
         -------
@@ -122,15 +122,21 @@ class TriaMesh:
         """
         io.write_vtk(self, filename)
 
-    def write_fssurf(self, filename):
+    def write_fssurf(self, filename, image=None):
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
 
         Parameters
         ----------
         filename : str
             Filename to save to.
+        image : str, object, None
+            Path to image or nibabel image object. If specified, the vertices
+            are assumed to be in voxel coordinates and are converted
+            to surface RAS (tkr) coordinates before saving.
+            The expected order of coordinates is (x, y, z) matching
+            the image voxel indices.
         """
-        io.write_fssurf(self, filename)
+        io.write_fssurf(self, filename, image=image)
 
     def _construct_adj_sym(self):
         """Construct symmetric adjacency matrix (edge graph) of triangle mesh.
@@ -541,6 +547,61 @@ class TriaMesh:
                 firstcol = []
         return loops
 
+    def connected_components(self):
+        """Compute connected components of the mesh.
+
+        Returns
+        -------
+        n_components : int
+            Number of connected components.
+        labels : array
+            Label array of shape (n_vertices,) where labels[i] is the component
+            ID of vertex i. Component IDs are integers from 0 to n_components-1.
+        """
+        from scipy.sparse.csgraph import connected_components
+
+        return connected_components(self.adj_sym, directed=False)
+
+    def keep_largest_connected_component(self, clean=True):
+        """Keep only the largest connected component of the mesh.
+
+        Modifies the mesh in-place.
+
+        Parameters
+        ----------
+        clean : bool, default=True
+            If True, remove vertices that are not used in the largest component.
+            If False, vertices are kept but triangles from other components are removed,
+            creating free vertices.
+
+        Returns
+        -------
+        vkeep : array or None
+            Indices (from original list) of kept vertices if clean=True, else None.
+        vdel : array or None
+            Indices of deleted (unused) vertices if clean=True, else None.
+        """
+        n_components, labels = self.connected_components()
+        if n_components <= 1:
+            if clean:
+                return self.rm_free_vertices_()
+            else:
+                return None, None
+        # Count vertices in each component
+        counts = np.bincount(labels)
+        # Get label of largest component
+        largest_comp_label = np.argmax(counts)
+        # Filter triangles: check which component the first vertex of each triangle
+        # belongs to (all vertices of a triangle are in the same component)
+        t_mask = labels[self.t[:, 0]] == largest_comp_label
+        self.t = self.t[t_mask]
+        if clean:
+            return self.rm_free_vertices_()
+        else:
+            # Re-init to update adjacency matrices with new t
+            self.__init__(self.v, self.t, self.fsinfo)
+            return None, None
+
     def centroid(self):
         """Compute centroid of triangle mesh as a weighted average of triangle centers.
 
@@ -700,10 +761,11 @@ class TriaMesh:
         np.add.at(vdeg, vids[:, 0], 1)
         np.add.at(vdeg, vids[:, 1], 1)
         # divide by vertex degree (maybe better by edge length sum??)
+        # handle division by zero (for isolated vertices)
         vdeg[vdeg == 0] = 1
         vv = vv / vdeg.reshape(-1, 1)
         # smooth vertex functions
-        vv = self.smooth_vfunc(vv, smoothit)
+        vv = self.smooth_laplace(vfunc=vv, n=smoothit, lambda_=1.0)
         # create vnum 3x3 symmetric matrices at each vertex
         mats = np.empty([vnum, 3, 3])
         mats[:, 0, :] = vv[:, [0, 1, 2]]
@@ -712,9 +774,8 @@ class TriaMesh:
         mats[:, 2, 1] = vv[:, 4]
         mats[:, 2, 2] = vv[:, 5]
         # compute eigendecomposition (real for symmetric matrices)
-        evals, evecs = np.linalg.eig(mats)
-        evals = np.real(evals)
-        evecs = np.real(evecs)
+        # eigh is better for symmetric matrices
+        evals, evecs = np.linalg.eigh(mats)
         # sort evals ascending
         # this is instable in perfectly planar regions
         #  (normal can lie in tangential plane)
@@ -826,7 +887,7 @@ class TriaMesh:
         Free vertices are vertices that are not used in any triangle.
         They can produce problems when constructing, e.g., Laplace matrices.
 
-        Will update v and t in mesh.
+        Modifies the mesh in-place.
 
         Returns
         -------
@@ -836,7 +897,7 @@ class TriaMesh:
             Indices of deleted (unused) vertices.
         """
         tflat = self.t.reshape(-1)
-        vnum = np.max(self.v.shape)
+        vnum = self.v.shape[0]
         if np.max(tflat) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
@@ -846,7 +907,7 @@ class TriaMesh:
         vdel = np.nonzero(~vkeep)[0]
         # if nothing to delete return
         if len(vdel) == 0:
-            return np.arange(vnum), []
+            return np.arange(vnum), np.array([], dtype=int)
         # delete unused vertices
         vnew = self.v[vkeep, :]
         # create lookup table
@@ -1055,7 +1116,7 @@ class TriaMesh:
     def map_vfunc_to_tfunc(self, vfunc):
         """Map vertex function to triangles by attributing 1/3 to each.
 
-        Uses number of vertices and trias
+        Uses number of vertices and trias.
 
         Parameters
         ----------
@@ -1073,8 +1134,37 @@ class TriaMesh:
         tfunc = np.sum(vfunc[self.t], axis=1)
         return tfunc
 
+    def _construct_smoothing_matrix(self):
+        """Construct the row-stochastic matrix for smoothing.
+
+        Returns
+        -------
+        csc_matrix
+            Sparse matrix for smoothing.
+        """
+        areas = self.vertex_areas()[:, np.newaxis]
+        adj = self.adj_sym.copy()
+        # binarize:
+        adj.data = np.ones(adj.data.shape)
+        # adjust columns to contain areas of vertex i
+        adj2 = adj.multiply(areas)
+        # rowsum is the area sum of 1-ring neighbors
+        rowsum = np.sum(adj2, axis=1)
+        # normalize rows to sum = 1, handling division by zero
+        rowsum[rowsum == 0] = 1.0
+        adj2 = adj2.multiply(1.0 / rowsum)
+        return adj2
+
     def smooth_vfunc(self, vfunc, n=1):
         """Smooth the mesh or a vertex function iteratively.
+
+        This is the most simple smoothing approach of a weighted
+        average of the neighbors.
+
+        .. deprecated::1.4.0
+            `smooth_vfunc` will be removed in LaPy 2.0.0, use `smooth_laplace`
+            or `smooth_taubin` instead. `smooth_laplace` with `lambda_=1`
+            is equivalent to this function.
 
         Parameters
         ----------
@@ -1088,36 +1178,96 @@ class TriaMesh:
         vfunc : array
             Smoothed surface vertex function.
         """
+        print("TriaMesh.smooth_vfunc is deprecated, use smooth_laplace or smooth_taubin instead.")
         if vfunc is None:
             vfunc = self.v
         vfunc = np.array(vfunc)
         if self.v.shape[0] != vfunc.shape[0]:
             raise ValueError("Error: length of vfunc needs to match number of vertices")
-        areas = self.vertex_areas()[:, np.newaxis]
-        adj = self.adj_sym.copy()
-        # binarize:
-        adj.data = np.ones(adj.data.shape)
-        # adjust columns to contain areas of vertex i
-        adj2 = adj.multiply(areas)
-        # rowsum is the area sum of 1-ring neighbors
-        rowsum = np.sum(adj2, axis=1)
-        # normalize rows to sum = 1
-        adj2 = adj2.multiply(1.0 / rowsum)
+        adj2 = self._construct_smoothing_matrix()
         # apply sparse matrix n times (fast in spite of loop)
         vout = adj2.dot(vfunc)
-        for _i in range(n - 1):
+        for _ in range(n - 1):
             vout = adj2.dot(vout)
         return vout
 
+    def smooth_laplace(self, vfunc=None, n=1, lambda_=0.5, mat=None):
+        """Smooth the mesh or a vertex function using Laplace smoothing.
+
+        Applies v_new = (1-lambda)*v + lambda * M*v
+        where M is the vertex-area weighted adjacency matrix.
+
+        Parameters
+        ----------
+        vfunc : array or None
+            Float vector of values at vertices, if None, use vertex coordinates.
+        n : int
+            Number of iterations.
+        lambda_ : float
+            Diffusion speed parameter. lambda=1 reduces to the most simple case
+            of a weighted average of the values at neighboring vertices,
+            while smaller lambdas will include the value at the current vertex.
+        mat : csc_matrix, None
+            Precomputed smoothing matrix.
+
+        Returns
+        -------
+        vfunc : array
+            Smoothed surface vertex function.
+        """
+        if vfunc is None:
+            vfunc = self.v
+        vfunc = np.array(vfunc)
+        if self.v.shape[0] != vfunc.shape[0]:
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
+        if mat is None:
+            mat = self._construct_smoothing_matrix()
+        for _ in range(n):
+            vfunc = (1.0 - lambda_) * vfunc + lambda_ * mat.dot(vfunc)
+        return vfunc
+
+    def smooth_taubin(self, vfunc=None, n=1, lambda_=0.5, mu=-0.53):
+        """Smooth the mesh or a vertex function using Taubin smoothing.
+
+        Taubin smoothing alternates between shrinking (positive lambda) and
+        expanding (negative mu) steps to avoid shrinkage of the mesh.
+
+        Parameters
+        ----------
+        vfunc : array or None
+            Float vector of values at vertices, if None, use vertex coordinates.
+        n : int
+            Number of iterations (each iteration includes one shrink and one expand step).
+        lambda_ : float
+            Shrinking factor (0 < lambda < 1).
+        mu : float
+            Expanding factor (negative, ``|mu| > lambda``).
+
+        Returns
+        -------
+        vfunc : array
+            Smoothed surface vertex function.
+        """
+        if vfunc is None:
+            vfunc = self.v
+        vfunc = np.array(vfunc)
+        if self.v.shape[0] != vfunc.shape[0]:
+            raise ValueError("Error: length of vfunc needs to match number of vertices")
+        mat = self._construct_smoothing_matrix()
+        for _ in range(n):
+            vfunc = self.smooth_laplace(vfunc, n=1, lambda_=lambda_, mat=mat)
+            vfunc = self.smooth_laplace(vfunc, n=1, lambda_=mu, mat=mat)
+        return vfunc
+
     def smooth_(self, n=1):
-        """Smooth the mesh iteratively in-place.
+        """Smooth the mesh iteratively in-place using Taubin smoothing.
 
         Parameters
         ----------
         n : int
             Smoothing iterations.
         """
-        vfunc = self.smooth_vfunc(self.v, n)
+        vfunc = self.smooth_taubin(self.v, n=n)
         self.v = vfunc
         return
 
@@ -1291,7 +1441,7 @@ class TriaMesh:
                    n_points=None):
         """Extract levelset of vfund at specific level as a path of 3D points.
 
-        For a given real valued scalar map on the surface mesh (vfunc) this
+        For a given real-valued scalar map on the surface mesh (vfunc) this
         function computes the edges that intersect with a given level set (level).
         It then finds the point on each mesh edge where the level set intersects.
         The points are sorted and returned as an ordered array of 3D coordinates

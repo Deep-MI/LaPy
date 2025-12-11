@@ -521,6 +521,7 @@ def test_normalize(tria_mesh_fixture):
 def test_edges(tria_mesh_fixture):
     """Test edges computation."""
     mesh = tria_mesh_fixture
+    mesh.orient_() # Ensure oriented
     # Basic edge check
     vids, tids = mesh.edges()
     assert vids.shape[1] == 2
@@ -593,9 +594,9 @@ def test_level_sets(tria_mesh_fixture):
     # The fixture might produce multiple loops if not carefully chosen.
     # z=0.5 on the fixture likely produces a simple loop around the middle.
     try:
-        path, l = mesh.level_path(vfunc, level)
+        path, l_length = mesh.level_path(vfunc, level)
         assert len(path) > 0
-        assert np.isclose(l, length)
+        assert np.isclose(l_length, length)
         # Check that all points on path have z approx 0.5
         np.testing.assert_allclose(path[:, 2], level, atol=1e-5)
     except ValueError:

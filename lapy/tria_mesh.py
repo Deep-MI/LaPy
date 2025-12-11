@@ -1441,7 +1441,7 @@ class TriaMesh:
                    n_points=None):
         """Extract levelset of vfund at specific level as a path of 3D points.
 
-        For a given real valued scalar map on the surface mesh (vfunc) this
+        For a given real-valued scalar map on the surface mesh (vfunc) this
         function computes the edges that intersect with a given level set (level).
         It then finds the point on each mesh edge where the level set intersects.
         The points are sorted and returned as an ordered array of 3D coordinates

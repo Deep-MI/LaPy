@@ -765,7 +765,7 @@ class TriaMesh:
         vdeg[vdeg == 0] = 1
         vv = vv / vdeg.reshape(-1, 1)
         # smooth vertex functions
-        vv = self.smooth_vfunc(vv, smoothit)
+        vv = self.smooth_laplace(vfunc=vv, n=smoothit, lambda_=1.0)
         # create vnum 3x3 symmetric matrices at each vertex
         mats = np.empty([vnum, 3, 3])
         mats[:, 0, :] = vv[:, [0, 1, 2]]
@@ -1164,7 +1164,7 @@ class TriaMesh:
         .. deprecated::1.4.0
             `smooth_vfunc` will be removed in LaPy 2.0.0, use `smooth_laplace`
             or `smooth_taubin` instead. `smooth_laplace` with `lambda_=1`
-            replicates this function.
+            is equivalent to this function.
 
         Parameters
         ----------

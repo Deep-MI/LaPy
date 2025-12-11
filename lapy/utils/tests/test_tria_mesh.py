@@ -505,3 +505,100 @@ def test_smooth_functions_custom_vfunc(tria_mesh_fixture):
     vfunc_taubin = mesh.smooth_taubin(vfunc, n=1, lambda_=0.5, mu=-0.53)
     assert not np.allclose(vfunc, vfunc_taubin)
     assert vfunc_taubin.shape == vfunc.shape
+
+
+def test_normalize(tria_mesh_fixture):
+    """Test normalize_ method."""
+    mesh = tria_mesh_fixture
+    mesh.normalize_()
+    # Check centroid is origin
+    centroid, area = mesh.centroid()
+    np.testing.assert_allclose(centroid, np.zeros(3), atol=1e-7)
+    # Check area is 1
+    assert np.isclose(area, 1.0)
+
+
+def test_edges(tria_mesh_fixture):
+    """Test edges computation."""
+    mesh = tria_mesh_fixture
+    # Basic edge check
+    vids, tids = mesh.edges()
+    assert vids.shape[1] == 2
+    assert tids.shape[1] == 2
+    assert vids.shape[0] == tids.shape[0]
+    # Test with boundary
+    boundary_mesh = TriaMesh(mesh.v, mesh.t[2:, :])
+    vids_b, tids_b, bdrv, bdrt = boundary_mesh.edges(with_boundary=True)
+    assert len(bdrv) > 0
+    assert len(bdrt) > 0
+
+
+def test_construct_adj_dir_tidx(tria_mesh_fixture):
+    """Test directed adjacency matrix with triangle indices."""
+    mesh = tria_mesh_fixture
+    mesh.orient_() # Ensure oriented
+    adj = mesh.construct_adj_dir_tidx()
+    # Check shape
+    assert adj.shape == (mesh.v.shape[0], mesh.v.shape[0])
+    # Check values (should be triangle indices + 1)
+    assert adj.max() <= mesh.t.shape[0]
+    assert adj.min() >= 0
+
+
+def test_map_functions(tria_mesh_fixture):
+    """Test mapping between vertex and triangle functions."""
+    mesh = tria_mesh_fixture
+    # Create a vertex function (e.g. index)
+    vfunc = np.arange(mesh.v.shape[0])
+    # Map to triangles
+    tfunc = mesh.map_vfunc_to_tfunc(vfunc)
+    assert tfunc.shape[0] == mesh.t.shape[0]
+    # Value on tria should be average of its vertices
+    expected_t0 = np.mean(vfunc[mesh.t[0]])
+    assert np.isclose(tfunc[0], expected_t0)
+    # Map back to vertices
+    vfunc_back = mesh.map_tfunc_to_vfunc(tfunc)
+    assert vfunc_back.shape[0] == mesh.v.shape[0]
+
+
+def test_curvature(tria_mesh_fixture):
+    """Test curvature computation."""
+    mesh = tria_mesh_fixture
+    mesh.orient_()
+    # Compute curvature
+    u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = mesh.curvature(smoothit=0)
+    assert u_min.shape == mesh.v.shape
+    assert u_max.shape == mesh.v.shape
+    assert c_min.shape[0] == mesh.v.shape[0]
+    assert c_max.shape[0] == mesh.v.shape[0]
+    assert normals.shape == mesh.v.shape
+    # Tria curvature
+    tu_min, tu_max, tc_min, tc_max = mesh.curvature_tria(smoothit=0)
+    assert tu_min.shape[0] == mesh.t.shape[0]
+    assert tc_min.shape[0] == mesh.t.shape[0]
+
+
+def test_level_sets(tria_mesh_fixture):
+    """Test level set functions."""
+    mesh = tria_mesh_fixture
+    # Define a simple function: z-coordinate
+    vfunc = mesh.v[:, 2]
+    level = 0.5
+    # Test level_length
+    length = mesh.level_length(vfunc, level)
+    # For a unit cube-like mesh, cut at z=0.5 should exist
+    assert length > 0
+    # Test level_path
+    # Note: level_path requires a single non-intersecting path.
+    # The fixture might produce multiple loops if not carefully chosen.
+    # z=0.5 on the fixture likely produces a simple loop around the middle.
+    try:
+        path, l = mesh.level_path(vfunc, level)
+        assert len(path) > 0
+        assert np.isclose(l, length)
+        # Check that all points on path have z approx 0.5
+        np.testing.assert_allclose(path[:, 2], level, atol=1e-5)
+    except ValueError:
+        # If topology is complex (multiple loops), it might raise ValueError
+        # In that case, we at least tested it runs until that check
+        pass

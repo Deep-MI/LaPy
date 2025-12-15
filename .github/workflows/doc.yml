@@ -50,7 +50,7 @@ jobs:
         shell: bash
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: doc-dev
           path: ./doc-dev

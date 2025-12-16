@@ -1,5 +1,6 @@
 import importlib
 import sys
+import logging
 from typing import Optional, Union
 
 import numpy as np
@@ -9,6 +10,7 @@ from .tet_mesh import TetMesh
 from .tria_mesh import TriaMesh
 from .utils._imports import import_optional_dependency
 
+logger = logging.getLogger(__name__)
 
 class Solver:
     """FEM solver for Laplace Eigenvalue and Poisson Equation.
@@ -62,7 +64,7 @@ class Solver:
         if type(geometry).__name__ == "TriaMesh":
             if aniso is not None:
                 # anisotropic Laplace
-                print("TriaMesh with anisotropic Laplace-Beltrami")
+                logger.info("TriaMesh with anisotropic Laplace-Beltrami")
                 u1, u2, c1, c2 = geometry.curvature_tria(smoothit=aniso_smooth)
                 # Diag mat to specify anisotropy strength
                 if isinstance(aniso, (list, tuple, set, np.ndarray)):
@@ -80,10 +82,10 @@ class Solver:
                 aniso_mat[:, 0] = np.exp(-aniso0 * np.abs(c2))
                 a, b = self._fem_tria_aniso(geometry, u1, u2, aniso_mat, lump)
             else:
-                print("TriaMesh with regular Laplace-Beltrami")
+                logger.info("TriaMesh with regular Laplace-Beltrami")
                 a, b = self._fem_tria(geometry, lump)
         elif type(geometry).__name__ == "TetMesh":
-            print("TetMesh with regular Laplace")
+            logger.info("TetMesh with regular Laplace")
             a, b = self._fem_tetra(geometry, lump)
         else:
             raise ValueError('Geometry type "' + type(geometry).__name__ + '" unknown')
@@ -138,7 +140,7 @@ class Solver:
         cr = np.cross(v3mv2, v1mv3)
         vol = 2 * np.sqrt(np.sum(cr * cr, axis=1))
         # zero vol will cause division by zero below, so set to small value:
-        vol_mean = 0.0001 * np.mean(vol)
+        vol_mean = max(0.0001 * np.mean(vol), sys.float_info.epsilon)
         vol[vol < sys.float_info.epsilon] = vol_mean
         # compute cotangents for A
         # using that v2mv1 = - (v3mv2 + v1mv3) this can also be seen by
@@ -241,7 +243,7 @@ class Solver:
         cr = np.cross(v3mv2, v1mv3)
         vol = 2 * np.sqrt(np.sum(cr * cr, axis=1))
         # zero vol will cause division by zero below, so set to small value:
-        vol_mean = 0.0001 * np.mean(vol)
+        vol_mean = max(0.0001 * np.mean(vol), sys.float_info.epsilon)
         vol[vol < sys.float_info.epsilon] = vol_mean
         # compute cotangents for A
         # using that v2mv1 = - (v3mv2 + v1mv3) this can also be seen by
@@ -322,8 +324,8 @@ class Solver:
         cr = np.cross(v3mv2, v1mv3)
         vol = 0.5 * np.sqrt(np.sum(cr * cr, axis=1))
         # zero vol will cause division by zero below, so set to small value:
-        vol_mean = 0.001 * np.mean(vol)
-        vol[vol == 0] = vol_mean
+        vol_mean = max(0.0001 * np.mean(vol), sys.float_info.epsilon)
+        vol[vol < sys.float_info.epsilon] = vol_mean
         # create b matrix data
         if not lump:
             b_ii = vol / 6
@@ -392,8 +394,8 @@ class Solver:
         cr = np.cross(e1, e3)
         vol = np.abs(np.sum(e4 * cr, axis=1))
         # zero vol will cause division by zero below, so set to small value:
-        vol_mean = 0.0001 * np.mean(vol)
-        vol[vol == 0] = vol_mean
+        vol_mean = max(0.0001 * np.mean(vol), sys.float_info.epsilon)
+        vol[vol < sys.float_info.epsilon] = vol_mean
         # compute dot products of edge vectors
         e11 = np.sum(e1 * e1, axis=1)
         e22 = np.sum(e2 * e2, axis=1)
@@ -636,7 +638,7 @@ class Solver:
 
         sigma = -0.01
         if self.use_cholmod:
-            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
                 matvec=chol,
@@ -646,7 +648,7 @@ class Solver:
         else:
             from scipy.sparse.linalg import splu
 
-            print("Solver: spsolve (LU decomposition) ...")
+            logger.info("Solver: spsolve (LU decomposition) ...")
             # turns out it is much faster to use cholesky and pass operator
             lu = splu(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
@@ -693,6 +695,7 @@ class Solver:
         """
         # check matrices
         dim = self.stiffness.shape[0]
+        dtype = self.stiffness.dtype
         if self.stiffness.shape != self.mass.shape or self.stiffness.shape[1] != dim:
             raise ValueError(
                 "Error: Square input matrices should have same number of rows and "
@@ -700,11 +703,13 @@ class Solver:
             )
         # create vector h
         if np.isscalar(h):
-            h = np.full((dim, 1), h, dtype="float64")
-        elif (not np.isscalar(h)) and h.size != dim:
-            raise ValueError(
-                "h should be either scalar or column vector with row num of A"
-            )
+            h = np.full((dim, 1), h, dtype=dtype)
+        else:
+            h = np.asarray(h, dtype=dtype)
+            if h.size != dim:
+                raise ValueError(
+                    "h should be either scalar or column vector with row num of A"
+                )
         if h.ndim == 1:
             h = h[:, np.newaxis]
         # create vector d
@@ -723,7 +728,7 @@ class Solver:
                     "dtup should contain index and data arrays (same lengths > 0)"
                 )
             dvec = sparse.csc_matrix(
-                (ddat, (didx, np.zeros(len(didx), dtype=np.uint32))), (dim, 1)
+                (ddat, (didx, np.zeros(len(didx), dtype=np.uint32))), (dim, 1), dtype=dtype
             )
 
         # create vector n
@@ -738,10 +743,11 @@ class Solver:
                     "dtup should contain index and data arrays (same lengths > 0)"
                 )
             nvec = sparse.csc_matrix(
-                (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1)
+                (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1), dtype=dtype
             )
         # compute right hand side
-        b = self.mass * (h - nvec)
+        mass = self.mass.astype(dtype, copy=False)
+        b = mass * (h - nvec)
         if len(didx) > 0:
             b = b - self.stiffness * dvec
         # remove Dirichlet Nodes
@@ -764,17 +770,17 @@ class Solver:
         else:
             a = self.stiffness
         # solve A x = b
-        print("Matrix Format now: " + a.getformat())
+        logger.debug("Matrix format now: %s", a.getformat())
         if self.use_cholmod:
-            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(a)
-            x = chol(b)
+            x = chol(b.astype(dtype))
         else:
             from scipy.sparse.linalg import splu
 
-            print("Solver: spsolve (LU decomposition) ...")
+            logger.info("Solver: spsolve (LU decomposition) ...")
             lu = splu(a)
-            x = lu.solve(b.astype(np.float32))
+            x = lu.solve(b.astype(dtype))
         x = np.squeeze(np.array(x))
         # pad Dirichlet nodes
         if len(didx) > 0:

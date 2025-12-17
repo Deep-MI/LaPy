@@ -130,7 +130,11 @@ class TetMesh:
         oriented: bool
             True if all tet volumes are positive.
             False if some or all are negative.
-            Raises ValueError if degenerate (zero-volume) tets are found.
+
+        Raises
+        ------
+        ValueError
+            If degenerate (zero-volume) tets are found.
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t0 = self.t[:, 0]

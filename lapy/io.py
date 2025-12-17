@@ -1,6 +1,9 @@
 """Functions to read and write spectra and vertex functions."""
 
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def read_vfunc(filename):
@@ -24,18 +27,21 @@ def read_vfunc(filename):
 
     try:
         with open(filename) as f:
-            txt = f.readlines()
+            txt = [x.strip() for x in f]
     except OSError:
-        print("[File " + filename + " not found or not readable]")
-        return
-    txt = [x.strip() for x in txt]
+        logger.error("File %s not found or not readable", filename)
+        raise
+
+    if "Solution:" not in txt:
+        raise ValueError("Expected 'Solution:' marker in %s", filename)
     txt.remove("Solution:")
-    txt = [re.sub("[{()}]", "", x) for x in txt]
+    txt = [re.sub("[{()}]", "", x) for x in txt if x]
+    if not txt:
+        raise ValueError("No vertex function data found in %s", filename)
+
     if len(txt) == 1:
         txt = [re.split("[,;]", x) for x in txt][0]
-    txt = [float(x) for x in txt]
-    # txt = np.array(txt)
-    return txt
+    return [float(x) for x in txt]
 
 
 def read_ev(filename):
@@ -54,66 +60,49 @@ def read_ev(filename):
     """
     # open file
     try:
-        f = open(filename)
+        with open(filename) as f:
+            # read file (and get rid of all \n)
+            ll = f.read().splitlines()
     except OSError:
-        print("[File " + filename + " not found or not readable]")
-        return
-    # read file (and get rid of all \n)
-    ll = f.read().splitlines()
+        logger.error("File %s not readable", filename)
+        raise
+
     # define data structure
-    d = dict()
+    d = {}
     # go through each line and parse it
     i = 0
+
+    def _parse_field(label, cast=int):
+        nonlocal i
+        d[label] = cast(ll[i].split(":", 1)[1].strip())
+        i += 1
+
     while i < len(ll):
-        if ll[i].lstrip().startswith("Creator:"):
-            d.update({"Creator": ll[i].split(":", 1)[1].strip()})
-            i = i + 1
-        elif ll[i].lstrip().startswith("File:"):
-            d.update({"File": ll[i].split(":", 1)[1].strip()})
-            i = i + 1
-        elif ll[i].lstrip().startswith("User:"):
-            d.update({"User": ll[i].split(":", 1)[1].strip()})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Refine:"):
-            d.update({"Refine": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Degree:"):
-            d.update({"Degree": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Dimension:"):
-            d.update({"Dimension": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Elements:"):
-            d.update({"Elements": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("DoF:"):
-            d.update({"DoF": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("NumEW:"):
-            d.update({"NumEW": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Area:"):
-            d.update({"Area": float(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Volume:"):
-            d.update({"Volume": float(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("BLength:"):
-            d.update({"BLength": float(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("EulerChar:"):
-            d.update({"EulerChar": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Time(pre)"):
-            d.update({"TimePre": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Time(calcAB)"):
-            d.update({"TimeCalcAB": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Time(calcEW)"):
-            d.update({"TimeCalcEW": int(ll[i].split(":", 1)[1].strip())})
-            i = i + 1
-        elif ll[i].lstrip().startswith("Eigenvalues"):
+        line = ll[i].lstrip()
+        if ":" in line:
+            key, _ = line.split(":", 1)
+            if key in {
+                "Creator",
+                "File",
+                "User",
+                "Refine",
+                "Degree",
+                "Dimension",
+                "Elements",
+                "DoF",
+                "NumEW",
+                "Area",
+                "Volume",
+                "BLength",
+                "EulerChar",
+                "Time(pre)",
+                "Time(calcAB)",
+                "Time(calcEW)",
+            }:
+                _parse_field(key if key != "Time(pre)" else "TimePre", float if key in {"Area", "Volume", "BLength"} else int)
+                continue
+
+        if line.startswith("Eigenvalues"):
             i = i + 1
             while ll[i].find("{") < 0:  # possibly introduce termination criterion
                 i = i + 1
@@ -128,7 +117,7 @@ def read_ev(filename):
             evals = np.array(evals.split(";")).astype(float)
             d.update({"Eigenvalues": evals})
             i = i + 1
-        elif ll[i].lstrip().startswith("Eigenvectors"):
+        elif line.startswith("Eigenvectors"):
             i = i + 1
             while not (ll[i].strip().startswith("sizes")):
                 i = i + 1

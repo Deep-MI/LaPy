@@ -36,7 +36,7 @@ def _ensure_planar_mesh(tria: TriaMesh, context: str) -> None:
         raise ValueError("Mesh is not planar")
 
 def _ensure_nonzero(value: float, name: str) -> None:
-    if value == 0:
+    if np.isclose(value, 0.0):
         raise ValueError(f"{name} is degenerate (division by zero)")
 
 def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:

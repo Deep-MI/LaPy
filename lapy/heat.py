@@ -7,10 +7,12 @@ mesh geometries (tet or tria mesh) for heat diffusion.
 import importlib
 from typing import Optional
 
+import logging
 import numpy as np
 
 from .utils._imports import import_optional_dependency
 
+logger = logging.getLogger(__name__)
 
 def diagonal(t, x, evecs, evals, n):
     """Compute heat kernel diagonal ( K(t,x,x,) ).
@@ -36,6 +38,8 @@ def diagonal(t, x, evecs, evals, n):
     h : array
         Matrix, rows: vertices selected in x, cols: times in t.
     """
+    if n > evecs.shape[1] or n > evals.shape[0]:
+        raise ValueError("n exceeds the number of available eigenpairs")
     # maybe add code to check dimensions of input and flip axis if necessary
     h = np.matmul(evecs[x, 0:n] * evecs[x, 0:n], np.exp(-np.matmul(evals[0:n], t)))
     return h
@@ -69,6 +73,8 @@ def kernel(t, vfix, evecs, evals, n):
         Matrix m rows: all vertices, cols: times in t.
     """
     # h = evecs * ( exp(-evals * t) .* repmat(evecs(vfix,:)',1,length(t))  )
+    if n > evecs.shape[1] or n > evals.shape[0]:
+        raise ValueError("n exceeds the number of available eigenpairs")
     h = np.matmul(evecs[:, 0:n], (np.exp(np.matmul(-evals[0:n], t)) * evecs[vfix, 0:n]))
     return h
 
@@ -107,6 +113,9 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     from . import Solver
 
     nv = len(geometry.v)
+    if np.any(vids < 0) or np.any(vids >= nv):
+        raise ValueError("vids contains out-of-range vertex indices")
+    vids = np.asarray(vids, dtype=int)
     fem = Solver(geometry, lump=True, aniso=aniso)
     # time of heat evolution:
     t = m * geometry.avg_edge_length() ** 2
@@ -114,17 +123,17 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     hmat = fem.mass + t * fem.stiffness
     # set initial heat
     b0 = np.zeros((nv,))
-    b0[np.array(vids)] = 1.0
+    b0[vids] = 1.0
     # solve H x = b0
-    print("Matrix Format now:  " + hmat.getformat())
+    logger.debug("Matrix Format: %s", hmat.getformat())
     if use_cholmod:
-        print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+        logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod")
         chol = sksparse.cholmod.cholesky(hmat)
         vfunc = chol(b0)
     else:
         from scipy.sparse.linalg import splu
 
-        print("Solver: spsolve (LU decomposition) ...")
+        logger.info("Solver: LU decomposition via splu")
         lu = splu(hmat)
         vfunc = lu.solve(np.float32(b0))
     return vfunc

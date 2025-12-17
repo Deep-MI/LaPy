@@ -100,7 +100,12 @@ def read_ev(filename):
                 "Time(calcAB)",
                 "Time(calcEW)",
             }:
-                _parse_field(key if key != "Time(pre)" else "TimePre",
+                label = {
+                    "Time(pre)": "TimePre",
+                    "Time(calcAB)": "TimeCalcAB",
+                    "Time(calcEW)": "TimeCalcEW",
+                }.get(key, key)
+                _parse_field(label,
                              float if key in {"Area", "Volume", "BLength"} else int)
                 continue
 

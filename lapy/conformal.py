@@ -102,7 +102,12 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     ratio = np.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / norm_a
     y2 = ori_h * ratio  # y-coordinate for the third vertex
     x2_square = norm_b ** 2 * ratio ** 2 - y2 ** 2
-    _ensure_nonzero(x2_square, "x2 calculation")
+    # Allow for small negative values due to floating-point rounding.
+    eps = 1e-12
+    if x2_square < -eps:
+        raise ValueError(f"Negative value encountered in x2 calculation: {x2_square}")
+    if x2_square < 0:
+        x2_square = 0.0
     x2 = np.sqrt(x2_square)
     # should be around (0.5, sqrt(3)/2) if we found an equilateral bigtri
 

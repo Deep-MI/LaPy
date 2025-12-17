@@ -1065,7 +1065,7 @@ class TriaMesh:
                 v.data = np.sign(v.data)
             endt = time.time()
             logger.debug(
-                "Searched mesh after %d flood iterations (%d sec).", count, endt - startt
+                "Searched mesh after %d flood iterations (%f sec).", count, endt - startt
             )
             # get tria indices that need flipping:
             idx = v.toarray() == -1

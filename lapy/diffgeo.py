@@ -550,7 +550,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         raise ValueError("Direction 1 should be anterior - posterior")
 
     # only flip direction if necessary
-    logger.info(f"ev1 min: {cmin1}  max {cmax1} ")
+    logger.info("ev1 min: %s  max %s", cmin1, cmax1)
     # axis 1 = y is aligned with this function (for brains in FS space)
     v1 = _unit_vector(cmax1 - cmin1, "direction 1")
     if cmax1[1] < cmin1[1]:

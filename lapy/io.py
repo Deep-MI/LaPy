@@ -34,11 +34,11 @@ def read_vfunc(filename):
         raise
 
     if "Solution:" not in txt:
-        raise ValueError("Expected 'Solution:' marker in %s", filename)
+        raise ValueError(f"Expected 'Solution:' marker in {filename}")
     txt.remove("Solution:")
     txt = [re.sub("[{()}]", "", x) for x in txt if x]
     if not txt:
-        raise ValueError("No vertex function data found in %s", filename)
+        raise ValueError(f"No vertex function data found in {filename}")
 
     if len(txt) == 1:
         txt = [re.split("[,;]", x) for x in txt][0]

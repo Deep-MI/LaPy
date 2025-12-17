@@ -16,6 +16,7 @@ If you use this code in your own work, please cite the following paper:
 Closed Brain Surfaces."
 SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
+import logging
 
 import importlib
 from typing import Any, Union
@@ -28,6 +29,20 @@ from scipy.sparse import csr_matrix
 from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
 
+logger = logging.getLogger(__name__)
+
+def _ensure_planar_mesh(tria: TriaMesh, context: str) -> None:
+    if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
+        logger.error("%s: Mesh should be on the complex plane.", context)
+        raise ValueError("Mesh is not planar")
+
+def _ensure_nonzero(value: float, name: str) -> None:
+    if value == 0:
+        raise ValueError(f"{name} is degenerate (division by zero)")
+
+def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:
+    if np.any(np.isclose(values, 0.0)):
+        raise ValueError(f"{name} contains zero entries and cannot be used as a denominator")
 
 def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.ndarray:
     """Linear method for computing spherical conformal map of a genus-0 closed surface.
@@ -49,12 +64,11 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     """
     # Ensure the input mesh has genus-0 topology
     if tria.euler() != 2:
-        print("ERROR: The mesh is not a genus-0 closed surface.")
+        logger.error("The mesh is not a genus-0 closed surface.")
         raise ValueError("Invalid input: Mesh must be genus-0.")
 
     # Find the "big triangle" by selecting the most regularly shaped triangle
-    tquals = tria.tria_qualities()
-    bigtri = np.argmax(tquals)
+    bigtri = np.argmax(tria.tria_qualities())
     # If it turns out that the spherical parameterization result is homogeneous
     # you can try to change bigtri to the id of some other triangles with good quality
 
@@ -64,7 +78,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     M = S.stiffness.astype(complex)
 
     # Fixed vertices of the big triangle
-    p0, p1, p2 = tria.t[bigtri, 0], tria.t[bigtri, 1], tria.t[bigtri, 2]
+    p0, p1, p2 = tria.t[bigtri, :]
     fixed = tria.t[bigtri, :]
 
     # Make rows/columns of fixed indices zero, and set the diagonal to 1
@@ -77,11 +91,20 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     x0, y0, x1, y1 = 0, 0, 1, 0
     a = tria.v[p1, :] - tria.v[p0, :]
     b = tria.v[p2, :] - tria.v[p0, :]
-    sin1 = np.linalg.norm(np.cross(a, b)) / (np.linalg.norm(a) * np.linalg.norm(b))
-    ori_h = np.linalg.norm(b) * sin1
-    ratio = np.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / np.linalg.norm(a)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    _ensure_nonzero(norm_a, "edge a")
+    _ensure_nonzero(norm_b, "edge b")
+    cross_ab = np.linalg.norm(np.cross(a, b))
+    denominator = norm_a * norm_b
+    _ensure_nonzero(denominator, "area denominator")
+    sin1 = cross_ab / denominator
+    ori_h = norm_b * sin1
+    ratio = np.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / norm_a
     y2 = ori_h * ratio  # y-coordinate for the third vertex
-    x2 = np.sqrt(np.linalg.norm(b) ** 2 * ratio ** 2 - y2 ** 2)
+    x2_square = norm_b ** 2 * ratio ** 2 - y2 ** 2
+    _ensure_nonzero(x2_square, "x2 calculation")
+    x2 = np.sqrt(x2_square)
     # should be around (0.5, sqrt(3)/2) if we found an equilateral bigtri
 
     # Solve Laplace's equation to compute the harmonic map
@@ -102,8 +125,10 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
 
     # Rescale the mapping for better area distribution
     w = np.empty(S.shape[:-1], dtype=complex)
-    w.real = (S[:, 0] / (1 + S[:, 2])).flatten()
-    w.imag = (S[:, 1] / (1 + S[:, 2])).flatten()
+    denom_north = 1 + S[:, 2]
+    _ensure_nonzero_array(denom_north, "northern stereographic denominator")
+    w.real = (S[:, 0] / denom_north).flatten()
+    w.imag = (S[:, 1] / denom_north).flatten()
 
     # Find the index of the southernmost triangle
     index = np.argsort(np.abs(z[tria.t[:, 0]]) +
@@ -128,7 +153,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # Final inverse stereographic projection
     S = inverse_stereographic(z)
     if np.isnan(np.sum(S)):
-        raise ValueError("Error: Projection contains NaN values!")
+        raise ValueError("Projection contains NaN values!")
         # could revert to spherical tutte map here
 
     # Fix near the south pole to reduce distortion
@@ -142,7 +167,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     fixed = idx[: np.minimum(nv, fixnum)]
 
     # South pole stereographic projection
-    P = np.column_stack((S[:, 0] / (1 + S[:, 2]), S[:, 1] / (1 + S[:, 2]), np.zeros(nv)))
+    P = np.column_stack((S[:, 0] / denom_north, S[:, 1] / denom_north, np.zeros(nv)))
 
     # Compute Beltrami coefficients for the current parameterization (value per triangle)
     triasouth = TriaMesh(P, tria.t)
@@ -157,13 +182,14 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
         # if the result has NaN entries, then most probably the number of
         # boundary constraints is not large enough
         # increase the number of boundary constrains and run again
-        print("South pole composed map contains NaN values!")
+        logger.warning("South pole composed map contains NaN values; retrying with more fixed vertices.")
         fixnum *= 5  # again, this number can be changed
         fixed = idx[: np.minimum(nv, fixnum)]
         mapping = linear_beltrami_solver(
             triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
         )
         if np.isnan(np.sum(mapping)):
+            logger.warning("Retry still contains NaNs; falling back to stereographic result.")
             mapping = P  # use the old result
 
     # inverse south pole stereographic projection
@@ -279,9 +305,7 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
         Complex Beltrami coefficient per triangle.
     """
     # Ensure the triangulation is planar
-    if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
-        print("ERROR: Mesh should be on the complex plane ...")
-        raise ValueError('Mesh is not planar')
+    _ensure_planar_mesh(tria, "Beltrami coefficient")
 
     # Extract 2D vertex positions and compute triangle edges
     v0 = tria.v[tria.t[:, 0], :][:, :-1]
@@ -362,14 +386,14 @@ def linear_beltrami_solver(
             triangulation to 2D coordinates, aligned to the given landmarks.
     """
     # Ensure the triangulation is planar
-    if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
-        print("ERROR: Mesh should be on the complex plane ...")
-        raise ValueError('Mesh is not planar')
+    _ensure_planar_mesh(tria, "Linear Beltrami solver")
 
     # Compute coefficients for the Beltrami equation
-    af = (1.0 - 2 * np.real(mu) + np.abs(mu) ** 2) / (1.0 - np.abs(mu) ** 2)
-    bf = -2.0 * np.imag(mu) / (1.0 - np.abs(mu) ** 2)
-    gf = (1.0 + 2 * np.real(mu) + np.abs(mu) ** 2) / (1.0 - np.abs(mu) ** 2)
+    denominator = 1.0 - np.abs(mu) ** 2
+    _ensure_nonzero_array(np.abs(denominator), "Beltrami denominator (1 - |mu|^2)")
+    af = (1.0 - 2 * np.real(mu) + np.abs(mu) ** 2) / denominator
+    bf = -2.0 * np.imag(mu) / denominator
+    gf = (1.0 + 2 * np.real(mu) + np.abs(mu) ** 2) / denominator
 
     # Extract vertices and indices for triangles (drop 3rd dimension)
     t0 = tria.t[:, 0]
@@ -392,6 +416,7 @@ def linear_beltrami_solver(
     c2 = np.sqrt(uxv2 ** 2 + uyv2 ** 2)
     s = 0.5 * (c0 + c1 + c2)
     area2 = 2 * np.sqrt(s * (s - c0) * (s - c1) * (s - c2))
+    _ensure_nonzero_array(area2, "triangle area")
 
     v00 = (af * uxv0 * uxv0 + 2 * bf * uxv0 * uyv0 + gf * uyv0 * uyv0) / area2
     v11 = (af * uxv1 * uxv1 + 2 * bf * uxv1 * uyv1 + gf * uyv1 * uyv1) / area2
@@ -470,16 +495,12 @@ def _sparse_symmetric_solve(
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
         importlib.import_module(".cholmod", sksparse.__name__)
-    else:
-        sksparse = None
-    if use_cholmod:
-        print("Solver: Cholesky decomposition (scikit-sparse cholmod) ...")
+        logger.info("Solver: Cholesky decomposition (scikit-sparse cholmod)")
         chol = sksparse.cholmod.cholesky(A)
         x = chol(b)
     else:
         from scipy.sparse.linalg import splu
-
-        print("Solver: LU decomposition (spsolve) ...")
+        logger.info("Solver: LU decomposition (spsolve)")
         lu = splu(A)
         x = lu.solve(b)
     return x
@@ -507,9 +528,11 @@ def stereographic(u: np.ndarray) -> np.ndarray:
     x = u[:, 0]
     y = u[:, 1]
     z = u[:, 2]
+    denom = 1 - z
+    _ensure_nonzero_array(np.abs(denom), "stereographic denominator (1 - z)")
     v = np.empty(u.shape[:-1], dtype=complex)
-    v.real = (x / (1-z)).flatten()
-    v.imag = (y / (1-z)).flatten()
+    v.real = (x / denom).flatten()
+    v.imag = (y / denom).flatten()
     return v
 
 

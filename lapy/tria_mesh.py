@@ -566,7 +566,7 @@ class TriaMesh:
 
         return connected_components(self.adj_sym, directed=False)
 
-    def keep_largest_connected_component(self, clean=True):
+    def keep_largest_connected_component_(self, clean=True):
         """Keep only the largest connected component of the mesh.
 
         Modifies the mesh in-place.

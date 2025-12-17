@@ -412,7 +412,7 @@ def test_keep_largest_connected_component(tria_mesh_fixture):
 
     # Test with clean=True (default)
     # Should keep only the larger component and remove unused vertices
-    vkeep, vdel = mesh.keep_largest_connected_component(clean=True)
+    vkeep, vdel = mesh.keep_largest_connected_component_(clean=True)
 
     assert mesh.v.shape[0] == 8
     assert mesh.t.shape[0] == 12
@@ -428,7 +428,7 @@ def test_keep_largest_connected_component(tria_mesh_fixture):
 
     # Test with clean=False
     # Should keep only triangles of larger component but keep all vertices
-    vkeep, vdel = mesh.keep_largest_connected_component(clean=False)
+    vkeep, vdel = mesh.keep_largest_connected_component_(clean=False)
 
     assert mesh.v.shape[0] == 11
     assert mesh.t.shape[0] == 12

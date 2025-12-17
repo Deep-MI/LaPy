@@ -113,6 +113,7 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     from . import Solver
 
     nv = len(geometry.v)
+    vids = np.asarray(vids, dtype=int)
     if np.any(vids < 0) or np.any(vids >= nv):
         raise ValueError("vids contains out-of-range vertex indices")
     vids = np.asarray(vids, dtype=int)

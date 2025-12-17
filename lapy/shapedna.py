@@ -5,6 +5,7 @@ problem as well as functions for normalization and comparison of
 Laplace spectra.
 """
 import logging
+
 import numpy as np
 import scipy.spatial.distance as di
 

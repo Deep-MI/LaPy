@@ -8,8 +8,8 @@ tet and tria versions.
 """
 
 import importlib
-
 import logging
+
 import numpy as np
 from scipy import sparse
 

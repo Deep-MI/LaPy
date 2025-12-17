@@ -5,9 +5,9 @@ mesh geometries (tet or tria mesh) for heat diffusion.
 """
 
 import importlib
+import logging
 from typing import Optional
 
-import logging
 import numpy as np
 
 from .utils._imports import import_optional_dependency

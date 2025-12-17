@@ -1,6 +1,7 @@
 """Functions to read and write spectra and vertex functions."""
 
 import logging
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -99,7 +100,8 @@ def read_ev(filename):
                 "Time(calcAB)",
                 "Time(calcEW)",
             }:
-                _parse_field(key if key != "Time(pre)" else "TimePre", float if key in {"Area", "Volume", "BLength"} else int)
+                _parse_field(key if key != "Time(pre)" else "TimePre",
+                             float if key in {"Area", "Volume", "BLength"} else int)
                 continue
 
         if line.startswith("Eigenvalues"):

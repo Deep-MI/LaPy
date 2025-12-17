@@ -16,9 +16,8 @@ If you use this code in your own work, please cite the following paper:
 Closed Brain Surfaces."
 SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
-import logging
-
 import importlib
+import logging
 from typing import Any, Union
 
 import numpy as np
@@ -182,7 +181,9 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
         # if the result has NaN entries, then most probably the number of
         # boundary constraints is not large enough
         # increase the number of boundary constrains and run again
-        logger.warning("South pole composed map contains NaN values; retrying with more fixed vertices.")
+        logger.warning(
+            "South pole composed map contains NaN values; retrying with more fixed vertices."
+        )
         fixnum *= 5  # again, this number can be changed
         fixed = idx[: np.minimum(nv, fixnum)]
         mapping = linear_beltrami_solver(

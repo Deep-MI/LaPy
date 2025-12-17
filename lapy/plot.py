@@ -9,14 +9,13 @@ For visualizing results in a juypter notebook use this::
         ...
 """
 
-import matplotlib
 import re
 from bisect import bisect
-from matplotlib.colors import LinearSegmentedColormap
 
 import numpy as np
 import plotly
 import plotly.graph_objs as go
+from matplotlib.colors import LinearSegmentedColormap
 
 from . import TetMesh
 

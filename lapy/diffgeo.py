@@ -456,7 +456,7 @@ def tria_mean_curvature_flow(
 
 def _unit_vector(v, name):
     norm = np.linalg.norm(v)
-    if norm == 0:
+    if np.isclose(norm, 0.0):
         raise ValueError(f"{name} is degenerate (zero length)")
     return v / norm
 

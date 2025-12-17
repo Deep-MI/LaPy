@@ -572,7 +572,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     if l33 < l23:
         logger.warning("WARNING: direction 3 wants to swap with 2, but cannot")
 
-    print(f"ev2 min: {cmin2}  max {cmax2} ")
+    logger.info("ev2 min: %s  max %s", cmin2, cmax2)
     # axis 2 = z is aligned with this function (for brains in FS space)
     v2 = _unit_vector(cmax2 - cmin2, "direction 2")
     if cmax2[2] < cmin2[2]:
@@ -580,7 +580,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         logger.debug("inverting direction 2 (superior - inferior)")
     l2 = abs(cmax2[2] - cmin2[2])
 
-    print(f"ev3 min: {cmin3}  max {cmax3} ")
+    logger.info("ev3 min: %s  max %s", cmin3, cmax3)
     # axis 0 = x is aligned with this function (for brains in FS space)
     v3 = _unit_vector(cmax3 - cmin3, "direction 3")
     if cmax3[0] < cmin3[0]:

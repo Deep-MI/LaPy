@@ -1,8 +1,11 @@
+import logging
+
 import numpy as np
 from scipy import sparse
 
 from . import _tet_io as io
 
+logger = logging.getLogger(__name__)
 
 class TetMesh:
     """Class representing a tetrahedral mesh.
@@ -30,7 +33,7 @@ class TetMesh:
     def __init__(self, v, t):
         self.v = np.array(v)
         self.t = np.array(t)
-        vnum = np.max(self.v.shape)
+        vnum = self.v.shape[0]
         if np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # put more checks here (e.g. the dim 3 conditions on columns)
@@ -96,13 +99,9 @@ class TetMesh:
         t2 = self.t[:, 1]
         t3 = self.t[:, 2]
         t4 = self.t[:, 3]
-        i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4)).reshape(
-            -1
-        )
-        j = np.column_stack((t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3)).reshape(
-            -1
-        )
-        adj = sparse.csc_matrix((np.ones(i.shape), (i, j)))
+        i = np.hstack((t1, t2, t2, t3, t3, t1, t1, t2, t3, t4, t4, t4))
+        j = np.hstack((t2, t1, t3, t2, t1, t3, t4, t4, t4, t1, t2, t3))
+        adj = sparse.csc_matrix((np.ones(i.shape, dtype=int), (i, j)))
         return adj
 
     def has_free_vertices(self):
@@ -115,7 +114,7 @@ class TetMesh:
         bool
             Whether vertex list has more vertices than tetra or not.
         """
-        vnum = np.max(self.v.shape)
+        vnum = len(self.v)
         vnumt = len(np.unique(self.t.reshape(-1)))
         return vnum != vnumt
 
@@ -129,7 +128,13 @@ class TetMesh:
         Returns
         -------
         oriented: bool
-            True if ``max(adj_directed)=1``.
+            True if all tet volumes are positive.
+            False if some or all are negative.
+
+        Raises
+        ------
+        ValueError
+            If degenerate (zero-volume) tets are found.
         """
         # Compute vertex coordinates and a difference vector for each triangle:
         t0 = self.t[:, 0]
@@ -146,18 +151,16 @@ class TetMesh:
         # Compute cross product and 6 * vol for each triangle:
         cr = np.cross(e0, e2)
         vol = np.sum(e3 * cr, axis=1)
+        if np.any(vol == 0):
+            raise ValueError("Degenerate (zero-volume) tetrahedra detected")
         if np.max(vol) < 0.0:
-            print("All tet orientations are flipped")
+            #print("All tet orientations are flipped")
             return False
         elif np.min(vol) > 0.0:
-            print("All tet orientations are correct")
+            #print("All tet orientations are correct")
             return True
-        elif np.count_nonzero(vol) < len(vol):
-            print("We have degenerated zero-volume tetrahedra")
-            return False
-        else:
-            print("Orientations are not uniform")
-            return False
+        #print("Orientations are not uniform")
+        return False
 
     def avg_edge_length(self):
         """Get average edge lengths in tet mesh.
@@ -218,7 +221,7 @@ class TetMesh:
             allts, axis=0, return_index=True, return_counts=True
         )
         tria = allt[indices[count == 1]]
-        print("Found " + str(np.size(tria, 0)) + " triangles on boundary.")
+        logger.info("Found %d triangles on boundary.", np.size(tria, 0))
         # if we have tetra function, map these to the boundary triangles
         if tetfunc is not None:
             alltidx = np.tile(np.arange(self.t.shape[0]), 4)
@@ -244,7 +247,7 @@ class TetMesh:
             Indices of deleted (unused) vertices.
         """
         tflat = self.t.reshape(-1)
-        vnum = np.max(self.v.shape)
+        vnum = len(self.v)
         if np.max(tflat) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         # determine which vertices to keep
@@ -294,17 +297,19 @@ class TetMesh:
         # Compute cross product and 6 * vol for each tetra:
         cr = np.cross(e0, e2)
         vol = np.sum(e3 * cr, axis=1)
+        if np.any(vol == 0):
+            raise ValueError("Degenerate (zero-volume) tetrahedra detected")
         negtet = vol < 0.0
         negnum = np.sum(negtet)
         if negnum == 0:
-            print("Mesh is oriented, nothing to do")
+            logger.info("Mesh is oriented, nothing to do")
             return 0
-        tnew = self.t
-        # negtet = np.where(negtet)
-        temp = self.t[negtet, 1]
-        tnew[negtet, 1] = self.t[negtet, 2]
+        tnew = self.t.copy()
+        temp = tnew[negtet, 1].copy()
+        tnew[negtet, 1] = tnew[negtet, 2]
         tnew[negtet, 2] = temp
-        onum = np.sum(negtet)
-        print("Flipped " + str(onum) + " tetrahedra")
-        self.__init__(self.v, tnew)
-        return onum
+        self.t = tnew
+        self.adj_sym = self.construct_adj_sym()
+        logger.info("Flipped %d tetrahedra", negnum)
+        #self.__init__(self.v, tnew)
+        return negnum

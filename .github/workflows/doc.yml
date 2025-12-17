@@ -33,7 +33,7 @@ jobs:
       - name: Build doc
         run: TZ=UTC sphinx-build ./main/doc ./doc-build/dev -W --keep-going
       - name: Upload documentation
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: doc-dev
           path: ./doc-build/dev
@@ -50,7 +50,7 @@ jobs:
         shell: bash
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: doc-dev
           path: ./doc-dev

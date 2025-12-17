@@ -138,7 +138,7 @@ def test_volume_oriented(tria_mesh_fixture):
     """
     # Use the appropriate exception that T.volume() raises
     with pytest.raises(
-        ValueError, match="Error: Can only compute volume for oriented triangle meshes!"
+        ValueError, match="Mesh must be oriented to compute volume."
     ):
         tria_mesh_fixture.volume()
 

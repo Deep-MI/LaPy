@@ -1,6 +1,6 @@
 import logging
-import warnings
 import sys
+import warnings
 
 import numpy as np
 from scipy import sparse
@@ -1065,7 +1065,7 @@ class TriaMesh:
                 v.data = np.sign(v.data)
             endt = time.time()
             logger.debug(
-                f"Searched mesh after {count} flood iterations ({endt - startt} sec)."
+                "Searched mesh after %d flood iterations (%d sec).", count, endt - startt
             )
             # get tria indices that need flipping:
             idx = v.toarray() == -1

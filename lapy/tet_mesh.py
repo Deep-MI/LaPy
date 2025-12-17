@@ -1,8 +1,11 @@
+import logging
+
 import numpy as np
 from scipy import sparse
 
 from . import _tet_io as io
 
+logger = logging.getLogger(__name__)
 
 class TetMesh:
     """Class representing a tetrahedral mesh.
@@ -214,7 +217,7 @@ class TetMesh:
             allts, axis=0, return_index=True, return_counts=True
         )
         tria = allt[indices[count == 1]]
-        print("Found " + str(np.size(tria, 0)) + " triangles on boundary.")
+        logger.info("Found %d triangles on boundary.", np.size(tria, 0))
         # if we have tetra function, map these to the boundary triangles
         if tetfunc is not None:
             alltidx = np.tile(np.arange(self.t.shape[0]), 4)
@@ -295,7 +298,7 @@ class TetMesh:
         negtet = vol < 0.0
         negnum = np.sum(negtet)
         if negnum == 0:
-            print("Mesh is oriented, nothing to do")
+            logger.info("Mesh is oriented, nothing to do")
             return 0
         tnew = self.t.copy()
         temp = tnew[negtet, 1].copy()
@@ -303,6 +306,6 @@ class TetMesh:
         tnew[negtet, 2] = temp
         self.t = tnew
         self.adj_sym = self.construct_adj_sym()
-        print("Flipped " + str(negnum) + " tetrahedra")
+        logger.info("Flipped %d tetrahedra", negnum)
         #self.__init__(self.v, tnew)
         return negnum

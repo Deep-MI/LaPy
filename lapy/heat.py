@@ -116,7 +116,6 @@ def diffusion(geometry, vids, m=1.0, aniso: Optional[int] = None, use_cholmod=Fa
     vids = np.asarray(vids, dtype=int)
     if np.any(vids < 0) or np.any(vids >= nv):
         raise ValueError("vids contains out-of-range vertex indices")
-    vids = np.asarray(vids, dtype=int)
     fem = Solver(geometry, lump=True, aniso=aniso)
     # time of heat evolution:
     t = m * geometry.avg_edge_length() ** 2

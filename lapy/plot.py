@@ -15,6 +15,7 @@ from bisect import bisect
 import numpy as np
 import plotly
 import plotly.graph_objs as go
+from matplotlib.colors import LinearSegmentedColormap
 
 from . import TetMesh
 
@@ -150,6 +151,8 @@ def _get_colorval(t, colormap):
     cstr/*: str
         Interpolated color for this value of t.
     """
+    if not (0.0 <= t <= 1.0):
+        raise ValueError("t must be between 0 and 1")
     if t == 0:
         return colormap[0][1]
     if t == 1:
@@ -160,9 +163,9 @@ def _get_colorval(t, colormap):
     pos = bisect(columns[0], t)
     # compute param between pos-1 and pos values
     if len(columns[0]) < pos + 1 or pos == 0:
-        print(f"pos: {pos}")
-        print(f"t: {t}")
-        print(columns[0])
+        #print(f"pos: {pos}")
+        #print(f"t: {t}")
+        #print(columns[0])
         raise ValueError("t not in range?")
     tt = (t - columns[0][pos - 1]) / (columns[0][pos] - columns[0][pos - 1])
     # get color before and after as array of 3 ints
@@ -194,8 +197,6 @@ def _map_z2color(zval, colormap, zmin, zmax):
     rgb : str
         Corresponding color of the zval.
     """
-    from matplotlib.colors import LinearSegmentedColormap
-
     if zmin > zmax:
         raise ValueError("incorrect relation between zmin and zmax")
 

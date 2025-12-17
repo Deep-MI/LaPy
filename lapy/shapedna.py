@@ -4,11 +4,31 @@ Includes code for solving the anisotropic Laplace-Beltrami eigenvalue
 problem as well as functions for normalization and comparison of
 Laplace spectra.
 """
+import logging
 
 import numpy as np
 import scipy.spatial.distance as di
 
 from . import Solver
+
+logger = logging.getLogger(__name__)
+
+def _positive_measure(value, name):
+    if value <= 0:
+        raise ValueError(f"{name} must be positive for normalization")
+    return value
+
+
+def _boundary_volume(geom):
+    bnd = geom.boundary_tria()
+    bnd.orient_()
+    return _positive_measure(bnd.volume(), "boundary volume")
+
+
+def _surface_measure(geom):
+    area = _positive_measure(geom.area(), "area")
+    return area
+
 
 
 def compute_shapedna(
@@ -86,40 +106,25 @@ def normalize_ev(geom, evals, method="geometry"):
     array_like
         Vector of re-weighted eigenvalues.
     """
+    geom_type = type(geom).__name__
     if method == "surface":
-        vol = geom.area()
+        return evals * _surface_measure(geom) ** (2.0 / 2.0)
 
-        return evals * vol ** np.divide(2.0, 2.0)
+    if method == "volume":
+        if geom_type == "TriaMesh":
+            return evals * _positive_measure(geom.volume(), "volume") ** (2.0 / 3.0)
+        if geom_type == "TetMesh":
+            return evals * _boundary_volume(geom) ** (2.0 / 3.0)
+        raise ValueError("Unsupported geometry type for volume normalization")
 
-    elif method == "volume":
-        if type(geom).__name__ == "TriaMesh":
-            geom.orient_()
+    if method == "geometry":
+        if geom_type == "TriaMesh":
+            return evals * _surface_measure(geom) ** (2.0 / 2.0)
+        if geom_type == "TetMesh":
+            return evals * _boundary_volume(geom) ** (2.0 / 3.0)
+        raise ValueError("Unsupported geometry type for geometry normalization")
 
-            vol = geom.volume()
-
-        elif type(geom).__name__ == "TetMesh":
-            bnd = geom.boundary_tria()
-
-            bnd.orient_()
-
-            vol = bnd.volume()
-
-        return evals * vol ** np.divide(2.0, 3.0)
-
-    elif method == "geometry":
-        if type(geom).__name__ == "TriaMesh":
-            vol = geom.area()
-
-            return evals * vol ** np.divide(2.0, 2.0)
-
-        elif type(geom).__name__ == "TetMesh":
-            bnd = geom.boundary_tria()
-
-            bnd.orient_()
-
-            vol = bnd.volume()
-
-            return evals * vol ** np.divide(2.0, 3.0)
+    raise ValueError(f"Unknown normalization method: {method}")
 
 
 def reweight_ev(evals):
@@ -161,5 +166,5 @@ def compute_distance(ev1, ev2, dist="euc"):
     if dist == "euc":
         return di.euclidean(ev1, ev2)
     else:
-        print("Only euclidean distance is currently implemented.")
-        return
+        logger.warning("Only Euclidean distance is currently implemented; received %s", dist)
+        raise ValueError(f"Distance metric {dist} is not implemented.")

@@ -1,10 +1,13 @@
+import logging
 import sys
+import warnings
 
 import numpy as np
 from scipy import sparse
 
 from . import _tria_io as io
 
+logger = logging.getLogger(__name__)
 
 class TriaMesh:
     """Class representing a triangle mesh.
@@ -314,11 +317,11 @@ class TriaMesh:
             Total enclosed volume.
         """
         if not self.is_closed():
-            return 0.0
+            logger.error("Volume computation requires closed mesh.")
+            raise ValueError("Mesh must be closed to compute volume.")
         if not self.is_oriented():
-            raise ValueError(
-                "Error: Can only compute volume for oriented triangle meshes!"
-            )
+            logger.error("Volume computation requires oriented mesh.")
+            raise ValueError("Mesh must be oriented to compute volume.")
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
         v2 = self.v[self.t[:, 2], :]
@@ -327,6 +330,7 @@ class TriaMesh:
         cr = np.cross(v1mv0, v2mv0)
         spatvol = np.sum(v0 * cr, axis=1)
         vol = np.sum(spatvol) / 6.0
+        logger.debug("Computed volume %s", vol)
         return vol
 
     def vertex_degrees(self):
@@ -879,6 +883,8 @@ class TriaMesh:
         Modifies the vertices.
         """
         centroid, area = self.centroid()
+        if area <= 0:
+            raise ValueError("Mesh surface area must be positive to normalize.")
         self.v = (1.0 / np.sqrt(area)) * (self.v - centroid)
 
     def rm_free_vertices_(self):
@@ -996,6 +1002,7 @@ class TriaMesh:
         tnew = self.t
         flipped = 0
         if not self.is_oriented():
+            logger.info("Orienting the mesh for consistent triangle ordering.")
             # get half edges
             t0 = self.t[:, 0]
             t1 = self.t[:, 1]
@@ -1057,8 +1064,8 @@ class TriaMesh:
                 v = tmat * v
                 v.data = np.sign(v.data)
             endt = time.time()
-            print(
-                f"Searched mesh after {count} flood iterations ({endt - startt} sec)."
+            logger.debug(
+                "Searched mesh after %d flood iterations (%f sec).", count, endt - startt
             )
             # get tria indices that need flipping:
             idx = v.toarray() == -1
@@ -1067,11 +1074,13 @@ class TriaMesh:
             tnew[np.ix_(idx, [1, 0])] = tnew[np.ix_(idx, [0, 1])]
             self.__init__(self.v, tnew, self.fsinfo)
             flipped = idx.sum()
-        # flip orientation on all trias if volume is negative:
-        if self.volume() < 0:
-            tnew[:, [1, 2]] = tnew[:, [2, 1]]
-            self.__init__(self.v, tnew, self.fsinfo)
-            flipped = tnew.shape[0] - flipped
+        # for closed meshes, flip orientation on all trias if volume is negative:
+        if self.is_closed():
+            logger.debug("Closed mesh detected; ensuring global orientation.")
+            if self.volume() < 0:
+                tnew[:, [1, 2]] = tnew[:, [2, 1]]
+                self.__init__(self.v, tnew, self.fsinfo)
+                flipped = tnew.shape[0] - flipped
         return flipped
 
     def map_tfunc_to_vfunc(self, tfunc, weighted=False):
@@ -1178,18 +1187,12 @@ class TriaMesh:
         vfunc : array
             Smoothed surface vertex function.
         """
-        print("TriaMesh.smooth_vfunc is deprecated, use smooth_laplace or smooth_taubin instead.")
-        if vfunc is None:
-            vfunc = self.v
-        vfunc = np.array(vfunc)
-        if self.v.shape[0] != vfunc.shape[0]:
-            raise ValueError("Error: length of vfunc needs to match number of vertices")
-        adj2 = self._construct_smoothing_matrix()
-        # apply sparse matrix n times (fast in spite of loop)
-        vout = adj2.dot(vfunc)
-        for _ in range(n - 1):
-            vout = adj2.dot(vout)
-        return vout
+        warnings.warn(
+            "TriaMesh.smooth_vfunc is deprecated, use smooth_laplace or smooth_taubin instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.smooth_laplace(vfunc=vfunc, n=n, lambda_=1.0)
 
     def smooth_laplace(self, vfunc=None, n=1, lambda_=0.5, mat=None):
         """Smooth the mesh or a vertex function using Laplace smoothing.

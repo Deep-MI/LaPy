@@ -587,7 +587,7 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
         ev3 = -1 * ev3
         logger.debug("inverting direction 3 (right - left)")
     l3 = abs(cmax3[0] - cmin3[0])
-    # compute spatal volume of the three direction vectors
+    # compute spatial volume of the three direction vectors
     spatvol = abs(np.dot(v1, np.cross(v2, v3)))
     logger.debug("spat vol: %g", spatvol)
 

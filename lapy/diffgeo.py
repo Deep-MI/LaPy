@@ -9,12 +9,14 @@ tet and tria versions.
 
 import importlib
 
+import logging
 import numpy as np
 from scipy import sparse
 
 from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
 
+logger = logging.getLogger(__name__)
 
 def compute_gradient(geom, vfunc):
     """Compute gradient of a vertex function f.
@@ -431,7 +433,7 @@ def tria_mean_curvature_flow(
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
         if use_cholmod:
-            print("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
+            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod")
             factor = sksparse.cholmod.cholesky(mass + step * a_mat)
             trianorm.v = factor(mass_v)
         else:
@@ -439,19 +441,24 @@ def tria_mean_curvature_flow(
             # as it can be 5-6 times faster
             from scipy.sparse.linalg import spsolve
 
-            print("Solver: spsolve (LU decomposition) ...")
+            logger.info("Solver: spsolve (LU decomposition)")
             trianorm.v = spsolve(mass + step * a_mat, mass_v)
         # normalize updated mesh
         trianorm.normalize_()
         # compute difference
         dv = trianorm.v - vlast
         diff = np.trace(np.square(np.matmul(np.transpose(dv), mass.dot(dv))))
-        print(f"Step {x + 1} delta: {diff}")
+        logger.debug("Step %d delta: %g", x + 1, diff)
         if diff < stop_eps:
-            print(f"Converged after {x + 1} iterations.")
+            logger.info("Converged after %d iterations.", x + 1)
             break
     return trianorm
 
+def _unit_vector(v, name):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        raise ValueError(f"{name} is degenerate (zero length)")
+    return v / norm
 
 def tria_spherical_project(tria, flow_iter=3, debug=False):
     """Compute the first 3 non-constant eigenfunctions and project the spectral embedding onto a sphere.
@@ -539,18 +546,16 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     l21 = abs(cmax2[1] - cmin2[1])
     l31 = abs(cmax3[1] - cmin3[1])
     if l11 < l21 or l11 < l31:
-        print("ERROR: direction 1 should be (anterior -posterior) but is not!")
-        print(f"  debug info: {l11} {l21} {l31} ")
-        # sys.exit(1)
+        logger.error("Direction 1 should be anterior - posterior (%g, %g, %g)", l11, l21, l31)
         raise ValueError("Direction 1 should be anterior - posterior")
 
     # only flip direction if necessary
-    print(f"ev1 min: {cmin1}  max {cmax1} ")
+    logger.info(f"ev1 min: {cmin1}  max {cmax1} ")
     # axis 1 = y is aligned with this function (for brains in FS space)
-    v1 = cmax1 - cmin1
+    v1 = _unit_vector(cmax1 - cmin1, "direction 1")
     if cmax1[1] < cmin1[1]:
         ev1 = -1 * ev1
-        print("inverting direction 1 (anterior - posterior)")
+        logger.debug("inverting direction 1 (anterior - posterior)")
     l1 = abs(cmax1[1] - cmin1[1])
 
     # for ev2 and ev3 there could be also a swap of the two
@@ -558,42 +563,39 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
     l32 = abs(cmax3[2] - cmin3[2])
     # usually ev2 should be superior inferior, if ev3 is better in that direction, swap
     if l22 < l32:
-        print("swapping direction 2 and 3")
+        logger.debug("swapping direction 2 and 3")
         ev2, ev3 = ev3, ev2
         cmax2, cmax3 = cmax3, cmax2
         cmin2, cmin3 = cmin3, cmin2
     l23 = abs(cmax2[0] - cmin2[0])
     l33 = abs(cmax3[0] - cmin3[0])
     if l33 < l23:
-        print("WARNING: direction 3 wants to swap with 2, but cannot")
+        logger.warning("WARNING: direction 3 wants to swap with 2, but cannot")
 
     print(f"ev2 min: {cmin2}  max {cmax2} ")
     # axis 2 = z is aligned with this function (for brains in FS space)
-    v2 = cmax2 - cmin2
+    v2 = _unit_vector(cmax2 - cmin2, "direction 2")
     if cmax2[2] < cmin2[2]:
         ev2 = -1 * ev2
-        print("inverting direction 2 (superior - inferior)")
+        logger.debug("inverting direction 2 (superior - inferior)")
     l2 = abs(cmax2[2] - cmin2[2])
 
     print(f"ev3 min: {cmin3}  max {cmax3} ")
     # axis 0 = x is aligned with this function (for brains in FS space)
-    v3 = cmax3 - cmin3
+    v3 = _unit_vector(cmax3 - cmin3, "direction 3")
     if cmax3[0] < cmin3[0]:
         ev3 = -1 * ev3
-        print("inverting direction 3 (right - left)")
+        logger.debug("inverting direction 3 (right - left)")
     l3 = abs(cmax3[0] - cmin3[0])
-
-    v1 = v1 * (1.0 / np.sqrt(np.sum(v1 * v1)))
-    v2 = v2 * (1.0 / np.sqrt(np.sum(v2 * v2)))
-    v3 = v3 * (1.0 / np.sqrt(np.sum(v3 * v3)))
+    # compute spatal volume of the three direction vectors
     spatvol = abs(np.dot(v1, np.cross(v2, v3)))
-    print(f"spat vol: {spatvol}")
+    logger.debug("spat vol: %g", spatvol)
 
     mvol = tria.volume()
-    print(f"orig mesh vol {mvol}")
+    logger.info("orig mesh vol %g", mvol)
     bvol = l1 * l2 * l3
-    print(f"box {l1}, {l2}, {l3} volume: {bvol} ")
-    print(f"box coverage: {bvol / mvol}")
+    logger.info("box %g, %g, %g volume: %g", l1, l2, l3, bvol)
+    logger.info("box coverage: %g", bvol / mvol)
 
     # we map evN to -1..0..+1 (keep zero level fixed)
     # I have the feeling that this helps a little with the stretching
@@ -631,32 +633,28 @@ def tria_spherical_project(tria, flow_iter=3, debug=False):
 
     trianew = TriaMesh(vn, tria.t)
     svol = trianew.area() / (4.0 * math.pi * 10000)
-    print(f"sphere area fraction: {svol} ")
+    logger.info("sphere area fraction: %g", svol)
 
     flippedarea = get_flipped_area(trianew) / (4.0 * math.pi * 10000)
     if flippedarea > 0.95:
-        print("ERROR: global normal flip, exiting ..")
-        # sys.exit(1)
+        logger.error("global normal flip detected: %g", flippedarea)
         raise ValueError("global normal flip")
 
-    print(f"flipped area fraction: {flippedarea} ")
+    logger.info("flipped area fraction: %g", flippedarea)
 
     if svol < 0.99:
-        print("ERROR: sphere area fraction should be above .99, exiting ..")
-        # sys.exit(1)
+        logger.error("sphere area fraction below threshold .99 > %g", svol)
         raise ValueError("sphere area fraction should be above .99")
 
     if flippedarea > 0.0008:
-        print("ERROR: flipped area fraction should be below .0008, exiting ..")
-        # sys.exit(1)
+        logger.error("flipped area fraction too high (>0.0008): %g", flippedarea)
         raise ValueError("flipped area fraction should be below .0008")
 
     # here we finally check also the spat vol (orthogonality of direction vectors)
     # we could stop earlier, but most failure cases will be covered by the svol and
     # flipped area which can be better interpreted than spatvol
     if spatvol < 0.6:
-        print("ERROR: spat vol (orthogonality) should be above .6, exiting ..")
-        # sys.exit(1)
+        logger.error("spat vol (orthogonality) below threshold 0.6 > %g", spatvol)
         raise ValueError("spat vol (orthogonality) should be above .6")
 
     return trianew

@@ -21,11 +21,12 @@ class TriaMesh:
     v : array_like
         List of lists of 2 or 3 float coordinates. For 2D vertices (n, 2),
         they will be automatically padded with z=0 to make them 3D internally.
+        Must not be empty.
     t : array_like
         List of lists of 3 int of indices (>= 0) into ``v`` array
         Ordering is important: All triangles should be
         oriented in the same way (counter-clockwise, when
-        looking from above).
+        looking from above). Must not be empty.
     fsinfo : dict | None
         FreeSurfer Surface Header Info.
 
@@ -44,6 +45,14 @@ class TriaMesh:
     _is_2d : bool
         Internal flag indicating if the mesh was created with 2D vertices.
 
+    Raises
+    ------
+    ValueError
+        If mesh has no triangles or vertices (empty mesh).
+        If vertices don't have 2 or 3 coordinates.
+        If triangles don't have exactly 3 vertices.
+        If triangle indices exceed number of vertices.
+
     Notes
     -----
     The class has static class methods to read triangle meshes from FreeSurfer,
@@ -52,6 +61,9 @@ class TriaMesh:
     When 2D vertices are provided, they are internally padded with z=0 to create
     3D vertices. This allows all geometric operations to work correctly while
     maintaining compatibility with 2D mesh data.
+
+    Empty meshes are not allowed. Use class methods (read_fssurf, read_vtk,
+    read_off) to load mesh data from files.
     """
 
     def __init__(self, v, t, fsinfo=None):
@@ -65,9 +77,16 @@ class TriaMesh:
         # If shape[1] != 3 but shape[0] == 3, transpose
         if self.t.shape[1] != 3 and self.t.shape[0] == 3:
             self.t = self.t.T
+
+        # Validate non-empty mesh
+        if self.t.size == 0:
+            raise ValueError("Mesh has no triangles (empty mesh)")
+        if self.v.size == 0:
+            raise ValueError("Mesh has no vertices (empty mesh)")
+
         # Check a few things
         vnum = np.max(self.v.shape)
-        if self.t.size >0 and np.max(self.t) >= vnum:
+        if np.max(self.t) >= vnum:
             raise ValueError("Max index exceeds number of vertices")
         if self.t.shape[1] != 3:
             raise ValueError("Triangles should have 3 vertices")
@@ -543,6 +562,7 @@ class TriaMesh:
         ln = np.sqrt(np.sum(n * n, axis=1))
         q = 2.0 * np.sqrt(3) * ln
         es = (v1mv0 * v1mv0).sum(1) + (v2mv1 * v2mv1).sum(1) + (v0mv2 * v0mv2).sum(1)
+        es[es < sys.float_info.epsilon] = 1  # avoid division by zero
         return q / es
 
     def boundary_loops(self):

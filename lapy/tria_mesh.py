@@ -19,7 +19,8 @@ class TriaMesh:
     Parameters
     ----------
     v : array_like
-        List of lists of 3 float coordinates.
+        List of lists of 2 or 3 float coordinates. For 2D vertices (n, 2),
+        they will be automatically padded with z=0 to make them 3D internally.
     t : array_like
         List of lists of 3 int of indices (>= 0) into ``v`` array
         Ordering is important: All triangles should be
@@ -31,7 +32,7 @@ class TriaMesh:
     Attributes
     ----------
     v : array_like
-        List of lists of 3 float coordinates.
+        List of lists of 3 float coordinates (internally always 3D).
     t : array_like
         List of lists of 3 int of indices (>= 0) into ``v`` array.
     adj_sym : csc_matrix
@@ -40,11 +41,17 @@ class TriaMesh:
         Directed adjacency matrix as csc sparse matrix.
     fsinfo : dict | None
         FreeSurfer Surface Header Info.
+    _is_2d : bool
+        Internal flag indicating if the mesh was created with 2D vertices.
 
     Notes
     -----
     The class has static class methods to read triangle meshes from FreeSurfer,
     OFF, and VTK file formats.
+
+    When 2D vertices are provided, they are internally padded with z=0 to create
+    3D vertices. This allows all geometric operations to work correctly while
+    maintaining compatibility with 2D mesh data.
     """
 
     def __init__(self, v, t, fsinfo=None):
@@ -53,7 +60,10 @@ class TriaMesh:
         # transpose if necessary
         if self.v.shape[0] < self.v.shape[1]:
             self.v = self.v.T
-        if self.t.shape[0] < self.t.shape[1]:
+        # For triangles, check if we need to transpose:
+        # Triangles should have shape (n_triangles, 3)
+        # If shape[1] != 3 but shape[0] == 3, transpose
+        if self.t.shape[1] != 3 and self.t.shape[0] == 3:
             self.t = self.t.T
         # Check a few things
         vnum = np.max(self.v.shape)
@@ -61,12 +71,52 @@ class TriaMesh:
             raise ValueError("Max index exceeds number of vertices")
         if self.t.shape[1] != 3:
             raise ValueError("Triangles should have 3 vertices")
-        if self.v.shape[1] != 3:
-            raise ValueError("Vertices should have 3 coordinates")
+
+        # Support both 2D and 3D vertices
+        if self.v.shape[1] == 2:
+            # Pad 2D vertices with z=0 to make them 3D
+            self.v = np.column_stack([self.v, np.zeros(self.v.shape[0])])
+            self._is_2d = True
+        elif self.v.shape[1] == 3:
+            self._is_2d = False
+        else:
+            raise ValueError("Vertices should have 2 or 3 coordinates")
+
         # Compute adjacency matrices
         self.adj_sym = self._construct_adj_sym()
         self.adj_dir = self._construct_adj_dir()
         self.fsinfo = fsinfo  # place for Freesurfer Header info
+
+    def is_2d(self):
+        """Check if the mesh was created with 2D vertices.
+
+        Returns
+        -------
+        bool
+            True if mesh was created with 2D vertices, False otherwise.
+        """
+        return self._is_2d
+
+    def get_vertices(self, original_dim=False):
+        """Get mesh vertices.
+
+        Parameters
+        ----------
+        original_dim : bool, default=False
+            If True and mesh was created with 2D vertices, return vertices
+            in original 2D format (without z-coordinate). If False, always
+            return 3D vertices.
+
+        Returns
+        -------
+        np.ndarray
+            Vertex array of shape (n, 2) or (n, 3) depending on original_dim.
+        """
+        if original_dim and self._is_2d:
+            # Return only x, y coordinates (strip z=0)
+            return self.v[:, :2]
+        else:
+            return self.v
 
     @classmethod
     def read_fssurf(cls, filename):

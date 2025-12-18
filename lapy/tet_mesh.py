@@ -33,7 +33,7 @@ class TetMesh:
         Vertex coordinates, shape (n_vertices, 3).
     t : np.ndarray
         Tetrahedron vertex indices, shape (n_tetrahedra, 4).
-    adj_sym : sparse.csc_matrix
+    adj_sym : scipy.sparse.csc_matrix
         Symmetric adjacency matrix as csc sparse matrix.
 
     Raises
@@ -109,7 +109,7 @@ class TetMesh:
 
         Returns
         -------
-        sparse.csc_matrix
+        scipy.sparse.csc_matrix
             Symmetric adjacency matrix as csc sparse matrix.
         """
         t1 = self.t[:, 0]

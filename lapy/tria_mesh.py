@@ -1325,7 +1325,7 @@ class TriaMesh:
 
         Returns
         -------
-        csc_matrix
+        scipy.sparse.csc_matrix
             Sparse matrix for smoothing.
         """
         areas = self.vertex_areas()[:, np.newaxis]

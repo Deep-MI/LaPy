@@ -115,7 +115,7 @@ def compute_shapedna(
         Number of eigenvalues/eigenvectors to compute.
     lump : bool, default=False
         If True, lump the mass matrix (diagonal). See `lapy.Solver` class.
-    aniso : float or tuple of shape (2,), optional
+    aniso : float or tuple of shape (2,) or None, default=None
         Anisotropy for curvature-based anisotropic Laplace. See `lapy.Solver`
         class.
     aniso_smooth : int, default=10

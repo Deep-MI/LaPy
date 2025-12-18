@@ -133,11 +133,16 @@ class TriaMesh:
         filename : str
             Filename to save to.
         image : str, object, None
-            Path to image or nibabel image object. If specified, the vertices
-            are assumed to be in voxel coordinates and are converted
-            to surface RAS (tkr) coordinates before saving.
-            The expected order of coordinates is (x, y, z) matching
-            the image voxel indices.
+            Path to image, nibabel image object, or image header. If specified, the vertices
+            are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
+            coordinates before saving.
+            The expected order of coordinates is (x, y, z) matching the image voxel indices in nibabel.
+
+            Notes
+            -----
+            The surface RAS (tkr) transform is obtained from a header that implements
+            ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
+            Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
         """
         io.write_fssurf(self, filename, image=image)
 

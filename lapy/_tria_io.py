@@ -506,29 +506,52 @@ def write_fssurf(tria, filename, image=None):
         Triangle mesh to save.
     filename : str
         Filename to save to.
-    image : str | nibabel.spatialimages.SpatialImage | None, optional
-        Path to image or image object. If specified, the vertices
-        are assumed to be in voxel coordinates and are converted
-        to surface RAS (tkr) coordinates before saving.
-        The expected order of coordinates is (x, y, z) matching
-        the image voxel indices.
+    image : str, object, None
+        Path to image, nibabel image object, or image header. If specified, the vertices
+        are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
+        coordinates before saving. The expected order of coordinates is (x, y, z)
+        matching the image voxel indices in nibabel.
+
+    Notes
+    -----
+    The surface RAS (tkr) transform is obtained from a header that implements
+    ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
+    Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
     """
     # open file
     try:
         from nibabel.freesurfer.io import write_geometry
+
         v = tria.v
         if image is not None:
             import nibabel as nib
             from nibabel.affines import apply_affine
             from nibabel.freesurfer.mghformat import MGHHeader
+
+            # Accept: path -> image, image -> header, or header directly
             if isinstance(image, str):
                 img = nib.load(image)
+                header = img.header
+            elif hasattr(image, "header"):
+                # nibabel SpatialImage-like object
+                header = image.header
             else:
-                img = image
-            header = img.header
-            if isinstance(img, nib.Nifti1Image):
-                header = MGHHeader.from_header(header)
+                # assume header-like object
+                header = image
+
+            # If header doesn't provide tkr transform, try converting to MGHHeader
+            if not hasattr(header, "get_vox2ras_tkr"):
+                try:
+                    header = MGHHeader.from_header(header)
+                except Exception as e:
+                    raise TypeError(
+                        "write_fssurf(..., image=...) expected a nibabel image, a path to an "
+                        "image, or a header that provides get_vox2ras_tkr() (or is convertible "
+                        "via MGHHeader.from_header)."
+                    ) from e
+
             v = apply_affine(header.get_vox2ras_tkr(), v)
+
         write_geometry(filename, v, tria.t, volume_info=tria.fsinfo)
     except OSError:
         print("[File " + filename + " not writable]")

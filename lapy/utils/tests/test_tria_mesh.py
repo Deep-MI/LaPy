@@ -603,3 +603,30 @@ def test_level_sets(tria_mesh_fixture):
         # If topology is complex (multiple loops), it might raise ValueError
         # In that case, we at least tested it runs until that check
         pass
+
+
+def test_2d_mesh_support():
+    """
+    Testing that TriaMesh correctly handles 2D vertices by padding with z=0
+    """
+    # Create a simple 2D mesh (unit square made of 2 triangles)
+    vertices_2d = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    triangles = np.array([[0, 1, 2], [0, 2, 3]])
+
+    # Create mesh with 2D vertices
+    mesh = TriaMesh(vertices_2d, triangles)
+
+    # Verify that vertices were padded to 3D
+    assert mesh.v.shape == (4, 3), "Vertices should be padded to 3D"
+    assert mesh.is_2d(), "Mesh should be marked as 2D"
+    assert np.allclose(mesh.v[:, 2], 0.0), "Z-coordinates should be 0"
+
+    # Verify that geometric operations work correctly
+    total_area = mesh.area()
+    assert np.isclose(total_area, 1.0), f"Square area should be 1.0, got {total_area}"
+
+    # Verify that original 2D vertices can be retrieved
+    v2d = mesh.get_vertices(original_dim=True)
+    assert v2d.shape == (4, 2), "Should return 2D vertices"
+    np.testing.assert_array_almost_equal(v2d, vertices_2d)
+

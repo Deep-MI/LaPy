@@ -120,7 +120,7 @@ match-dir = '^lapy.*'
 add_ignore = 'D100,D104,D107'
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 extend-exclude = [
     "doc",
     ".github",

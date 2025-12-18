@@ -6,6 +6,7 @@ import numpy as np
 from scipy import sparse
 
 from . import _tria_io as io
+from . import polygon
 
 logger = logging.getLogger(__name__)
 
@@ -1420,34 +1421,10 @@ class TriaMesh:
         else:
             return path
 
-    @staticmethod
-    def __resample_polygon(path3d: np.ndarray, n_points: int = 100) -> np.ndarray:
-        # Helper: Cumulative Euclidean distance between successive polygon points.
-        # This will be the "x" for interpolation
-        d = np.cumsum(np.r_[0, np.sqrt((np.diff(path3d, axis=0) ** 2).sum(axis=1))])
-        # get linearly spaced points along the cumulative Euclidean distance
-        d_sampled = np.linspace(0, d.max(), n_points)
-        # interpolate x and y coordinates
-        xy_interp = np.c_[
-            np.interp(d_sampled, d, path3d[:, 0]),
-            np.interp(d_sampled, d, path3d[:, 1]),
-            np.interp(d_sampled, d, path3d[:, 2]),
-        ]
-        return xy_interp
-
-    @staticmethod
-    def __iterative_resample_polygon(
-        path3d: np.ndarray, n_points: int = 100, n_iter: int = 3) -> np.ndarray:
-        # Helper: resample multiple times to numerically stabilize the result to be
-        # truly equidistant
-        path3d_resampled = TriaMesh.__resample_polygon(path3d, n_points)
-        for _ in range(n_iter - 1):
-            path3d_resampled = TriaMesh.__resample_polygon(path3d_resampled, n_points)
-        return path3d_resampled
 
     def level_path(self, vfunc, level, get_tria_idx=False, get_edges=False,
                    n_points=None):
-        """Extract levelset of vfund at specific level as a path of 3D points.
+        """Extract levelset of vfund at a specific level as a path of 3D points.
 
         For a given real-valued scalar map on the surface mesh (vfunc) this
         function computes the edges that intersect with a given level set (level).
@@ -1456,7 +1433,7 @@ class TriaMesh:
         together with the length of the level set path.
 
         Note: Only works for level sets that represent a single non-intersecting
-        path with exactly one start and one endpoint!
+        path with exactly one start and one endpoint (e.g. not closed)!
 
         Additional options: get_tria_idx and get_edges when True will also
         return an array of triangle ids for each path segment, defining the
@@ -1491,12 +1468,12 @@ class TriaMesh:
         Returns
         -------
         path: array
-            Array of shape (n,3) containing 3D coordinates of vertices on level path.
+            Array of shape (n,3) containing 3D coordinates of vertices on a level path.
         length : float
-            Length of level set.
+            Length of the level set.
         tria_idx : array
             Array of triangle index for each segment on the path (length n-1
-            if path is length n). Will only be returned if get_tria_idx is True.
+            if the path is length n). Will only be returned, if get_tria_idx is True.
         edges_vidxs : array
             Array of shape (n,2) of vertex indices (i,j) for each 3D point, defining
             the vertices of the original mesh of the edge intersecting the level set
@@ -1595,7 +1572,7 @@ class TriaMesh:
             if n_points:
                 if get_edges:
                     raise ValueError("n_points cannot be combined with get_edges=True.")
-                path3d = TriaMesh.__iterative_resample_polygon(path3d, n_points)
+                path3d = polygon.resample(path3d, n_points, n_iter=3)
             if get_edges:
                 return path3d, llength, edges_vidxs, edges_relpos
             else:

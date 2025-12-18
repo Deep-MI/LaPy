@@ -135,8 +135,8 @@ class TriaMesh:
         image : str, object, None
             Path to image, nibabel image object, or image header. If specified, the vertices
             are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
-            coordinates before saving.
-            The expected order of coordinates is (x, y, z) matching the image voxel indices in nibabel.
+            coordinates before saving. The expected order of coordinates is (x, y, z)
+            matching the image voxel indices in nibabel.
 
             Notes
             -----

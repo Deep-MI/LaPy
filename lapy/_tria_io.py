@@ -506,11 +506,11 @@ def write_fssurf(tria, filename, image=None):
         Triangle mesh to save.
     filename : str
         Filename to save to.
-    image : str | nibabel.spatialimages.SpatialImage | nibabel.spatialimages.SpatialImageHeader | None, optional
+    image : str, object, None
         Path to image, nibabel image object, or image header. If specified, the vertices
         are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
-        coordinates before saving.
-        The expected order of coordinates is (x, y, z) matching the image voxel indices in nibabel.
+        coordinates before saving. The expected order of coordinates is (x, y, z)
+        matching the image voxel indices in nibabel.
 
         Notes
         -----
@@ -545,9 +545,9 @@ def write_fssurf(tria, filename, image=None):
                     header = MGHHeader.from_header(header)
                 except Exception as e:
                     raise TypeError(
-                        "write_fssurf(..., image=...) expected a nibabel image, a path to an image, "
-                        "or a header that provides get_vox2ras_tkr() (or is convertible via "
-                        "MGHHeader.from_header)."
+                        "write_fssurf(..., image=...) expected a nibabel image, a path to an "
+                        "image, or a header that provides get_vox2ras_tkr() (or is convertible "
+                        "via MGHHeader.from_header)."
                     ) from e
 
             v = apply_affine(header.get_vox2ras_tkr(), v)

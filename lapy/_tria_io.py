@@ -512,11 +512,11 @@ def write_fssurf(tria, filename, image=None):
         coordinates before saving. The expected order of coordinates is (x, y, z)
         matching the image voxel indices in nibabel.
 
-        Notes
-        -----
-        The surface RAS (tkr) transform is obtained from a header that implements
-        ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
-        Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
+    Notes
+    -----
+    The surface RAS (tkr) transform is obtained from a header that implements
+    ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
+    Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
     """
     # open file
     try:

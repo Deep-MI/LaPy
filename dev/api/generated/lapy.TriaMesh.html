@@ -274,7 +274,7 @@
 <h1>lapy.TriaMesh<a class="headerlink" href="#lapy-triamesh" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.TriaMesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TriaMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fsinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L12-L1597"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TriaMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fsinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L12-L1602"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh" title="Link to this definition">¶</a></dt>
 <dd><p>Class representing a triangle mesh.</p>
 <p>This is an efficient implementation of a triangle mesh data structure
 with core functionality using sparse matrices internally (Scipy).</p>
@@ -447,7 +447,7 @@ looking from above).</p>
 OFF, and VTK file formats.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.area">
-<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L300-L309"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.area" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L305-L314"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.area" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the total surface area of triangle mesh.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -461,7 +461,7 @@ OFF, and VTK file formats.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.avg_edge_length">
-<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L367-L380"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.avg_edge_length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L372-L385"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.avg_edge_length" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the average edge length of the mesh.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -475,7 +475,7 @@ OFF, and VTK file formats.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.boundary_loops">
-<span class="sig-name descname"><span class="pre">boundary_loops</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L501-L552"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.boundary_loops" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">boundary_loops</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L506-L557"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.boundary_loops" title="Link to this definition">¶</a></dt>
 <dd><p>Compute a tuple of boundary loops.</p>
 <p>Meshes can have 0 or more boundary loops, which are cycles in the directed
 adjacency graph of the boundary edges.
@@ -493,7 +493,7 @@ vertex (like a figure 8). That case needs debugging.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.centroid">
-<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L609-L636"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.centroid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L614-L641"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.centroid" title="Link to this definition">¶</a></dt>
 <dd><p>Compute centroid of triangle mesh as a weighted average of triangle centers.</p>
 <p>The weight is determined by the triangle area.
 (This could be done much faster if a FEM lumped mass matrix M is
@@ -513,7 +513,7 @@ with averaging vertices weighted by vertex area)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.connected_components">
-<span class="sig-name descname"><span class="pre">connected_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L554-L567"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.connected_components" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">connected_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L559-L572"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.connected_components" title="Link to this definition">¶</a></dt>
 <dd><p>Compute connected components of the mesh.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -530,7 +530,7 @@ ID of vertex i. Component IDs are integers from 0 to n_components-1.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.construct_adj_dir_tidx">
-<span class="sig-name descname"><span class="pre">construct_adj_dir_tidx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L194-L218"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.construct_adj_dir_tidx" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">construct_adj_dir_tidx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L199-L223"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.construct_adj_dir_tidx" title="Link to this definition">¶</a></dt>
 <dd><p>Construct directed adjacency matrix (edge graph) of triangle mesh.</p>
 <p>The directed adjacency matrix contains the triangle indices (only for
 non-manifold meshes). Operates only on triangles.</p>
@@ -547,7 +547,7 @@ of one in the matrix (allows lookup of vertex to tria).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.curvature">
-<span class="sig-name descname"><span class="pre">curvature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L689-L817"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.curvature" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">curvature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L694-L822"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.curvature" title="Link to this definition">¶</a></dt>
 <dd><p>Compute various curvature values at vertices.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -587,7 +587,7 @@ ACM Transactions on Graphics, 2003.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.curvature_tria">
-<span class="sig-name descname"><span class="pre">curvature_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L819-L878"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.curvature_tria" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">curvature_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L824-L883"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.curvature_tria" title="Link to this definition">¶</a></dt>
 <dd><p>Compute min and max curvature and directions (orthogonal and in tria plane).</p>
 <p>First we compute these values on vertices and then smooth
 there. Finally, they get mapped to the trias (averaging) and projected onto
@@ -616,7 +616,7 @@ the triangle plane, and orthogonalized.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L638-L687"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.edges" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L643-L692"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.edges" title="Link to this definition">¶</a></dt>
 <dd><p>Compute vertices and adjacent triangle ids for each edge.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -646,7 +646,7 @@ associated triangle to each boundary edge.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.euler">
-<span class="sig-name descname"><span class="pre">euler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L257-L274"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.euler" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">euler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L262-L279"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.euler" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the Euler Characteristic.</p>
 <p>The Euler characteristic is the number of vertices minus the number
 of edges plus the number of triangles  (= #V - #E + #T). For example,
@@ -664,7 +664,7 @@ This operates only on triangles array.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.has_free_vertices">
-<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L457-L467"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.has_free_vertices" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L462-L472"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.has_free_vertices" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the vertex list has more vertices than what is used in tria.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -678,7 +678,7 @@ This operates only on triangles array.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.is_closed">
-<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L220-L230"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_closed" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L225-L235"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_closed" title="Link to this definition">¶</a></dt>
 <dd><p>Check if triangle mesh is closed (no boundary edges).</p>
 <p>Operates only on triangles</p>
 <dl class="field-list simple">
@@ -693,7 +693,7 @@ This operates only on triangles array.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.is_manifold">
-<span class="sig-name descname"><span class="pre">is_manifold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L232-L242"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_manifold" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_manifold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L237-L247"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_manifold" title="Link to this definition">¶</a></dt>
 <dd><p>Check if triangle mesh is manifold (no edges with &gt;2 triangles).</p>
 <p>Operates only on triangles</p>
 <dl class="field-list simple">
@@ -708,7 +708,7 @@ This operates only on triangles array.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.is_oriented">
-<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L244-L255"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_oriented" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L249-L260"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.is_oriented" title="Link to this definition">¶</a></dt>
 <dd><p>Check if triangle mesh is oriented.</p>
 <p>True if all triangles are oriented counter-clockwise, when looking from
 above. Operates only on triangles.</p>
@@ -724,7 +724,7 @@ above. Operates only on triangles.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.keep_largest_connected_component_">
-<span class="sig-name descname"><span class="pre">keep_largest_connected_component_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L569-L607"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.keep_largest_connected_component_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">keep_largest_connected_component_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L574-L612"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.keep_largest_connected_component_" title="Link to this definition">¶</a></dt>
 <dd><p>Keep only the largest connected component of the mesh.</p>
 <p>Modifies the mesh in-place.</p>
 <dl class="field-list">
@@ -749,7 +749,7 @@ creating free vertices.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.level_length">
-<span class="sig-name descname"><span class="pre">level_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1277-L1339"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.level_length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">level_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1282-L1344"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.level_length" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the length of level sets.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -771,7 +771,7 @@ creating free vertices.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.level_path">
-<span class="sig-name descname"><span class="pre">level_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_tria_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1443-L1597"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.level_path" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">level_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_tria_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1448-L1602"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.level_path" title="Link to this definition">¶</a></dt>
 <dd><p>Extract levelset of vfund at specific level as a path of 3D points.</p>
 <p>For a given real-valued scalar map on the surface mesh (vfunc) this
 function computes the edges that intersect with a given level set (level).
@@ -837,7 +837,7 @@ Will only be returned if get_edges is True.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.map_tfunc_to_vfunc">
-<span class="sig-name descname"><span class="pre">map_tfunc_to_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1086-L1123"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.map_tfunc_to_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">map_tfunc_to_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1091-L1128"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.map_tfunc_to_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Map tria function to vertices by attributing 1/3 to each vertex of triangle.</p>
 <p>Uses vertices and trias.</p>
 <dl class="field-list">
@@ -865,7 +865,7 @@ will also yield the vertex areas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.map_vfunc_to_tfunc">
-<span class="sig-name descname"><span class="pre">map_vfunc_to_tfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1125-L1144"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.map_vfunc_to_tfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">map_vfunc_to_tfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1130-L1149"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.map_vfunc_to_tfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Map vertex function to triangles by attributing 1/3 to each.</p>
 <p>Uses number of vertices and trias.</p>
 <dl class="field-list">
@@ -886,7 +886,7 @@ will also yield the vertex areas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.normal_offset_">
-<span class="sig-name descname"><span class="pre">normal_offset_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L965-L978"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.normal_offset_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">normal_offset_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L970-L983"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.normal_offset_" title="Link to this definition">¶</a></dt>
 <dd><p>Move vertices along normal by distance <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
 <p>normal_offset(d) moves vertices along normal by distance d</p>
 <dl class="field-list">
@@ -901,14 +901,14 @@ will also yield the vertex areas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.normalize_">
-<span class="sig-name descname"><span class="pre">normalize_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L880-L888"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.normalize_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">normalize_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L885-L893"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.normalize_" title="Link to this definition">¶</a></dt>
 <dd><p>Normalize TriaMesh to unit surface area and centroid at the origin.</p>
 <p>Modifies the vertices.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.orient_">
-<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L980-L1084"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.orient_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L985-L1089"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.orient_" title="Link to this definition">¶</a></dt>
 <dd><p>Re-orient triangles of manifold mesh to be consistent.</p>
 <p>Re-orients triangles of manifold mesh to be consistent, so that vertices are
 listed counter-clockwise, when looking from above (outside).</p>
@@ -995,7 +995,7 @@ sign</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.refine_">
-<span class="sig-name descname"><span class="pre">refine_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L929-L963"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.refine_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">refine_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L934-L968"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.refine_" title="Link to this definition">¶</a></dt>
 <dd><p>Refine the triangle mesh by placing new vertex on each edge midpoint.</p>
 <p>Thus creates 4 similar triangles from one parent triangle.
 Modifies mesh in place.</p>
@@ -1011,7 +1011,7 @@ Modifies mesh in place.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.rm_free_vertices_">
-<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L890-L927"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.rm_free_vertices_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L895-L932"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.rm_free_vertices_" title="Link to this definition">¶</a></dt>
 <dd><p>Remove unused (free) vertices.</p>
 <p>Free vertices are vertices that are not used in any triangle.
 They can produce problems when constructing, e.g., Laplace matrices.</p>
@@ -1030,7 +1030,7 @@ They can produce problems when constructing, e.g., Laplace matrices.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.smooth_">
-<span class="sig-name descname"><span class="pre">smooth_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1265-L1275"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1270-L1280"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth the mesh iteratively in-place using Taubin smoothing.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1044,7 +1044,7 @@ They can produce problems when constructing, e.g., Laplace matrices.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.smooth_laplace">
-<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1197-L1230"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_laplace" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1202-L1235"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_laplace" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth the mesh or a vertex function using Laplace smoothing.</p>
 <p>Applies v_new = (1-lambda)*v + lambda * M*v
 where M is the vertex-area weighted adjacency matrix.</p>
@@ -1074,7 +1074,7 @@ while smaller lambdas will include the value at the current vertex.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.smooth_taubin">
-<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1232-L1263"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_taubin" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1237-L1268"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_taubin" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth the mesh or a vertex function using Taubin smoothing.</p>
 <p>Taubin smoothing alternates between shrinking (positive lambda) and
 expanding (negative mu) steps to avoid shrinkage of the mesh.</p>
@@ -1102,7 +1102,7 @@ expanding (negative mu) steps to avoid shrinkage of the mesh.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.smooth_vfunc">
-<span class="sig-name descname"><span class="pre">smooth_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1167-L1195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L1172-L1200"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.smooth_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth the mesh or a vertex function iteratively.</p>
 <p>This is the most simple smoothing approach of a weighted
 average of the neighbors.</p>
@@ -1126,7 +1126,7 @@ average of the neighbors.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.tria_areas">
-<span class="sig-name descname"><span class="pre">tria_areas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L276-L298"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_areas" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tria_areas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L281-L303"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_areas" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the area of triangles using Heron’s formula.</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Heron%27s_formula">Heron’s formula</a>
 computes the area of a triangle by using the three edge lengths.</p>
@@ -1142,7 +1142,7 @@ computes the area of a triangle by using the three edge lengths.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.tria_normals">
-<span class="sig-name descname"><span class="pre">tria_normals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L382-L407"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_normals" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tria_normals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L387-L412"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_normals" title="Link to this definition">¶</a></dt>
 <dd><p>Compute triangle normals.</p>
 <p>Ordering of triangles is important: counterclockwise when looking.</p>
 <dl class="field-list">
@@ -1157,7 +1157,7 @@ computes the area of a triangle by using the three edge lengths.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.tria_qualities">
-<span class="sig-name descname"><span class="pre">tria_qualities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L469-L499"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_qualities" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tria_qualities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L474-L504"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.tria_qualities" title="Link to this definition">¶</a></dt>
 <dd><p>Compute triangle quality for each triangle in mesh where.</p>
 <p>q = 4 sqrt(3) A / (e1^2 + e2^2 + e3^2 )
 where A is the triangle area and ei the edge length of the three edges.
@@ -1179,7 +1179,7 @@ R.E. Bank, PLTMG …, Frontiers in Appl. Math. (7), 1990.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.vertex_areas">
-<span class="sig-name descname"><span class="pre">vertex_areas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L347-L365"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_areas" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">vertex_areas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L352-L370"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_areas" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the area associated to each vertex (1/3 of one-ring trias).</p>
 <dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1193,7 +1193,7 @@ R.E. Bank, PLTMG …, Frontiers in Appl. Math. (7), 1990.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.vertex_degrees">
-<span class="sig-name descname"><span class="pre">vertex_degrees</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L336-L345"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_degrees" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">vertex_degrees</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L341-L350"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_degrees" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the vertex degrees (number of edges at each vertex).</p>
 <dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1207,7 +1207,7 @@ R.E. Bank, PLTMG …, Frontiers in Appl. Math. (7), 1990.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.vertex_normals">
-<span class="sig-name descname"><span class="pre">vertex_normals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L409-L455"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_normals" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">vertex_normals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L414-L460"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.vertex_normals" title="Link to this definition">¶</a></dt>
 <dd><p>Compute vertex normals.</p>
 <dl class="simple">
 <dt>get_vertex_normals(v,t) computes vertex normals</dt><dd><p>Triangle normals around each vertex are averaged, weighted
@@ -1228,7 +1228,7 @@ at the triangle from above.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.volume">
-<span class="sig-name descname"><span class="pre">volume</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L311-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.volume" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">volume</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L316-L339"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.volume" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the volume of closed triangle mesh, summing tetrahedra at origin.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1242,22 +1242,25 @@ at the triangle from above.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TriaMesh.write_fssurf">
-<span class="sig-name descname"><span class="pre">write_fssurf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L128-L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.write_fssurf" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">write_fssurf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tria_mesh.py#L128-L147"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TriaMesh.write_fssurf" title="Link to this definition">¶</a></dt>
 <dd><p>Save as Freesurfer Surface Geometry file (wrap Nibabel).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Filename to save to.</p>
 </dd>
-<dt><strong>image</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Path to image or nibabel image object. If specified, the vertices
-are assumed to be in voxel coordinates and are converted
-to surface RAS (tkr) coordinates before saving.
-The expected order of coordinates is (x, y, z) matching
-the image voxel indices.</p>
+<dt><strong>image</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Path to image, nibabel image object, or image header. If specified, the vertices
+are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
+coordinates before saving. The expected order of coordinates is (x, y, z)
+matching the image voxel indices in nibabel.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The surface RAS (tkr) transform is obtained from a header that implements
+<code class="docutils literal notranslate"><span class="pre">get_vox2ras_tkr()</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">MGHHeader</span></code>). For other header types (NIfTI1/2,
+Analyze/SPM, etc.), we attempt conversion via <code class="docutils literal notranslate"><span class="pre">MGHHeader.from_header</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">

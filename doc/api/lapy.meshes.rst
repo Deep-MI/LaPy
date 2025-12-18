@@ -1,5 +1,5 @@
-Meshes
-======
+Geometries
+==========
 
 .. currentmodule:: lapy
 
@@ -8,3 +8,4 @@ Meshes
 
     TriaMesh
     TetMesh
+    polygon

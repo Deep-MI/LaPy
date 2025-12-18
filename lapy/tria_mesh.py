@@ -1394,7 +1394,7 @@ class TriaMesh:
             Diffusion speed parameter in range [0, 1]. lambda_=1 reduces to
             weighted average of neighboring vertices, while smaller values
             preserve more of the original values.
-        mat : sparse.csc_matrix or None, default=None
+        mat : scipy.sparse.csc_matrix or None, default=None
             Precomputed smoothing matrix. If None, constructs it internally.
 
         Returns

@@ -1,6 +1,7 @@
 import logging
 import sys
 import warnings
+from typing import Optional, Union
 
 import numpy as np
 from scipy import sparse
@@ -106,7 +107,7 @@ class TriaMesh:
         self.adj_dir = self._construct_adj_dir()
         self.fsinfo = fsinfo  # place for Freesurfer Header info
 
-    def is_2d(self):
+    def is_2d(self) -> bool:
         """Check if the mesh was created with 2D vertices.
 
         Returns
@@ -116,7 +117,7 @@ class TriaMesh:
         """
         return self._is_2d
 
-    def get_vertices(self, original_dim=False):
+    def get_vertices(self, original_dim: bool = False) -> np.ndarray:
         """Get mesh vertices.
 
         Parameters
@@ -185,17 +186,22 @@ class TriaMesh:
         """
         return io.read_vtk(filename)
 
-    def write_vtk(self, filename):
-        """Save as VTK file.
+    def write_vtk(self, filename: str) -> None:
+        """Save mesh as VTK file.
 
         Parameters
         ----------
         filename : str
             Filename to save to.
+
+        Raises
+        ------
+        IOError
+            If file cannot be written.
         """
         io.write_vtk(self, filename)
 
-    def write_fssurf(self, filename, image=None):
+    def write_fssurf(self, filename: str, image: Optional[object] = None) -> None:
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
 
         Parameters
@@ -207,6 +213,13 @@ class TriaMesh:
             are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
             coordinates before saving. The expected order of coordinates is (x, y, z)
             matching the image voxel indices in nibabel.
+
+        Raises
+        ------
+        IOError
+            If file cannot be written.
+        ValueError
+            If image header cannot be processed.
 
         Notes
         -----
@@ -316,7 +329,7 @@ class TriaMesh:
         """
         return np.max(self.adj_sym.data) <= 2
 
-    def is_oriented(self):
+    def is_oriented(self) -> bool:
         """Check if triangle mesh is oriented.
 
         True if all triangles are oriented counter-clockwise, when looking from
@@ -329,7 +342,7 @@ class TriaMesh:
         """
         return np.max(self.adj_dir.data) == 1
 
-    def euler(self):
+    def euler(self) -> int:
         """Compute the Euler Characteristic.
 
         The Euler characteristic is the number of vertices minus the number
@@ -348,7 +361,7 @@ class TriaMesh:
         enum = int(self.adj_sym.nnz / 2)
         return vnum - enum + tnum
 
-    def tria_areas(self):
+    def tria_areas(self) -> np.ndarray:
         """Compute the area of triangles using Heron's formula.
 
         `Heron's formula <https://en.wikipedia.org/wiki/Heron%27s_formula>`_
@@ -356,8 +369,8 @@ class TriaMesh:
 
         Returns
         -------
-        areas : array
-            Array with areas of each triangle.
+        np.ndarray
+            Array with areas of each triangle, shape (n_triangles,).
         """
         v0 = self.v[self.t[:, 0], :]
         v1 = self.v[self.t[:, 1], :]
@@ -372,24 +385,32 @@ class TriaMesh:
         areas = np.sqrt(ph * (ph - a) * (ph - b) * (ph - c))
         return areas
 
-    def area(self):
+    def area(self) -> float:
         """Compute the total surface area of triangle mesh.
 
         Returns
         -------
         float
-            Total surface area.
+            Total surface area (sum of all triangle areas).
         """
         areas = self.tria_areas()
         return np.sum(areas)
 
-    def volume(self):
+    def volume(self) -> float:
         """Compute the volume of closed triangle mesh, summing tetrahedra at origin.
+
+        The mesh must be closed (no boundary edges) and oriented (consistent
+        triangle orientation).
 
         Returns
         -------
-        vol : float
+        float
             Total enclosed volume.
+
+        Raises
+        ------
+        ValueError
+            If mesh is not closed or not oriented.
         """
         if not self.is_closed():
             logger.error("Volume computation requires closed mesh.")
@@ -408,13 +429,13 @@ class TriaMesh:
         logger.debug("Computed volume %s", vol)
         return vol
 
-    def vertex_degrees(self):
+    def vertex_degrees(self) -> np.ndarray:
         """Compute the vertex degrees (number of edges at each vertex).
 
         Returns
         -------
-        vdeg : array
-            Array of vertex degrees.
+        np.ndarray
+            Array of vertex degrees, shape (n_vertices,).
         """
         vdeg = np.bincount(self.t.reshape(-1))
         return vdeg
@@ -454,15 +475,18 @@ class TriaMesh:
         )
         return edgelens.mean()
 
-    def tria_normals(self):
+    def tria_normals(self) -> np.ndarray:
         """Compute triangle normals.
 
-        Ordering of triangles is important: counterclockwise when looking.
+        Triangle normals are computed using the cross product of two edges.
+        Ordering of triangles is important: normals point outward for
+        counter-clockwise oriented triangles when looking from above.
 
         Returns
         -------
-        n : array of shape (n_triangles, 3)
-            Triangle normals.
+        np.ndarray
+            Triangle normals of shape (n_triangles, 3). Each normal is
+            normalized to unit length.
         """
         # Compute vertex coordinates and a difference vectors for each triangle:
         v0 = self.v[self.t[:, 0], :]
@@ -477,19 +501,23 @@ class TriaMesh:
         n = n / ln.reshape(-1, 1)
         return n
 
-    def vertex_normals(self):
+    def vertex_normals(self) -> np.ndarray:
         """Compute vertex normals.
 
-        get_vertex_normals(v,t) computes vertex normals
-            Triangle normals around each vertex are averaged, weighted
-            by the angle that they contribute.
-            Ordering is important: counterclockwise when looking
-            at the triangle from above.
+        Vertex normals are computed by averaging triangle normals around each
+        vertex, weighted by the angle that each triangle contributes at that
+        vertex. The mesh must be oriented for meaningful results.
 
         Returns
         -------
-        n : array of shape (n_triangles, 3)
-            Vertex normals.
+        np.ndarray
+            Vertex normals of shape (n_vertices, 3). Each normal is
+            normalized to unit length.
+
+        Raises
+        ------
+        ValueError
+            If mesh is not oriented.
         """
         if not self.is_oriented():
             raise ValueError(
@@ -520,22 +548,25 @@ class TriaMesh:
         n = n / ln.reshape(-1, 1)
         return n
 
-    def has_free_vertices(self):
-        """Check if the vertex list has more vertices than what is used in tria.
+    def has_free_vertices(self) -> bool:
+        """Check if the vertex list has more vertices than what is used in triangles.
+
+        Free vertices are vertices that are not referenced by any triangle.
 
         Returns
         -------
         bool
-            Whether vertex list has more vertices or not.
+            True if vertex list has more vertices than used in triangles,
+            False otherwise.
         """
         vnum = np.max(self.v.shape)
         vnumt = len(np.unique(self.t.reshape(-1)))
         return vnum != vnumt
 
-    def tria_qualities(self):
-        """Compute triangle quality for each triangle in mesh where.
+    def tria_qualities(self) -> np.ndarray:
+        """Compute triangle quality for each triangle in mesh.
 
-        q = 4 sqrt(3) A / (e1^2 + e2^2 + e3^2 )
+        Quality measure: q = 4 sqrt(3) A / (e1^2 + e2^2 + e3^2)
         where A is the triangle area and ei the edge length of the three edges.
         Constants are chosen so that q=1 for the equilateral triangle.
 
@@ -546,8 +577,9 @@ class TriaMesh:
 
         Returns
         -------
-        array
-            Array with triangle qualities.
+        np.ndarray
+            Array with triangle qualities, shape (n_triangles,). Values range
+            from 0 (degenerate) to 1 (equilateral).
         """
         # Compute vertex coordinates and a difference vectors for each triangle:
         v0 = self.v[self.t[:, 0], :]
@@ -565,18 +597,28 @@ class TriaMesh:
         es[es < sys.float_info.epsilon] = 1  # avoid division by zero
         return q / es
 
-    def boundary_loops(self):
-        """Compute a tuple of boundary loops.
+    def boundary_loops(self) -> list:
+        """Compute boundary loops of the mesh.
 
         Meshes can have 0 or more boundary loops, which are cycles in the directed
-        adjacency graph of the boundary edges.
-        Works on trias only. Could fail if loops are connected via a single
-        vertex (like a figure 8). That case needs debugging.
+        adjacency graph of the boundary edges. The mesh must be manifold and oriented.
+
+        .. note::
+
+            Could fail if loops are connected via a single vertex (like a figure 8).
+            That case needs debugging.
 
         Returns
         -------
-        loops : list of list
-            List of lists with boundary loops.
+        list of list
+            List of lists with boundary loops. Each inner list contains vertex
+            indices forming a closed loop. Empty list if mesh is closed.
+
+        Raises
+        ------
+        ValueError
+            If mesh is not manifold (edges with more than 2 triangles).
+            If mesh is not oriented.
         """
         if not self.is_manifold():
             raise ValueError(
@@ -618,14 +660,16 @@ class TriaMesh:
                 firstcol = []
         return loops
 
-    def connected_components(self):
+    def connected_components(self) -> tuple[int, np.ndarray]:
         """Compute connected components of the mesh.
+
+        Uses scipy's connected_components on the symmetric adjacency matrix.
 
         Returns
         -------
         n_components : int
             Number of connected components.
-        labels : array
+        labels : np.ndarray
             Label array of shape (n_vertices,) where labels[i] is the component
             ID of vertex i. Component IDs are integers from 0 to n_components-1.
         """
@@ -633,7 +677,9 @@ class TriaMesh:
 
         return connected_components(self.adj_sym, directed=False)
 
-    def keep_largest_connected_component_(self, clean=True):
+    def keep_largest_connected_component_(
+        self, clean: bool = True
+    ) -> tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """Keep only the largest connected component of the mesh.
 
         Modifies the mesh in-place.
@@ -647,9 +693,9 @@ class TriaMesh:
 
         Returns
         -------
-        vkeep : array or None
+        vkeep : np.ndarray or None
             Indices (from original list) of kept vertices if clean=True, else None.
-        vdel : array or None
+        vdel : np.ndarray or None
             Indices of deleted (unused) vertices if clean=True, else None.
         """
         n_components, labels = self.connected_components()
@@ -673,7 +719,7 @@ class TriaMesh:
             self.__init__(self.v, self.t, self.fsinfo)
             return None, None
 
-    def centroid(self):
+    def centroid(self) -> tuple[np.ndarray, float]:
         """Compute centroid of triangle mesh as a weighted average of triangle centers.
 
         The weight is determined by the triangle area.
@@ -683,8 +729,8 @@ class TriaMesh:
 
         Returns
         -------
-        centroid : float
-            The centroid of the mesh.
+        centroid : np.ndarray
+            The centroid coordinates of the mesh, shape (3,).
         totalarea : float
             The total area of the mesh.
         """
@@ -702,28 +748,36 @@ class TriaMesh:
         c = centers * areas[:, np.newaxis]
         return np.sum(c, axis=0), totalarea
 
-    def edges(self, with_boundary=False):
+    def edges(self, with_boundary: bool = False) -> tuple[np.ndarray, ...]:
         """Compute vertices and adjacent triangle ids for each edge.
 
         Parameters
         ----------
-        with_boundary : bool
-            Also work on boundary half edges, default ignore.
+        with_boundary : bool, default=False
+            If True, also return boundary half edges. If False, only return
+            interior edges.
 
         Returns
         -------
-        vids : array
-            Column array with starting and end vertex for each unique inner edge.
-        tids : array
-            2 column array with triangle containing the half edge
-            from vids[0,:] to vids [1,:] in first column and the
-            neighboring triangle in the second column.
-        bdrvids : array
-            If with_boundary is true: 2 column array with each
-            boundary half-edge.
-        bdrtids : array
-            If with_boundary is true: 1 column array with the
-            associated triangle to each boundary edge.
+        vids : np.ndarray
+            Array of shape (n_edges, 2) with starting and end vertex for each
+            unique inner edge.
+        tids : np.ndarray
+            Array of shape (n_edges, 2) with triangle containing the half edge
+            from vids[:,0] to vids[:,1] in first column and the neighboring
+            triangle in the second column.
+        bdrvids : np.ndarray
+            If with_boundary is True: Array of shape (n_boundary_edges, 2) with
+            each boundary half-edge. Only returned if with_boundary=True.
+        bdrtids : np.ndarray
+            If with_boundary is True: Array of shape (n_boundary_edges, 1) with
+            the associated triangle to each boundary edge. Only returned if
+            with_boundary=True.
+
+        Raises
+        ------
+        ValueError
+            If mesh is not oriented.
         """
         if not self.is_oriented():
             raise ValueError(
@@ -753,12 +807,25 @@ class TriaMesh:
         bdrtrias = bdrtrias[nzids].reshape(-1, 1)
         return vids, tids, bdrv, bdrtrias
 
-    def curvature(self, smoothit=3):
+    def curvature(
+        self, smoothit: int = 3
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
         """Compute various curvature values at vertices.
+
+        Computes principal curvature directions and values, mean and Gaussian
+        curvature at each vertex using the anisotropic polygonal remeshing approach.
 
         .. note::
 
-            For the algorithm see e.g.
+            For the algorithm see:
             Pierre Alliez, David Cohen-Steiner, Olivier Devillers,
             Bruno Levy, and Mathieu Desbrun.
             Anisotropic Polygonal Remeshing.
@@ -766,25 +833,25 @@ class TriaMesh:
 
         Parameters
         ----------
-        smoothit : int
-            Smoothing iterations on vertex functions.
+        smoothit : int, default=3
+            Number of smoothing iterations on vertex functions.
 
         Returns
         -------
-        u_min : array of shape (vnum, 3)
-            Minimal curvature directions.
-        u_max : array of shape (vnum, 3)
-            Maximal curvature directions.
-        c_min : array
-            Minimal curvature.
-        c_max : array
-            Maximal curvature.
-        c_mean : array
-            Mean curvature ``(c_min + c_max) / 2.0m``.
-        c_gauss : array
-           Gauss curvature ``c_min * c_maxm``.
-        normals : array of shape (vnum, 3)
-           Normals.
+        u_min : np.ndarray
+            Minimal curvature directions, shape (n_vertices, 3).
+        u_max : np.ndarray
+            Maximal curvature directions, shape (n_vertices, 3).
+        c_min : np.ndarray
+            Minimal curvature values, shape (n_vertices,).
+        c_max : np.ndarray
+            Maximal curvature values, shape (n_vertices,).
+        c_mean : np.ndarray
+            Mean curvature ``(c_min + c_max) / 2.0``, shape (n_vertices,).
+        c_gauss : np.ndarray
+           Gauss curvature ``c_min * c_max``, shape (n_vertices,).
+        normals : np.ndarray
+           Vertex normals, shape (n_vertices, 3).
         """
         # import warnings
         # warnings.filterwarnings('error')
@@ -883,28 +950,31 @@ class TriaMesh:
         u_max[i, :] = -u_max[i, :]
         return u_min, u_max, c_min, c_max, c_mean, c_gauss, normals
 
-    def curvature_tria(self, smoothit=3):
-        """Compute min and max curvature and directions (orthogonal and in tria plane).
+    def curvature_tria(
+        self, smoothit: int = 3
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Compute min and max curvature and directions on triangle faces.
 
-        First we compute these values on vertices and then smooth
-        there. Finally, they get mapped to the trias (averaging) and projected onto
-        the triangle plane, and orthogonalized.
+        First computes curvature values on vertices and smooths them.
+        Then maps them to triangles (averaging) and projects onto the triangle plane,
+        ensuring orthogonality.
 
         Parameters
         ----------
-        smoothit : int
+        smoothit : int, default=3
             Number of smoothing iterations for curvature computation on vertices.
 
         Returns
         -------
-        u_min : array
-            Min curvature direction on triangles.
-        u_max : array
-            Max curvature direction on triangles.
-        c_min : array
-            Min curvature on triangles.
-        c_max : array
-            Max curvature on triangles.
+        u_min : np.ndarray
+            Minimal curvature direction on triangles, shape (n_triangles, 3).
+        u_max : np.ndarray
+            Maximal curvature direction on triangles, shape (n_triangles, 3).
+            Orthogonal to u_min and triangle normal.
+        c_min : np.ndarray
+            Minimal curvature values on triangles, shape (n_triangles,).
+        c_max : np.ndarray
+            Maximal curvature values on triangles, shape (n_triangles,).
         """
         u_min, u_max, c_min, c_max, c_mean, c_gauss, normals = self.curvature(smoothit)
 
@@ -944,30 +1014,43 @@ class TriaMesh:
         #   find orthogonal umin next?
         return tumin2, tumax2, tcmin, tcmax
 
-    def normalize_(self):
+    def normalize_(self) -> None:
         """Normalize TriaMesh to unit surface area and centroid at the origin.
 
-        Modifies the vertices.
+        Modifies the vertices in-place by:
+        1. Translating centroid to origin
+        2. Scaling to unit surface area
+
+        Raises
+        ------
+        ValueError
+            If mesh surface area is not positive.
         """
         centroid, area = self.centroid()
         if area <= 0:
             raise ValueError("Mesh surface area must be positive to normalize.")
         self.v = (1.0 / np.sqrt(area)) * (self.v - centroid)
 
-    def rm_free_vertices_(self):
+    def rm_free_vertices_(self) -> tuple[np.ndarray, np.ndarray]:
         """Remove unused (free) vertices.
 
-        Free vertices are vertices that are not used in any triangle.
+        Free vertices are vertices that are not referenced by any triangle.
         They can produce problems when constructing, e.g., Laplace matrices.
 
-        Modifies the mesh in-place.
+        Modifies the mesh in-place by removing unused vertices and re-indexing
+        triangles.
 
         Returns
         -------
-        vkeep : array
-            Indices (from original list) of kept vertices.
-        vdel : array
-            Indices of deleted (unused) vertices.
+        vkeep : np.ndarray
+            Indices (from original list) of kept vertices, shape (n_kept,).
+        vdel : np.ndarray
+            Indices of deleted (unused) vertices, shape (n_deleted,).
+
+        Raises
+        ------
+        ValueError
+            If triangle indices exceed number of vertices.
         """
         tflat = self.t.reshape(-1)
         vnum = self.v.shape[0]
@@ -993,16 +1076,17 @@ class TriaMesh:
         self.__init__(vnew, tnew, self.fsinfo)
         return vkeep, vdel
 
-    def refine_(self, it=1):
+    def refine_(self, it: int = 1) -> None:
         """Refine the triangle mesh by placing new vertex on each edge midpoint.
 
-        Thus creates 4 similar triangles from one parent triangle.
-        Modifies mesh in place.
+        Creates 4 similar triangles from each parent triangle (1-to-4 subdivision).
+        Modifies mesh in-place.
 
         Parameters
         ----------
-        it : int
-            Number of iterations.
+        it : int, default=1
+            Number of refinement iterations. Each iteration quadruples the number
+            of triangles.
         """
         for _x in range(it):
             # make symmetric adj matrix to upper triangle
@@ -1029,42 +1113,57 @@ class TriaMesh:
             # set new vertices and tria and re-init adj matrices
             self.__init__(vnew, tnew, self.fsinfo)
 
-    def normal_offset_(self, d):
-        """Move vertices along normal by distance ``d``.
+    def normal_offset_(self, d: float) -> None:
+        """Move vertices along their normals by distance d.
 
-        normal_offset(d) moves vertices along normal by distance d
+        Displaces each vertex along its vertex normal. Useful for creating
+        offset surfaces or inflating/deflating meshes.
 
         Parameters
         ----------
-        d : int | array
-            Move distance.
+        d : float or np.ndarray
+            Move distance. Can be a scalar (same distance for all vertices)
+            or array of shape (n_vertices,) for per-vertex distances.
+
+        Raises
+        ------
+        ValueError
+            If mesh is not oriented (required for vertex normals).
+
+        Notes
+        -----
+        This modifies vertices in-place without re-initializing adjacency matrices.
         """
         n = self.vertex_normals()
         vn = self.v + d * n
         self.v = vn
         # no need to re-init, only changed vertices
 
-    def orient_(self):
+    def orient_(self) -> int:
         """Re-orient triangles of manifold mesh to be consistent.
 
-        Re-orients triangles of manifold mesh to be consistent, so that vertices are
-        listed counter-clockwise, when looking from above (outside).
+        Re-orients triangles so that vertices are listed counter-clockwise
+        when looking from above (outside). Uses a flood-fill algorithm to
+        propagate orientation from the first triangle.
 
         Algorithm:
 
-        * Construct list for each half-edge with its triangle and edge direction
-        * Drop boundary half-edges and find half-edge pairs
-        * Construct sparse matrix with triangle neighbors, with entry 1 for opposite
-          half edges and -1 for parallel half-edges (normal flip across this edge)
-        * Flood mesh from first tria using triangle neighbor matrix and keeping track of
-          sign
-        * When flooded, negative sign for a triangle indicates it needs to be flipped
-        * If global volume is negative, flip everything (first tria was wrong)
+        1. Construct list for each half-edge with its triangle and edge direction
+        2. Drop boundary half-edges and find half-edge pairs
+        3. Construct sparse matrix with triangle neighbors, with entry 1 for opposite
+           half edges and -1 for parallel half-edges (normal flip across this edge)
+        4. Flood mesh from first triangle using neighbor matrix, tracking sign
+        5. Negative sign for a triangle indicates it needs to be flipped
+        6. If global volume is negative, flip everything (first triangle was wrong)
 
         Returns
         -------
-        flipped : int
-            Number of trias flipped.
+        int
+            Number of triangles flipped.
+
+        Notes
+        -----
+        This modifies the triangle array in-place to achieve consistent orientation.
         """
         tnew = self.t
         flipped = 0
@@ -1150,27 +1249,31 @@ class TriaMesh:
                 flipped = tnew.shape[0] - flipped
         return flipped
 
-    def map_tfunc_to_vfunc(self, tfunc, weighted=False):
-        """Map tria function to vertices by attributing 1/3 to each vertex of triangle.
+    def map_tfunc_to_vfunc(self, tfunc: np.ndarray, weighted: bool = False) -> np.ndarray:
+        """Map triangle function to vertices by attributing 1/3 to each vertex.
 
-        Uses vertices and trias.
+        Distributes triangle values to their three vertices. Useful for converting
+        per-triangle data to per-vertex data.
 
         Parameters
         ----------
-        tfunc : array
-            Float vector or matrix (#t x N) of values at vertices.
+        tfunc : np.ndarray
+            Float vector or matrix of shape (n_triangles,) or (n_triangles, N)
+            with values at triangles.
         weighted : bool, default=False
-            False, weigh only by 1/3, e.g. to compute
-            vertex areas from tria areas
-            True, weigh by triangle area / 3, e.g. to
-            integrate a function defined on the trias,
-            for example integrating the "one" function
-            will also yield the vertex areas.
+            If False, weigh only by 1/3 (e.g., to compute vertex areas from
+            triangle areas). If True, weigh by triangle area / 3 (e.g., to
+            integrate a function defined on the triangles).
 
         Returns
         -------
-        vfunc : array
-            Function on vertices vector or matrix (#v x N).
+        np.ndarray
+            Function on vertices, shape (n_vertices,) or (n_vertices, N).
+
+        Raises
+        ------
+        ValueError
+            If tfunc length doesn't match number of triangles.
         """
         if self.t.shape[0] != tfunc.shape[0]:
             raise ValueError(
@@ -1189,20 +1292,27 @@ class TriaMesh:
         np.add.at(vfunc, self.t[:, 2], tfunca)
         return np.squeeze(vfunc / 3.0)
 
-    def map_vfunc_to_tfunc(self, vfunc):
-        """Map vertex function to triangles by attributing 1/3 to each.
+    def map_vfunc_to_tfunc(self, vfunc: np.ndarray) -> np.ndarray:
+        """Map vertex function to triangles by averaging vertex values.
 
-        Uses number of vertices and trias.
+        Computes triangle values by averaging the values at the three vertices
+        of each triangle.
 
         Parameters
         ----------
-        vfunc : array
-            Float vector or matrix (#t x N) of values at vertices.
+        vfunc : np.ndarray
+            Float vector or matrix of shape (n_vertices,) or (n_vertices, N)
+            with values at vertices.
 
         Returns
         -------
-        tfunc : array
-            Function on trias vector or matrix (#t x N).
+        np.ndarray
+            Function on triangles, shape (n_triangles,) or (n_triangles, N).
+
+        Raises
+        ------
+        ValueError
+            If vfunc length doesn't match number of vertices.
         """
         if self.v.shape[0] != vfunc.shape[0]:
             raise ValueError("Error: length of vfunc needs to match number of vertices")
@@ -1261,29 +1371,41 @@ class TriaMesh:
         )
         return self.smooth_laplace(vfunc=vfunc, n=n, lambda_=1.0)
 
-    def smooth_laplace(self, vfunc=None, n=1, lambda_=0.5, mat=None):
+    def smooth_laplace(
+        self,
+        vfunc: Optional[np.ndarray] = None,
+        n: int = 1,
+        lambda_: float = 0.5,
+        mat: Optional[sparse.csc_matrix] = None,
+    ) -> np.ndarray:
         """Smooth the mesh or a vertex function using Laplace smoothing.
 
-        Applies v_new = (1-lambda)*v + lambda * M*v
+        Applies iterative smoothing: v_new = (1-lambda)*v + lambda * M*v
         where M is the vertex-area weighted adjacency matrix.
 
         Parameters
         ----------
-        vfunc : array or None
-            Float vector of values at vertices, if None, use vertex coordinates.
-        n : int
-            Number of iterations.
-        lambda_ : float
-            Diffusion speed parameter. lambda=1 reduces to the most simple case
-            of a weighted average of the values at neighboring vertices,
-            while smaller lambdas will include the value at the current vertex.
-        mat : csc_matrix, None
-            Precomputed smoothing matrix.
+        vfunc : np.ndarray or None, default=None
+            Float vector of values at vertices, shape (n_vertices,) or (n_vertices, N).
+            If None, uses vertex coordinates for mesh smoothing.
+        n : int, default=1
+            Number of smoothing iterations.
+        lambda_ : float, default=0.5
+            Diffusion speed parameter in range [0, 1]. lambda_=1 reduces to
+            weighted average of neighboring vertices, while smaller values
+            preserve more of the original values.
+        mat : sparse.csc_matrix or None, default=None
+            Precomputed smoothing matrix. If None, constructs it internally.
 
         Returns
         -------
-        vfunc : array
-            Smoothed surface vertex function.
+        np.ndarray
+            Smoothed vertex function, same shape as input vfunc.
+
+        Raises
+        ------
+        ValueError
+            If vfunc length doesn't match number of vertices.
         """
         if vfunc is None:
             vfunc = self.v
@@ -1296,27 +1418,47 @@ class TriaMesh:
             vfunc = (1.0 - lambda_) * vfunc + lambda_ * mat.dot(vfunc)
         return vfunc
 
-    def smooth_taubin(self, vfunc=None, n=1, lambda_=0.5, mu=-0.53):
+    def smooth_taubin(
+        self,
+        vfunc: Optional[np.ndarray] = None,
+        n: int = 1,
+        lambda_: float = 0.5,
+        mu: float = -0.53,
+    ) -> np.ndarray:
         """Smooth the mesh or a vertex function using Taubin smoothing.
 
         Taubin smoothing alternates between shrinking (positive lambda) and
-        expanding (negative mu) steps to avoid shrinkage of the mesh.
+        expanding (negative mu) steps to reduce shrinkage while smoothing.
+        This is a low-pass filter that better preserves mesh volume.
 
         Parameters
         ----------
-        vfunc : array or None
-            Float vector of values at vertices, if None, use vertex coordinates.
-        n : int
-            Number of iterations (each iteration includes one shrink and one expand step).
-        lambda_ : float
-            Shrinking factor (0 < lambda < 1).
-        mu : float
-            Expanding factor (negative, ``|mu| > lambda``).
+        vfunc : np.ndarray or None, default=None
+            Float vector of values at vertices, shape (n_vertices,) or (n_vertices, N).
+            If None, uses vertex coordinates for mesh smoothing.
+        n : int, default=1
+            Number of smoothing iterations (each iteration applies both lambda
+            and mu steps).
+        lambda_ : float, default=0.5
+            Positive diffusion parameter for shrinking step.
+        mu : float, default=-0.53
+            Negative diffusion parameter for expanding step. Should be negative
+            and satisfy mu < -lambda to avoid instability.
 
         Returns
         -------
-        vfunc : array
-            Smoothed surface vertex function.
+        np.ndarray
+            Smoothed vertex function, same shape as input vfunc.
+
+        Raises
+        ------
+        ValueError
+            If vfunc length doesn't match number of vertices.
+
+        References
+        ----------
+        Gabriel Taubin, "A Signal Processing Approach to Fair Surface Design",
+        SIGGRAPH 1995.
         """
         if vfunc is None:
             vfunc = self.v
@@ -1329,32 +1471,42 @@ class TriaMesh:
             vfunc = self.smooth_laplace(vfunc, n=1, lambda_=mu, mat=mat)
         return vfunc
 
-    def smooth_(self, n=1):
+    def smooth_(self, n: int = 1) -> None:
         """Smooth the mesh iteratively in-place using Taubin smoothing.
 
         Parameters
         ----------
-        n : int
-            Smoothing iterations.
+        n : int, default=1
+            Number of smoothing iterations.
         """
         vfunc = self.smooth_taubin(self.v, n=n)
         self.v = vfunc
         return
 
-    def level_length(self, vfunc, level):
+    def level_length(self, vfunc: np.ndarray, level: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Compute the length of level sets.
+
+        For a scalar function defined on mesh vertices, computes the total length
+        of the curve where the function equals the specified level value(s).
 
         Parameters
         ----------
-        vfunc : array
-            Float vector of values at vertices (here only scalar function 1D).
-        level : float | array
-            Level set value or array of level values.
+        vfunc : np.ndarray
+            Scalar function values at vertices, shape (n_vertices,). Must be 1D.
+        level : float or np.ndarray
+            Level set value(s). Can be a single float or array of level values.
 
         Returns
         -------
-        length : float | array
-            Length of level set (or array of lengths).
+        float or np.ndarray
+            Length of level set. Returns float for single level, array for
+            multiple levels.
+
+        Raises
+        ------
+        ValueError
+            If vfunc is not 1-dimensional.
+            If no lengths could be computed.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
@@ -1406,32 +1558,47 @@ class TriaMesh:
             raise ValueError("No lengths computed, should never get here.")
 
     @staticmethod
-    def __reduce_edges_to_path(edges, start_idx=None, get_edge_idx=False):
+    def __reduce_edges_to_path(
+        edges: np.ndarray,
+        start_idx: Optional[int] = None,
+        get_edge_idx: bool = False,
+    ) -> Union[np.ndarray, tuple[np.ndarray, np.ndarray]]:
         """Reduce undirected unsorted edges (index pairs) to path (index array).
+
+        Converts an unordered list of edge pairs into an ordered path by finding
+        a traversal from one endpoint to the other.
 
         Parameters
         ----------
-        edges : list of shape (n, 2)
-            Pairs of positive integer node indices representing a undirected edges.
-            All indices from 0 to max(edges) must be used and graph needs to be
-            connected. Nodes cannot have more than 2 neighbors. Also needs exactly
-            two endnodes (nodes with only one neighbor). Tip for closed loops, cut
-            it open before passing to this function by removing one edge.
-        start_idx : int, default: None
-            Node with only one neighbor to start path. Optional, if not passed the
-            node with the smaller index will be selected as start point.
-        get_edge_idx : bool, default: False
-            Also return index of edge into edges for each path segment. This list
-            has length n, while path has length n+1.
+        edges : np.ndarray
+            Array of shape (n, 2) with pairs of positive integer node indices
+            representing undirected edges. All indices from 0 to max(edges) must
+            be used and graph needs to be connected. Nodes cannot have more than
+            2 neighbors. Requires exactly two endnodes (nodes with only one
+            neighbor). For closed loops, cut it open by removing one edge before
+            passing to this function.
+        start_idx : int or None, default=None
+            Node with only one neighbor to start path. If None, the node with
+            the smaller index will be selected as start point.
+        get_edge_idx : bool, default=False
+            If True, also return index of edge into edges for each path segment.
+            The returned edge index list has length n, while path has length n+1.
 
         Returns
         -------
-        path: array
-            Array of length n+1 containing indices as single path from start to
-            endpoint.
-        edge_idx: array
+        path : np.ndarray
+            Array of length n+1 containing node indices as single path from start
+            to endpoint.
+        edge_idx : np.ndarray
             Array of length n containing corresponding edge idx into edges for each
-            path segment. Only passed if get_edges_idx is True.
+            path segment. Only returned if get_edge_idx is True.
+
+        Raises
+        ------
+        ValueError
+            If graph does not have exactly two endpoints.
+            If start_idx is not one of the endpoints.
+            If graph is not connected.
         """
         from scipy.sparse.csgraph import shortest_path
 
@@ -1483,68 +1650,69 @@ class TriaMesh:
             return path
 
 
-    def level_path(self, vfunc, level, get_tria_idx=False, get_edges=False,
-                   n_points=None):
-        """Extract levelset of vfund at a specific level as a path of 3D points.
+    def level_path(
+        self,
+        vfunc: np.ndarray,
+        level: float,
+        get_tria_idx: bool = False,
+        get_edges: bool = False,
+        n_points: Optional[int] = None,
+    ) -> tuple[np.ndarray, ...]:
+        """Extract levelset of vfunc at a specific level as a path of 3D points.
 
-        For a given real-valued scalar map on the surface mesh (vfunc) this
+        For a given real-valued scalar map on the surface mesh (vfunc), this
         function computes the edges that intersect with a given level set (level).
         It then finds the point on each mesh edge where the level set intersects.
         The points are sorted and returned as an ordered array of 3D coordinates
         together with the length of the level set path.
 
-        Note: Only works for level sets that represent a single non-intersecting
-        path with exactly one start and one endpoint (e.g. not closed)!
+        .. note::
 
-        Additional options: get_tria_idx and get_edges when True will also
-        return an array of triangle ids for each path segment, defining the
-        triangle i, where the path from i to i+1 passes through (so for a path
-        with n points, these will be n-1 triangle ids). Furthermore, an array
-        of edge vertex indices of shape (n,2) can be obtained defining the two
-        vertices of the intersecting edge in the original mesh for each 3D point
-        on the path. A second array is returned, defining the relative position
-        of the intersecting point along this edge as a float from 0 (start vertex)
-        to 1 (end vertex). This information can, for example, be useful for
-        interpolating a second surface map at the new path point coordinates.
-        Neither of this information is available when n_points is used to resample
-        the path into n_points equidistant new points as the association to edges
-        or triangles in the original mesh is lost.
+            Only works for level sets that represent a single non-intersecting
+            path with exactly one start and one endpoint (e.g., not closed)!
 
         Parameters
         ----------
-        vfunc : array
-            Float vector of values at vertices (here only scalar function 1D).
+        vfunc : np.ndarray
+            Scalar function values at vertices, shape (n_vertices,). Must be 1D.
         level : float
-            Level set value.
-        get_tria_idx : bool, default: False
-            Also return a list of triangle indices for each edge, default False.
-        get_edges : bool, default: False
-            Also return a list of two vertex indices (i,j) for each 3D point and
-            a list of the relative position defining the 3D point along that
-            edge (i,j) from the original mesh, default False.
-        n_points : int
-            Resample level set into n equidistant points. Cannot be combined
-            with get_tria_idx=True nor with get_edges=True.
+            Level set value to extract.
+        get_tria_idx : bool, default=False
+            If True, also return array of triangle indices for each path segment.
+        get_edges : bool, default=False
+            If True, also return arrays of vertex indices (i,j) and relative
+            positions for each 3D point along the intersecting edge.
+        n_points : int or None, default=None
+            If specified, resample level set into n equidistant points. Cannot
+            be combined with get_tria_idx=True or get_edges=True.
 
         Returns
         -------
-        path: array
-            Array of shape (n,3) containing 3D coordinates of vertices on a level path.
+        path : np.ndarray
+            Array of shape (n, 3) containing 3D coordinates of vertices on the
+            level path.
         length : float
             Length of the level set.
-        tria_idx : array
-            Array of triangle index for each segment on the path (length n-1
-            if the path is length n). Will only be returned, if get_tria_idx is True.
-        edges_vidxs : array
-            Array of shape (n,2) of vertex indices (i,j) for each 3D point, defining
-            the vertices of the original mesh of the edge intersecting the level set
-            at this point. Will only be returned if get_edges is True.
-        edges_relpos: array
-            Array of floats defining the relative position for each 3D point along
-            the edges of the original mesh (defined by the two points in edges_vidxs).
-            Float value 0 defines first point, and 1 defines end point. So the 3D
-            point of the path is computed (1 - relpos) v_i + relpos v_j.
-            Will only be returned if get_edges is True.
+        tria_idx : np.ndarray
+            Array of triangle indices for each segment on the path, shape (n-1,)
+            if the path has length n. Only returned if get_tria_idx is True.
+        edges_vidxs : np.ndarray
+            Array of shape (n, 2) with vertex indices (i,j) for each 3D point,
+            defining the vertices of the original mesh edge intersecting the
+            level set at this point. Only returned if get_edges is True.
+        edges_relpos : np.ndarray
+            Array of floats defining the relative position for each 3D point
+            along the edges of the original mesh (defined by edges_vidxs).
+            Value 0 corresponds to first vertex, 1 to second vertex.
+            The 3D point is computed as: (1 - relpos) * v_i + relpos * v_j.
+            Only returned if get_edges is True.
+
+        Raises
+        ------
+        ValueError
+            If vfunc is not 1-dimensional.
+            If n_points is combined with get_tria_idx=True.
+            If n_points is combined with get_edges=True.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")

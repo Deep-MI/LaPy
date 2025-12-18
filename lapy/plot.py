@@ -267,15 +267,15 @@ def plot_tet_mesh(
     ----------
     tetra : TetMesh
         Tetrahedral mesh to plot.
-    vfunc : np.ndarray or None, default=None
+    vfunc : np.ndarray, default=None
         Scalar function at vertices, shape (n_vertices,).
     plot_edges : bool, default=False
         Whether to plot edges or not.
     plot_levels : bool, default=False
         Whether to plot levels or not.
-    tfunc : np.ndarray or None, default=None
+    tfunc : np.ndarray, default=None
         3D vector function of gradient, shape (n_tetrahedra,) or (n_tetrahedra, 3).
-    cutting : str or list of str, optional
+    cutting : str or list of str, default=None
         To view the 'interior' of the tetra mesh, one or more cutting
         criteria can be defined as input arguments to this function:
         e.g. cutting=('x<-10') or cutting=('z>=5') or cutting=('f>4')
@@ -292,15 +292,15 @@ def plot_tet_mesh(
         Height of the plot (in px).
     flatshading : bool, default=False
         Whether normal smoothing is applied to the meshes or not.
-    xrange : list or tuple of float, optional
+    xrange : list or tuple of float, default=None
         Sets the range of the x-axis as [min, max].
-    yrange : list or tuple of float, optional
+    yrange : list or tuple of float, default=None
         Sets the range of the y-axis as [min, max].
-    zrange : list or tuple of float, optional
+    zrange : list or tuple of float, default=None
         Sets the range of the z-axis as [min, max].
     showcaxis : bool, default=False
         Whether a colorbar is displayed or not.
-    caxis : list or tuple of float, optional
+    caxis : list or tuple of float, default=None
         Sets the bound of the color domain as [lower_bound, upper_bound].
 
     Returns
@@ -427,23 +427,23 @@ def plot_tria_mesh(
     ----------
     tria : TriaMesh
         Triangle mesh to plot.
-    vfunc : np.ndarray or None, default=None
+    vfunc : np.ndarray, default=None
         Scalar function at vertices, shape (n_vertices,) or (n_vertices, N).
-    tfunc : np.ndarray or None, default=None
+    tfunc : np.ndarray, default=None
         3D vector function of gradient, shape (n_triangles,) or (n_triangles, 3).
-    vcolor : list of str, optional
+    vcolor : list of str, default=None
         Sets the color of each vertex, shape (n_vertices,).
-    tcolor : list of str, optional
+    tcolor : list of str, default=None
         Sets the color of each face, shape (n_triangles,).
     showcaxis : bool, default=False
         Whether a colorbar is displayed or not.
-    caxis : list or tuple of float, optional
+    caxis : list or tuple of float, default=None
         Sets the bound of the color domain as [lower_bound, upper_bound].
-    xrange : list or tuple of float, optional
+    xrange : list or tuple of float, default=None
         Sets the range of the x-axis as [min, max].
-    yrange : list or tuple of float, optional
+    yrange : list or tuple of float, default=None
         Sets the range of the y-axis as [min, max].
-    zrange : list or tuple of float, optional
+    zrange : list or tuple of float, default=None
         Sets the range of the z-axis as [min, max].
     plot_edges : bool, default=False
         Whether to plot edges or not.
@@ -453,7 +453,7 @@ def plot_tria_mesh(
         Color of the edges.
     tic_color : str, default="rgb(50,200,10)"
         Color of the ticks.
-    background_color : str, optional
+    background_color : str, default=None
         Color of background.
     flatshading : bool, default=False
         Whether normal smoothing is applied to the meshes or not.
@@ -461,12 +461,12 @@ def plot_tria_mesh(
         Width of the plot (in px).
     height : int, default=800
         Height of the plot (in px).
-    camera : dict, optional
+    camera : dict, default=None
         Camera dictionary with keys 'center', 'eye', and 'up', each containing
         a dict with x, y, z coordinates.
     html_output : bool, default=False
         Whether or not to give out as html output.
-    export_png : str, optional
+    export_png : str, default=None
         Local file path or file object to write the image to.
     scale_png : float, default=1.0
         Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution.

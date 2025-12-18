@@ -795,7 +795,7 @@ class TriaMesh:
         adjtria2 = adjtria.transpose()
         adjtriu1 = sparse.triu(adjtria, 0, format="csr")
         adjtriu2 = sparse.triu(adjtria2, 0, format="csr")
-        vids = np.array(np.nonzero(adjtriu1)).T
+        vids = np.array(np.nonzero(adjtriu1), dtype=np.int32).T
         tids = np.empty(vids.shape, dtype=np.int32)
         tids[:, 0] = adjtriu1.data - 1
         tids[:, 1] = adjtriu2.data - 1

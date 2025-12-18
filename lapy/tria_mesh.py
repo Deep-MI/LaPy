@@ -456,10 +456,6 @@ class TriaMesh:
         ln = np.sqrt(np.sum(n * n, axis=1))
         ln[ln < sys.float_info.epsilon] = 1  # avoid division by zero
         n = n / ln.reshape(-1, 1)
-        # lni = np.divide(1.0, ln)
-        # n[:, 0] *= lni
-        # n[:, 1] *= lni
-        # n[:, 2] *= lni
         return n
 
     def vertex_normals(self):
@@ -480,7 +476,6 @@ class TriaMesh:
             raise ValueError(
                 "Error: Vertex normals are meaningless for un-oriented triangle meshes!"
             )
-        import sys
 
         # Compute vertex coordinates and a difference vector for each triangle:
         v0 = self.v[self.t[:, 0], :]
@@ -504,10 +499,6 @@ class TriaMesh:
         ln = np.sqrt(np.sum(n * n, axis=1))
         ln[ln < sys.float_info.epsilon] = 1  # avoid division by zero
         n = n / ln.reshape(-1, 1)
-        # lni = np.divide(1.0, ln)
-        # n[:, 0] *= lni
-        # n[:, 1] *= lni
-        # n[:, 2] *= lni
         return n
 
     def has_free_vertices(self):

@@ -60,7 +60,10 @@ class TriaMesh:
         # transpose if necessary
         if self.v.shape[0] < self.v.shape[1]:
             self.v = self.v.T
-        if self.t.shape[0] < self.t.shape[1]:
+        # For triangles, check if we need to transpose:
+        # Triangles should have shape (n_triangles, 3)
+        # If shape[1] != 3 but shape[0] == 3, transpose
+        if self.t.shape[1] != 3 and self.t.shape[0] == 3:
             self.t = self.t.T
         # Check a few things
         vnum = np.max(self.v.shape)

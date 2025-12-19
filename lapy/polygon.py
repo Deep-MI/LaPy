@@ -67,14 +67,27 @@ class Polygon:
         if self.points.size == 0:
             raise ValueError("Polygon has no points (empty)")
 
-        # Transpose if necessary
-        if self.points.shape[0] < self.points.shape[1]:
+        # Ensure points array is 2-dimensional
+        if self.points.ndim != 2:
+            raise ValueError("Points array must be 2-dimensional")
+
+        n_rows, n_cols = self.points.shape
+
+        # Support both (n_points, dim) and (dim, n_points) where dim is 2 or 3.
+        # Only transpose when it is unambiguous that the first dimension is dim.
+        if n_cols not in (2, 3) and n_rows in (2, 3):
+            logger.warning(
+                "Transposing points array from shape %s to %s; expected shape (n_points, dim).",
+                self.points.shape,
+                self.points.T.shape,
+            )
             self.points = self.points.T
+            n_rows, n_cols = self.points.shape
 
         # Support both 2D and 3D points
-        if self.points.shape[1] == 2:
+        if n_cols == 2:
             self._is_2d = True
-        elif self.points.shape[1] == 3:
+        elif n_cols == 3:
             self._is_2d = False
         else:
             raise ValueError("Points should have 2 or 3 coordinates")

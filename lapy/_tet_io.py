@@ -3,12 +3,18 @@
 Should be called via the TetMesh member functions.
 """
 
+import logging
 import os.path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
+if TYPE_CHECKING:
+    from .tet_mesh import TetMesh
 
-def read_gmsh(filename):
+logger = logging.getLogger(__name__)
+
+def read_gmsh(filename: str) -> "TetMesh":
     """Load GMSH tetrahedron mesh.
 
     Parameters
@@ -18,54 +24,63 @@ def read_gmsh(filename):
 
     Returns
     -------
-    tet : TetMesh
-        Object of loaded  GMSH tetrahedron mesh.
+    TetMesh
+        Object of loaded GMSH tetrahedron mesh.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
+    ValueError
+        If file format is invalid or binary format is encountered.
     """
     extension = os.path.splitext(filename)[1]
     verbose = 1
     if verbose > 0:
-        print("--> GMSH format         ... ")
+        logger.info("--> GMSH format         ... ")
     if extension != ".msh":
-        print("[no .msh file] --> FAILED\n")
-        return
+        msg = "[no .msh file] --> FAILED\n"
+        logger.error(msg)
+        raise ValueError(msg)
     try:
         f = open(filename)
     except OSError:
-        print("[file not found or not readable]\n")
-        return
+        logger.error("[file not found or not readable]")
+        raise
     line = f.readline()
     if not line.startswith("$MeshFormat"):
-        print("[$MeshFormat keyword not found] --> FAILED\n")
+        msg = "[$MeshFormat keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     line = f.readline()
     larr = line.split()
     ver = float(larr[0])
     ftype = int(larr[1])
     datatype = int(larr[2])
-    print(
-        "Msh file ver ",
+    logger.debug(
+        "Msh file ver %s, ftype %s, datatype %s",
         ver,
-        " , ftype ",
         ftype,
-        " , datatype ",
         datatype,
-        "\n",
     )
     if ftype != 0:
-        print("[binary format not implemented] --> FAILED\n")
+        msg = "[binary format not implemented] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     line = f.readline()
     if not line.startswith("$EndMeshFormat"):
-        print("[$EndMeshFormat keyword not found] --> FAILED\n")
+        msg = "[$EndMeshFormat keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     line = f.readline()
     if not line.startswith("$Nodes"):
-        print("[$Nodes keyword not found] --> FAILED\n")
+        msg = "[$Nodes keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     pnum = int(f.readline())
     # read (nodes X 4) matrix as chunk
     # drop first column
@@ -74,42 +89,46 @@ def read_gmsh(filename):
     v = np.delete(v, 0, 1)
     line = f.readline()
     if not line.startswith("$EndNodes"):
-        print("[$EndNodes keyword not found] --> FAILED\n")
+        msg = "[$EndNodes keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     line = f.readline()
     if not line.startswith("$Elements"):
-        print("[$Elements keyword not found] --> FAILED\n")
+        msg = "[$Elements keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     tnum = int(f.readline())
     pos = f.tell()
     line = f.readline()
     f.seek(pos)
     larr = line.split()
     if int(larr[1]) != 4:
-        print("larr: ", larr, "\n")
-        print("[can only read tetras] --> FAILED\n")
+        logger.debug("larr: %s", larr)
+        msg = "[can only read tetras] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     # read (nodes X ?) matrix
     t = np.fromfile(f, "int", tnum * len(larr), " ")
     t.shape = (tnum, len(larr))
     t = np.delete(t, np.s_[0 : len(larr) - 4], 1)
     line = f.readline()
     if not line.startswith("$EndElements"):
-        print("Line: ", line, " \n")
-        print("[$EndElements keyword not found] --> FAILED\n")
+        logger.debug("Line: %s", line)
+        msg = "[$EndElements keyword not found] --> FAILED\n"
+        logger.error(msg)
         f.close()
-        return
+        raise ValueError(msg)
     f.close()
-    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    logger.info(" --> DONE ( V: %d , T: %d )", v.shape[0], t.shape[0])
     from . import TetMesh
 
     return TetMesh(v, t)
 
 
-def read_vtk(filename):
+def read_vtk(filename: str) -> "TetMesh":
     """Load VTK tetrahedron mesh.
 
     Parameters
@@ -119,17 +138,27 @@ def read_vtk(filename):
 
     Returns
     -------
-    tet : TetMesh
-        Object of loaded  VTK tetrahedron mesh.
+    TetMesh
+        Object of loaded VTK tetrahedron mesh.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
+    ValueError
+        If ASCII keyword is not found.
+        If DATASET POLYDATA or DATASET UNSTRUCTURED_GRID is not found.
+        If POINTS keyword is malformed.
+        If file does not contain tetrahedra data.
     """
     verbose = 1
     if verbose > 0:
-        print("--> VTK format         ... ")
+        logger.info("--> VTK format         ... ")
     try:
         f = open(filename)
     except OSError:
-        print("[file not found or not readable]\n")
-        return
+        logger.error("[file not found or not readable]")
+        raise
     # skip comments
     line = f.readline()
     while line[0] == "#":
@@ -141,29 +170,27 @@ def read_vtk(filename):
         # print line
         count = count + 1
     if not line.startswith("ASCII"):
-        print("[ASCII keyword not found] --> FAILED\n")
-        return
+        msg = "[ASCII keyword not found] --> FAILED\n"
+        logger.error(msg)
+        raise ValueError(msg)
     # expect Dataset Polydata line after ASCII:
     line = f.readline()
     if not line.startswith("DATASET POLYDATA") and not line.startswith(
         "DATASET UNSTRUCTURED_GRID"
     ):
-        print(
-            "[read: "
-            + line
-            + " expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID] --> FAILED\n"
+        msg = (
+            f"[read: {line} expected DATASET POLYDATA or DATASET UNSTRUCTURED_GRID]"
+            f" --> FAILED\n"
         )
-        return
+        logger.error(msg)
+        raise ValueError(msg)
     # read number of points
     line = f.readline()
     larr = line.split()
     if larr[0] != "POINTS" or (larr[2] != "float" and larr[2] != "double"):
-        print(
-            "[read: "
-            + line
-            + " expected POINTS # float or POINTS # double ] --> FAILED\n"
-        )
-        return
+        msg = f"[read: {line} expected POINTS # float or POINTS # double ] --> FAILED\n"
+        logger.error(msg)
+        raise ValueError(msg)
     pnum = int(larr[1])
     # read points as chunk
     v = np.fromfile(f, "float32", 3 * pnum, " ")
@@ -176,27 +203,28 @@ def read_vtk(filename):
         ttnum = int(larr[2])
         npt = float(ttnum) / tnum
         if npt != 5.0:
-            print(
-                "[having: " + str(npt) + " data per tetra, expected 4+1] --> FAILED\n"
-            )
-            return
+            msg = f"[having: {npt} data per tetra, expected 4+1] --> FAILED\n"
+            logger.error(msg)
+            raise ValueError(msg)
         t = np.fromfile(f, "int", ttnum, " ")
         t.shape = (tnum, 5)
         if t[tnum - 1][0] != 4:
-            print("[can only read tetras] --> FAILED\n")
-            return
+            msg = "[can only read tetras] --> FAILED\n"
+            logger.error(msg)
+            raise ValueError(msg)
         t = np.delete(t, 0, 1)
     else:
-        print("[read: " + line + " expected POLYGONS or CELLS] --> FAILED\n")
-        return
+        msg = f"[read: {line} expected POLYGONS or CELLS] --> FAILED\n"
+        logger.error(msg)
+        raise ValueError(msg)
     f.close()
-    print(" --> DONE ( V: " + str(v.shape[0]) + " , T: " + str(t.shape[0]) + " )\n")
+    logger.info(" --> DONE ( V: %d , T: %d )", v.shape[0], t.shape[0])
     from . import TetMesh
 
     return TetMesh(v, t)
 
 
-def write_vtk(tet, filename):
+def write_vtk(tet: "TetMesh", filename: str) -> None:
     """Save VTK file.
 
     Parameters
@@ -205,13 +233,18 @@ def write_vtk(tet, filename):
         Tetrahedron mesh to save.
     filename : str
         Filename to save to.
+
+    Raises
+    ------
+    OSError
+        If file is not writable.
     """
     # open file
     try:
         f = open(filename, "w")
     except OSError:
-        print("[File " + filename + " not writable]")
-        return
+        logger.error("[File %s not writable]", filename)
+        raise
     # check data structure
     # ...
     # Write

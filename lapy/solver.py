@@ -95,35 +95,39 @@ class Solver:
         self.use_cholmod = use_cholmod
 
     @staticmethod
-    def _fem_tria(tria: TriaMesh, lump: bool = False):  # computeABtria(v,t)
-        r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a triangle mesh.
+    def _fem_tria(
+        tria: TriaMesh, lump: bool = False
+    ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
+        r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a triangle mesh.
 
-        The 2 sparse symmetric matrices are computed for a given triangle mesh using the
-        linear finite element method (assuming a closed mesh or Neumann boundary
-        condition).
+        The 2 sparse symmetric matrices are computed for a given triangle mesh
+        using the linear finite element method (assuming a closed mesh or
+        Neumann boundary condition).
 
         Parameters
         ----------
         tria : TriaMesh
             Triangle mesh.
-        lump : bool
+        lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
 
         Returns
         -------
-        A : csc_matrix of shape (n, n)
-            Sparse symmetric positive semi definite matrix.
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
+        A : scipy.sparse.csc_matrix
+            Sparse symmetric positive semi-definite stiffness matrix, shape (n, n).
+        B : scipy.sparse.csc_matrix
+            Sparse symmetric positive definite mass matrix, shape (n, n).
 
         Notes
         -----
         This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+
+        * Sparse generalized Eigenvalue problem: ``A x = lambda B x``
         * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
         * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
-        """  # noqa: E501
+
+        Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        """
         import sys
 
         # Compute vertex coordinates and a difference vector for each triangle:
@@ -180,44 +184,49 @@ class Solver:
 
     @staticmethod
     def _fem_tria_aniso(
-        tria, u1, u2, aniso_mat, lump: bool = False
-    ):  # computeABtria(v,t)
-        r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a triangle mesh.
+        tria: TriaMesh,
+        u1: np.ndarray,
+        u2: np.ndarray,
+        aniso_mat: np.ndarray,
+        lump: bool = False,
+    ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
+        r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a triangle mesh.
 
-        The 2 sparse symmetric matrices are computed for a given triangle mesh using the
-        linear finite element method (assuming a closed mesh or Neumann boundary
-        condition).
+        The 2 sparse symmetric matrices are computed for a given triangle mesh
+        using the linear finite element method (assuming a closed mesh or
+        Neumann boundary condition).
 
         Parameters
         ----------
         tria : TriaMesh
             Triangle mesh.
-        u1 : array
-            Minimum curvature direction per triangle ((N, 3) floats).
-        u2 : array
-            Maximum curvature direction per triangle ((N, 3) floats).
-        aniso_mat : array
-            Anisotropy matrix. Diagonal elements in ``u1``, ``u2`` basis per triangle
-            ((N, 2) floats).
-        lump : bool
+        u1 : np.ndarray
+            Minimum curvature direction per triangle, shape (n_triangles, 3).
+        u2 : np.ndarray
+            Maximum curvature direction per triangle, shape (n_triangles, 3).
+        aniso_mat : np.ndarray
+            Anisotropy matrix. Diagonal elements in ``u1``, ``u2`` basis per
+            triangle, shape (n_triangles, 2).
+        lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
-
 
         Returns
         -------
-        A : csc_matrix of shape (n, n)
-            Sparse symmetric positive semi definite matrix.
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
+        A : scipy.sparse.csc_matrix
+            Sparse symmetric positive semi-definite stiffness matrix, shape (n, n).
+        B : scipy.sparse.csc_matrix
+            Sparse symmetric positive definite mass matrix, shape (n, n).
 
         Notes
         -----
         This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+
+        * Sparse generalized Eigenvalue problem: ``A x = lambda B x``
         * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
         * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
-        """  # noqa: E501
+
+        Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        """
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -282,33 +291,32 @@ class Solver:
         return a, b
 
     @staticmethod
-    def fem_tria_mass(tria: TriaMesh, lump: bool = False):
+    def fem_tria_mass(tria: TriaMesh, lump: bool = False) -> sparse.csc_matrix:
         """Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.
 
-        The sparse symmetric matrix is computed for a given triangle mesh using the
-        linear finite element method (assuming a closed mesh or Neumann boundary
-        condition).
-        This function is faster than the constructor above and can be used when only a
-        mass matrix is needed.
+        The sparse symmetric matrix is computed for a given triangle mesh using
+        the linear finite element method (assuming a closed mesh or Neumann
+        boundary condition). This function is faster than the constructor above
+        and can be used when only a mass matrix is needed.
 
         Parameters
         ----------
         tria : TriaMesh
             Triangle mesh.
-        lump : bool
+        lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
 
         Returns
         -------
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
+        scipy.sparse.csc_matrix
+            Sparse symmetric positive definite mass matrix ``B``, shape (n, n).
 
         Notes
         -----
-            This only returns the mass matrix ``B`` of the Eigenvalue problem:
-            ``A x = lambda B x``. The area of the surface mesh can be obtained via
-            ``B.sum()``.
-        """  # noqa: E501
+        This only returns the mass matrix ``B`` of the Eigenvalue problem:
+        ``A x = lambda B x``. The area of the surface mesh can be obtained
+        via ``B.sum()``.
+        """
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -347,34 +355,38 @@ class Solver:
         return b
 
     @staticmethod
-    def _fem_tetra(tetra: TetMesh, lump: bool = False):
-        r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a tetrahedral mesh.
+    def _fem_tetra(
+        tetra: TetMesh, lump: bool = False
+    ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
+        r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a tetrahedral mesh.
 
-        The 2 sparse symmetric matrices are computed for a given tetrahedral mesh using
-        the linear finite element method (Neumann boundary condition).
+        The 2 sparse symmetric matrices are computed for a given tetrahedral
+        mesh using the linear finite element method (Neumann boundary condition).
 
         Parameters
         ----------
         tetra : TetMesh
             Tetrahedral mesh.
-        lump : bool
+        lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
 
         Returns
         -------
-        A : csc_matrix of shape (n, n)
-            Sparse symmetric positive semi definite matrix.
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
+        A : scipy.sparse.csc_matrix
+            Sparse symmetric positive semi-definite stiffness matrix, shape (n, n).
+        B : scipy.sparse.csc_matrix
+            Sparse symmetric positive definite mass matrix, shape (n, n).
 
         Notes
         -----
         This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+
+        * Sparse generalized Eigenvalue problem: ``A x = lambda B x``
         * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
         * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
-        """  # noqa: E501
+
+        Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        """
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tetra.t[:, 0]
         t2 = tetra.t[:, 1]
@@ -494,34 +506,38 @@ class Solver:
         return a, b
 
     @staticmethod
-    def _fem_voxels(vox, lump: bool = False):  # computeABvoxels(v,t)
-        r"""Compute the 2 sparse symmetric matices of the Laplace-Beltrami operator for a voxel mesh.
+    def _fem_voxels(
+        vox, lump: bool = False
+    ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
+        r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a voxel mesh.
 
-        The 2 sparse symmetric matrices are computed for a given voxel mesh using the
-        linear finite element method (Neumann boundary condition).
+        The 2 sparse symmetric matrices are computed for a given voxel mesh
+        using the linear finite element method (Neumann boundary condition).
 
         Parameters
         ----------
-        vox : array
-            Voxel mesh.
-        lump : bool
+        vox : object
+            Voxel mesh object with vertices (v) and voxel indices (t).
+        lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
 
         Returns
         -------
-        A : csc_matrix of shape (n, n)
-            Sparse symmetric positive semi definite matrix.
-        B : csc_matrix of shape (n, n)
-            Sparse symmetric positive definite matrix.
+        A : scipy.sparse.csc_matrix
+            Sparse symmetric positive semi-definite stiffness matrix, shape (n, n).
+        B : scipy.sparse.csc_matrix
+            Sparse symmetric positive definite mass matrix, shape (n, n).
 
         Notes
         -----
         This static method can be used to solve:
-        * sparse generalized Eigenvalue problem: ``A x = lambda B x``
+
+        * Sparse generalized Eigenvalue problem: ``A x = lambda B x``
         * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
         * Laplace equation: ``A x = 0``
-        or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
-        """  # noqa: E501
+
+        Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
+        """
         # Inputs:   v - vertices : list of lists of 3 floats
         #           t - voxels   : list of lists of 8 int of indices (>=0) into v array
         #                          Ordering: base counter-clockwise, then top counter-
@@ -616,23 +632,26 @@ class Solver:
         b = sparse.csc_matrix((local_b, (i, j)))
         return a, b
 
-    def eigs(self, k: int = 10):
+    def eigs(self, k: int = 10) -> tuple[np.ndarray, np.ndarray]:
         """Compute the linear finite-element method Laplace-Beltrami spectrum.
 
         Parameters
         ----------
-        k : int
-            The number of eigenvalues and eigenvectors desired. ``k`` must be smaller
-            than ``N``. It is not possible to compute all eigenvectors of a matrix.
+        k : int, default=10
+            The number of eigenvalues and eigenvectors desired. ``k`` must be
+            smaller than ``N`` (number of vertices). It is not possible to
+            compute all eigenvectors of a matrix.
 
         Returns
         -------
-        eigenvalues : array of shape (k,)
-            Array of k eigenvalues. For closed meshes or Neumann boundary condition,
-            ``0`` will be the first eigenvalue (with constant eigenvector).
-        eigenvectors : array of shape (N, k)
-            Array representing the k eigenvectors. The column ``eigenvectors[:, i]`` is
-            the eigenvector corresponding to ``eigenvalues[i]``.
+        eigenvalues : np.ndarray
+            Array of k eigenvalues, shape (k,). For closed meshes or Neumann
+            boundary condition, ``0`` will be the first eigenvalue (with
+            constant eigenvector).
+        eigenvectors : np.ndarray
+            Array representing the k eigenvectors, shape (n_vertices, k).
+            The column ``eigenvectors[:, i]`` is the eigenvector corresponding
+            to ``eigenvalues[i]``.
         """
         from scipy.sparse.linalg import LinearOperator, eigsh
 
@@ -661,37 +680,52 @@ class Solver:
         )
         return eigenvalues, eigenvectors
 
-    def poisson(self, h=0.0, dtup=(), ntup=()):  # poissonSolver
-        """Solver for the poisson equation with boundary conditions.
+    def poisson(
+        self,
+        h: Union[float, np.ndarray] = 0.0,
+        dtup: tuple = (),
+        ntup: tuple = (),
+    ) -> np.ndarray:
+        """Solver for the Poisson equation with boundary conditions.
 
-        This solver is based on the ``A`` and ``B`` Laplace matrices where ``A x = B h``
-        and ``A`` is a sparse symmetric positive semi definitive matrix of shape
-        ``(n`, n)`` and B is a sparse symmetric positive definitive matrix of shape
-        ``(n, n)``.
+        This solver is based on the ``A`` and ``B`` Laplace matrices where
+        ``A x = B h`` and ``A`` is a sparse symmetric positive semi-definite
+        matrix of shape ``(n, n)`` and B is a sparse symmetric positive
+        definite matrix of shape ``(n, n)``.
 
         Parameters
         ----------
-        h : float | array
+        h : float or np.ndarray, default=0.0
             Right hand side, can be constant or array with vertex values.
-            The default ``0`` corresponds to Laplace equation ``A x = 0``.
-        dtup : tuple
-            Dirichlet boundary condition as a tuple containing the index and data arrays
-            of same length. The default, an empty tuple, corresponds to no Dirichlet
-            condition.
-        ntup : tuple
-            Neumann boundary condition as a tuple containing the index and data arrays
-            of same length. The default, an empty tuple, corresponds to Neumann on all
-            boundaries.
+            The default ``0.0`` corresponds to Laplace equation ``A x = 0``.
+        dtup : tuple, default=()
+            Dirichlet boundary condition as a tuple containing the index and
+            data arrays of same length. The default, an empty tuple,
+            corresponds to no Dirichlet condition.
+        ntup : tuple, default=()
+            Neumann boundary condition as a tuple containing the index and
+            data arrays of same length. The default, an empty tuple,
+            corresponds to Neumann on all boundaries.
 
         Returns
         -------
-        x : array
-            Array with vertex value of the solution.
+        np.ndarray
+            Array with vertex values of the solution, shape (n_vertices,).
+
+        Raises
+        ------
+        ValueError
+            If input matrices are not square or have different dimensions.
+            If h is not scalar or array matching matrix dimensions.
+            If dtup or ntup don't contain exactly 2 arrays.
+            If dtup indices are not unique.
+            If dtup or ntup arrays have mismatched lengths.
+            If matrix format is not CSC or CSR.
 
         Notes
         -----
-        ``A`` and ``B`` are obtained via ``computeAB`` for either triangle or tetraheral
-        mesh.
+        ``A`` and ``B`` are obtained via ``computeAB`` for either triangle
+        or tetrahedral mesh.
         """
         # check matrices
         dim = self.stiffness.shape[0]

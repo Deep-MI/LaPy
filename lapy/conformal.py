@@ -31,15 +31,57 @@ from .utils._imports import import_optional_dependency
 logger = logging.getLogger(__name__)
 
 def _ensure_planar_mesh(tria: TriaMesh, context: str) -> None:
+    """Ensure mesh is planar (all z-coordinates near zero).
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangle mesh to check.
+    context : str
+        Context string for error message.
+
+    Raises
+    ------
+    ValueError
+        If mesh is not planar (z-coordinate variation exceeds 0.001).
+    """
     if np.amax(tria.v[:, 2]) - np.amin(tria.v[:, 2]) > 0.001:
         logger.error("%s: Mesh should be on the complex plane.", context)
         raise ValueError("Mesh is not planar")
 
 def _ensure_nonzero(value: float, name: str) -> None:
+    """Ensure value is not close to zero.
+
+    Parameters
+    ----------
+    value : float
+        Value to check.
+    name : str
+        Name of the value for error message.
+
+    Raises
+    ------
+    ValueError
+        If value is close to zero (division by zero risk).
+    """
     if np.isclose(value, 0.0):
         raise ValueError(f"{name} is degenerate (division by zero)")
 
 def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:
+    """Ensure array contains no values close to zero.
+
+    Parameters
+    ----------
+    values : np.ndarray
+        Array to check.
+    name : str
+        Name of the array for error message.
+
+    Raises
+    ------
+    ValueError
+        If any value in array is close to zero.
+    """
     if np.any(np.isclose(values, 0.0)):
         raise ValueError(f"{name} contains zero entries and cannot be used as a denominator")
 
@@ -51,15 +93,23 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     tria : TriaMesh
         A triangular mesh object representing a genus-0 closed surface.
     use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+        Which solver to use. If True, use Cholesky decomposition from
+        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
 
     Returns
     -------
-    mapping: np.ndarray
-        Vertex coordinates as NumPy array of shape (n, 3) of the spherical conformal
+    np.ndarray
+        Vertex coordinates of shape (n_vertices, 3) of the spherical conformal
         parameterization.
+
+    Raises
+    ------
+    ValueError
+        If mesh is not genus-0 (Euler characteristic != 2).
+        If edge lengths are degenerate.
+        If projection contains NaN values.
+    ImportError
+        If use_cholmod is True but scikit-sparse is not installed.
     """
     # Ensure the input mesh has genus-0 topology
     if tria.euler() != 2:
@@ -203,9 +253,10 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     return mapping
 
 
-def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tuple[np.ndarray, Any]:
-    r"""
-    Find an improved Mobius transformation to reduce distortion.
+def mobius_area_correction_spherical(
+    tria: TriaMesh, mapping: np.ndarray
+) -> tuple[np.ndarray, Any]:
+    r"""Find an improved Mobius transformation to reduce distortion.
 
     This helps reducing the area distortion of
     a spherical conformal parameterization using the method in
@@ -216,17 +267,19 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
     tria : TriaMesh
         Genus-0 closed triangle mesh.
     mapping : np.ndarray
-        A NumPy array of shape (n, 3) representing vertex coordinates of a spherical conformal parameterization.
+        Vertex coordinates of shape (n_vertices, 3) representing a spherical conformal
+        parameterization.
 
     Returns
     -------
-    map_mobius: np.ndarray
-        A NumPy array of shape (n, 3) with vertex coordinates updated to minimize area distortion.
-    result: np.ndarray
-        Optimal parameters (x) for the Mobius transformation, where
+    map_mobius : np.ndarray
+        Vertex coordinates of shape (n_vertices, 3) updated to minimize area distortion.
+    result : object
+        Optimization result object containing optimal parameters (x) for the Mobius
+        transformation, where
 
         .. math::
-            f(z) = \frac{az+b}{cz+d} = \frac{(x(1)+x(2)*1j)*z+(x(3)+x(4)*1j)}{(x(5)+x(6)*1j)*z+(x(7)+x(8)*1j)}.
+            f(z) = \frac{az+b}{cz+d} = \frac{(x[0]+x[1]*1j)*z+(x[2]+x[3]*1j)}{(x[4]+x[5]*1j)*z+(x[6]+x[7]*1j)}.
     """  # noqa: E501
     # Compute normalized triangle areas
     area_t = tria.tria_areas()
@@ -290,8 +343,7 @@ def mobius_area_correction_spherical(tria: TriaMesh, mapping: np.ndarray) -> tup
 
 
 def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
-    """
-    Compute the Beltrami coefficient of a given mapping.
+    """Compute the Beltrami coefficient of a given mapping.
 
     The Beltrami coefficient is a complex-valued function that characterizes the
     distortion of a mapping in terms of conformality.
@@ -302,13 +354,18 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
         Genus-0 closed triangle mesh.
         Should be planar mapping on complex plane.
     mapping : np.ndarray
-        A numpy array of shape (n, 3) representing the coordinates of the spherical conformal
+        Vertex coordinates of shape (n_vertices, 3) representing the spherical conformal
         parameterization.
 
     Returns
     -------
-    mu : np.ndarray
-        Complex Beltrami coefficient per triangle.
+    np.ndarray
+        Complex Beltrami coefficient per triangle, shape (n_triangles,).
+
+    Raises
+    ------
+    ValueError
+        If mesh is not planar.
     """
     # Ensure the triangulation is planar
     _ensure_planar_mesh(tria, "Beltrami coefficient")
@@ -363,10 +420,9 @@ def linear_beltrami_solver(
         mu: np.ndarray,
         landmark: np.ndarray,
         target: np.ndarray,
-        use_cholmod=False
+        use_cholmod: bool = False
 ) -> np.ndarray:
-    """
-    Solve the Linear Beltrami equation for a given mesh and target.
+    """Solve the Linear Beltrami equation for a given mesh and target.
 
     Parameters
     ----------
@@ -374,22 +430,29 @@ def linear_beltrami_solver(
         Genus-0 closed triangle mesh.
         Should be planar mapping on complex plane.
     mu : np.ndarray
-        A numpy array containing Beltrami coefficients, describing distortion at each vertex.
+        Beltrami coefficients describing distortion at each triangle, shape (n_triangles,).
     landmark : np.ndarray
-        A numpy array of indices specifying the fixed landmark vertices.
+        Indices of fixed landmark vertices, shape (n_landmarks,).
     target : np.ndarray
-        A numpy array of shape (len(landmark), 2), specifying the 2D target positions
-            for the landmark vertices.
+        2D target positions for the landmark vertices, shape (n_landmarks, 2).
     use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Attempt to use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+        Which solver to use. If True, use Cholesky decomposition from
+        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
 
     Returns
     -------
-    mapping : np.ndarray
-        An array of shape (n, 2) representing the mapping of all vertices in the
-            triangulation to 2D coordinates, aligned to the given landmarks.
+    np.ndarray
+        Mapping of all vertices to 2D coordinates, shape (n_vertices, 2),
+        aligned to the given landmarks.
+
+    Raises
+    ------
+    ValueError
+        If mesh is not planar.
+        If triangle areas are degenerate.
+        If Beltrami denominator is close to zero.
+    ImportError
+        If use_cholmod is True but scikit-sparse is not installed.
     """
     # Ensure the triangulation is planar
     _ensure_planar_mesh(tria, "Linear Beltrami solver")
@@ -475,8 +538,7 @@ def _sparse_symmetric_solve(
         b: Union[np.ndarray, csr_matrix],
         use_cholmod: bool = False
 ) -> np.ndarray:
-    """
-    Solve a sparse symmetric linear system of equations Ax = b.
+    """Solve a sparse symmetric linear system of equations Ax = b.
 
     Depending on the availability of the `scikit-sparse` package, it uses either:
     - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
@@ -484,19 +546,23 @@ def _sparse_symmetric_solve(
 
     Parameters
     ----------
-    A : csc_matrix of shape (n, n)
-        The sparse, symmetric coefficient matrix (in CSR format).
-    b : (Union[np.ndarray, csr_matrix])
-        The right-hand-side vector or matrix.
+    A : csr_matrix
+        Sparse, symmetric coefficient matrix of shape (n, n) in CSR format.
+    b : np.ndarray or csr_matrix
+        Right-hand-side vector or matrix.
     use_cholmod : bool, default=False
-        Which solver to use:
-            * True : Attempt to use Cholesky decomposition from scikit-sparse cholmod.
-            * False: Use spsolve (LU decomposition).
+        Which solver to use. If True, use Cholesky decomposition from
+        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
 
     Returns
     -------
-    x: np.ndarray
-        The solution vector `x` for the system Ax = b.
+    np.ndarray
+        Solution vector x for the system Ax = b.
+
+    Raises
+    ------
+    ImportError
+        If use_cholmod is True but scikit-sparse is not installed.
     """
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
@@ -513,20 +579,22 @@ def _sparse_symmetric_solve(
 
 
 def stereographic(u: np.ndarray) -> np.ndarray:
-    """
-    Map points on a sphere to the complex plane using the stereographic projection.
+    """Map points on a sphere to the complex plane using the stereographic projection.
 
     Parameters
     ----------
     u : np.ndarray
-        A numpy array of shape (n, 3), where each row represents a point on the sphere
-        as (x, y, z) coordinates.
+        Points on the sphere as (x, y, z) coordinates, shape (n_points, 3).
 
     Returns
     -------
-    np.ndarray:
-        A numpy array of shape (n,) containing the mapped points as complex numbers
-        on the complex plane.
+    np.ndarray
+        Mapped points as complex numbers on the complex plane, shape (n_points,).
+
+    Raises
+    ------
+    ValueError
+        If stereographic denominator (1 - z) is close to zero.
     """
     # Map sphere to complex plane
     # u has three columns (x,y,z)
@@ -543,22 +611,19 @@ def stereographic(u: np.ndarray) -> np.ndarray:
 
 
 def inverse_stereographic(u: np.ndarray) -> np.ndarray:
-    """
-    Compute mapping from the complex plane to the sphere using the inverse stereographic projection.
+    """Compute mapping from the complex plane to the sphere using inverse stereographic projection.
 
     Parameters
     ----------
-    u : Union[np.ndarray, list[complex], list[tuple[float, float]]]
+    u : np.ndarray
         Input points in the complex plane. Can be:
-            - A numpy array of shape (n, 2), representing real and imaginary parts.
-            - A list of complex numbers.
-            - A list of tuples representing (real, imaginary) coordinates.
+        - Array of shape (n_points, 2), representing real and imaginary parts.
+        - Array of complex numbers of shape (n_points,).
 
     Returns
     -------
-    np.ndarray:
-        A numpy array of shape (n, 3) containing the mapped points on the sphere as
-        (x, y, z) coordinates.
+    np.ndarray
+        Mapped points on the sphere as (x, y, z) coordinates, shape (n_points, 3).
     """
     if np.iscomplexobj(u):
         x = u.real

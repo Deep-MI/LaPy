@@ -7,7 +7,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-def read_vfunc(filename):
+def read_vfunc(filename: str) -> list[float]:
     """Import vertex functions from txt file.
 
     Values can be separated by ``;`` or ``,`` and surrounded by ``{}`` or ``()``
@@ -21,8 +21,15 @@ def read_vfunc(filename):
 
     Returns
     -------
-    vals : array
+    list of float
         List of vfunc parameters.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
+    ValueError
+        If 'Solution:' marker is not found or no vertex function data exists.
     """
     import re
 
@@ -45,7 +52,7 @@ def read_vfunc(filename):
     return [float(x) for x in txt]
 
 
-def read_ev(filename):
+def read_ev(filename: str) -> dict:
     """Load EV file.
 
     Parameters
@@ -55,9 +62,15 @@ def read_ev(filename):
 
     Returns
     -------
-    d: dict
+    dict
         Dictionary of eigenvalues, eigenvectors (optional), and associated
-        information.
+        information. Contains keys like 'Eigenvalues' (np.ndarray), 'Eigenvectors'
+        (np.ndarray, optional), and metadata fields.
+
+    Raises
+    ------
+    OSError
+        If file is not readable.
     """
     # open file
     try:
@@ -169,7 +182,7 @@ def read_ev(filename):
     return d
 
 
-def write_ev(filename, d):
+def write_ev(filename: str, d: dict) -> None:
     """Save EV data structures as txt file (format from ShapeDNA).
 
     Parameters
@@ -178,18 +191,25 @@ def write_ev(filename, d):
         Filename to save to.
     d : dict
         Dictionary of eigenvalues, eigenvectors (optional), and associated
-        information.
+        information. Must contain key 'Eigenvalues' (np.ndarray). Optional keys
+        include 'Eigenvectors' (np.ndarray) and various metadata fields.
+
+    Raises
+    ------
+    OSError
+        If file is not writable.
+    ValueError
+        If 'Eigenvalues' key is missing from dictionary.
     """
     # open file
     try:
         f = open(filename, "w")
     except OSError:
-        print("[File " + filename + " not writable]")
-        return
+        logger.error("File %s not writable", filename)
+        raise
     # check data structure
     if "Eigenvalues" not in d:
-        print("ERROR: no Eigenvalues specified")
-        exit(1)
+        raise ValueError("ERROR: no Eigenvalues specified")
     # ...
     # Write
     if "Creator" in d:
@@ -263,8 +283,8 @@ def write_ev(filename, d):
     f.close()
 
 
-def write_vfunc(filename, vfunc):
-    """Save vertex in PSOL txt file.
+def write_vfunc(filename: str, vfunc: np.ndarray) -> None:
+    """Save vertex function in PSOL txt file.
 
     First line "Solution:", "," separated values inside ()
 
@@ -272,14 +292,19 @@ def write_vfunc(filename, vfunc):
     ----------
     filename : str
         Filename to save to.
-    vfunc : array_like
-        List of vfunc parameters.
+    vfunc : np.ndarray
+        Array of vfunc parameters, shape (n_vertices,).
+
+    Raises
+    ------
+    OSError
+        If file is not writable.
     """
     try:
         f = open(filename, "w")
     except OSError:
-        print("[File " + filename + " not writable]")
-        return
+        logger.error("File %s not writable", filename)
+        raise
     f.write("Solution:\n")
     f.write("(" + ",".join(vfunc.astype(str)) + ")")
     f.close()

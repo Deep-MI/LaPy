@@ -8,6 +8,8 @@ import sys
 
 import numpy as np
 from scipy import sparse
+
+
 class Polygon:
     """Class representing a polygon path (open or closed).
 

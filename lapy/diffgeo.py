@@ -9,13 +9,17 @@ tet and tria versions.
 
 import importlib
 import logging
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 from scipy import sparse
 
 from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
+
+if TYPE_CHECKING:
+    from .tet_mesh import TetMesh
+    from .tria_mesh import TriaMesh
 
 logger = logging.getLogger(__name__)
 

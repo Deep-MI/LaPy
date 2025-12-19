@@ -274,7 +274,8 @@ class Polygon:
         """Construct smoothing matrix for Laplacian smoothing.
 
         Creates a row-stochastic matrix where each point is connected to
-        its neighbors (previous and next point).
+        its neighbors (previous and next point). For open polygons, boundary
+        points (first and last) are kept fixed.
 
         Returns
         -------
@@ -288,16 +289,22 @@ class Polygon:
             i = np.arange(n)
             j_prev = np.roll(np.arange(n), 1)
             j_next = np.roll(np.arange(n), -1)
-        else:
-            # For open polygons, first and last points have only one neighbor
-            i = np.arange(n)
-            j_prev = np.clip(np.arange(n) - 1, 0, n - 1)
-            j_next = np.clip(np.arange(n) + 1, 0, n - 1)
 
-        # Create adjacency with neighbors
-        i_all = np.concatenate([i, i])
-        j_all = np.concatenate([j_prev, j_next])
-        data = np.ones(len(i_all))
+            # Create adjacency with neighbors
+            i_all = np.concatenate([i, i])
+            j_all = np.concatenate([j_prev, j_next])
+            data = np.ones(len(i_all))
+        else:
+            # For open polygons, first and last points stay fixed
+            # Interior points are connected to their neighbors
+            i_interior = np.arange(1, n - 1)
+            j_prev_interior = i_interior - 1
+            j_next_interior = i_interior + 1
+
+            # Create adjacency for interior points
+            i_all = np.concatenate([i_interior, i_interior])
+            j_all = np.concatenate([j_prev_interior, j_next_interior])
+            data = np.ones(len(i_all))
 
         adj = sparse.csc_matrix((data, (i_all, j_all)), shape=(n, n))
 
@@ -305,6 +312,11 @@ class Polygon:
         row_sum = np.array(adj.sum(axis=1)).ravel()
         row_sum[row_sum == 0] = 1.0  # Avoid division by zero
         adj = adj.multiply(1.0 / row_sum[:, np.newaxis])
+
+        # For open polygons, add identity for boundary points
+        if not self.closed:
+            adj[0, 0] = 1.0
+            adj[n - 1, n - 1] = 1.0
 
         return adj
 

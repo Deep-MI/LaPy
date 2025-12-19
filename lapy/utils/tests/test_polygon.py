@@ -35,7 +35,7 @@ class TestPolygonClass:
     def test_init_invalid_dimensions_raises(self):
         """Test that invalid dimensions raise ValueError."""
         with pytest.raises(ValueError, match="2 or 3 coordinates"):
-            Polygon(np.array([[0.0], [1.0]]))
+            Polygon(np.array([[0.0, 1.0, 2.0, 3.0]]))
 
     def test_length_open(self):
         """Test length computation for open polygon."""
@@ -220,6 +220,42 @@ class TestPolygonClass:
         result = poly.smooth_taubin(n=1, inplace=True)
 
         assert result is poly, "Should return self when inplace=True"
+
+    def test_smooth_two_point_open(self):
+        """Test smoothing on two-point open polygon."""
+        points = np.array([[0.0, 0.0], [1.0, 1.0]])
+        poly = Polygon(points, closed=False)
+        smoothed = poly.smooth_laplace(n=5, lambda_=0.5, inplace=False)
+
+        # Both points should remain unchanged (boundary points are fixed)
+        assert np.allclose(smoothed.get_points(), points), \
+            "Two-point open polygon should not change when smoothed"
+
+    def test_smooth_two_point_closed(self):
+        """Test smoothing on two-point closed polygon."""
+        points = np.array([[0.0, 0.0], [2.0, 2.0]])
+        poly = Polygon(points, closed=True)
+        smoothed = poly.smooth_laplace(n=5, lambda_=0.5, inplace=False)
+
+        # Points should converge to their midpoint
+        midpoint = np.mean(points, axis=0)
+        assert np.allclose(smoothed.get_points(), midpoint, atol=1e-10), \
+            "Two-point closed polygon should converge to midpoint"
+
+    def test_smooth_three_point_open(self):
+        """Test smoothing on three-point open polygon."""
+        points = np.array([[0.0, 0.0], [0.5, 2.0], [1.0, 0.0]])
+        poly = Polygon(points, closed=False)
+        smoothed = poly.smooth_laplace(n=5, lambda_=0.5, inplace=False)
+
+        # First and last points should remain fixed
+        assert np.allclose(smoothed.get_points()[0], points[0]), \
+            "First point should remain fixed in open polygon"
+        assert np.allclose(smoothed.get_points()[-1], points[-1]), \
+            "Last point should remain fixed in open polygon"
+        # Middle point should be smoothed (moved toward average of neighbors)
+        assert smoothed.get_points()[1, 1] < points[1, 1], \
+            "Middle point should be smoothed downward"
 
 
 if __name__ == "__main__":

@@ -4,15 +4,10 @@ This module provides a Polygon class for processing 2D and 3D polygon paths with
 various geometric operations including resampling, smoothing, and metric computations.
 """
 
-import logging
 import sys
 
 import numpy as np
 from scipy import sparse
-
-logger = logging.getLogger(__name__)
-
-
 class Polygon:
     """Class representing a polygon path (open or closed).
 
@@ -177,14 +172,14 @@ class Polygon:
         y_closed = np.append(y, y[0])
         # Shoelace formula components
         cross = x_closed[:-1] * y_closed[1:] - x_closed[1:] * y_closed[:-1]
-        area = 0.5 * np.abs(cross.sum())
+        signed_area = 0.5 * cross.sum()
 
-        if area < sys.float_info.epsilon:
-            # Degenerate case: zero area
+        if abs(signed_area) < sys.float_info.epsilon:
+            # Degenerate case: zero or near-zero area
             return np.mean(self.points, axis=0)
 
-        cx = np.sum((x_closed[:-1] + x_closed[1:]) * cross) / (6.0 * area)
-        cy = np.sum((y_closed[:-1] + y_closed[1:]) * cross) / (6.0 * area)
+        cx = np.sum((x_closed[:-1] + x_closed[1:]) * cross) / (6.0 * signed_area)
+        cy = np.sum((y_closed[:-1] + y_closed[1:]) * cross) / (6.0 * signed_area)
         return np.array([cx, cy])
 
     def area(self) -> float:
@@ -241,6 +236,10 @@ class Polygon:
         Polygon
             Resampled polygon. Returns self if inplace=True, new instance otherwise.
         """
+        if n_points < 2:
+            raise ValueError("n_points must be at least 2")
+        if n_iter < 1:
+            raise ValueError("n_iter must be at least 1")
         def _resample_once(p: np.ndarray, n: int, is_closed: bool) -> np.ndarray:
             """Single resampling pass."""
             if is_closed:
@@ -344,6 +343,11 @@ class Polygon:
         Polygon
             Smoothed polygon. Returns self if inplace=True, new instance otherwise.
         """
+        # Input validation to enforce documented parameter ranges
+        if not isinstance(n, int) or n <= 0:
+            raise ValueError(f"n must be a positive integer, got {n!r}")
+        if not (0.0 <= lambda_ <= 1.0):
+            raise ValueError(f"lambda_ must be in the range [0, 1], got {lambda_!r}")
         mat = self._construct_smoothing_matrix()
         points_smooth = self.points.copy()
 
@@ -386,6 +390,12 @@ class Polygon:
         Polygon
             Smoothed polygon. Returns self if inplace=True, new instance otherwise.
         """
+        if n <= 0:
+            raise ValueError("n must be a positive integer")
+        if lambda_ <= 0:
+            raise ValueError("lambda_ must be positive")
+        if mu >= 0:
+            raise ValueError("mu must be negative")
         mat = self._construct_smoothing_matrix()
         points_smooth = self.points.copy()
 

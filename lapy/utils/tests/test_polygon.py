@@ -173,9 +173,9 @@ class TestPolygonClass:
             "Should preserve number of points"
         # First and last points should remain unchanged for open polygon
         assert np.allclose(smoothed.get_points()[0], points[0]), \
-            "First point should not change much"
+            "First point should remain unchanged (up to numerical precision)"
         assert np.allclose(smoothed.get_points()[-1], points[-1]), \
-            "Last point should not change much"
+            "Last point should remain unchanged (up to numerical precision)"
 
     def test_smooth_laplace_closed(self):
         """Test Laplace smoothing on closed polygon."""

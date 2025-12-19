@@ -1,0 +1,11 @@
+﻿lapy.Polygon
+============
+
+.. currentmodule:: lapy
+
+.. autoclass:: Polygon
+   :members:
+   :inherited-members:
+
+.. minigallery:: lapy.Polygon
+    :add-heading:

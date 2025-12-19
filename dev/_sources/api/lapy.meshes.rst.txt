@@ -8,4 +8,4 @@ Geometries
 
     TriaMesh
     TetMesh
-    polygon
+    Polygon

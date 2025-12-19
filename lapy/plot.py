@@ -303,10 +303,6 @@ def plot_tet_mesh(
     caxis : list or tuple of float, default=None
         Sets the bound of the color domain as [lower_bound, upper_bound].
 
-    Returns
-    -------
-    None
-
     Raises
     ------
     ValueError
@@ -472,10 +468,6 @@ def plot_tria_mesh(
         Scale factor of image. >1.0 increase resolution; <1.0 decrease resolution.
     no_display : bool, default=False
         Whether to plot on display or not.
-
-    Returns
-    -------
-    None
 
     Raises
     ------

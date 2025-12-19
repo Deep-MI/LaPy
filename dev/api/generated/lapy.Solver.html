@@ -275,7 +275,7 @@
 <h1>lapy.Solver<a class="headerlink" href="#lapy-solver" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.Solver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L15-L791"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L15-L825"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver" title="Link to this definition">¶</a></dt>
 <dd><p>FEM solver for Laplace Eigenvalue and Poisson Equation.</p>
 <p>Inputs can be geometry classes which have vertices and elements.
 Currently <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> and <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a> are implemented.
@@ -317,7 +317,7 @@ If False, will use slower LU decomposition.</p>
 <td><p>Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Solver.poisson" title="lapy.Solver.poisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson</span></code></a>([h, dtup, ntup])</p></td>
-<td><p>Solver for the poisson equation with boundary conditions.</p></td>
+<td><p>Solver for the Poisson equation with boundary conditions.</p></td>
 </tr>
 </tbody>
 </table>
@@ -327,23 +327,26 @@ If False, will use slower LU decomposition.</p>
 external function that do not need stiffness.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.eigs">
-<span class="sig-name descname"><span class="pre">eigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L619-L662"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.eigs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L635-L681"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.eigs" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the linear finite-element method Laplace-Beltrami spectrum.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of eigenvalues and eigenvectors desired. <code class="docutils literal notranslate"><span class="pre">k</span></code> must be smaller
-than <code class="docutils literal notranslate"><span class="pre">N</span></code>. It is not possible to compute all eigenvectors of a matrix.</p>
+<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=10</span></dt><dd><p>The number of eigenvalues and eigenvectors desired. <code class="docutils literal notranslate"><span class="pre">k</span></code> must be
+smaller than <code class="docutils literal notranslate"><span class="pre">N</span></code> (number of vertices). It is not possible to
+compute all eigenvectors of a matrix.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (k,)</span></dt><dd><p>Array of k eigenvalues. For closed meshes or Neumann boundary condition,
-<code class="docutils literal notranslate"><span class="pre">0</span></code> will be the first eigenvalue (with constant eigenvector).</p>
+<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array of k eigenvalues, shape (k,). For closed meshes or Neumann
+boundary condition, <code class="docutils literal notranslate"><span class="pre">0</span></code> will be the first eigenvalue (with
+constant eigenvector).</p>
 </dd>
-<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> of shape (N, k)</span></dt><dd><p>Array representing the k eigenvectors. The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is
-the eigenvector corresponding to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</span></code>.</p>
+<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array representing the k eigenvectors, shape (n_vertices, k).
+The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is the eigenvector corresponding
+to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</span></code>.</p>
 </dd>
 </dl>
 </dd>
@@ -352,69 +355,79 @@ the eigenvector corresponding to <code class="docutils literal notranslate"><spa
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.fem_tria_mass">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fem_tria_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L284-L347"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.fem_tria_mass" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fem_tria_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L293-L355"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.fem_tria_mass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.</p>
-<p>The sparse symmetric matrix is computed for a given triangle mesh using the
-linear finite element method (assuming a closed mesh or Neumann boundary
-condition).
-This function is faster than the constructor above and can be used when only a
-mass matrix is needed.</p>
+<p>The sparse symmetric matrix is computed for a given triangle mesh using
+the linear finite element method (assuming a closed mesh or Neumann
+boundary condition). This function is faster than the constructor above
+and can be used when only a mass matrix is needed.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
+<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>B</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a> of shape (n, n)</span></dt><dd><p>Sparse symmetric positive definite matrix.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.sparse.csc_matrix</span></code></a></dt><dd><p>Sparse symmetric positive definite mass matrix <code class="docutils literal notranslate"><span class="pre">B</span></code>, shape (n, n).</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>This only returns the mass matrix <code class="docutils literal notranslate"><span class="pre">B</span></code> of the Eigenvalue problem:
-<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">lambda</span> <span class="pre">B</span> <span class="pre">x</span></code>. The area of the surface mesh can be obtained via
-<code class="docutils literal notranslate"><span class="pre">B.sum()</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">lambda</span> <span class="pre">B</span> <span class="pre">x</span></code>. The area of the surface mesh can be obtained
+via <code class="docutils literal notranslate"><span class="pre">B.sum()</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.poisson">
-<span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L664-L791"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.poisson" title="Link to this definition">¶</a></dt>
-<dd><p>Solver for the poisson equation with boundary conditions.</p>
-<p>This solver is based on the <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> Laplace matrices where <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">B</span> <span class="pre">h</span></code>
-and <code class="docutils literal notranslate"><span class="pre">A</span></code> is a sparse symmetric positive semi definitive matrix of shape
-<code class="docutils literal notranslate"><span class="pre">(n`,</span> <span class="pre">n)</span></code> and B is a sparse symmetric positive definitive matrix of shape
-<code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">n)</span></code>.</p>
+<span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L683-L825"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.poisson" title="Link to this definition">¶</a></dt>
+<dd><p>Solver for the Poisson equation with boundary conditions.</p>
+<p>This solver is based on the <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> Laplace matrices where
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">B</span> <span class="pre">h</span></code> and <code class="docutils literal notranslate"><span class="pre">A</span></code> is a sparse symmetric positive semi-definite
+matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">n)</span></code> and B is a sparse symmetric positive
+definite matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">n)</span></code>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Right hand side, can be constant or array with vertex values.
-The default <code class="docutils literal notranslate"><span class="pre">0</span></code> corresponds to Laplace equation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
+<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, default=0.0</span></dt><dd><p>Right hand side, can be constant or array with vertex values.
+The default <code class="docutils literal notranslate"><span class="pre">0.0</span></code> corresponds to Laplace equation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
 </dd>
-<dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a></span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and data arrays
-of same length. The default, an empty tuple, corresponds to no Dirichlet
-condition.</p>
+<dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and
+data arrays of same length. The default, an empty tuple,
+corresponds to no Dirichlet condition.</p>
 </dd>
-<dt><strong>ntup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a></span></dt><dd><p>Neumann boundary condition as a tuple containing the index and data arrays
-of same length. The default, an empty tuple, corresponds to Neumann on all
-boundaries.</p>
+<dt><strong>ntup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Neumann boundary condition as a tuple containing the index and
+data arrays of same length. The default, an empty tuple,
+corresponds to Neumann on all boundaries.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>x</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>Array with vertex value of the solution.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Array with vertex values of the solution, shape (n_vertices,).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If input matrices are not square or have different dimensions.
+If h is not scalar or array matching matrix dimensions.
+If dtup or ntup don’t contain exactly 2 arrays.
+If dtup indices are not unique.
+If dtup or ntup arrays have mismatched lengths.
+If matrix format is not CSC or CSR.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> are obtained via <code class="docutils literal notranslate"><span class="pre">computeAB</span></code> for either triangle or tetraheral
-mesh.</p>
+<p><code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> are obtained via <code class="docutils literal notranslate"><span class="pre">computeAB</span></code> for either triangle
+or tetrahedral mesh.</p>
 </dd></dl>
 
 </dd></dl>

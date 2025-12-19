@@ -276,67 +276,87 @@
 <p>Functions for computing and comparing Laplace spectra.</p>
 <p>Includes code for solving the anisotropic Laplace-Beltrami eigenvalue
 problem as well as functions for normalization and comparison of
-Laplace spectra.</p>
+Laplace spectra (shapeDNA descriptors).</p>
+<p>The shapeDNA is a descriptor based on the eigenvalues and eigenvectors
+of the Laplace-Beltrami operator and can be used for shape analysis
+and comparison.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.compute_distance">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L149-L170"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L253-L291"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the shape dissimilarity from two shapeDNA descriptors.</p>
+<p>Computes a distance metric between two sets of eigenvalues to quantify
+the dissimilarity between two shapes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>ev1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>First set of sorted eigenvalues.</p>
+<dt><strong>ev1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>First set of sorted eigenvalues, shape (k,).</p>
 </dd>
-<dt><strong>ev2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>Second set of sorted eigenvalues.</p>
+<dt><strong>ev2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Second set of sorted eigenvalues, shape (k,).</p>
 </dd>
-<dt><strong>dist</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Distance measure; currently only ‘euc’ (Euclidean).</p>
+<dt><strong>dist</strong><span class="classifier">{‘euc’}, default=’euc’</span></dt><dd><p>Distance measure. Currently only ‘euc’ (Euclidean) is implemented.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>*</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Distance between the eigenvalue arrays.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></dt><dd><p>Distance between the eigenvalue arrays.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If dist is not ‘euc’ (other distance metrics not yet implemented).</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The eigenvalue arrays should have the same length and be normalized and
+reweighted in the same way for meaningful comparison.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.compute_shapedna">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_shapedna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L34-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_shapedna" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_shapedna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L96-L166"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_shapedna" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the shapeDNA descriptor for triangle or tetrahedral meshes.</p>
+<p>The shapeDNA descriptor consists of the eigenvalues and eigenvectors of
+the Laplace-Beltrami operator and can be used for shape analysis and
+comparison.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
+<dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> | <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=50</span></dt><dd><p>Number of eigenfunctions / eigenvalues.</p>
+<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=50</span></dt><dd><p>Number of eigenvalues/eigenvectors to compute.</p>
 </dd>
-<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><dl class="simple">
-<dt>If True, lump the mass matrix (diagonal).</dt><dd><p>(See ‘lapy.Solver.Solver’ class).</p>
+<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, lump the mass matrix (diagonal). See <a class="reference internal" href="lapy.Solver.html#lapy.Solver" title="lapy.Solver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lapy.Solver</span></code></a> class.</p>
 </dd>
-</dl>
+<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,) | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Anisotropy for curvature-based anisotropic Laplace. See <a class="reference internal" href="lapy.Solver.html#lapy.Solver" title="lapy.Solver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lapy.Solver</span></code></a>
+class.</p>
 </dd>
-<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,)</span></dt><dd><dl class="simple">
-<dt>Anisotropy for curvature based anisotopic Laplace.</dt><dd><p>(See ‘lapy.Solver.Solver’ class).</p>
+<dt><strong>aniso_smooth</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=10</span></dt><dd><p>Number of smoothing iterations for curvature computation on vertices.
+See <a class="reference internal" href="lapy.Solver.html#lapy.Solver" title="lapy.Solver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lapy.Solver</span></code></a> class.</p>
 </dd>
-</dl>
-</dd>
-<dt><strong>aniso_smooth</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><dl class="simple">
-<dt>Number of smoothing iterations for curvature computation on vertices.</dt><dd><p>(See ‘lapy.Solver.Solver’ class).</p>
-</dd>
-</dl>
-</dd>
-<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a></span></dt><dd><p>If True, attempts to use the Cholesky decomposition for improved execution
-speed. Requires the <code class="docutils literal notranslate"><span class="pre">scikit-sparse</span></code> library. If it can not be found, an error
-will be thrown.
-If False, will use slower LU decomposition.</p>
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, attempts to use the Cholesky decomposition for improved
+execution speed. Requires the <code class="docutils literal notranslate"><span class="pre">scikit-sparse</span></code> library. If it cannot
+be found, an error will be thrown. If False, will use slower LU
+decomposition.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>ev</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>A dictionary, including ‘Eigenvalues’ and ‘Eigenvectors’ fields.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></dt><dd><p>A dictionary with the following keys:</p>
+<ul class="simple">
+<li><p>‘Refine’ : int - Refinement level (0)</p></li>
+<li><p>‘Degree’ : int - Polynomial degree (1)</p></li>
+<li><p>‘Dimension’ : int - Mesh dimension (2 for TriaMesh, 3 for TetMesh)</p></li>
+<li><p>‘Elements’ : int - Number of mesh elements</p></li>
+<li><p>‘DoF’ : int - Degrees of freedom (number of vertices)</p></li>
+<li><p>‘NumEW’ : int - Number of eigenvalues computed</p></li>
+<li><p>‘Eigenvalues’ : np.ndarray - Array of eigenvalues, shape (k,)</p></li>
+<li><p>‘Eigenvectors’ : np.ndarray - Array of eigenvectors, shape (n_vertices, k)</p></li>
+</ul>
 </dd>
 </dl>
 </dd>
@@ -345,24 +365,37 @@ If False, will use slower LU decomposition.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.normalize_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L90-L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
-<dd><p>Normalize a surface or a volume.</p>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L169-L222"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize eigenvalues for a surface or a volume.</p>
+<p>Normalizes eigenvalues to account for different mesh sizes and dimensions,
+enabling meaningful comparison between different shapes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>geom</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
+<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Set of sorted eigenvalues, shape (k,).</p>
 </dd>
-<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Either “surface”, “volume”, or “geometry”;
-“geometry” will perform surface normalization for
-2D objects, and volume normalization for 3D objects.</p>
+<dt><strong>method</strong><span class="classifier">{‘surface’, ‘volume’, ‘geometry’}, default=’geometry’</span></dt><dd><p>Normalization method:</p>
+<ul class="simple">
+<li><p>‘surface’: Normalize by surface area (for 2D surfaces)</p></li>
+<li><p>‘volume’: Normalize by enclosed volume (for 3D objects)</p></li>
+<li><p>‘geometry’: Automatically choose surface for TriaMesh, volume for TetMesh</p></li>
+</ul>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Vector of re-weighted eigenvalues, shape (k,).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If method is not one of ‘surface’, ‘volume’, or ‘geometry’.
+If geometry type is unsupported for the chosen normalization.
+If the measure (area/volume) is not positive.</p>
 </dd>
 </dl>
 </dd>
@@ -371,22 +404,28 @@ If False, will use slower LU decomposition.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.reweight_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L130-L146"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
-<dd><p>Apply linear re-weighting.</p>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L225-L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
+<dd><p>Apply linear re-weighting to eigenvalues.</p>
+<p>Divides each eigenvalue by its index to reduce the influence of higher
+eigenvalues, which tend to be less stable.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>Set of sorted eigenvalues.</p>
+<dt><strong>evals</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Set of sorted eigenvalues, shape (k,).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>evals: <a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></dt><dd><p>Vector of re-weighted eigenvalues.</p>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Vector of re-weighted eigenvalues, shape (k,). Each eigenvalue is
+divided by its 1-based index: <code class="docutils literal notranslate"><span class="pre">evals[i]</span> <span class="pre">/</span> <span class="pre">(i+1)</span></code>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>This reweighting scheme gives less importance to higher eigenvalues, which
+are typically more sensitive to discretization and numerical errors.</p>
 </dd></dl>
 
 </section>

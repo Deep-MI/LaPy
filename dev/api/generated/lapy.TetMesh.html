@@ -275,23 +275,39 @@
 <h1>lapy.TetMesh<a class="headerlink" href="#lapy-tetmesh" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.TetMesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TetMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L10-L315"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">TetMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L14-L344"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh" title="Link to this definition">¶</a></dt>
 <dd><p>Class representing a tetrahedral mesh.</p>
 <p>This is an efficient implementation of a tetrahedral mesh data structure
 with core functionality using sparse matrices internally (Scipy).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>v</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>List of lists of 3 float coordinates.</p>
+<dt><strong>v</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>List of lists of 3 float coordinates, shape (n_vertices, 3).</p>
 </dd>
-<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>List of lists of 4 int of indices (&gt;=0) into <code class="docutils literal notranslate"><span class="pre">v</span></code> array.
-Ordering is important: so that t0, t1, t2 are oriented
-counterclockwise when looking from above, and t3 is
+<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.3)"><span>array_like</span></a></span></dt><dd><p>List of lists of 4 int of indices (&gt;=0) into <code class="docutils literal notranslate"><span class="pre">v</span></code> array,
+shape (n_tetrahedra, 4). Ordering is important: so that t0, t1, t2
+are oriented counterclockwise when looking from above, and t3 is
 on top of that triangle.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Attributes</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>v</strong></p></td>
+<td><p>(np.ndarray) Vertex coordinates, shape (n_vertices, 3).</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>t</strong></p></td>
+<td><p>(np.ndarray) Tetrahedron vertex indices, shape (n_tetrahedra, 4).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>adj_sym</strong></p></td>
+<td><p>(scipy.sparse.csc_matrix) Symmetric adjacency matrix as csc sparse matrix.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Methods</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -329,13 +345,21 @@ on top of that triangle.</p>
 </tbody>
 </table>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If max index in t exceeds number of vertices.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
-<p>The class has static class methods to read tetrahera meshes from
+<p>The class has static class methods to read tetrahedra meshes from
 <a class="reference external" href="https://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format">GMSH</a>
 and <a class="reference external" href="https://examples.vtk.org/site/VTKFileFormats/">VTK</a> files.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.avg_edge_length">
-<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L165-L178"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.avg_edge_length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">avg_edge_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L182-L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.avg_edge_length" title="Link to this definition">¶</a></dt>
 <dd><p>Get average edge lengths in tet mesh.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -349,13 +373,13 @@ and <a class="reference external" href="https://examples.vtk.org/site/VTKFileFor
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.boundary_tria">
-<span class="sig-name descname"><span class="pre">boundary_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tetfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L180-L231"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.boundary_tria" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">boundary_tria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tetfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L197-L251"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.boundary_tria" title="Link to this definition">¶</a></dt>
 <dd><p>Get boundary triangle mesh of tetrahedra.</p>
-<p>It can have multiple connected components.
-Tria will have same vertices (including free vertices),
-so that the tria indices agree with the tet-mesh, in case we want to
-transfer information back, e.g. a FEM boundary condition, or to access
-a TetMesh vertex function with TriaMesh.t indices.</p>
+<p>It can have multiple connected components. Tria will have same vertices
+(including free vertices), so that the tria indices agree with the
+tet-mesh, in case we want to transfer information back, e.g. a FEM
+boundary condition, or to access a TetMesh vertex function with
+TriaMesh.t indices.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Note, that it seems to be returning non-oriented triangle meshes,
@@ -364,7 +388,7 @@ may need some debugging, until then use tria.orient_() after this.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>tetfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>List of tetra function values (optional).</p>
+<dt><strong>tetfunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>List of tetra function values, shape (n_tetrahedra,). Optional.</p>
 </dd>
 </dl>
 </dd>
@@ -372,7 +396,8 @@ may need some debugging, until then use tria.orient_() after this.</p>
 <dd class="field-even"><dl>
 <dt><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></dt><dd><p>TriaMesh of boundary (potentially &gt;1 components).</p>
 </dd>
-<dt><strong>triafunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>List of tria function values (only returned if <code class="docutils literal notranslate"><span class="pre">tetfunc</span></code> is provided).</p>
+<dt><strong>triafunc</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>List of tria function values, shape (n_boundary_triangles,).
+Only returned if <code class="docutils literal notranslate"><span class="pre">tetfunc</span></code> is provided.</p>
 </dd>
 </dl>
 </dd>
@@ -381,16 +406,15 @@ may need some debugging, until then use tria.orient_() after this.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.construct_adj_sym">
-<span class="sig-name descname"><span class="pre">construct_adj_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L85-L105"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.construct_adj_sym" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">construct_adj_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L103-L122"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.construct_adj_sym" title="Link to this definition">¶</a></dt>
 <dd><p>Create adjacency symmetric matrix.</p>
-<p>The adjacency matrix will be symmetric. Each inner
-edge will get the number of tetrahedra that contain this edge.
-Inner edges are usually 3 or larger, boundary, 2 or 1.
-Works on tetras only.</p>
-<dl class="field-list">
+<p>The adjacency matrix will be symmetric. Each inner edge will get the
+number of tetrahedra that contain this edge. Inner edges are usually
+3 or larger, boundary edges are 2 or 1. Works on tetras only.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>adj</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">csc_matrix</span></code></a></span></dt><dd><p>Symmetric adjacency matrix as csc sparse matrix.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix" title="(in SciPy v1.16.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.sparse.csc_matrix</span></code></a></dt><dd><p>Symmetric adjacency matrix as csc sparse matrix.</p>
 </dd>
 </dl>
 </dd>
@@ -399,13 +423,13 @@ Works on tetras only.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.has_free_vertices">
-<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L107-L119"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.has_free_vertices" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">has_free_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L124-L136"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.has_free_vertices" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the vertex list has more vertices than what is used in tetra.</p>
 <p>(same implementation as in <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a>)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p>Whether vertex list has more vertices than tetra or not.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p>Whether vertex list has more vertices than tetrahedra use or not.</p>
 </dd>
 </dl>
 </dd>
@@ -414,16 +438,16 @@ Works on tetras only.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.is_oriented">
-<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L121-L163"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.is_oriented" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_oriented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L138-L180"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.is_oriented" title="Link to this definition">¶</a></dt>
 <dd><p>Check if tet mesh is oriented.</p>
-<p>True if all tetrahedra are oriented
-so that v0,v1,v2 are oriented counterclockwise when looking from above,
-and v3 is on top of that triangle.</p>
+<p>True if all tetrahedra are oriented so that v0, v1, v2 are oriented
+counterclockwise when looking from above, and v3 is on top of that
+triangle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt>oriented: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p>True if all tet volumes are positive.
-False if some or all are negative.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p>True if all tet volumes are positive, False if some or all are
+negative.</p>
 </dd>
 </dl>
 </dd>
@@ -438,15 +462,20 @@ False if some or all are negative.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.orient_">
-<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L273-L315"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.orient_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">orient_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L298-L344"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.orient_" title="Link to this definition">¶</a></dt>
 <dd><p>Ensure that tet mesh is oriented.</p>
-<p>Re-orient tetras so that
-v0,v1,v2 are oriented counterclockwise when looking from above,
-and v3 is on top of that triangle.</p>
-<dl class="field-list">
+<p>Re-orient tetras so that v0, v1, v2 are oriented counterclockwise when
+looking from above, and v3 is on top of that triangle.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>onum</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of re-oriented tetras.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></dt><dd><p>Number of re-oriented tetras.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If degenerate (zero-volume) tetrahedra are detected.</p>
 </dd>
 </dl>
 </dd>
@@ -455,7 +484,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.read_gmsh">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_gmsh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L43-L57"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_gmsh" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_gmsh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L61-L75"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_gmsh" title="Link to this definition">¶</a></dt>
 <dd><p>Load GMSH tetrahedron mesh.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -465,8 +494,8 @@ and v3 is on top of that triangle.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Object of loaded GMSH tetrahedron mesh.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></dt><dd><p>Object of loaded GMSH tetrahedron mesh.</p>
 </dd>
 </dl>
 </dd>
@@ -475,7 +504,7 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.read_vtk">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L59-L73"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_vtk" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L77-L91"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.read_vtk" title="Link to this definition">¶</a></dt>
 <dd><p>Load VTK tetrahedron mesh.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -485,8 +514,8 @@ and v3 is on top of that triangle.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>tet</strong><span class="classifier"><a class="reference internal" href="#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Object of loaded VTK tetrahedron mesh.</p>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></dt><dd><p>Object of loaded VTK tetrahedron mesh.</p>
 </dd>
 </dl>
 </dd>
@@ -495,18 +524,24 @@ and v3 is on top of that triangle.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.rm_free_vertices_">
-<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L233-L271"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.rm_free_vertices_" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">rm_free_vertices_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L253-L296"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.rm_free_vertices_" title="Link to this definition">¶</a></dt>
 <dd><p>Remove unused (free) vertices from v and t.</p>
-<p>These are vertices that are not used in any triangle. They can produce problems
-when constructing, e.g., Laplace matrices.</p>
+<p>These are vertices that are not used in any tetrahedron. They can
+produce problems when constructing, e.g., Laplace matrices.</p>
 <p>Will update v and t in mesh.
 Same implementation as in <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a>.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt>vkeep: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Indices (from original list) of kept vertices.</p>
+<dd class="field-odd"><dl>
+<dt><strong>vkeep</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Indices (from original list) of kept vertices.</p>
 </dd>
-<dt>vdel: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>Indices of deleted (unused) vertices.</p>
+<dt><strong>vdel</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Indices of deleted (unused) vertices.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If max index in t exceeds number of vertices.</p>
 </dd>
 </dl>
 </dd>
@@ -515,7 +550,7 @@ Same implementation as in <a class="reference internal" href="lapy.TriaMesh.html
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.TetMesh.write_vtk">
-<span class="sig-name descname"><span class="pre">write_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L75-L83"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.write_vtk" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">write_vtk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/tet_mesh.py#L93-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.TetMesh.write_vtk" title="Link to this definition">¶</a></dt>
 <dd><p>Save as VTK file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

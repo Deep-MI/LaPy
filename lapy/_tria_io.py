@@ -3,7 +3,7 @@
 Should be called via the TriaMesh member functions.
 """
 
-from logging import getLogger
+import logging
 from typing import TYPE_CHECKING, Optional
 
 import numpy as np
@@ -11,7 +11,7 @@ import numpy as np
 if TYPE_CHECKING:
     from .tria_mesh import TriaMesh
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 def read_fssurf(filename: str) -> "TriaMesh":
     """Load triangle mesh from FreeSurfer surface geometry file.
@@ -262,7 +262,6 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
     LICENSE MIT
     https://github.com/nschloe/meshio
     """
-    import logging
     import struct
 
     import numpy

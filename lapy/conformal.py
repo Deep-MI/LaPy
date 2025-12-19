@@ -274,7 +274,7 @@ def mobius_area_correction_spherical(
     -------
     map_mobius : np.ndarray
         Vertex coordinates of shape (n_vertices, 3) updated to minimize area distortion.
-    result : OptimizeResult
+    result : object
         Optimization result object containing optimal parameters (x) for the Mobius
         transformation, where
 

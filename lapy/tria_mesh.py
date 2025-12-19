@@ -1801,8 +1801,11 @@ class TriaMesh:
             if n_points:
                 if get_edges:
                     raise ValueError("n_points cannot be combined with get_edges=True.")
-                path3d = polygon.resample(path3d, n_points, n_iter=3)
+                poly = polygon.Polygon(path3d, closed=False)
+                path3d = poly.resample(n_points=n_points, n_iter=3, inplace=False)
+                path3d = path3d.get_points()
             if get_edges:
                 return path3d, llength, edges_vidxs, edges_relpos
             else:
                 return path3d, llength
+

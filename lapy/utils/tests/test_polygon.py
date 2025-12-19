@@ -35,7 +35,7 @@ class TestPolygonClass:
     def test_init_invalid_dimensions_raises(self):
         """Test that invalid dimensions raise ValueError."""
         with pytest.raises(ValueError, match="2 or 3 coordinates"):
-            Polygon(np.array([[0.0], [1.0]]))
+            Polygon(np.array([[0.0, 1.0, 2.0, 3.0]]))
 
     def test_length_open(self):
         """Test length computation for open polygon."""

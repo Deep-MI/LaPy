@@ -4,10 +4,13 @@ This module provides a Polygon class for processing 2D and 3D polygon paths with
 various geometric operations including resampling, smoothing, and metric computations.
 """
 
+import logging
 import sys
 
 import numpy as np
 from scipy import sparse
+
+logger = logging.getLogger(__name__)
 
 
 class Polygon:

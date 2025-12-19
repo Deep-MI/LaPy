@@ -277,6 +277,17 @@ class Polygon:
         its neighbors (previous and next point). For open polygons, boundary
         points (first and last) are kept fixed.
 
+        The method handles polygons of any size:
+
+        - For open polygons with 2 points: Both boundary points remain fixed
+          (identity matrix), so smoothing has no effect.
+        - For open polygons with 3+ points: Boundary points are fixed, interior
+          points are averaged with their neighbors.
+        - For closed polygons with 2 points: Each point is averaged with its
+          neighbor, causing them to converge to their midpoint.
+        - For closed polygons with 3+ points: All points are averaged with
+          their neighbors in a circular manner.
+
         Returns
         -------
         scipy.sparse.csc_matrix

@@ -271,7 +271,7 @@ class Polygon:
             return Polygon(points_resampled, closed=self.closed)
 
     def _construct_smoothing_matrix(self) -> sparse.csc_matrix:
-        """Construct smoothing matrix for Laplacian smoothing.
+        """Construct smoothing matrix for Laplace smoothing.
 
         Creates a row-stochastic matrix where each point is connected to
         its neighbors (previous and next point). For open polygons, boundary
@@ -294,29 +294,28 @@ class Polygon:
             i_all = np.concatenate([i, i])
             j_all = np.concatenate([j_prev, j_next])
             data = np.ones(len(i_all))
+
+            adj = sparse.csc_matrix((data, (i_all, j_all)), shape=(n, n))
+
+            # Normalize rows to create stochastic matrix
+            row_sum = np.array(adj.sum(axis=1)).ravel()
+            row_sum[row_sum == 0] = 1.0  # Avoid division by zero
+            adj = adj.multiply(1.0 / row_sum[:, np.newaxis])
         else:
-            # For open polygons, first and last points stay fixed
-            # Interior points are connected to their neighbors
-            i_interior = np.arange(1, n - 1)
-            j_prev_interior = i_interior - 1
-            j_next_interior = i_interior + 1
+            # For open polygons, use LIL format for easier construction
+            adj = sparse.lil_matrix((n, n))
 
-            # Create adjacency for interior points
-            i_all = np.concatenate([i_interior, i_interior])
-            j_all = np.concatenate([j_prev_interior, j_next_interior])
-            data = np.ones(len(i_all))
-
-        adj = sparse.csc_matrix((data, (i_all, j_all)), shape=(n, n))
-
-        # Normalize rows to create stochastic matrix
-        row_sum = np.array(adj.sum(axis=1)).ravel()
-        row_sum[row_sum == 0] = 1.0  # Avoid division by zero
-        adj = adj.multiply(1.0 / row_sum[:, np.newaxis])
-
-        # For open polygons, add identity for boundary points
-        if not self.closed:
+            # Set identity for boundary points (they stay fixed)
             adj[0, 0] = 1.0
             adj[n - 1, n - 1] = 1.0
+
+            # For interior points, connect to neighbors
+            for i in range(1, n - 1):
+                adj[i, i - 1] = 0.5
+                adj[i, i + 1] = 0.5
+
+            # Convert to CSC for efficient operations
+            adj = adj.tocsc()
 
         return adj
 

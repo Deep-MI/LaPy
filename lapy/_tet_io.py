@@ -3,10 +3,14 @@
 Should be called via the TetMesh member functions.
 """
 
+from typing import TYPE_CHECKING, Optional
+
 import os.path
 
 import numpy as np
 
+if TYPE_CHECKING:
+    from .tet_mesh import TetMesh
 
 def read_gmsh(filename):
     """Load GMSH tetrahedron mesh.

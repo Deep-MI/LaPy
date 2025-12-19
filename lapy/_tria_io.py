@@ -4,11 +4,14 @@ Should be called via the TriaMesh member functions.
 """
 
 from logging import getLogger
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 
+if TYPE_CHECKING:
+    from .tria_mesh import TriaMesh
 
-def read_fssurf(filename):
+def read_fssurf(filename: str) -> "TriaMesh":
     """Load triangle mesh from FreeSurfer surface geometry file.
 
     Parameters
@@ -20,6 +23,11 @@ def read_fssurf(filename):
     -------
     TriaMesh
         Loaded triangle mesh.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
     """
     getLogger(__name__).debug("--> FS Surf format     ... ")
     try:
@@ -37,7 +45,7 @@ def read_fssurf(filename):
     return TriaMesh(surf[0], surf[1], fsinfo=surf[2])
 
 
-def read_off(filename):
+def read_off(filename: str) -> "TriaMesh":
     """Load triangle mesh from OFF txt file.
 
     Parameters
@@ -49,6 +57,13 @@ def read_off(filename):
     -------
     TriaMesh
         Loaded triangle mesh.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
+        If OFF keyword is not found.
+        If file does not contain triangle data.
     """
     getLogger(__name__).debug("--> OFF format         ... ")
     try:
@@ -93,7 +108,7 @@ def read_off(filename):
     return TriaMesh(v, t)
 
 
-def read_vtk(filename):
+def read_vtk(filename: str) -> "TriaMesh":
     """Load triangle mesh from VTK txt file.
 
     Parameters
@@ -105,6 +120,15 @@ def read_vtk(filename):
     -------
     TriaMesh
         Loaded triangle mesh.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
+        If ASCII keyword is not found.
+        If DATASET POLYDATA or DATASET UNSTRUCTURED_GRID is not found.
+        If POINTS keyword is malformed.
+        If file does not contain triangle data.
     """
     getLogger(__name__).debug("--> VTK format         ... ")
     try:
@@ -201,7 +225,7 @@ def read_vtk(filename):
     return TriaMesh(v, t)
 
 
-def read_gmsh(filename):
+def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
     """Load GMSH tetra mesh ASCII Format.
 
     Parameters
@@ -211,16 +235,23 @@ def read_gmsh(filename):
 
     Returns
     -------
-    points : array
-        List of points.
-    cells : array_like
-        List of cells.
-    point_data : array_like
-        Data of points.
-    cell_data : aray_like
-        Data of cells.
-    field_data : array_like
-        Data of fields.
+    points : np.ndarray
+        Array of point coordinates, shape (n_points, 3).
+    cells : dict
+        Dictionary mapping cell type strings to arrays of cell vertex indices.
+        Each array has shape (n_cells_of_type, n_vertices_per_cell).
+    point_data : dict
+        Dictionary of point data arrays.
+    cell_data : dict
+        Dictionary mapping cell type strings to dictionaries of data arrays.
+        Contains 'physical' and 'geometrical' tags where available.
+    field_data : dict
+        Dictionary mapping physical region names to their integer tags.
+
+    Raises
+    ------
+    OSError
+        If file is not found or not readable.
 
     Notes
     -----
@@ -463,7 +494,7 @@ def read_gmsh(filename):
     return points, cells, point_data, cell_data, field_data
 
 
-def write_vtk(tria, filename):
+def write_vtk(tria: "TriaMesh", filename: str) -> None:
     """Save VTK file.
 
     Parameters
@@ -472,6 +503,11 @@ def write_vtk(tria, filename):
         Triangle mesh to save.
     filename : str
         Filename to save to.
+
+    Raises
+    ------
+    OSError
+        If file is not writable.
     """
     # open file
     try:
@@ -497,7 +533,7 @@ def write_vtk(tria, filename):
     f.close()
 
 
-def write_fssurf(tria, filename, image=None):
+def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None) -> None:
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 
     Parameters
@@ -506,11 +542,18 @@ def write_fssurf(tria, filename, image=None):
         Triangle mesh to save.
     filename : str
         Filename to save to.
-    image : str, object, None
+    image : str, object, or None, default=None
         Path to image, nibabel image object, or image header. If specified, the vertices
         are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
         coordinates before saving. The expected order of coordinates is (x, y, z)
         matching the image voxel indices in nibabel.
+
+    Raises
+    ------
+    OSError
+        If file is not writable.
+    TypeError
+        If image header cannot be converted to provide get_vox2ras_tkr() method.
 
     Notes
     -----

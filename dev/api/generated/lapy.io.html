@@ -276,7 +276,7 @@
 <p>Functions to read and write spectra and vertex functions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.read_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L55-L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Load EV file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -304,7 +304,7 @@ information. Contains keys like ‘Eigenvalues’ (np.ndarray), ‘Eigenvectors�
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.read_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.read_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">read_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L10-L52"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.read_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Import vertex functions from txt file.</p>
 <p>Values can be separated by <code class="docutils literal notranslate"><span class="pre">;</span></code> or <code class="docutils literal notranslate"><span class="pre">,</span></code> and surrounded by <code class="docutils literal notranslate"><span class="pre">{}</span></code> or <code class="docutils literal notranslate"><span class="pre">()</span></code>
 brackets. Also first line can have the keyword “Solution:”, i.e. the PSOL format
@@ -335,7 +335,7 @@ from ShapeDNA.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.write_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L185-L283"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Save EV data structures as txt file (format from ShapeDNA).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -361,7 +361,7 @@ include ‘Eigenvectors’ (np.ndarray) and various metadata fields.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.io.write_vfunc">
-<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.io.write_vfunc" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.io.</span></span><span class="sig-name descname"><span class="pre">write_vfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/io.py#L286-L310"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.io.write_vfunc" title="Link to this definition">¶</a></dt>
 <dd><p>Save vertex function in PSOL txt file.</p>
 <p>First line “Solution:”, “,” separated values inside ()</p>
 <dl class="field-list">
@@ -461,7 +461,7 @@ include ‘Eigenvectors’ (np.ndarray) and various metadata fields.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=e0a75244"></script>
+</div><script src="../../_static/documentation_options.js?v=b1514d62"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

@@ -329,6 +329,24 @@ class TriaMesh:
         """
         return np.max(self.adj_sym.data) <= 2
 
+    def is_boundary(self) -> np.ndarray:
+        """Check which vertices are on the boundary.
+
+        Returns
+        -------
+        np.ndarray
+            Boolean array of shape (n_vertices,) where True indicates the vertex
+            is on a boundary edge (an edge that belongs to only one triangle).
+        """
+        # Boundary edges have value 1 in the symmetric adjacency matrix
+        boundary_edges = self.adj_sym == 1
+        # Get vertices that are part of any boundary edge
+        boundary_vertices = np.zeros(self.v.shape[0], dtype=bool)
+        rows, cols = boundary_edges.nonzero()
+        boundary_vertices[rows] = True
+        boundary_vertices[cols] = True
+        return boundary_vertices
+
     def is_oriented(self) -> bool:
         """Check if triangle mesh is oriented.
 
@@ -1014,6 +1032,112 @@ class TriaMesh:
         #   find orthogonal umin next?
         return tumin2, tumax2, tcmin, tcmax
 
+    def critical_points(self, vfunc: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Compute critical points (extrema and saddles) of a function on mesh vertices.
+
+        A minimum is a vertex where all neighbor values are larger.
+        A maximum is a vertex where all neighbor values are smaller.
+        A saddle is a vertex with at least two regions of neighbors with larger values,
+        and two with smaller values. Boundary vertices assume a virtual edge outside
+        the mesh that closes the boundary loop around the vertex.
+
+        Parameters
+        ----------
+        vfunc : np.ndarray
+            Real-valued function defined on mesh vertices, shape (n_vertices,).
+
+        Returns
+        -------
+        minima : np.ndarray
+            Array of vertex indices that are local minima, shape (n_minima,).
+        maxima : np.ndarray
+            Array of vertex indices that are local maxima, shape (n_maxima,).
+        saddles : np.ndarray
+            Array of vertex indices that are saddles (all orders), shape (n_saddles,).
+        saddle_orders : np.ndarray
+            Array of saddle orders for each saddle vertex (same length as saddles), shape (n_saddles,).
+            Order 2 = simple saddle (4 sign flips), order 3+ = higher-order saddles.
+
+        Notes
+        -----
+        The algorithm works by:
+        1. For each vertex, compute difference: neighbor_value - vertex_value
+        2. Minima: all differences are positive (all neighbors higher)
+        3. Maxima: all differences are negative (all neighbors lower)
+        4. Saddles: count sign flips across opposite edges in triangles at vertex
+           - Regular point: 2 sign flips
+           - Simple saddle (order 2): 4 sign flips
+           - Higher-order saddle (order n): 2n sign flips, order = n_flips / 2
+        5. Tie-breaker: when two vertices have equal function values, the vertex
+           with the higher vertex ID is treated as slightly larger to remove ambiguity.
+
+        The implementation is fully vectorized using sparse matrices and numpy operations.
+        """
+        vfunc = np.asarray(vfunc)
+        if len(vfunc) != self.v.shape[0]:
+            raise ValueError("vfunc length must match number of vertices")
+        n_vertices = self.v.shape[0]
+
+        # Use SYMMETRIC adjacency matrix to get ALL edges (including boundary edges in both directions)
+        # COMPUTE EDGE SIGNS ONCE for all neighbor relationships
+        rows, cols = self.adj_sym.nonzero()
+        edge_diffs = vfunc[cols] - vfunc[rows]
+        edge_signs = np.sign(edge_diffs)
+        # Tie-breaker: when function values are equal, vertex with higher ID is larger
+        zero_mask = edge_signs == 0
+        edge_signs[zero_mask] = np.sign(cols[zero_mask] - rows[zero_mask])
+        # Create sparse matrix of edge signs for O(1) lookup
+        edge_sign_matrix = sparse.csr_matrix(
+            (edge_signs, (rows, cols)),
+            shape=(n_vertices, n_vertices)
+        )
+
+        # CLASSIFY MINIMA AND MAXIMA
+        # Compute min and max edge sign per vertex (row-wise)
+        # Note: edge_sign_matrix only contains +1/-1 (never 0 due to tie-breaker)
+        # Implicit zeros in sparse matrix represent non-neighbors and can be ignored
+        min_signs = edge_sign_matrix.min(axis=1).toarray().flatten()
+        max_signs = edge_sign_matrix.max(axis=1).toarray().flatten()
+        # Minimum: all neighbor signs are positive (+1)
+        # If min in {0,1} and max=1, all actual neighbors are +1 (zeros are non-neighbors)
+        is_minimum = (min_signs > -1) & (max_signs == 1)
+        # Maximum: all neighbor signs are negative (-1)
+        # If min=-1 and max in {-1,0}, all actual neighbors are -1 (zeros are non-neighbors)
+        is_maximum = (min_signs == -1) & (max_signs < 1)
+        minima = np.where(is_minimum)[0]
+        maxima = np.where(is_maximum)[0]
+
+        # COUNT SIGN FLIPS at opposite edge for saddle detection
+        sign_flips = np.zeros(n_vertices, dtype=int)
+        t0 = self.t[:, 0]
+        t1 = self.t[:, 1]
+        t2 = self.t[:, 2]
+        # For vertex 0, opposite edge is (v1, v2)
+        sign0_1 = np.array(edge_sign_matrix[t0, t1]).flatten()
+        sign0_2 = np.array(edge_sign_matrix[t0, t2]).flatten()
+        sign1_2 = np.array(edge_sign_matrix[t1, t2]).flatten()
+        flip0 = (sign0_1 * sign0_2) < 0
+        np.add.at(sign_flips, t0[flip0], 1)
+        # For vertex 1, opposite edge is (v2, v0)
+        # sign(v1→v0) = -sign(v0→v1) = -sign0_1
+        flip1 = (sign1_2 * (-sign0_1)) < 0
+        np.add.at(sign_flips, t1[flip1], 1)
+        # For vertex 2, opposite edge is (v0, v1)
+        # sign(v2→v0) = -sign(v0→v2) = -sign0_2
+        # sign(v2→v1) = -sign(v1→v2) = -sign1_2
+        flip2 = (sign0_2 * sign1_2) < 0
+        np.add.at(sign_flips, t2[flip2], 1)
+
+        # CLASSIFY SADDLES
+        # Saddles have 4+ flips (regular points have 2, minima/maxima have 0)
+        # Boundary vertices can have 3 flips (or more) to be a saddle, assuming an additional flip outside
+        # Order = n_flips / 2
+        is_saddle = sign_flips >= 3
+        saddles = np.where(is_saddle)[0]
+        saddle_orders = (sign_flips[saddles] + 1) // 2
+
+        return minima, maxima, saddles, saddle_orders
+
     def normalize_(self) -> None:
         """Normalize TriaMesh to unit surface area and centroid at the origin.
 
@@ -1562,92 +1686,169 @@ class TriaMesh:
         edges: np.ndarray,
         start_idx: Optional[int] = None,
         get_edge_idx: bool = False,
-    ) -> Union[np.ndarray, tuple[np.ndarray, np.ndarray]]:
-        """Reduce undirected unsorted edges (index pairs) to path (index array).
+    ) -> Union[list, tuple[list, list]]:
+        """Reduce undirected unsorted edges to ordered path(s).
 
-        Converts an unordered list of edge pairs into an ordered path by finding
-        a traversal from one endpoint to the other.
+        Converts unordered edge pairs into ordered paths by finding traversals.
+        Handles single open paths, closed loops, and multiple disconnected components.
+        Always returns lists to handle multiple components uniformly.
 
         Parameters
         ----------
         edges : np.ndarray
             Array of shape (n, 2) with pairs of positive integer node indices
-            representing undirected edges. All indices from 0 to max(edges) must
-            be used and graph needs to be connected. Nodes cannot have more than
-            2 neighbors. Requires exactly two endnodes (nodes with only one
-            neighbor). For closed loops, cut it open by removing one edge before
-            passing to this function.
+            representing undirected edges. Node indices can have gaps (i.e., not all
+            indices from 0 to max need to appear in the edges). Only nodes that
+            actually appear in edges are processed.
         start_idx : int or None, default=None
-            Node with only one neighbor to start path. If None, the node with
-            the smaller index will be selected as start point.
+            Preferred start node. If None, selects an endpoint (degree 1) automatically,
+            or arbitrary node for closed loops. Must be a node that appears in edges.
         get_edge_idx : bool, default=False
-            If True, also return index of edge into edges for each path segment.
-            The returned edge index list has length n, while path has length n+1.
+            If True, also return edge indices for each path segment.
 
         Returns
         -------
-        path : np.ndarray
-            Array of length n+1 containing node indices as single path from start
-            to endpoint.
-        edge_idx : np.ndarray
-            Array of length n containing corresponding edge idx into edges for each
-            path segment. Only returned if get_edge_idx is True.
+        paths : list[np.ndarray]
+            List of ordered paths, one per connected component. For closed loops,
+            first node is repeated at end.
+        edge_idxs : list[np.ndarray]
+            List of edge index arrays, one per component. Only returned if
+            get_edge_idx=True.
 
         Raises
         ------
         ValueError
-            If graph does not have exactly two endpoints.
-            If start_idx is not one of the endpoints.
-            If graph is not connected.
+            If start_idx is invalid.
+            If graph has degree > 2 (branching or self-intersections).
         """
-        from scipy.sparse.csgraph import shortest_path
-
-        # Extract node indices and create a sparse adjacency matrix
         edges = np.array(edges)
+        if edges.shape[0] == 0:
+            return ([], []) if get_edge_idx else []
+
+        # Build adjacency matrix
         i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
         j = np.column_stack((edges[:, 1], edges[:, 0])).reshape(-1)
         dat = np.ones(i.shape)
         n = edges.max() + 1
         adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
-        # Find the degree of each node, sum over rows to get degree
         degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
-        endpoints = np.where(degrees == 1)[0]
-        if len(endpoints) != 2:
-            raise ValueError(
-                "The graph does not have exactly two endpoints; invalid input."
-            )
-        if not start_idx:
-            start_idx = endpoints[0]
-        else:
-            if not np.isin(start_idx, endpoints):
+
+        # Find connected components
+        n_comp, labels = sparse.csgraph.connected_components(adj_matrix, directed=False)
+
+        # Build edge index lookup matrix
+        edge_dat = np.arange(edges.shape[0]) + 1
+        edge_dat = np.column_stack((edge_dat, edge_dat)).reshape(-1)
+        eidx_matrix = sparse.csr_matrix((edge_dat, (i, j)), shape=(n, n))
+
+        paths = []
+        edge_idxs = []
+
+        for comp_id in range(n_comp):
+            comp_nodes = np.where(labels == comp_id)[0]
+            if len(comp_nodes) == 0:
+                continue
+
+            comp_degrees = degrees[comp_nodes]
+
+            # Skip isolated nodes (degree 0) that exist only due to matrix sizing.
+            # When edges use indices [0, 5, 10], we create a matrix of size 11x11.
+            # Indices [1,2,3,4,6,7,8,9] don't appear in any edges (have degree 0).
+            # connected_components treats each as a separate component, but they're
+            # not real nodes - just phantom entries from sizing matrix to max_index+1.
+            if np.all(comp_degrees == 0):
+                continue
+
+            # SAFETY CHECK: Reject graphs with nodes of degree > 2
+            # This single check catches all problematic cases:
+            # - Branching structures (Y-shape, star graph)
+            # - Self-intersections (figure-8, etc.)
+            # - Trees with multiple endpoints
+            # Valid graphs have only degree 1 (endpoints) and degree 2 (path nodes)
+            max_degree = comp_degrees.max()
+            if max_degree > 2:
+                high_degree_nodes = comp_nodes[comp_degrees > 2]
                 raise ValueError(
-                    f"start_idx {start_idx} must be one of the endpoints {endpoints}."
+                    f"Component {comp_id}: found {len(high_degree_nodes)} node(s) with degree > 2 "
+                    f"(max degree: {max_degree}). Degrees: {np.sort(comp_degrees)}. "
+                    f"This indicates branching or self-intersecting structure. "
+                    f"Only simple paths and simple closed loops are supported."
                 )
-        # Traverse the graph by computing shortest path
-        dist_matrix = shortest_path(
-            csgraph=adj_matrix,
-            directed=False,
-            indices=start_idx,
-            return_predecessors=False,
-        )
-        if np.isinf(dist_matrix).any():
-            raise ValueError(
-                "Ensure connected graph with indices from 0 to max_idx without gaps."
-            )
-        # sort indices according to distance form start
-        path = dist_matrix.argsort()
-        # get edge idx of each segment from original list
-        enum = edges.shape[0]
-        dat = np.arange(enum) + 1
-        dat = np.column_stack((dat, dat)).reshape(-1)
-        eidx_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
-        ei = path[0:-1]
-        ej = path[(np.arange(path.size - 1) + 1)]
-        eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
+
+            # Determine if closed loop: all nodes have degree 2
+            is_closed = np.all(comp_degrees == 2)
+
+            # For closed loops: break one edge to convert to open path
+            if is_closed:
+                # Pick start node
+                if start_idx is not None and start_idx in comp_nodes:
+                    start = start_idx
+                else:
+                    start = comp_nodes[0]
+
+                # Find neighbors of start node to break one edge
+                neighbors = adj_matrix[start, :].nonzero()[1]
+                neighbors_in_comp = [n for n in neighbors if n in comp_nodes]
+
+                if len(neighbors_in_comp) < 2:
+                    raise ValueError(f"Component {comp_id}: Closed loop node {start} should have 2 neighbors")
+
+                # Break the edge from start to first neighbor (temporarily)
+                adj_matrix = adj_matrix.tolil()
+                break_neighbor = neighbors_in_comp[0]
+                adj_matrix[start, break_neighbor] = 0
+                adj_matrix[break_neighbor, start] = 0
+                adj_matrix = adj_matrix.tocsr()
+
+                # Update degrees after breaking edge
+                degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
+                comp_degrees = degrees[comp_nodes]
+
+            # Now handle as open path (both originally open and converted closed loops)
+            endpoints = comp_nodes[comp_degrees == 1]
+
+            if len(endpoints) != 2:
+                raise ValueError(
+                    f"Component {comp_id}: Expected 2 endpoints after breaking loop, found {len(endpoints)}"
+                )
+
+            # Select start node
+            if is_closed:
+                # For closed loops, start is already selected above
+                pass
+            elif start_idx is not None and start_idx in endpoints:
+                start = start_idx
+            else:
+                # For originally open paths, pick first endpoint
+                start = endpoints[0]
+
+            # Use shortest_path to order nodes by distance from start
+            dist = sparse.csgraph.shortest_path(adj_matrix, indices=start, directed=False)
+
+            if np.isinf(dist[comp_nodes]).any():
+                raise ValueError(f"Component {comp_id} is not fully connected.")
+
+            # Sort nodes by distance from start
+            path = comp_nodes[dist[comp_nodes].argsort()]
+
+            # For closed loops: append start again to close the loop
+            if is_closed:
+                path = np.append(path, path[0])
+
+            paths.append(path)
+
+            # Get edge indices if requested
+            if get_edge_idx:
+                ei = path[:-1]
+                ej = path[1:]
+                eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
+                edge_idxs.append(eidx)
+
+        # Always return lists
         if get_edge_idx:
-            return path, eidx
+            return paths, edge_idxs
         else:
-            return path
+            return paths
 
 
     def level_path(
@@ -1766,15 +1967,31 @@ class TriaMesh:
         p2 = np.squeeze(p[edge_idxs[:, 1]])
         llength = np.sqrt(((p1 - p2) ** 2).sum(1)).sum()
         # compute path from unordered, not-directed edge list
-        # and return path as list of points, and path length
+        # __reduce_edges_to_path now returns lists (can have multiple components)
         if get_tria_idx:
-            path, edge_idx = TriaMesh.__reduce_edges_to_path(
-                edge_idxs, get_edge_idx=get_tria_idx
+            paths, edge_idxs_list = TriaMesh.__reduce_edges_to_path(
+                edge_idxs, get_edge_idx=True
             )
+            # level_path expects single component
+            if len(paths) != 1:
+                raise ValueError(
+                    f"Found {len(paths)} disconnected level curves. "
+                    f"Use extract_level_curves() for multiple components."
+                )
+            path = paths[0]
+            edge_idx = edge_idxs_list[0]
             # translate local edge id to global tria id
             tria_idx = t_idx[edge_idx]
         else:
-            path = TriaMesh.__reduce_edges_to_path(edge_idxs, get_tria_idx)
+            paths = TriaMesh.__reduce_edges_to_path(edge_idxs, get_edge_idx=False)
+            # level_path expects single component
+            if len(paths) != 1:
+                raise ValueError(
+                    f"Found {len(paths)} disconnected level curves. "
+                    f"Use extract_level_curves() for multiple components."
+                )
+            path = paths[0]
+
         # remove duplicate vertices (happens when levelset hits a vertex almost
         # perfectly)
         path3d = p[path, :]
@@ -1808,4 +2025,3 @@ class TriaMesh:
                 return path3d, llength, edges_vidxs, edges_relpos
             else:
                 return path3d, llength
-

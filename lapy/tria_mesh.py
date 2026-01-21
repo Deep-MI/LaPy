@@ -1065,13 +1065,11 @@ class TriaMesh:
         2. Minima: all differences are positive (all neighbors higher)
         3. Maxima: all differences are negative (all neighbors lower)
         4. Saddles: count sign flips across opposite edges in triangles at vertex
-           - Regular point: 2 sign flips
-           - Simple saddle (order 2): 4 sign flips
-           - Higher-order saddle (order n): 2n sign flips, order = n_flips / 2
+            - Regular point: 2 sign flips
+            - Simple saddle (order 2): 4 sign flips
+            - Higher-order saddle (order n): 2n sign flips, order = n_flips / 2
         5. Tie-breaker: when two vertices have equal function values, the vertex
-           with the higher vertex ID is treated as slightly larger to remove ambiguity.
-
-        The implementation is fully vectorized using sparse matrices and numpy operations.
+            with the higher vertex ID is treated as slightly larger to remove ambiguity.
         """
         vfunc = np.asarray(vfunc)
         if len(vfunc) != self.v.shape[0]:
@@ -1875,12 +1873,11 @@ class TriaMesh:
             List of Polygon objects, one for each connected level curve component.
             Each polygon has the following additional attributes:
             - points : np.ndarray of shape (n_points, 3) - 3D coordinates on level curve
-              (access via polygon.points or polygon.get_points())
             - closed : bool - whether the curve is closed
             - tria_idx : np.ndarray of shape (n_segments,) - triangle index for each segment
             - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for edge
             - edge_bary : np.ndarray of shape (n_points,) - barycentric coordinate [0,1]
-              along edge where level set intersects (0=first vertex, 1=second vertex)
+                along edge where level set intersects (0=first vertex, 1=second vertex)
 
         Raises
         ------
@@ -2022,7 +2019,7 @@ class TriaMesh:
             For closed loops, the first and last points are identical (duplicated)
             so you can detect closure via ``np.allclose(path[0], path[-1])``.
             For open paths, the path has two distinct endpoints.
-            This function is kept mainly for backward compatability.
+            This function is kept mainly for backward compatibility.
 
             **For more advanced use cases, consider using extract_level_paths() directly:**
 

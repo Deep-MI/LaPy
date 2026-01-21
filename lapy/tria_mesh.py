@@ -2023,7 +2023,7 @@ class TriaMesh:
 
             **For more advanced use cases, consider using extract_level_paths() directly:**
 
-            - Multiple disconnected components: extract_level_pathss returns all components
+            - Multiple disconnected components: extract_level_paths returns all components
             - Custom resampling: Get Polygon objects and use Polygon.resample() directly
             - Metadata analysis: Access triangle indices and edge information per component
             - Closed loop detection: Polygon objects have a ``closed`` attribute

@@ -1061,15 +1061,18 @@ class TriaMesh:
         Notes
         -----
         The algorithm works by:
+
         1. For each vertex, compute difference: neighbor_value - vertex_value
         2. Minima: all differences are positive (all neighbors higher)
         3. Maxima: all differences are negative (all neighbors lower)
         4. Saddles: count sign flips across opposite edges in triangles at vertex
-            - Regular point: 2 sign flips
-            - Simple saddle (order 2): 4 sign flips
-            - Higher-order saddle (order n): 2n sign flips, order = n_flips / 2
+
+           - Regular point: 2 sign flips
+           - Simple saddle (order 2): 4 sign flips
+           - Higher-order saddle (order n): 2n sign flips, order = n_flips / 2
+
         5. Tie-breaker: when two vertices have equal function values, the vertex
-            with the higher vertex ID is treated as slightly larger to remove ambiguity.
+           with the higher vertex ID is treated as slightly larger to remove ambiguity.
         """
         vfunc = np.asarray(vfunc)
         if len(vfunc) != self.v.shape[0]:
@@ -1872,12 +1875,13 @@ class TriaMesh:
         list[polygon.Polygon]
             List of Polygon objects, one for each connected level curve component.
             Each polygon has the following additional attributes:
+
             - points : np.ndarray of shape (n_points, 3) - 3D coordinates on level curve
             - closed : bool - whether the curve is closed
             - tria_idx : np.ndarray of shape (n_segments,) - triangle index for each segment
             - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for edge
             - edge_bary : np.ndarray of shape (n_points,) - barycentric coordinate [0,1]
-                along edge where level set intersects (0=first vertex, 1=second vertex)
+              along edge where level set intersects (0=first vertex, 1=second vertex)
 
         Raises
         ------

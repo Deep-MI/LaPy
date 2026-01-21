@@ -2149,6 +2149,8 @@ class TriaMesh:
             poly = polygon.Polygon(path3d, closed=curve.closed)
             path3d = poly.resample(n_points=n_points, n_iter=3, inplace=False)
             path3d = path3d.get_points()
+            if curve.closed:
+                path3d = np.vstack([path3d, path3d[0:1]])
 
         # Build return tuple based on options
         if get_tria_idx:

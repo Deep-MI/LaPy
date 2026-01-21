@@ -1850,6 +1850,152 @@ class TriaMesh:
         else:
             return paths
 
+    def extract_level_paths(
+        self,
+        vfunc: np.ndarray,
+        level: float,
+    ) -> list[polygon.Polygon]:
+        """Extract level set paths as Polygon objects with triangle/edge metadata.
+
+        For a given scalar function on mesh vertices, extracts all paths where
+        the function equals the specified level. Returns polygons with embedded
+        metadata about which triangles and edges were intersected.
+        Handles single open paths, closed loops, and multiple disconnected components.
+
+        Parameters
+        ----------
+        vfunc : np.ndarray
+            Scalar function values at vertices, shape (n_vertices,). Must be 1D.
+        level : float
+            Level set value to extract.
+
+        Returns
+        -------
+        list[polygon.Polygon]
+            List of Polygon objects, one for each connected level curve component.
+            Each polygon has the following additional attributes:
+            - points : np.ndarray of shape (n_points, 3) - 3D coordinates on level curve
+              (access via polygon.points or polygon.get_points())
+            - closed : bool - whether the curve is closed
+            - tria_idx : np.ndarray of shape (n_segments,) - triangle index for each segment
+            - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for edge
+            - edge_bary : np.ndarray of shape (n_points,) - barycentric coordinate [0,1]
+              along edge where level set intersects (0=first vertex, 1=second vertex)
+
+        Raises
+        ------
+        ValueError
+            If vfunc is not 1-dimensional.
+        """
+        if vfunc.ndim > 1:
+            raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
+
+        # Get intersecting triangles
+        intersect = vfunc[self.t] > level
+        t_idx = np.where(
+            np.logical_or(
+                np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2
+            )
+        )[0]
+
+        if t_idx.size == 0:
+            return []
+
+        # Reduce to triangles that intersect with level
+        t_level = self.t[t_idx, :]
+        intersect = intersect[t_idx, :]
+
+        # Invert triangles with two true values so single vertex is true
+        intersect[np.sum(intersect, axis=1) > 1, :] = np.logical_not(
+            intersect[np.sum(intersect, axis=1) > 1, :]
+        )
+
+        # Get index within triangle with single vertex
+        idx_single = np.argmax(intersect, axis=1)
+        idx_o1 = (idx_single + 1) % 3
+        idx_o2 = (idx_single + 2) % 3
+
+        # Get global indices
+        gidx0 = t_level[np.arange(t_level.shape[0]), idx_single]
+        gidx1 = t_level[np.arange(t_level.shape[0]), idx_o1]
+        gidx2 = t_level[np.arange(t_level.shape[0]), idx_o2]
+
+        # Sort edge indices (rows are triangles, cols are the two vertex ids)
+        # This creates unique edge identifiers
+        gg1 = np.sort(
+            np.concatenate((gidx0[:, np.newaxis], gidx1[:, np.newaxis]), axis=1)
+        )
+        gg2 = np.sort(
+            np.concatenate((gidx0[:, np.newaxis], gidx2[:, np.newaxis]), axis=1)
+        )
+
+        # Concatenate all edges and get unique ones
+        gg = np.concatenate((gg1, gg2), axis=0)
+        gg_unique = np.unique(gg, axis=0)
+
+        # Generate level set intersection points for unique edges
+        # Barycentric coordinate (0=first vertex, 1=second vertex)
+        xl = ((level - vfunc[gg_unique[:, 0]])
+              / (vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]))
+
+        # 3D points on unique edges
+        p = ((1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]]
+             + xl[:, np.newaxis] * self.v[gg_unique[:, 1]])
+
+        # Fill sparse matrix with new point indices (+1 to distinguish from zero)
+        a_mat = sparse.csc_matrix(
+            (np.arange(gg_unique.shape[0]) + 1, (gg_unique[:, 0], gg_unique[:, 1]))
+        )
+
+        # For each triangle, create edge pair via lookup in matrix
+        edge_idxs = (np.concatenate((a_mat[gg1[:, 0], gg1[:, 1]],
+                                      a_mat[gg2[:, 0], gg2[:, 1]]), axis=0).T - 1)
+
+        # Reduce edges to paths (returns list of paths for multiple components)
+        paths, path_edge_idxs = self._TriaMesh__reduce_edges_to_path(edge_idxs, get_edge_idx=True)
+
+        # Build polygon objects for each connected component
+        polygons = []
+        for path_nodes, path_edge_idx in zip(paths, path_edge_idxs):
+            # Get 3D coordinates for this path
+            poly_v = p[path_nodes, :]
+
+            # Remove duplicate vertices (when levelset hits a vertex almost perfectly)
+            dd = ((poly_v[0:-1, :] - poly_v[1:, :]) ** 2).sum(1)
+            dd = np.append(dd, 1)  # Never delete last node
+            eps = 0.000001
+            keep_ids = dd > eps
+            poly_v = poly_v[keep_ids, :]
+
+            # Get triangle indices for each edge
+            poly_tria_idx = t_idx[path_edge_idx[keep_ids[:-1]]]
+
+            # Get edge vertex indices
+            poly_edge_vidx = gg_unique[path_nodes[keep_ids], :]
+
+            # Get barycentric coordinates
+            poly_edge_bary = xl[path_nodes[keep_ids]]
+
+            # Create polygon with metadata
+            # Use closed=None to let Polygon auto-detect based on endpoints
+            # This will automatically remove duplicate endpoint if present
+            n_points_before = poly_v.shape[0]
+            poly = polygon.Polygon(poly_v, closed=None)
+            n_points_after = poly.points.shape[0]
+
+            # If Polygon removed duplicate endpoint, adjust metadata
+            if n_points_after < n_points_before:
+                # Remove last entry from metadata to match polygon points
+                poly_edge_vidx = poly_edge_vidx[:n_points_after]
+                poly_edge_bary = poly_edge_bary[:n_points_after]
+
+            poly.tria_idx = poly_tria_idx
+            poly.edge_vidx = poly_edge_vidx
+            poly.edge_bary = poly_edge_bary
+
+            polygons.append(poly)
+
+        return polygons
 
     def level_path(
         self,
@@ -1867,10 +2013,23 @@ class TriaMesh:
         The points are sorted and returned as an ordered array of 3D coordinates
         together with the length of the level set path.
 
+        This implementation uses extract_level_paths internally to compute the
+        level set, ensuring consistent handling of closed loops and metadata.
+
         .. note::
 
-            Only works for level sets that represent a single non-intersecting
-            path with exactly one start and one endpoint (e.g., not closed)!
+            Works for level sets that represent a single path or closed loop.
+            For closed loops, the first and last points are identical (duplicated)
+            so you can detect closure via ``np.allclose(path[0], path[-1])``.
+            For open paths, the path has two distinct endpoints.
+            This function is kept mainly for backward compatability.
+
+            **For more advanced use cases, consider using extract_level_paths() directly:**
+
+            - Multiple disconnected components: extract_level_pathss returns all components
+            - Custom resampling: Get Polygon objects and use Polygon.resample() directly
+            - Metadata analysis: Access triangle indices and edge information per component
+            - Closed loop detection: Polygon objects have a ``closed`` attribute
 
         Parameters
         ----------
@@ -1880,6 +2039,8 @@ class TriaMesh:
             Level set value to extract.
         get_tria_idx : bool, default=False
             If True, also return array of triangle indices for each path segment.
+            For closed loops with n points (including duplicate), returns n-1 triangle
+            indices. For open paths with n points, returns n-1 triangle indices.
         get_edges : bool, default=False
             If True, also return arrays of vertex indices (i,j) and relative
             positions for each 3D point along the intersecting edge.
@@ -1891,12 +2052,15 @@ class TriaMesh:
         -------
         path : np.ndarray
             Array of shape (n, 3) containing 3D coordinates of vertices on the
-            level path.
+            level path. For closed loops, the last point duplicates the first point,
+            so ``np.allclose(path[0], path[-1])`` will be True.
         length : float
-            Length of the level set.
+            Total length of the level set path. For closed loops, includes the
+            closing segment from last to first point.
         tria_idx : np.ndarray
             Array of triangle indices for each segment on the path, shape (n-1,)
-            if the path has length n. Only returned if get_tria_idx is True.
+            where n is the number of points (including duplicate for closed loops).
+            Only returned if get_tria_idx is True.
         edges_vidxs : np.ndarray
             Array of shape (n, 2) with vertex indices (i,j) for each 3D point,
             defining the vertices of the original mesh edge intersecting the
@@ -1912,116 +2076,90 @@ class TriaMesh:
         ------
         ValueError
             If vfunc is not 1-dimensional.
+            If multiple disconnected level paths are found (use extract_level_paths).
             If n_points is combined with get_tria_idx=True.
             If n_points is combined with get_edges=True.
-        """
-        if vfunc.ndim > 1:
-            raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
-        # get intersecting triangles
-        intersect = vfunc[self.t] > level
-        t_idx = np.where(
-            np.logical_or(
-                np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2
-            )
-        )[0]
-        # reduce to triangles that intersect with level:
-        t_level = self.t[t_idx, :]
-        intersect = intersect[t_idx, :]
-        # trias have one vertex on one side and two on the other side of the level set
-        # invert trias with two true values, so that single vertex is true
-        intersect[np.sum(intersect, axis=1) > 1, :] = np.logical_not(
-            intersect[np.sum(intersect, axis=1) > 1, :]
-        )
-        # get idx within tria with single vertex:
-        idx_single = np.argmax(intersect, axis=1)
-        idx_o1 = (idx_single + 1) % 3
-        idx_o2 = (idx_single + 2) % 3
-        # get global idx
-        gidx0 = t_level[np.arange(t_level.shape[0]), idx_single]
-        gidx1 = t_level[np.arange(t_level.shape[0]), idx_o1]
-        gidx2 = t_level[np.arange(t_level.shape[0]), idx_o2]
-        # sort edge indices (rows are trias, cols are the two vertex ids)
-        gg1 = np.sort(
-            np.concatenate((gidx0[:, np.newaxis], gidx1[:, np.newaxis]), axis=1)
-        )
-        gg2 = np.sort(
-            np.concatenate((gidx0[:, np.newaxis], gidx2[:, np.newaxis]), axis=1)
-        )
-        # concatenate all and get unique ones
-        gg = np.concatenate((gg1, gg2), axis=0)
-        gg_unique = np.unique(gg, axis=0)
-        # generate level set intersection points for unique edges
-        xl = ((level - vfunc[gg_unique[:, 0]])
-              / ( vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]))
-        p = ((1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]]
-             + xl[:, np.newaxis] * self.v[gg_unique[:, 1]])
-        # fill sparse matrix with new point indices (+1 to distinguish from zero)
-        a_mat = sparse.csc_matrix(
-            (np.arange(gg_unique.shape[0]) + 1, (gg_unique[:, 0], gg_unique[:, 1]))
-        )
-        # for each tria create one edge via lookup in matrix
-        edge_idxs = ( np.concatenate((a_mat[gg1[:, 0], gg1[:, 1]],
-                                      a_mat[gg2[:, 0], gg2[:, 1]]), axis=0).T - 1 )
-        # lengths computation
-        p1 = np.squeeze(p[edge_idxs[:, 0]])
-        p2 = np.squeeze(p[edge_idxs[:, 1]])
-        llength = np.sqrt(((p1 - p2) ** 2).sum(1)).sum()
-        # compute path from unordered, not-directed edge list
-        # __reduce_edges_to_path now returns lists (can have multiple components)
-        if get_tria_idx:
-            paths, edge_idxs_list = TriaMesh.__reduce_edges_to_path(
-                edge_idxs, get_edge_idx=True
-            )
-            # level_path expects single component
-            if len(paths) != 1:
-                raise ValueError(
-                    f"Found {len(paths)} disconnected level curves. "
-                    f"Use extract_level_curves() for multiple components."
-                )
-            path = paths[0]
-            edge_idx = edge_idxs_list[0]
-            # translate local edge id to global tria id
-            tria_idx = t_idx[edge_idx]
-        else:
-            paths = TriaMesh.__reduce_edges_to_path(edge_idxs, get_edge_idx=False)
-            # level_path expects single component
-            if len(paths) != 1:
-                raise ValueError(
-                    f"Found {len(paths)} disconnected level curves. "
-                    f"Use extract_level_curves() for multiple components."
-                )
-            path = paths[0]
 
-        # remove duplicate vertices (happens when levelset hits a vertex almost
-        # perfectly)
-        path3d = p[path, :]
-        dd = ((path3d[0:-1, :] - path3d[1:, :]) ** 2).sum(1)
-        # append 1 (never delete last node, if identical to the one before, we delete
-        # the one before)
-        dd = np.append(dd, 1)
-        eps = 0.000001
-        keep_ids = dd > eps
-        path3d = path3d[keep_ids, :]
-        edges_vidxs = gg_unique[path, :]
-        edges_vidxs = edges_vidxs[keep_ids, :]
-        edges_relpos = xl[path]
-        edges_relpos = edges_relpos[keep_ids]
-        if get_tria_idx:
-            if n_points:
+        See Also
+        --------
+        extract_level_paths : Extract multiple disconnected level paths as Polygon objects.
+            Recommended for advanced use cases with multiple components, custom resampling,
+            or when you need explicit closed/open information.
+
+        Examples
+        --------
+        >>> # Extract a simple level curve
+        >>> path, length = mesh.level_path(vfunc, 0.5)
+        >>> print(f"Path has {path.shape[0]} points, length {length:.2f}")
+
+        >>> # Check if the path is closed
+        >>> is_closed = np.allclose(path[0], path[-1])
+        >>> print(f"Path is closed: {is_closed}")
+
+        >>> # Get triangle indices for each segment
+        >>> path, length, tria_idx = mesh.level_path(vfunc, 0.5, get_tria_idx=True)
+
+        >>> # Get complete edge metadata
+        >>> path, length, edges, relpos = mesh.level_path(vfunc, 0.5, get_edges=True)
+
+        >>> # Resample to fixed number of points
+        >>> path, length = mesh.level_path(vfunc, 0.5, n_points=100)
+
+        >>> # For multiple components, use extract_level_paths instead
+        >>> curves = mesh.extract_level_paths(vfunc, 0.5)
+        >>> for i, curve in enumerate(curves):
+        >>>     print(f"Component {i}: {curve.points.shape[0]} points, closed={curve.closed}")
+        """
+        # Use extract_level_paths to get polygons
+        curves = self.extract_level_paths(vfunc, level)
+
+        # level_path expects single component
+        if len(curves) != 1:
+            raise ValueError(
+                f"Found {len(curves)} disconnected level curves. "
+                f"Use extract_level_paths() for multiple components."
+            )
+
+        # Get the single curve
+        curve = curves[0]
+
+        # Extract data from polygon
+        path3d = curve.points
+        edges_vidxs = curve.edge_vidx
+        edges_relpos = curve.edge_bary
+
+        # Compute length using polygon's length method
+        length = curve.length()
+
+        # For closed loops, duplicate the last point to match first point
+        # This allows users to detect closure via np.allclose(path[0], path[-1])
+        # and maintains backward compatibility with the original level_path behavior
+        if curve.closed:
+            path3d = np.vstack([path3d, path3d[0:1]])
+            edges_vidxs = np.vstack([edges_vidxs, edges_vidxs[0:1]])
+            edges_relpos = np.append(edges_relpos, edges_relpos[0])
+
+        # Handle optional resampling
+        if n_points:
+            if get_tria_idx:
                 raise ValueError("n_points cannot be combined with get_tria_idx=True.")
-            tria_idx = tria_idx[dd[:-1] > eps]
             if get_edges:
-                return path3d, llength, tria_idx, edges_vidxs, edges_relpos
+                raise ValueError("n_points cannot be combined with get_edges=True.")
+            poly = polygon.Polygon(path3d, closed=curve.closed)
+            path3d = poly.resample(n_points=n_points, n_iter=3, inplace=False)
+            path3d = path3d.get_points()
+
+        # Build return tuple based on options
+        if get_tria_idx:
+            tria_idx = curve.tria_idx
+            if get_edges:
+                return path3d, length, tria_idx, edges_vidxs, edges_relpos
             else:
-                return path3d, llength, tria_idx
+                return path3d, length, tria_idx
         else:
-            if n_points:
-                if get_edges:
-                    raise ValueError("n_points cannot be combined with get_edges=True.")
-                poly = polygon.Polygon(path3d, closed=False)
-                path3d = poly.resample(n_points=n_points, n_iter=3, inplace=False)
-                path3d = path3d.get_points()
             if get_edges:
-                return path3d, llength, edges_vidxs, edges_relpos
+                return path3d, length, edges_vidxs, edges_relpos
             else:
-                return path3d, llength
+                return path3d, length
+
+

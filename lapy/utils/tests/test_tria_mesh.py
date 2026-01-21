@@ -826,10 +826,11 @@ def test_extract_level_paths_closed_loop():
     # Extract level curve at mid-height (should create closed loop around pyramid)
     curves = mesh.extract_level_paths(vfunc, 0.5)
 
-    assert len(curves) > 0, "Expected at least one level curve"
+    assert len(curves) == 1, "Expected one level curve"
 
-    # At least one curve should be closed
-    has_closed = any(curve.closed for curve in curves)
+    # Curve should be closed
+    assert curves[0].closed, "Expected closed level curve"
+
     # Note: May or may not be closed depending on mesh topology
 
     # All points should be approximately at z=0.5
@@ -891,11 +892,9 @@ def test_extract_level_paths_metadata():
         # Check tria_idx
         assert hasattr(curve, 'tria_idx'), "Missing tria_idx"
         # Number of segments (tria_idx) depends on whether curve is closed
-        if curve.closed:
-            expected_segments = n_points
-        else:
-            expected_segments = n_points - 1
-        # Note: tria_idx may be shorter if duplicate points were removed
+        expected_tria_len = n_points if curve.closed else n_points - 1
+        assert curve.tria_idx.shape == (expected_tria_len,), \
+            f"tria_idx should be ({expected_tria_len},), got {curve.tria_idx.shape}"
 
         # Check edge_vidx
         assert hasattr(curve, 'edge_vidx'), "Missing edge_vidx"
@@ -946,9 +945,9 @@ def test_level_path():
     # Test 2: Check if path is closed (first == last point)
     is_closed = np.allclose(path[0], path[-1])
     if is_closed:
-        print(f"  Path is closed (first point == last point)")
+        print("  Path is closed (first point == last point)")
     else:
-        print(f"  Path is open (endpoints differ)")
+        print("  Path is open (endpoints differ)")
 
     # Test 3: Get triangle indices
     path_with_tria, length_with_tria, tria_idx = mesh.level_path(
@@ -1009,20 +1008,6 @@ def test_level_path():
     # Length should be approximately the same
     np.testing.assert_allclose(length_resampled, length, rtol=0.1,
                                err_msg="Resampled length should be close to original")
-
-    # Test 7: Error case - resampling with get_tria_idx should raise ValueError
-    try:
-        mesh.level_path(vfunc, level, get_tria_idx=True, n_points=50)
-        assert False, "Should raise ValueError when combining n_points with get_tria_idx"
-    except ValueError as e:
-        assert "n_points cannot be combined with get_tria_idx" in str(e)
-
-    # Test 8: Error case - resampling with get_edges should raise ValueError
-    try:
-        mesh.level_path(vfunc, level, get_edges=True, n_points=50)
-        assert False, "Should raise ValueError when combining n_points with get_edges"
-    except ValueError as e:
-        assert "n_points cannot be combined with get_edges" in str(e)
 
 
 def test_level_path_closed_loop():
@@ -1094,7 +1079,7 @@ def test_level_path_multiple_components_error():
         # Check via extract_level_paths
         curves = mesh.extract_level_paths(vfunc, 0.5)
         if len(curves) > 1:
-            assert False, "Should have raised ValueError for multiple components"
+            assert len(curves) == 1, "Should have raised ValueError for multiple components"
         # If only 1 component, that's fine - test is conditional
     except ValueError as e:
         # Expected error

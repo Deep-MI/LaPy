@@ -596,7 +596,28 @@ def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None
 
             v = apply_affine(header.get_vox2ras_tkr(), v)
 
-        write_geometry(filename, v, tria.t, volume_info=tria.fsinfo)
+            # create volume_info from header
+            affine = header.get_best_affine()
+            voxelsize = header.get_zooms()[:3]
+            Mdc = affine[:3, :3] / voxelsize
+            shape = header.get_data_shape()[:3]
+            cras = affine @ np.array([shape[0] / 2, shape[1] / 2, shape[2] / 2, 1])
+            volume_info = {
+                'head': np.array([2, 0, 20]), # array indicating volume info is present
+                'valid': '1',
+                'filename': 'unknown',
+                'volume': np.array(shape, dtype=int),
+                'voxelsize': np.array(voxelsize, dtype=float),
+                'xras': Mdc[:, 0],
+                'yras': Mdc[:, 1],
+                'zras': Mdc[:, 2],
+                'cras': cras[:3]
+            }
+        else:
+            volume_info = tria.fsinfo
+
+        write_geometry(filename, v, tria.t, volume_info=volume_info)
+
     except OSError:
         logger.error("[File %s not writable]", filename)
         raise

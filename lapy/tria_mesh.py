@@ -201,7 +201,12 @@ class TriaMesh:
         """
         io.write_vtk(self, filename)
 
-    def write_fssurf(self, filename: str, image: Optional[object] = None) -> None:
+    def write_fssurf(
+        self,
+        filename: str,
+        image: Optional[object] = None,
+        coords_are_voxels: Optional[bool] = None,
+    ) -> None:
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
 
         Parameters
@@ -209,17 +214,26 @@ class TriaMesh:
         filename : str
             Filename to save to.
         image : str, object, None
-            Path to image, nibabel image object, or image header. If specified, the vertices
-            are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
-            coordinates before saving. The expected order of coordinates is (x, y, z)
-            matching the image voxel indices in nibabel.
+            Path to image, nibabel image object, or image header. If specified, volume_info
+            will be extracted from the image header, and by default, vertices are assumed to
+            be in voxel coordinates and will be converted to surface RAS (tkr) before saving.
+            The expected order of coordinates is (x, y, z) matching the image voxel indices
+            in nibabel.
+        coords_are_voxels : bool or None, default=None
+            Specifies whether vertices are in voxel coordinates. If None (default), the
+            behavior is inferred: when image is provided, vertices are assumed to be in
+            voxel space and converted to surface RAS; when image is not provided, vertices
+            are assumed to already be in surface RAS. Set explicitly to True to force
+            conversion (requires image), or False to skip conversion even when image is
+            provided (only extracts volume_info).
 
         Raises
         ------
+        ValueError
+            If coords_are_voxels is explicitly True but image is None.
+            If image header cannot be processed.
         IOError
             If file cannot be written.
-        ValueError
-            If image header cannot be processed.
 
         Notes
         -----
@@ -227,7 +241,7 @@ class TriaMesh:
         ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
         Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
         """
-        io.write_fssurf(self, filename, image=image)
+        io.write_fssurf(self, filename, image=image, coords_are_voxels=coords_are_voxels)
 
     def _construct_adj_sym(self):
         """Construct symmetric adjacency matrix (edge graph) of triangle mesh.

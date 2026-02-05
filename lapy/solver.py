@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class Solver:
     """FEM solver for Laplace Eigenvalue and Poisson Equation.
 
-    Inputs can be geometry classes which have vertices and elements.
-    Currently `~lapy.TriaMesh` and `~lapy.TetMesh` are implemented.
+    Inputs can be geometry classes, which have vertices and elements.
+    Currently, `~lapy.TriaMesh` and `~lapy.TetMesh` are implemented.
     FEM matrices (stiffness (or A) and mass matrix (or B)) are computed
     during the construction. After that the Eigenvalue solver (`lapy.Solver.eigs`) or
     Poisson Solver (`lapy.Solver.poisson`) can be called.
@@ -28,11 +28,11 @@ class Solver:
     lump : bool
         If True, lump the mass matrix (diagonal).
     aniso : float | tuple of shape (2,)
-        Anisotropy for curvature based anisotopic Laplace.
+        Anisotropy for curvature-based anisotopic Laplace.
         If a tuple ``(a_min, a_max), differentially affects the minimum and maximum
         curvature directions. e.g. ``(0, 50)`` will set scaling to 1 into the minimum
-        curvature direction, even if the maximum curvature is large in those regions (
-        i.e. isotropic in regions with large maximum curvature and minimum curvature
+        curvature direction, even if the maximum curvature is large in those regions
+        (i.e. isotropic in regions with large maximum curvature and minimum curvature
         close to 0, i.e. a concave cylinder).
     aniso_smooth : int | None
         Number of smoothing iterations for curvature computation on vertices.
@@ -41,11 +41,15 @@ class Solver:
         speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
         will be thrown.
         If False, will use slower LU decomposition.
+    dtype : numpy.dtype, default=np.float64
+        Data type for the stiffness and mass matrices. Defaults to ``np.float64``
+        for numerical stability. Use ``np.float32`` explicitly if memory is constrained
+        and precision is less critical.
 
     Notes
     -----
     The class has a static member to create the mass matrix of `~lapy.TriaMesh` for
-    external function that do not need stiffness.
+    external functions that do not need stiffness.
     """
 
     def __init__(
@@ -55,12 +59,17 @@ class Solver:
         aniso: Optional[Union[float, tuple[float, float]]] = None,
         aniso_smooth: int = 10,
         use_cholmod: bool = False,
+        dtype: np.dtype = np.float64,
     ) -> None:
         if use_cholmod:
             self.sksparse = import_optional_dependency("sksparse", raise_error=True)
             importlib.import_module(".cholmod", self.sksparse.__name__)
         else:
             self.sksparse = None
+
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
+
         if type(geometry).__name__ == "TriaMesh":
             if aniso is not None:
                 # anisotropic Laplace
@@ -77,16 +86,16 @@ class Solver:
                 else:
                     aniso0 = aniso
                     aniso1 = aniso
-                aniso_mat = np.empty((geometry.t.shape[0], 2))
+                aniso_mat = np.empty((geometry.t.shape[0], 2), dtype=dtype)
                 aniso_mat[:, 1] = np.exp(-aniso1 * np.abs(c1))
                 aniso_mat[:, 0] = np.exp(-aniso0 * np.abs(c2))
-                a, b = self._fem_tria_aniso(geometry, u1, u2, aniso_mat, lump)
+                a, b = self._fem_tria_aniso(geometry, u1, u2, aniso_mat, lump, dtype)
             else:
                 logger.info("TriaMesh with regular Laplace-Beltrami")
-                a, b = self._fem_tria(geometry, lump)
+                a, b = self._fem_tria(geometry, lump, dtype)
         elif type(geometry).__name__ == "TetMesh":
             logger.info("TetMesh with regular Laplace")
-            a, b = self._fem_tetra(geometry, lump)
+            a, b = self._fem_tetra(geometry, lump, dtype)
         else:
             raise ValueError('Geometry type "' + type(geometry).__name__ + '" unknown')
         self.stiffness = a
@@ -96,7 +105,7 @@ class Solver:
 
     @staticmethod
     def _fem_tria(
-        tria: TriaMesh, lump: bool = False
+        tria: TriaMesh, lump: bool = False, dtype: np.dtype = np.float64
     ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
         r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a triangle mesh.
 
@@ -110,6 +119,8 @@ class Solver:
             Triangle mesh.
         lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
+        dtype : numpy.dtype, default=np.float64
+            Data type for the output matrices. Defaults to ``np.float64`` for numerical stability.
 
         Returns
         -------
@@ -123,12 +134,15 @@ class Solver:
         This static method can be used to solve:
 
         * Sparse generalized Eigenvalue problem: ``A x = lambda B x``
-        * Poisson equation: ``A x = B f`` (where f is function on mesh vertices)
+        * Poisson equation: ``A x = B f`` (where f is a function on mesh vertices)
         * Laplace equation: ``A x = 0``
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
         import sys
+
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
 
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
@@ -159,12 +173,12 @@ class Solver:
         # stack columns to assemble data
         local_a = np.column_stack(
             (a12, a12, a23, a23, a31, a31, a11, a22, a33)
-        ).reshape(-1)
+        ).reshape(-1).astype(dtype, copy=False)
         i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(-1)
         j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(-1)
         # Construct sparse matrix:
         # a = sparse.csr_matrix((local_a, (i, j)))
-        a = sparse.csc_matrix((local_a, (i, j)))
+        a = sparse.csc_matrix((local_a, (i, j)), dtype=dtype)
         # construct mass matrix (sparse or diagonal if lumped)
         if not lump:
             # create b matrix data (account for that vol is 4 times area)
@@ -172,14 +186,14 @@ class Solver:
             b_ij = vol / 48
             local_b = np.column_stack(
                 (b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)
-            ).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, j)))
+            ).reshape(-1).astype(dtype, copy=False)
+            b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         else:
             # when lumping put all onto diagonal  (area/3 for each vertex)
             b_ii = vol / 12
-            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1).astype(dtype, copy=False)
             i = np.column_stack((t1, t2, t3)).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, i)))
+            b = sparse.csc_matrix((local_b, (i, i)), dtype=dtype)
         return a, b
 
     @staticmethod
@@ -189,6 +203,7 @@ class Solver:
         u2: np.ndarray,
         aniso_mat: np.ndarray,
         lump: bool = False,
+        dtype: np.dtype = np.float64,
     ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
         r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a triangle mesh.
 
@@ -209,6 +224,8 @@ class Solver:
             triangle, shape (n_triangles, 2).
         lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
+        dtype : numpy.dtype, default=np.float64
+            Data type for the output matrices. Defaults to ``np.float64`` for numerical stability.
 
         Returns
         -------
@@ -227,6 +244,11 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
+        import sys
+
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
+
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -268,30 +290,30 @@ class Solver:
         # stack columns to assemble data
         local_a = np.column_stack(
             (a12, a12, a23, a23, a31, a31, a11, a22, a33)
-        ).reshape(-1)
+        ).reshape(-1).astype(dtype, copy=False)
         i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(-1)
         j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(-1)
         # Construct sparse matrix:
         # a = sparse.csr_matrix((local_a, (i, j)))
-        a = sparse.csc_matrix((local_a, (i, j)), dtype=np.float32)
+        a = sparse.csc_matrix((local_a, (i, j)), dtype=dtype)
         if not lump:
             # create b matrix data (account for that vol is 4 times area)
             b_ii = vol / 24
             b_ij = vol / 48
             local_b = np.column_stack(
                 (b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)
-            ).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, j)), dtype=np.float32)
+            ).reshape(-1).astype(dtype, copy=False)
+            b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         else:
             # when lumping put all onto diagonal  (area/3 for each vertex)
             b_ii = vol / 12
-            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1).astype(dtype, copy=False)
             i = np.column_stack((t1, t2, t3)).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, i)), dtype=np.float32)
+            b = sparse.csc_matrix((local_b, (i, i)), dtype=dtype)
         return a, b
 
     @staticmethod
-    def fem_tria_mass(tria: TriaMesh, lump: bool = False) -> sparse.csc_matrix:
+    def fem_tria_mass(tria: TriaMesh, lump: bool = False, dtype: np.dtype = np.float64) -> sparse.csc_matrix:
         """Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.
 
         The sparse symmetric matrix is computed for a given triangle mesh using
@@ -305,6 +327,8 @@ class Solver:
             Triangle mesh.
         lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
+        dtype : numpy.dtype, default=np.float64
+            Data type for the output matrix. Defaults to ``np.float64`` for numerical stability.
 
         Returns
         -------
@@ -317,6 +341,11 @@ class Solver:
         ``A x = lambda B x``. The area of the surface mesh can be obtained
         via ``B.sum()``.
         """
+        import sys
+
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
+
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tria.t[:, 0]
         t2 = tria.t[:, 1]
@@ -340,23 +369,23 @@ class Solver:
             b_ij = vol / 12
             local_b = np.column_stack(
                 (b_ij, b_ij, b_ij, b_ij, b_ij, b_ij, b_ii, b_ii, b_ii)
-            ).reshape(-1)
+            ).reshape(-1).astype(dtype, copy=False)
             # stack edge and diag coords for matrix indices
             i = np.column_stack((t1, t2, t2, t3, t3, t1, t1, t2, t3)).reshape(-1)
             j = np.column_stack((t2, t1, t3, t2, t1, t3, t1, t2, t3)).reshape(-1)
             # Construct sparse matrix:
-            b = sparse.csc_matrix((local_b, (i, j)))
+            b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         else:
             # when lumping put all onto diagonal
             b_ii = vol / 3
-            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1)
+            local_b = np.column_stack((b_ii, b_ii, b_ii)).reshape(-1).astype(dtype, copy=False)
             i = np.column_stack((t1, t2, t3)).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, i)))
+            b = sparse.csc_matrix((local_b, (i, i)), dtype=dtype)
         return b
 
     @staticmethod
     def _fem_tetra(
-        tetra: TetMesh, lump: bool = False
+        tetra: TetMesh, lump: bool = False, dtype: np.dtype = np.float64
     ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
         r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a tetrahedral mesh.
 
@@ -369,6 +398,8 @@ class Solver:
             Tetrahedral mesh.
         lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
+        dtype : numpy.dtype, default=np.float64
+            Data type for the output matrices. Defaults to ``np.float64`` for numerical stability.
 
         Returns
         -------
@@ -387,6 +418,11 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
+        import sys
+
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
+
         # Compute vertex coordinates and a difference vector for each triangle:
         t1 = tetra.t[:, 0]
         t2 = tetra.t[:, 1]
@@ -471,7 +507,7 @@ class Solver:
         local_a = local_a / 6.0
         # Construct sparse matrix:
         # a = sparse.csr_matrix((local_a, (i, j)))
-        a = sparse.csc_matrix((local_a, (i, j)))
+        a = sparse.csc_matrix((local_a.astype(dtype, copy=False), (i, j)), dtype=dtype)
         if not lump:
             # create b matrix data (account for that vol is 6 times tet volume)
             bii = vol / 60.0
@@ -495,19 +531,19 @@ class Solver:
                     bii,
                     bii,
                 )
-            ).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, j)))
+            ).reshape(-1).astype(dtype, copy=False)
+            b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         else:
             # when lumping put all onto diagonal (volume/4 for each vertex)
             bii = vol / 24.0
-            local_b = np.column_stack((bii, bii, bii, bii)).reshape(-1)
+            local_b = np.column_stack((bii, bii, bii, bii)).reshape(-1).astype(dtype, copy=False)
             i = np.column_stack((t1, t2, t3, t4)).reshape(-1)
-            b = sparse.csc_matrix((local_b, (i, i)))
+            b = sparse.csc_matrix((local_b, (i, i)), dtype=dtype)
         return a, b
 
     @staticmethod
     def _fem_voxels(
-        vox, lump: bool = False
+        vox, lump: bool = False, dtype: np.dtype = np.float64
     ) -> tuple[sparse.csc_matrix, sparse.csc_matrix]:
         r"""Compute the 2 sparse symmetric matrices of the Laplace-Beltrami operator for a voxel mesh.
 
@@ -520,6 +556,8 @@ class Solver:
             Voxel mesh object with vertices (v) and voxel indices (t).
         lump : bool, default=False
             If True, ``B`` should be lumped (diagonal).
+        dtype : numpy.dtype, default=np.float64
+            Data type for the output matrices. Defaults to ``np.float64`` for numerical stability.
 
         Returns
         -------
@@ -538,6 +576,9 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
+        # Ensure dtype is a numpy dtype object
+        dtype = np.dtype(dtype)
+
         # Inputs:   v - vertices : list of lists of 3 floats
         #           t - voxels   : list of lists of 8 int of indices (>=0) into v array
         #                          Ordering: base counter-clockwise, then top counter-
@@ -622,14 +663,14 @@ class Solver:
         else:
             local_b = tb * vol
         local_a = vol * (a0 * ta00 + a1 * ta11 + a2 * ta22)
-        local_b = np.repeat(local_b[np.newaxis, :, :], tnum, axis=0).reshape(-1)
-        local_a = np.repeat(local_a[np.newaxis, :, :], tnum, axis=0).reshape(-1)
+        local_b = np.repeat(local_b[np.newaxis, :, :], tnum, axis=0).reshape(-1).astype(dtype, copy=False)
+        local_a = np.repeat(local_a[np.newaxis, :, :], tnum, axis=0).reshape(-1).astype(dtype, copy=False)
         # Construct row and col indices.
         i = np.array([np.tile(x, (8, 1)) for x in vox.t]).reshape(-1)
         j = np.array([np.transpose(np.tile(x, (8, 1))) for x in vox.t]).reshape(-1)
         # Construct sparse matrix:
-        a = sparse.csc_matrix((local_a, (i, j)))
-        b = sparse.csc_matrix((local_b, (i, j)))
+        a = sparse.csc_matrix((local_a, (i, j)), dtype=dtype)
+        b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         return a, b
 
     def eigs(self, k: int = 10) -> tuple[np.ndarray, np.ndarray]:

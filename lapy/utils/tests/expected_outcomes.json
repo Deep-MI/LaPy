@@ -87,7 +87,7 @@
             "tolerance": 1e-4
         },
         "test_normalize_ev_geometry": {
-            "expected_normalized_values": [-0.00024099089, 25.017845, 25.022799],
+            "expected_normalized_values": [-2.50339562e-05, 2.50180884e+01, 2.50230140e+01],
             "tolerance": 1e-4
         },
         "test_reweight_ev": {

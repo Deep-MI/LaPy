@@ -275,10 +275,10 @@
 <h1>lapy.Solver<a class="headerlink" href="#lapy-solver" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.Solver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L15-L825"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso_smooth=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L15-L858"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver" title="Link to this definition">¶</a></dt>
 <dd><p>FEM solver for Laplace Eigenvalue and Poisson Equation.</p>
-<p>Inputs can be geometry classes which have vertices and elements.
-Currently <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> and <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a> are implemented.
+<p>Inputs can be geometry classes, which have vertices and elements.
+Currently, <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> and <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a> are implemented.
 FEM matrices (stiffness (or A) and mass matrix (or B)) are computed
 during the construction. After that the Eigenvalue solver (<a class="reference internal" href="#lapy.Solver.eigs" title="lapy.Solver.eigs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lapy.Solver.eigs</span></code></a>) or
 Poisson Solver (<a class="reference internal" href="#lapy.Solver.poisson" title="lapy.Solver.poisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lapy.Solver.poisson</span></code></a>) can be called.</p>
@@ -289,11 +289,11 @@ Poisson Solver (<a class="reference internal" href="#lapy.Solver.poisson" title=
 </dd>
 <dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p>If True, lump the mass matrix (diagonal).</p>
 </dd>
-<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,)</span></dt><dd><p>Anisotropy for curvature based anisotopic Laplace.
+<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,)</span></dt><dd><p>Anisotropy for curvature-based anisotopic Laplace.
 If a tuple <code class="docutils literal notranslate"><span class="pre">(a_min,</span> <span class="pre">a_max),</span> <span class="pre">differentially</span> <span class="pre">affects</span> <span class="pre">the</span> <span class="pre">minimum</span> <span class="pre">and</span> <span class="pre">maximum</span>
 <span class="pre">curvature</span> <span class="pre">directions.</span> <span class="pre">e.g.</span> <span class="pre">``(0,</span> <span class="pre">50)</span></code> will set scaling to 1 into the minimum
-curvature direction, even if the maximum curvature is large in those regions (
-i.e. isotropic in regions with large maximum curvature and minimum curvature
+curvature direction, even if the maximum curvature is large in those regions
+(i.e. isotropic in regions with large maximum curvature and minimum curvature
 close to 0, i.e. a concave cylinder).</p>
 </dd>
 <dt><strong>aniso_smooth</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Number of smoothing iterations for curvature computation on vertices.</p>
@@ -302,6 +302,10 @@ close to 0, i.e. a concave cylinder).</p>
 speed. Requires the <code class="docutils literal notranslate"><span class="pre">scikit-sparse</span></code> library. If it can not be found, an error
 will be thrown.
 If False, will use slower LU decomposition.</p>
+</dd>
+<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the stiffness and mass matrices. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>
+for numerical stability. Use <code class="docutils literal notranslate"><span class="pre">np.float32</span></code> explicitly if memory is constrained
+and precision is less critical.</p>
 </dd>
 </dl>
 </dd>
@@ -313,7 +317,7 @@ If False, will use slower LU decomposition.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Solver.eigs" title="lapy.Solver.eigs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eigs</span></code></a>([k])</p></td>
 <td><p>Compute the linear finite-element method Laplace-Beltrami spectrum.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Solver.fem_tria_mass" title="lapy.Solver.fem_tria_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fem_tria_mass</span></code></a>(tria[, lump])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Solver.fem_tria_mass" title="lapy.Solver.fem_tria_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fem_tria_mass</span></code></a>(tria[, lump, dtype])</p></td>
 <td><p>Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Solver.poisson" title="lapy.Solver.poisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson</span></code></a>([h, dtup, ntup])</p></td>
@@ -324,10 +328,10 @@ If False, will use slower LU decomposition.</p>
 </div>
 <p class="rubric">Notes</p>
 <p>The class has a static member to create the mass matrix of <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> for
-external function that do not need stiffness.</p>
+external functions that do not need stiffness.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.eigs">
-<span class="sig-name descname"><span class="pre">eigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L635-L681"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.eigs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L668-L714"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.eigs" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the linear finite-element method Laplace-Beltrami spectrum.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -355,7 +359,7 @@ to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.fem_tria_mass">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fem_tria_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L293-L355"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.fem_tria_mass" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fem_tria_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L311-L378"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.fem_tria_mass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the sparse symmetric mass matrix of the Laplace-Beltrami operator for a given triangle mesh.</p>
 <p>The sparse symmetric matrix is computed for a given triangle mesh using
 the linear finite element method (assuming a closed mesh or Neumann
@@ -367,6 +371,8 @@ and can be used when only a mass matrix is needed.</p>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
 <dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
+</dd>
+<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the output matrix. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> for numerical stability.</p>
 </dd>
 </dl>
 </dd>
@@ -385,7 +391,7 @@ via <code class="docutils literal notranslate"><span class="pre">B.sum()</span><
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Solver.poisson">
-<span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L683-L825"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.poisson" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/solver.py#L716-L858"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Solver.poisson" title="Link to this definition">¶</a></dt>
 <dd><p>Solver for the Poisson equation with boundary conditions.</p>
 <p>This solver is based on the <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> Laplace matrices where
 <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">B</span> <span class="pre">h</span></code> and <code class="docutils literal notranslate"><span class="pre">A</span></code> is a sparse symmetric positive semi-definite

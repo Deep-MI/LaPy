@@ -139,7 +139,6 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
-        import sys
 
         # Ensure dtype is a numpy dtype object
         dtype = np.dtype(dtype)
@@ -244,7 +243,6 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
-        import sys
 
         # Ensure dtype is a numpy dtype object
         dtype = np.dtype(dtype)
@@ -341,7 +339,6 @@ class Solver:
         ``A x = lambda B x``. The area of the surface mesh can be obtained
         via ``B.sum()``.
         """
-        import sys
 
         # Ensure dtype is a numpy dtype object
         dtype = np.dtype(dtype)
@@ -418,7 +415,6 @@ class Solver:
 
         Or to model the operator's action on a vector ``x``: ``y = B\(Ax)``.
         """
-        import sys
 
         # Ensure dtype is a numpy dtype object
         dtype = np.dtype(dtype)

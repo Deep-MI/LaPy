@@ -534,7 +534,12 @@ def write_vtk(tria: "TriaMesh", filename: str) -> None:
     f.close()
 
 
-def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None) -> None:
+def write_fssurf(
+    tria: "TriaMesh",
+    filename: str,
+    image: Optional[object] = None,
+    coords_are_voxels: Optional[bool] = None,
+) -> None:
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 
     Parameters
@@ -544,13 +549,23 @@ def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None
     filename : str
         Filename to save to.
     image : str, object, or None, default=None
-        Path to image, nibabel image object, or image header. If specified, the vertices
-        are assumed to be in voxel coordinates and are converted to surface RAS (tkr)
-        coordinates before saving. The expected order of coordinates is (x, y, z)
-        matching the image voxel indices in nibabel.
+        Path to image, nibabel image object, or image header. If specified, volume_info
+        will be extracted from the image header, and by default, vertices are assumed to
+        be in voxel coordinates and will be converted to surface RAS (tkr) before saving.
+        The expected order of coordinates is (x, y, z) matching the image voxel indices
+        in nibabel.
+    coords_are_voxels : bool or None, default=None
+        Specifies whether vertices are in voxel coordinates. If None (default), the
+        behavior is inferred: when image is provided, vertices are assumed to be in
+        voxel space and converted to surface RAS; when image is not provided, vertices
+        are assumed to already be in surface RAS. Set explicitly to True to force
+        conversion (requires image), or False to skip conversion even when image is
+        provided (only extracts volume_info).
 
     Raises
     ------
+    ValueError
+        If coords_are_voxels is explicitly True but image is None.
     OSError
         If file is not writable.
     TypeError
@@ -562,6 +577,17 @@ def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None
     ``get_vox2ras_tkr()`` (e.g., ``MGHHeader``). For other header types (NIfTI1/2,
     Analyze/SPM, etc.), we attempt conversion via ``MGHHeader.from_header``.
     """
+    # Infer coords_are_voxels if not explicitly set
+    if coords_are_voxels is None:
+        coords_are_voxels = image is not None
+
+    # Validate parameters
+    if coords_are_voxels and image is None:
+        raise ValueError(
+            "coords_are_voxels=True requires an image to be provided for voxel-to-surface-RAS "
+            "coordinate conversion. Either provide an image or set coords_are_voxels=False."
+        )
+
     # open file
     try:
         from nibabel.freesurfer.io import write_geometry
@@ -594,7 +620,9 @@ def write_fssurf(tria: "TriaMesh", filename: str, image: Optional[object] = None
                         "via MGHHeader.from_header)."
                     ) from e
 
-            v = apply_affine(header.get_vox2ras_tkr(), v)
+            # Convert from voxel to surface RAS coordinates if requested
+            if coords_are_voxels:
+                v = apply_affine(header.get_vox2ras_tkr(), v)
 
             # create volume_info from header
             affine = header.get_best_affine()

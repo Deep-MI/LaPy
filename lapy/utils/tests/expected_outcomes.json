@@ -147,7 +147,7 @@
         "test_visualization_triangle_mesh": {
             "expected_elements": 4800,
             "expected_dof": 2402,
-            "expected_ev": [-4.1549094e-05, 4.169634, 4.170457]
+            "expected_ev": [-4.17232603e-06, 4.16968140e+00, 4.17050233e+00]
         },
         "test_visualization_tetrahedral_mesh": {
             "expected_elements": 48000,

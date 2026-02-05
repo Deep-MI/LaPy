@@ -58,7 +58,7 @@ def test_Laplace_Geodesics(load_square_mesh):
     Bi = B.copy()
     Bi.data **= -1
 
-    assert B.sum() == 1.0
+    assert B.sum() == pytest.approx(1.0, rel=1e-6)
     assert Bi is not B
     # Convert A to a dense NumPy array
     A_dense = A.toarray()

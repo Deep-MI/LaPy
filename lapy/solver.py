@@ -665,7 +665,7 @@ class Solver:
         b = sparse.csc_matrix((local_b, (i, j)), dtype=dtype)
         return a, b
 
-    def eigs(self, k: int = 10) -> tuple[np.ndarray, np.ndarray]:
+    def eigs(self, k: int = 10, sigma: float = -0.01) -> tuple[np.ndarray, np.ndarray]:
         """Compute the linear finite-element method Laplace-Beltrami spectrum.
 
         Parameters
@@ -674,6 +674,10 @@ class Solver:
             The number of eigenvalues and eigenvectors desired. ``k`` must be
             smaller than ``N`` (number of vertices). It is not possible to
             compute all eigenvectors of a matrix.
+        sigma : float, default=-0.01
+            Shift value for the shift-invert mode. The solver finds eigenvalues
+            near sigma. Negative values work well for finding smallest eigenvalues.
+            Adjust if convergence issues occur (typically small negative).
 
         Returns
         -------
@@ -688,7 +692,6 @@ class Solver:
         """
         from scipy.sparse.linalg import LinearOperator, eigsh
 
-        sigma = -0.01
         if self.use_cholmod:
             logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
             chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
@@ -807,7 +810,7 @@ class Solver:
             ndat = ntup[1]
             if not (len(nidx) > 0 and len(nidx) == len(ndat)):
                 raise ValueError(
-                    "dtup should contain index and data arrays (same lengths > 0)"
+                    "ntup should contain index and data arrays (same lengths > 0)"
                 )
             nvec = sparse.csc_matrix(
                 (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1), dtype=dtype
@@ -830,7 +833,7 @@ class Solver:
                 a = a[mask, :]
                 a = a.tocsc()
             elif self.stiffness.getformat() == "csr":
-                a = self.stiffness[mask, :].tocrc()
+                a = self.stiffness[mask, :].tocsr()
                 a = a[:, mask]
             else:
                 raise ValueError("A matrix needs to be sparse CSC or CSR")

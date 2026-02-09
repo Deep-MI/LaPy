@@ -171,9 +171,9 @@ def normalize_ev(
     evals: np.ndarray,
     method: str = "geometry",
 ) -> np.ndarray:
-    """Normalize eigenvalues for a surface or a volume.
+    """Normalize eigenvalues for a 2D surface or a 3D solid.
 
-    Normalizes eigenvalues to account for different mesh sizes and dimensions,
+    Normalizes eigenvalues to unit surface area or unit volume,
     enabling meaningful comparison between different shapes.
 
     Parameters
@@ -185,8 +185,8 @@ def normalize_ev(
     method : {'surface', 'volume', 'geometry'}, default='geometry'
         Normalization method:
 
-        - 'surface': Normalize by surface area (for 2D surfaces)
-        - 'volume': Normalize by enclosed volume (for 3D objects)
+        - 'surface': Normalize to unit surface area
+        - 'volume': Normalize to unit volume
         - 'geometry': Automatically choose surface for TriaMesh, volume for TetMesh
 
     Returns
@@ -197,13 +197,18 @@ def normalize_ev(
     Raises
     ------
     ValueError
-        If method is not one of 'surface', 'volume', or 'geometry'.
-        If geometry type is unsupported for the chosen normalization.
-        If the measure (area/volume) is not positive.
+        If the method is not one of 'surface', 'volume', or 'geometry'.
+        If the geometry type is unsupported for the chosen normalization.
+        If method=volume and the volume of a surface is not defined.
+
+    Notes
+    -----
+    For TriaMesh with 'volume' method, the mesh must be closed and oriented
+    to compute a valid enclosed volume.
     """
     geom_type = type(geom).__name__
     if method == "surface":
-        return evals * _surface_measure(geom) ** (2.0 / 2.0)
+        return evals * _surface_measure(geom)
 
     if method == "volume":
         if geom_type == "TriaMesh":
@@ -214,7 +219,7 @@ def normalize_ev(
 
     if method == "geometry":
         if geom_type == "TriaMesh":
-            return evals * _surface_measure(geom) ** (2.0 / 2.0)
+            return evals * _surface_measure(geom)
         if geom_type == "TetMesh":
             return evals * _boundary_volume(geom) ** (2.0 / 3.0)
         raise ValueError("Unsupported geometry type for geometry normalization")

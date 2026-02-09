@@ -442,12 +442,13 @@ class Polygon:
         Polygon
             Smoothed polygon. Returns self if inplace=True, new instance otherwise.
         """
-        if n <= 0:
-            raise ValueError("n must be a positive integer")
+        # Input validation to enforce documented parameter ranges
+        if not isinstance(n, int) or n <= 0:
+            raise ValueError(f"n must be a positive integer, got {n!r}")
         if lambda_ <= 0:
-            raise ValueError("lambda_ must be positive")
+            raise ValueError(f"lambda_ must be positive, got {lambda_!r}")
         if mu >= 0:
-            raise ValueError("mu must be negative")
+            raise ValueError(f"mu must be negative, got {mu!r}")
         mat = self._construct_smoothing_matrix()
         points_smooth = self.points.copy()
 

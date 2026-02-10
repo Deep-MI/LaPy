@@ -4,7 +4,7 @@ Should be called via the TriaMesh member functions.
 """
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -537,8 +537,8 @@ def write_vtk(tria: "TriaMesh", filename: str) -> None:
 def write_fssurf(
     tria: "TriaMesh",
     filename: str,
-    image: Optional[object] = None,
-    coords_are_voxels: Optional[bool] = None,
+    image: object | None = None,
+    coords_are_voxels: bool | None = None,
 ) -> None:
     """Save Freesurfer Surface Geometry file (wrap Nibabel).
 

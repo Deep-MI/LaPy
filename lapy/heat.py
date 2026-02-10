@@ -6,7 +6,6 @@ mesh geometries (tet or tria mesh) for heat diffusion.
 
 import importlib
 import logging
-from typing import Optional, Union
 
 import numpy as np
 
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def diagonal(
-    t: Union[float, np.ndarray],
+    t: float | np.ndarray,
     x: np.ndarray,
     evecs: np.ndarray,
     evals: np.ndarray,
@@ -60,7 +59,7 @@ def diagonal(
 
 
 def kernel(
-    t: Union[float, np.ndarray],
+    t: float | np.ndarray,
     vfix: int,
     evecs: np.ndarray,
     evals: np.ndarray,
@@ -112,9 +111,9 @@ def kernel(
 
 def diffusion(
     geometry: object,
-    vids: Union[int, np.ndarray],
+    vids: int | np.ndarray,
     m: float = 1.0,
-    aniso: Optional[int] = None,
+    aniso: int | None = None,
     use_cholmod: bool = False,
 ) -> np.ndarray:
     """Compute the heat diffusion from initial vertices in vids.

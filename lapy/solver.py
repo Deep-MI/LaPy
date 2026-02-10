@@ -1,7 +1,6 @@
 import importlib
 import logging
 import sys
-from typing import Optional, Union
 
 import numpy as np
 from scipy import sparse
@@ -54,9 +53,9 @@ class Solver:
 
     def __init__(
         self,
-        geometry: Union[TriaMesh, TetMesh],
+        geometry: TriaMesh | TetMesh,
         lump: bool = False,
-        aniso: Optional[Union[float, tuple[float, float]]] = None,
+        aniso: float | tuple[float, float] | None = None,
         aniso_smooth: int = 10,
         use_cholmod: bool = False,
         dtype: np.dtype = np.float64,
@@ -718,7 +717,7 @@ class Solver:
 
     def poisson(
         self,
-        h: Union[float, np.ndarray] = 0.0,
+        h: float | np.ndarray = 0.0,
         dtup: tuple = (),
         ntup: tuple = (),
     ) -> np.ndarray:

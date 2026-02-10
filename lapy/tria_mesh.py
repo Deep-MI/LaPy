@@ -1,7 +1,6 @@
 import logging
 import sys
 import warnings
-from typing import Optional, Union
 
 import numpy as np
 from scipy import sparse
@@ -204,8 +203,8 @@ class TriaMesh:
     def write_fssurf(
         self,
         filename: str,
-        image: Optional[object] = None,
-        coords_are_voxels: Optional[bool] = None,
+        image: object | None = None,
+        coords_are_voxels: bool | None = None,
     ) -> None:
         """Save as Freesurfer Surface Geometry file (wrap Nibabel).
 
@@ -711,7 +710,7 @@ class TriaMesh:
 
     def keep_largest_connected_component_(
         self, clean: bool = True
-    ) -> tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         """Keep only the largest connected component of the mesh.
 
         Modifies the mesh in-place.
@@ -1512,10 +1511,10 @@ class TriaMesh:
 
     def smooth_laplace(
         self,
-        vfunc: Optional[np.ndarray] = None,
+        vfunc: np.ndarray | None = None,
         n: int = 1,
         lambda_: float = 0.5,
-        mat: Optional[sparse.csc_matrix] = None,
+        mat: sparse.csc_matrix | None = None,
     ) -> np.ndarray:
         """Smooth the mesh or a vertex function using Laplace smoothing.
 
@@ -1559,7 +1558,7 @@ class TriaMesh:
 
     def smooth_taubin(
         self,
-        vfunc: Optional[np.ndarray] = None,
+        vfunc: np.ndarray | None = None,
         n: int = 1,
         lambda_: float = 0.5,
         mu: float = -0.53,
@@ -1622,7 +1621,7 @@ class TriaMesh:
         self.v = vfunc
         return
 
-    def level_length(self, vfunc: np.ndarray, level: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def level_length(self, vfunc: np.ndarray, level: float | np.ndarray) -> float | np.ndarray:
         """Compute the length of level sets.
 
         For a scalar function defined on mesh vertices, computes the total length
@@ -1699,9 +1698,9 @@ class TriaMesh:
     @staticmethod
     def __reduce_edges_to_path(
         edges: np.ndarray,
-        start_idx: Optional[int] = None,
+        start_idx: int | None = None,
         get_edge_idx: bool = False,
-    ) -> Union[list, tuple[list, list]]:
+    ) -> list | tuple[list, list]:
         """Reduce undirected unsorted edges to ordered path(s).
 
         Converts unordered edge pairs into ordered paths by finding traversals.
@@ -1971,7 +1970,7 @@ class TriaMesh:
 
         # Build polygon objects for each connected component
         polygons = []
-        for path_nodes, path_edge_idx in zip(paths, path_edge_idxs):
+        for path_nodes, path_edge_idx in zip(paths, path_edge_idxs, strict=True):
             # Get 3D coordinates for this path
             poly_v = p[path_nodes, :]
 
@@ -2018,7 +2017,7 @@ class TriaMesh:
         level: float,
         get_tria_idx: bool = False,
         get_edges: bool = False,
-        n_points: Optional[int] = None,
+        n_points: int | None = None,
     ) -> tuple[np.ndarray, ...]:
         """Extract levelset of vfunc at a specific level as a path of 3D points.
 

@@ -5,7 +5,6 @@ various geometric operations including resampling, smoothing, and metric computa
 """
 import logging
 import sys
-from typing import Optional
 
 import numpy as np
 from scipy import sparse
@@ -67,7 +66,7 @@ class Polygon:
     False
     """
 
-    def __init__(self, points: np.ndarray, closed: Optional[bool] = None):
+    def __init__(self, points: np.ndarray, closed: bool | None = None):
         self.points = np.array(points)
 
         # Validate non-empty polygon

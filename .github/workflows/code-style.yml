@@ -15,10 +15,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Setup Python 3.10
+      - name: Setup Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.13'
           cache: 'pip' # caching pip dependencies
       - name: Install dependencies
         run: |
@@ -28,11 +28,6 @@ jobs:
         run: ruff check .
       - name: Run codespell
         uses: codespell-project/actions-codespell@master
-        with:
-          check_filenames: true
-          check_hidden: true
-          skip: './.git,./build,./.mypy_cache,./.pytest_cache'
-          ignore_words_file: ./.codespellignore
       - name: Run pydocstyle
         run: pydocstyle .
       - name: Run bibclean

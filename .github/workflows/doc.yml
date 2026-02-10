@@ -41,7 +41,9 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: doc-dev
-          path: doc-build/dev !doc-build/dev/.doctrees
+          path: |
+            doc-build/dev
+            !doc-build/dev/.doctrees
 
   deploy:
     if: github.event_name == 'push'

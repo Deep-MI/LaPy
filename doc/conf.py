@@ -143,6 +143,7 @@ numpydoc_xref_aliases = {
     # LaPy
     "TetMesh": "lapy.TetMesh",
     "TriaMesh": "lapy.TriaMesh",
+    "Polygon": "lapy.Polygon",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
     "Figure": "matplotlib.figure.Figure",

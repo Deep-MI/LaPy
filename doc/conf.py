@@ -183,6 +183,12 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.__iter__",
     r"\.__div__",
     r"\.__neg__",
+    # Imported third-party objects (not part of LaPy API)
+    r"\.Any$",  # typing.Any
+    r"\.csr_matrix$",  # scipy.sparse.csr_matrix
+    r"\.minimize$",  # scipy.optimize.minimize
+    r"\.bisect$",  # bisect.bisect
+    r"\.LinearSegmentedColormap$",  # matplotlib.colors.LinearSegmentedColormap
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------

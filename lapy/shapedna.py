@@ -9,7 +9,7 @@ of the Laplace-Beltrami operator and can be used for shape analysis
 and comparison.
 """
 import logging
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 import scipy.spatial.distance as di
@@ -97,7 +97,7 @@ def compute_shapedna(
     geom: Union["TriaMesh", "TetMesh"],
     k: int = 50,
     lump: bool = False,
-    aniso: Optional[Union[float, tuple[float, float]]] = None,
+    aniso: float | tuple[float, float] | None = None,
     aniso_smooth: int = 10,
     use_cholmod: bool = False,
 ) -> dict:

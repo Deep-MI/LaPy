@@ -11,7 +11,7 @@ version = '1.6.0-dev'
 description = 'A package for differential geometry on meshes (Laplace, FEM)'
 readme = 'README.md'
 license = {file = 'LICENSE'}
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 authors = [
     {name = 'Martin Reuter', email = 'martin.reuter@dzne.de'},
 ]
@@ -34,10 +34,10 @@ classifiers = [
     'Operating System :: Unix',
     'Operating System :: MacOS',
     'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
     'Natural Language :: English',
     'License :: OSI Approved :: MIT License',
     'Intended Audience :: Science/Research',
@@ -63,13 +63,12 @@ doc = [
     'matplotlib',
     'memory-profiler',
     'numpydoc',
-    'sphinx!=7.2.*',
+    'sphinx>=7.0,!=7.2.*',
     'sphinxcontrib-bibtex',
     'sphinx-copybutton',
     'sphinx-design',
     'sphinx-gallery',
     'sphinx-issues',
-    'pypandoc',
     'nbsphinx',
     'IPython', # For syntax highlighting in notebooks
     'ipykernel',
@@ -141,6 +140,12 @@ select = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "examples/*" = ["E501"]   # ignore too long lines in example ipynb
+
+[tool.codespell]
+ignore-words-list = 'coo,daty'
+check-filenames = true
+check-hidden = true
+skip = './.git,./build,./.mypy_cache,./.pytest_cache'
 
 [tool.pytest.ini_options]
 minversion = '6.0'

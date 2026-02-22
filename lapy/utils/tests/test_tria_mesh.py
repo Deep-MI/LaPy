@@ -1053,6 +1053,7 @@ def test_gifti_io(tmp_path):
     Test reading and writing GIFTI surface meshes using TriaMesh.read_gifti and write_gifti.
     """
     import numpy as np
+
     from lapy.tria_mesh import TriaMesh
 
     # Create a simple mesh

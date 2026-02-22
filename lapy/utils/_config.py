@@ -1,14 +1,15 @@
 import platform
 import re
 import sys
+from collections.abc import Callable
 from functools import partial
 from importlib.metadata import requires, version
-from typing import IO, Callable, Optional
+from typing import IO
 
 import psutil
 
 
-def sys_info(fid: Optional[IO] = None, developer: bool = False):
+def sys_info(fid: IO | None = None, developer: bool = False):
     """Print the system information for debugging.
 
     Parameters

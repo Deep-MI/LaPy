@@ -630,3 +630,466 @@ def test_2d_mesh_support():
     assert v2d.shape == (4, 2), "Should return 2D vertices"
     np.testing.assert_array_almost_equal(v2d, vertices_2d)
 
+
+def test_critical_points_simple():
+    """
+    Test critical_points on a simple mesh with known extrema.
+    """
+    # Create a simple triangular mesh with 3 peaks and a valley
+    vertices = np.array([
+        [0.0, 0.0, 0.5],  # 0: center (middle height)
+        [1.0, 0.0, 1.0],  # 1: peak
+        [0.0, 1.0, 0.0],  # 2: valley
+        [-1.0, 0.0, 1.0], # 3: peak
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 2, 3],
+        [0, 3, 1],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function: z-coordinate
+    vfunc = vertices[:, 2]
+
+    # Compute critical points
+    minima, maxima, saddles, saddle_orders = mesh.critical_points(vfunc)
+
+    # Expected: vertex 2 is minimum (z=0), vertices 1 and 3 are maxima (z=1)
+    assert 2 in minima, f"Expected vertex 2 (valley) as minimum, got minima={minima}"
+    assert 1 in maxima or 3 in maxima, f"Expected vertices 1 or 3 (peaks) as maxima, got maxima={maxima}"
+    # Vertex 0 is at mid-height, surrounded by higher and lower neighbors - could be saddle or regular
+
+    # Simpler test: just verify the function runs without error
+    assert len(minima) + len(maxima) + len(saddles) > 0, "Should find some critical points"
+
+
+def test_critical_points_saddle():
+    """
+    Test critical_points on a mesh with a saddle point.
+    """
+    # Create a simple saddle mesh: 3x3 grid in xy-plane
+    # Height creates saddle at center
+    vertices = np.array([
+        [-1, -1, 1],  # 0: corner (high)
+        [0, -1, 0],   # 1: edge midpoint (low)
+        [1, -1, 1],   # 2: corner (high)
+        [-1, 0, 0],   # 3: edge midpoint (low)
+        [0, 0, 0.5],  # 4: center (saddle)
+        [1, 0, 0],    # 5: edge midpoint (low)
+        [-1, 1, 1],   # 6: corner (high)
+        [0, 1, 0],    # 7: edge midpoint (low)
+        [1, 1, 1],    # 8: corner (high)
+    ], dtype=float)
+
+    # Create triangular mesh from grid
+    triangles = np.array([
+        [0, 1, 4], [0, 4, 3],  # bottom-left quad
+        [1, 2, 5], [1, 5, 4],  # bottom-right quad
+        [3, 4, 7], [3, 7, 6],  # top-left quad
+        [4, 5, 8], [4, 8, 7],  # top-right quad
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Use z-coordinate as function
+    vfunc = vertices[:, 2]
+
+    # Compute critical points
+    minima, maxima, saddles, saddle_orders = mesh.critical_points(vfunc)
+
+    # Center should be a saddle (neighbors alternate high-low)
+    assert 4 in saddles, f"Expected vertex 4 (center) to be a saddle, saddles={saddles}"
+    # Check saddle order for center vertex
+    saddle_idx = np.where(saddles == 4)[0]
+    if len(saddle_idx) > 0:
+        order = saddle_orders[saddle_idx[0]]
+        assert order >= 2, f"Expected saddle order >= 2, got {order}"
+
+
+def test_critical_points_with_ties():
+    """
+    Test critical_points with equal function values (tie-breaker rule).
+    """
+    # Simple triangle mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [0.5, 1.0, 0.0],
+    ])
+    triangles = np.array([[0, 1, 2]])
+    mesh = TriaMesh(vertices, triangles)
+
+    # All vertices have same value (ties everywhere)
+    vfunc = np.array([1.0, 1.0, 1.0])
+
+    # Should not crash, tie-breaker should resolve ambiguities
+    minima, maxima, saddles, saddle_orders = mesh.critical_points(vfunc)
+
+    # With tie-breaker, vertex with highest ID is treated as larger
+    # So vertex 2 should be maximum, vertex 0 should be minimum
+    assert 0 in minima, "Expected vertex 0 to be minimum with tie-breaker"
+    assert 2 in maxima, "Expected vertex 2 to be maximum with tie-breaker"
+
+
+def test_critical_points_boundary():
+    """
+    Test critical_points on a mesh with boundary (non-closed).
+    """
+    # Single triangle (has boundary)
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 1.0],
+        [0.0, 1.0, 0.0],
+    ])
+    triangles = np.array([[0, 1, 2]])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function
+    vfunc = vertices[:, 2]
+
+    minima, maxima, saddles, saddle_orders = mesh.critical_points(vfunc)
+
+    # Vertex 1 is highest (z=1), vertices 0 and 2 are lowest (z=0)
+    assert 1 in maxima, f"Expected vertex 1 as maximum, got maxima={maxima}"
+    assert len(minima) >= 1, f"Expected at least one minimum, got {len(minima)}"
+
+
+def test_extract_level_paths_simple():
+    """
+    Test extract_level_paths on a simple mesh with single level curve.
+    """
+    # Create a simple mesh: unit square in xy-plane
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [1.0, 1.0, 1.0],
+        [0.0, 1.0, 1.0],
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 2, 3],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function (z-coordinate)
+    vfunc = vertices[:, 2]
+
+    # Extract level curve at z=0.5
+    curves = mesh.extract_level_paths(vfunc, 0.5)
+
+    # Should have at least one curve
+    assert len(curves) > 0, "Expected at least one level curve"
+
+    # Check that returned objects are Polygon
+    from ...polygon import Polygon
+    for curve in curves:
+        assert isinstance(curve, Polygon), f"Expected Polygon, got {type(curve)}"
+
+    # Check that polygons have required attributes
+    for curve in curves:
+        assert hasattr(curve, 'points'), "Polygon should have 'points' attribute"
+        assert hasattr(curve, 'closed'), "Polygon should have 'closed' attribute"
+        assert hasattr(curve, 'tria_idx'), "Polygon should have 'tria_idx' attribute"
+        assert hasattr(curve, 'edge_vidx'), "Polygon should have 'edge_vidx' attribute"
+        assert hasattr(curve, 'edge_bary'), "Polygon should have 'edge_bary' attribute"
+
+    # Check that points are 3D
+    for curve in curves:
+        assert curve.points.shape[1] == 3, f"Expected 3D points, got shape {curve.points.shape}"
+
+
+def test_extract_level_paths_closed_loop():
+    """
+    Test extract_level_paths on a mesh with closed loop level curve.
+    """
+    # Create a pyramid mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],  # base
+        [1.0, 0.0, 0.0],  # base
+        [1.0, 1.0, 0.0],  # base
+        [0.0, 1.0, 0.0],  # base
+        [0.5, 0.5, 1.0],  # apex
+    ])
+    triangles = np.array([
+        [0, 1, 4],
+        [1, 2, 4],
+        [2, 3, 4],
+        [3, 0, 4],
+        [0, 2, 1],
+        [0, 3, 2],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function
+    vfunc = vertices[:, 2]
+
+    # Extract level curve at mid-height (should create closed loop around pyramid)
+    curves = mesh.extract_level_paths(vfunc, 0.5)
+
+    assert len(curves) == 1, "Expected one level curve"
+
+    # Curve should be closed
+    assert curves[0].closed, "Expected closed level curve"
+
+    # Note: May or may not be closed depending on mesh topology
+
+    # All points should be approximately at z=0.5
+    for curve in curves:
+        z_coords = curve.points[:, 2]
+        np.testing.assert_allclose(z_coords, 0.5, atol=1e-5,
+                                   err_msg="Level curve points should be at z=0.5")
+
+
+def test_extract_level_paths_no_intersection():
+    """
+    Test extract_level_paths when level doesn't intersect mesh.
+    """
+    # Simple triangle
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 1.0],
+        [0.0, 1.0, 1.0],
+    ])
+    triangles = np.array([[0, 1, 2]])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function
+    vfunc = vertices[:, 2]
+
+    # Extract level curve at z=10.0 (way above mesh)
+    curves = mesh.extract_level_paths(vfunc, 10.0)
+
+    # Should return empty list
+    assert len(curves) == 0, f"Expected no curves, got {len(curves)}"
+
+
+def test_extract_level_paths_metadata():
+    """
+    Test that extract_level_paths returns correct metadata.
+    """
+    # Create a simple mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.5],
+        [1.0, 1.0, 1.0],
+        [0.0, 1.0, 0.5],
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 2, 3],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Height function
+    vfunc = vertices[:, 2]
+
+    # Extract level curve
+    curves = mesh.extract_level_paths(vfunc, 0.5)
+
+    for curve in curves:
+        n_points = curve.points.shape[0]
+
+        # Check tria_idx
+        assert hasattr(curve, 'tria_idx'), "Missing tria_idx"
+        # Number of segments (tria_idx) depends on whether curve is closed
+        expected_tria_len = n_points if curve.closed else n_points - 1
+        assert curve.tria_idx.shape == (expected_tria_len,), \
+            f"tria_idx should be ({expected_tria_len},), got {curve.tria_idx.shape}"
+
+        # Check edge_vidx
+        assert hasattr(curve, 'edge_vidx'), "Missing edge_vidx"
+        assert curve.edge_vidx.shape == (n_points, 2), \
+            f"edge_vidx should be (n_points, 2), got {curve.edge_vidx.shape}"
+
+        # Check edge_bary
+        assert hasattr(curve, 'edge_bary'), "Missing edge_bary"
+        assert curve.edge_bary.shape == (n_points,), \
+            f"edge_bary should be (n_points,), got {curve.edge_bary.shape}"
+        # Barycentric coordinates should be in [0, 1]
+        assert np.all(curve.edge_bary >= 0) and np.all(curve.edge_bary <= 1), \
+            "edge_bary should be in [0, 1]"
+
+
+def test_level_path():
+    """
+    Test level_path function for single path extraction with various options.
+    """
+    # Create a simple mesh with a clear level curve
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.5],
+        [1.0, 1.0, 1.0],
+        [0.0, 1.0, 0.5],
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 2, 3],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+    vfunc = vertices[:, 2]
+    level = 0.5
+
+    # Test 1: Basic usage - get path and length
+    path, length = mesh.level_path(vfunc, level)
+
+    assert path.ndim == 2, "Path should be 2D array"
+    assert path.shape[1] == 3, f"Path should have 3D points, got shape {path.shape}"
+    assert path.shape[0] >= 2, "Path should have at least 2 points"
+    assert length > 0, f"Path length should be positive, got {length}"
+
+    # Check all points are approximately at the level
+    z_coords = path[:, 2]
+    np.testing.assert_allclose(z_coords, level, atol=1e-5,
+                               err_msg=f"All path points should be at z={level}")
+
+    # Test 2: Check if path is closed (first == last point)
+    is_closed = np.allclose(path[0], path[-1])
+    if is_closed:
+        print("  Path is closed (first point == last point)")
+    else:
+        print("  Path is open (endpoints differ)")
+
+    # Test 3: Get triangle indices
+    path_with_tria, length_with_tria, tria_idx = mesh.level_path(
+        vfunc, level, get_tria_idx=True
+    )
+
+    np.testing.assert_array_equal(path_with_tria, path,
+                                  err_msg="Path should be same with get_tria_idx=True")
+    assert length_with_tria == length, "Length should be same"
+    assert tria_idx.ndim == 1, "tria_idx should be 1D array"
+    # For n points, we have n-1 segments
+    expected_tria_len = path.shape[0] - 1
+    assert tria_idx.shape[0] == expected_tria_len, \
+        f"tria_idx should have {expected_tria_len} elements, got {tria_idx.shape[0]}"
+    # Triangle indices should be valid
+    assert np.all(tria_idx >= 0), "Triangle indices should be non-negative"
+    assert np.all(tria_idx < len(triangles)), \
+        f"Triangle indices should be < {len(triangles)}"
+
+    # Test 4: Get edge information
+    path_with_edges, length_with_edges, edges_vidxs, edges_relpos = mesh.level_path(
+        vfunc, level, get_edges=True
+    )
+
+    np.testing.assert_array_equal(path_with_edges, path,
+                                  err_msg="Path should be same with get_edges=True")
+    assert length_with_edges == length, "Length should be same"
+    assert edges_vidxs.shape == (path.shape[0], 2), \
+        f"edges_vidxs should be (n_points, 2), got {edges_vidxs.shape}"
+    assert edges_relpos.shape == (path.shape[0],), \
+        f"edges_relpos should be (n_points,), got {edges_relpos.shape}"
+    # Barycentric coordinates should be in [0, 1]
+    assert np.all(edges_relpos >= 0) and np.all(edges_relpos <= 1), \
+        "Barycentric coordinates should be in [0, 1]"
+
+    # Test 5: Get both triangle and edge information
+    result = mesh.level_path(vfunc, level, get_tria_idx=True, get_edges=True)
+    path_full, length_full, tria_idx_full, edges_vidxs_full, edges_relpos_full = result
+
+    np.testing.assert_array_equal(path_full, path,
+                                  err_msg="Path should be consistent")
+    np.testing.assert_array_equal(tria_idx_full, tria_idx,
+                                  err_msg="tria_idx should be consistent")
+    np.testing.assert_array_equal(edges_vidxs_full, edges_vidxs,
+                                  err_msg="edges_vidxs should be consistent")
+    np.testing.assert_array_equal(edges_relpos_full, edges_relpos,
+                                  err_msg="edges_relpos should be consistent")
+
+    # Test 6: Resampling to fixed number of points
+    n_resample = 50
+    path_resampled, length_resampled = mesh.level_path(
+        vfunc, level, n_points=n_resample
+    )
+
+    assert path_resampled.shape[0] == n_resample, \
+        f"Resampled path should have {n_resample} points, got {path_resampled.shape[0]}"
+    assert path_resampled.shape[1] == 3, "Resampled path should have 3D points"
+    # Length should be approximately the same
+    np.testing.assert_allclose(length_resampled, length, rtol=0.1,
+                               err_msg="Resampled length should be close to original")
+
+
+def test_level_path_closed_loop():
+    """
+    Test level_path on a mesh that produces a closed loop.
+    """
+    # Create a pyramid mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],  # base
+        [1.0, 0.0, 0.0],  # base
+        [1.0, 1.0, 0.0],  # base
+        [0.0, 1.0, 0.0],  # base
+        [0.5, 0.5, 1.0],  # apex
+    ])
+    triangles = np.array([
+        [0, 1, 4],
+        [1, 2, 4],
+        [2, 3, 4],
+        [3, 0, 4],
+        [0, 2, 1],
+        [0, 3, 2],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+    vfunc = vertices[:, 2]
+
+    # Extract level at mid-height (should create closed loop around pyramid)
+    path, length = mesh.level_path(vfunc, 0.5)
+
+    # For closed loops, first and last points should be identical
+    is_closed = np.allclose(path[0], path[-1])
+    assert is_closed, "Closed loop should have first point equal to last point"
+
+    # All points should be at z=0.5
+    np.testing.assert_allclose(path[:, 2], 0.5, atol=1e-5,
+                               err_msg="All points should be at z=0.5")
+
+    # Length should be positive
+    assert length > 0, "Closed loop should have positive length"
+
+
+def test_gifti_io(tmp_path):
+    """
+    Test reading and writing GIFTI surface meshes using TriaMesh.read_gifti and write_gifti.
+    """
+    import numpy as np
+
+    from lapy.tria_mesh import TriaMesh
+
+    # Create a simple mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 1, 3],
+        [0, 2, 3],
+        [1, 2, 3],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Write to GIFTI
+    gifti_file = tmp_path / "test.surf.gii"
+    mesh.write_gifti(str(gifti_file))
+
+    # Read back
+    mesh2 = TriaMesh.read_gifti(str(gifti_file))
+
+    # Check vertices and triangles
+    np.testing.assert_allclose(mesh2.v, mesh.v, rtol=1e-6, atol=1e-8)
+    np.testing.assert_array_equal(mesh2.t, mesh.t)
+    assert mesh2.v.shape == mesh.v.shape
+    assert mesh2.t.shape == mesh.t.shape
+
+    # Check that mesh2 is a TriaMesh
+    assert isinstance(mesh2, TriaMesh)
+
+    # Check that mesh2 is not empty
+    assert mesh2.v.size > 0
+    assert mesh2.t.size > 0
+
+    # Check that mesh2 is not 2D
+    assert not mesh2.is_2d()

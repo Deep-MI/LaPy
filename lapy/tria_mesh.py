@@ -63,7 +63,7 @@ class TriaMesh:
     maintaining compatibility with 2D mesh data.
 
     Empty meshes are not allowed. Use class methods (read_fssurf, read_vtk,
-    read_off) to load mesh data from files.
+    read_off, read_gifti) to load mesh data from files.
     """
 
     def __init__(self, v, t, fsinfo=None):
@@ -185,6 +185,48 @@ class TriaMesh:
         """
         return io.read_vtk(filename)
 
+    @classmethod
+    def read_gifti(cls, filename: str) -> "TriaMesh":
+        """Load triangle mesh from a GIFTI surface file.
+
+        GIFTI (``.surf.gii``) is the standard surface format used by HCP,
+        FSL, FreeSurfer (since v6), and many other neuroimaging tools.
+
+        Parameters
+        ----------
+        filename : str
+            Path to a GIFTI surface file (e.g. ``lh.pial.surf.gii``).
+
+        Returns
+        -------
+        TriaMesh
+            Loaded triangle mesh.  Vertex coordinates are in the coordinate
+            system stored in the file (usually surface RAS or MNI).
+
+        Raises
+        ------
+        ImportError
+            If ``nibabel`` is not installed.
+        OSError
+            If the file is not found or not readable.
+        ValueError
+            If the GIFTI file does not contain both a POINTSET and a TRIANGLE
+            data array.
+
+        Notes
+        -----
+        The GIFTI format supports multiple coordinate systems per file.
+        This function uses whatever coordinate system nibabel exposes by
+        default, which corresponds to the first coordinate system listed in
+        the file (typically surface RAS for FreeSurfer output).
+
+        Examples
+        --------
+        >>> from lapy import TriaMesh
+        >>> tria = TriaMesh.read_gifti("lh.pial.surf.gii")  # doctest: +SKIP
+        """
+        return io.read_gifti(filename)
+
     def write_vtk(self, filename: str) -> None:
         """Save mesh as VTK file.
 
@@ -199,6 +241,36 @@ class TriaMesh:
             If file cannot be written.
         """
         io.write_vtk(self, filename)
+
+    def write_gifti(self, filename: str) -> None:
+        """Save mesh as a GIFTI surface file.
+
+        Writes the mesh as a ``.surf.gii`` GIFTI file using nibabel.
+
+        Parameters
+        ----------
+        filename : str
+            Output filename (conventionally ends with ``.surf.gii``).
+
+        Raises
+        ------
+        ImportError
+            If ``nibabel`` is not installed.
+        OSError
+            If the file cannot be written.
+
+        Notes
+        -----
+        Vertex coordinates are stored as ``float32`` and triangle indices as
+        ``int32``, matching the conventions of most neuroimaging software.
+
+        Examples
+        --------
+        >>> from lapy import TriaMesh
+        >>> tria = TriaMesh.read_off("my_mesh.off")  # doctest: +SKIP
+        >>> tria.write_gifti("my_mesh.surf.gii")  # doctest: +SKIP
+        """
+        io.write_gifti(self, filename)
 
     def write_fssurf(
         self,

@@ -495,6 +495,146 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
     return points, cells, point_data, cell_data, field_data
 
 
+def read_gifti(filename: str) -> "TriaMesh":
+    """Load triangle mesh from GIFTI surface file.
+
+    GIFTI (``.surf.gii``) is the standard surface format used by HCP, FSL,
+    FreeSurfer (since v6), and many other neuroimaging tools.  The file must
+    contain at least one data array with intent ``NIFTI_INTENT_POINTSET``
+    (coordinates) and one with intent ``NIFTI_INTENT_TRIANGLE`` (topology).
+
+    Parameters
+    ----------
+    filename : str
+        Path to a GIFTI surface file (e.g. ``lh.pial.surf.gii``).
+
+    Returns
+    -------
+    TriaMesh
+        Loaded triangle mesh.  Vertex coordinates are returned in the
+        coordinate system stored in the file (usually surface RAS or MNI).
+
+    Raises
+    ------
+    ImportError
+        If ``nibabel`` is not installed.
+    OSError
+        If the file is not found or not readable.
+    ValueError
+        If the GIFTI file does not contain both a POINTSET and a TRIANGLE
+        data array.
+
+    Notes
+    -----
+    The GIFTI format supports multiple coordinate systems per file
+    (``GiftiCoordSystem``).  This function uses whatever coordinate system
+    nibabel exposes by default, which corresponds to the *first* coordinate
+    system listed in the file (typically surface RAS for FreeSurfer output).
+
+    Examples
+    --------
+    >>> from lapy import TriaMesh
+    >>> tria = TriaMesh.read_gifti("lh.pial.surf.gii")  # doctest: +SKIP
+    """
+    logger.debug("--> GIFTI format       ... ")
+    try:
+        import nibabel as nib
+    except ImportError as e:
+        raise ImportError(
+            "nibabel is required to read GIFTI files. "
+            "Install it with: pip install nibabel"
+        ) from e
+    try:
+        img = nib.load(filename)
+    except OSError:
+        logger.error("[file not found or not readable]")
+        raise
+    if not isinstance(img, nib.gifti.GiftiImage):
+        raise ValueError(
+            f"Expected a GIFTI image, but got {type(img).__name__}. "
+            "Make sure the file is a valid GIFTI surface file (.surf.gii)."
+        )
+    try:
+        coords, trias = img.agg_data(("pointset", "triangle"))
+    except Exception as exc:
+        raise ValueError(
+            f"Could not extract POINTSET and TRIANGLE data arrays from {filename}. "
+            "Make sure the file is a valid GIFTI surface file."
+        ) from exc
+    if coords is None or trias is None:
+        raise ValueError(
+            f"{filename} does not contain both a POINTSET (coordinates) and a "
+            "TRIANGLE (topology) data array."
+        )
+    coords = np.array(coords, dtype=float)
+    trias = np.array(trias, dtype=np.int64)
+    logger.info(" --> DONE ( V: %d , T: %d )", coords.shape[0], trias.shape[0])
+    from . import TriaMesh
+
+    return TriaMesh(coords, trias)
+
+
+def write_gifti(tria: "TriaMesh", filename: str) -> None:
+    """Save triangle mesh to a GIFTI surface file.
+
+    Writes the mesh as a ``.surf.gii`` GIFTI file using nibabel.  The
+    coordinate data array uses intent ``NIFTI_INTENT_POINTSET`` and the
+    topology array uses intent ``NIFTI_INTENT_TRIANGLE``.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangle mesh to save.
+    filename : str
+        Output filename (conventionally ends with ``.surf.gii``).
+
+    Raises
+    ------
+    ImportError
+        If ``nibabel`` is not installed.
+    OSError
+        If the file cannot be written.
+
+    Notes
+    -----
+    Vertex coordinates are stored as ``float32`` and triangle indices as
+    ``int32``, matching the conventions of most neuroimaging software.
+
+    Examples
+    --------
+    >>> from lapy import TriaMesh
+    >>> tria = TriaMesh.read_off("my_mesh.off")  # doctest: +SKIP
+    >>> tria.write_gifti("my_mesh.surf.gii")  # doctest: +SKIP
+    """
+    try:
+        import nibabel as nib
+        from nibabel.gifti import GiftiDataArray, GiftiImage
+        from nibabel.nifti1 import intent_codes
+    except ImportError as e:
+        raise ImportError(
+            "nibabel is required to write GIFTI files. "
+            "Install it with: pip install nibabel"
+        ) from e
+    try:
+        coords = tria.v.astype(np.float32)
+        trias = tria.t.astype(np.int32)
+        coord_array = GiftiDataArray(
+            coords,
+            intent=intent_codes.code["NIFTI_INTENT_POINTSET"],
+            datatype="NIFTI_TYPE_FLOAT32",
+        )
+        tria_array = GiftiDataArray(
+            trias,
+            intent=intent_codes.code["NIFTI_INTENT_TRIANGLE"],
+            datatype="NIFTI_TYPE_INT32",
+        )
+        img = GiftiImage(darrays=[coord_array, tria_array])
+        nib.save(img, filename)
+    except OSError:
+        logger.error("[File %s not writable]", filename)
+        raise
+
+
 def write_vtk(tria: "TriaMesh", filename: str) -> None:
     """Save VTK file.
 

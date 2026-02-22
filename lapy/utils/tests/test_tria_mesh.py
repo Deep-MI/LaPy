@@ -1047,3 +1047,48 @@ def test_level_path_closed_loop():
     # Length should be positive
     assert length > 0, "Closed loop should have positive length"
 
+
+def test_gifti_io(tmp_path):
+    """
+    Test reading and writing GIFTI surface meshes using TriaMesh.read_gifti and write_gifti.
+    """
+    import numpy as np
+    from lapy.tria_mesh import TriaMesh
+
+    # Create a simple mesh
+    vertices = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
+    ])
+    triangles = np.array([
+        [0, 1, 2],
+        [0, 1, 3],
+        [0, 2, 3],
+        [1, 2, 3],
+    ])
+    mesh = TriaMesh(vertices, triangles)
+
+    # Write to GIFTI
+    gifti_file = tmp_path / "test.surf.gii"
+    mesh.write_gifti(str(gifti_file))
+
+    # Read back
+    mesh2 = TriaMesh.read_gifti(str(gifti_file))
+
+    # Check vertices and triangles
+    np.testing.assert_allclose(mesh2.v, mesh.v, rtol=1e-6, atol=1e-8)
+    np.testing.assert_array_equal(mesh2.t, mesh.t)
+    assert mesh2.v.shape == mesh.v.shape
+    assert mesh2.t.shape == mesh.t.shape
+
+    # Check that mesh2 is a TriaMesh
+    assert isinstance(mesh2, TriaMesh)
+
+    # Check that mesh2 is not empty
+    assert mesh2.v.size > 0
+    assert mesh2.t.size > 0
+
+    # Check that mesh2 is not 2D
+    assert not mesh2.is_2d()

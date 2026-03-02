@@ -33,7 +33,7 @@ jobs:
       - name: Build doc
         run: TZ=UTC sphinx-build ./main/doc ./doc-build/dev -W --keep-going
       - name: Upload documentation
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: doc-dev
           path: ./doc-build/dev

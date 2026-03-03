@@ -357,7 +357,6 @@ def tria_compute_divergence(tria: TriaMesh, tfunc: np.ndarray) -> np.ndarray:
         x0 = ((c2 - c1)[:, np.newaxis, :] * tfunc).sum(-1)  # (T, F)
         x1 = ((c0 - c2)[:, np.newaxis, :] * tfunc).sum(-1)  # (T, F)
         x2 = ((c1 - c0)[:, np.newaxis, :] * tfunc).sum(-1)  # (T, F)
-        n_funcs = tfunc.shape[1]
         n_t = len(tria.t)
         # Build a (n_verts, 3T) CSR scatter matrix from mesh connectivity
         # (depends only on tria.t, not on tfunc values) and multiply by the

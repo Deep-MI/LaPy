@@ -16,18 +16,17 @@ import numpy as np
 import pytest
 
 from ...diffgeo import (
+    tet_compute_divergence,
+    tet_compute_gradient,
     tria_compute_divergence,
     tria_compute_divergence2,
     tria_compute_geodesic_f,
     tria_compute_gradient,
     tria_compute_rotated_f,
-    tet_compute_divergence,
-    tet_compute_gradient,
 )
 from ...solver import Solver
-from ...tria_mesh import TriaMesh
 from ...tet_mesh import TetMesh
-
+from ...tria_mesh import TriaMesh
 
 # ---------------------------------------------------------------------------
 # Fixtures

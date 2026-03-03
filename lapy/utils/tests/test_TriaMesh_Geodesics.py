@@ -190,3 +190,4 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
     ]
     computed_max_abs_diff = max(abs(gf - x))
     assert np.allclose(computed_max_abs_diff, expected_max_abs_diff)
+

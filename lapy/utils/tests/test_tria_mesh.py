@@ -460,7 +460,8 @@ def test_smooth_laplace(tria_mesh_fixture):
     # Equivalence check with old smooth_vfunc (which corresponds to lambda=1)
     # Note: smooth_vfunc applies M*v. smooth_laplace applies (1-l)v + l*M*v.
     # If l=1, result is M*v.
-    v_old = mesh.smooth_vfunc(v_orig, n=1)
+    with pytest.warns(DeprecationWarning, match="smooth_vfunc is deprecated"):
+        v_old = mesh.smooth_vfunc(v_orig, n=1)
     v_new = mesh.smooth_laplace(v_orig, n=1, lambda_=1.0)
     np.testing.assert_allclose(v_old, v_new)
 

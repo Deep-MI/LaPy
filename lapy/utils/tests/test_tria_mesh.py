@@ -915,12 +915,14 @@ def test_level_path():
     """
     Test level_path function for single path extraction with various options.
     """
-    # Create a simple mesh with a clear level curve
+    # Create a simple mesh where level=0.5 crosses edge interiors cleanly.
+    # Vertices 0,1 have z=0 and vertices 2,3 have z=1, so the level set at
+    # z=0.5 intersects two edges (not any vertex) — one per triangle.
     vertices = np.array([
         [0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.5],
+        [1.0, 0.0, 0.0],
         [1.0, 1.0, 1.0],
-        [0.0, 1.0, 0.5],
+        [0.0, 1.0, 1.0],
     ])
     triangles = np.array([
         [0, 1, 2],

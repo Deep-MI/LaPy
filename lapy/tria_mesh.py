@@ -498,8 +498,7 @@ class TriaMesh:
         n = np.cross(v1mv0, v2mv0)
         ln = np.sqrt(np.sum(n * n, axis=1))
         ln[ln < sys.float_info.epsilon] = 1  # avoid division by zero
-        n = n / ln.reshape(-1, 1)
-        return n
+        return n / ln.reshape(-1, 1)
 
     def vertex_normals(self) -> np.ndarray:
         """Compute vertex normals.
@@ -537,16 +536,13 @@ class TriaMesh:
         cr0 = np.cross(v1mv0, -v0mv2)
         cr1 = np.cross(v2mv1, -v1mv0)
         cr2 = np.cross(v0mv2, -v2mv1)
-        # Add normals at each vertex (there can be duplicate indices in t at vertex i)
         n = np.zeros(self.v.shape)
         np.add.at(n, self.t[:, 0], cr0)
         np.add.at(n, self.t[:, 1], cr1)
         np.add.at(n, self.t[:, 2], cr2)
-        # Normalize normals
         ln = np.sqrt(np.sum(n * n, axis=1))
         ln[ln < sys.float_info.epsilon] = 1  # avoid division by zero
-        n = n / ln.reshape(-1, 1)
-        return n
+        return n / ln.reshape(-1, 1)
 
     def has_free_vertices(self) -> bool:
         """Check if the vertex list has more vertices than what is used in triangles.
@@ -987,12 +983,8 @@ class TriaMesh:
         # print(np.max(np.abs(np.sum(tumin * tumax, axis=1))))
         # print(np.sum(tumin * tumax, axis=1))
 
-        # project onto triangle plane:
-        e0 = self.v[self.t[:, 1], :] - self.v[self.t[:, 0], :]
-        e1 = self.v[self.t[:, 2], :] - self.v[self.t[:, 0], :]
-        tn = np.cross(e0, e1)
-        tnl = np.sqrt(np.sum(tn * tn, axis=1)).reshape(-1, 1)
-        tn = tn / np.maximum(tnl, 1e-8)
+        # project onto triangle plane using tria normals (already unit length)
+        tn = self.tria_normals()
         # project tumin back to tria plane and normalize
         tumin2 = tumin - tn * (np.sum(tn * tumin, axis=1)).reshape(-1, 1)
         tuminl = np.sqrt(np.sum(tumin2 * tumin2, axis=1)).reshape(-1, 1)

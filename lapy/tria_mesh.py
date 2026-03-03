@@ -1928,17 +1928,150 @@ class TriaMesh:
         else:
             return paths
 
+    def _extract_level_paths_core(
+        self,
+        vfunc: np.ndarray,
+        level: float,
+        t_idx: np.ndarray,
+    ) -> list[polygon.Polygon]:
+        """Core level-path extraction on a pre-selected subset of triangles.
+
+        Internal helper used by extract_level_paths. Computes edge-edge intersections
+        with the level set for the given triangle indices and assembles them into
+        ordered Polygon fragments. Fragments may be open (their endpoints lie on
+        edges adjacent to masked-out special vertices).
+
+        Parameters
+        ----------
+        vfunc : np.ndarray
+            Scalar function values at vertices, shape (n_vertices,).
+        level : float
+            Level set value.
+        t_idx : np.ndarray
+            Indices into self.t of the triangles to process. Must already exclude
+            triangles whose intersection count is 0 or 3.
+
+        Returns
+        -------
+        list[polygon.Polygon]
+            Polygon fragments. Each has attributes: points, closed, tria_idx,
+            edge_vidx (shape (n_points, 2) with original mesh vertex indices),
+            edge_bary (barycentric coordinate along each edge).
+        """
+        if t_idx.size == 0:
+            return []
+
+        # Reduce to triangles that intersect with level
+        t_level = self.t[t_idx, :]
+        intersect = vfunc[t_level] > level
+
+        # Invert triangles with two true values so the single-vertex side is true
+        two_true = np.sum(intersect, axis=1) > 1
+        intersect[two_true, :] = ~intersect[two_true, :]
+
+        # Get index within triangle with single vertex above threshold
+        idx_single = np.argmax(intersect, axis=1)
+        idx_o1 = (idx_single + 1) % 3
+        idx_o2 = (idx_single + 2) % 3
+
+        # Get global vertex indices
+        rows = np.arange(t_level.shape[0])
+        gidx0 = t_level[rows, idx_single]
+        gidx1 = t_level[rows, idx_o1]
+        gidx2 = t_level[rows, idx_o2]
+
+        # Build sorted edge pairs (unique edge identifier)
+        gg1 = np.sort(np.stack((gidx0, gidx1), axis=1), axis=1)
+        gg2 = np.sort(np.stack((gidx0, gidx2), axis=1), axis=1)
+
+        # Unique intersection edges across all triangles
+        gg = np.concatenate((gg1, gg2), axis=0)
+        gg_unique = np.unique(gg, axis=0)
+
+        # Barycentric coordinate along each unique edge (0=first vertex, 1=second vertex)
+        xl = ((level - vfunc[gg_unique[:, 0]])
+              / (vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]))
+
+        # 3D intersection points
+        p = ((1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]]
+             + xl[:, np.newaxis] * self.v[gg_unique[:, 1]])
+
+        # Sparse lookup: edge (u,v) -> index in gg_unique (+1 to distinguish from 0)
+        a_mat = sparse.csc_matrix(
+            (np.arange(gg_unique.shape[0]) + 1,
+             (gg_unique[:, 0], gg_unique[:, 1])),
+            shape=(self.v.shape[0], self.v.shape[0]),
+        )
+
+        # For each triangle, look up the two intersection-edge indices
+        edge_idxs = (
+            np.concatenate(
+                (np.asarray(a_mat[gg1[:, 0], gg1[:, 1]]),
+                 np.asarray(a_mat[gg2[:, 0], gg2[:, 1]])),
+                axis=0,
+            ).T - 1
+        )
+
+        # Reduce edges to ordered paths / loops
+        paths, path_edge_idxs = self._TriaMesh__reduce_edges_to_path(
+            edge_idxs, get_edge_idx=True
+        )
+
+        # Assemble Polygon objects
+        polygons = []
+        for path_nodes, path_edge_idx in zip(paths, path_edge_idxs, strict=True):
+            poly_v = p[path_nodes, :]
+
+            # Remove near-duplicate vertices (level set nearly hits a vertex)
+            dd = ((poly_v[:-1, :] - poly_v[1:, :]) ** 2).sum(1)
+            dd = np.append(dd, 1.0)   # never drop last node
+            keep = dd > 1e-12
+            poly_v = poly_v[keep, :]
+
+            poly_tria_idx = t_idx[path_edge_idx[keep[:-1]]]
+            poly_edge_vidx = gg_unique[path_nodes[keep], :]
+            poly_edge_bary = xl[path_nodes[keep]]
+
+            n_before = poly_v.shape[0]
+            poly = polygon.Polygon(poly_v, closed=None)
+            n_after = poly.points.shape[0]
+
+            # If Polygon removed duplicate endpoint (closed loop), trim metadata
+            if n_after < n_before:
+                poly_edge_vidx = poly_edge_vidx[:n_after]
+                poly_edge_bary = poly_edge_bary[:n_after]
+
+            poly.tria_idx = poly_tria_idx
+            poly.edge_vidx = poly_edge_vidx
+            poly.edge_bary = poly_edge_bary
+
+            polygons.append(poly)
+
+        return polygons
+
     def extract_level_paths(
         self,
         vfunc: np.ndarray,
         level: float,
+        eps: float | None = None,
     ) -> list[polygon.Polygon]:
         """Extract level set paths as Polygon objects with triangle/edge metadata.
 
         For a given scalar function on mesh vertices, extracts all paths where
         the function equals the specified level. Returns polygons with embedded
         metadata about which triangles and edges were intersected.
-        Handles single open paths, closed loops, and multiple disconnected components.
+
+        Handles single open paths, closed loops, multiple disconnected components,
+        and level sets that pass exactly through mesh vertices (including saddle
+        vertices). When the level set hits a vertex exactly:
+
+        - At a **regular vertex**: the two path fragments are reconnected through
+          the vertex into a single continuous path or loop.
+        - At a **saddle vertex**: the level set splits into separate curves (one per
+          lobe). Each curve is emitted as an independent Polygon. An info message
+          is logged when this happens.
+        - At a **boundary vertex**: the open path fragment is extended to include
+          the vertex as its endpoint.
 
         Parameters
         ----------
@@ -1946,6 +2079,9 @@ class TriaMesh:
             Scalar function values at vertices, shape (n_vertices,). Must be 1D.
         level : float
             Level set value to extract.
+        eps : float or None, default=None
+            Tolerance for detecting vertices exactly on the level set.
+            If None, defaults to ``max(1e-10, 1e-7 * (|level| + 1))``.
 
         Returns
         -------
@@ -1956,124 +2092,254 @@ class TriaMesh:
             - points : np.ndarray of shape (n_points, 3) - 3D coordinates on level curve
             - closed : bool - whether the curve is closed
             - tria_idx : np.ndarray of shape (n_segments,) - triangle index for each segment
-            - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for edge
+            - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for the
+              intersected edge (original mesh vertex indices)
             - edge_bary : np.ndarray of shape (n_points,) - barycentric coordinate [0,1]
-              along edge where level set intersects (0=first vertex, 1=second vertex)
+              along each edge where the level set intersects
+              (0 = first vertex of edge, 1 = second vertex)
 
         Raises
         ------
         ValueError
             If vfunc is not 1-dimensional.
+
+        Notes
+        -----
+        When two or more vertices of the same triangle are exactly on the level set
+        (the level set runs along a mesh edge), a warning is issued and those triangles
+        are skipped. The returned curves may be incomplete in that case.
+
+        For saddle vertices at the same level value (saddle-to-saddle paths), an info
+        message is logged and the fragments are emitted separately with the shared
+        vertex appended to each endpoint.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
 
-        # Get intersecting triangles
-        intersect = vfunc[self.t] > level
-        t_idx = np.where(
-            np.logical_or(
-                np.sum(intersect, axis=1) == 1, np.sum(intersect, axis=1) == 2
+        if eps is None:
+            eps = max(1e-10, 1e-7 * (abs(level) + 1.0))
+
+        # ------------------------------------------------------------------
+        # Step 1: detect vertices exactly on the level set
+        # ------------------------------------------------------------------
+        on_level = np.abs(vfunc - level) < eps
+        special_verts = np.where(on_level)[0]   # vertex indices
+
+        # ------------------------------------------------------------------
+        # Step 2: guard against edge-on-level (2+ vertices in same triangle)
+        # ------------------------------------------------------------------
+        on_level_per_tri = on_level[self.t].sum(axis=1)
+        if (on_level_per_tri >= 2).any():
+            warnings.warn(
+                "Some triangles have 2 or more vertices exactly on the level set "
+                "(the level set runs along a mesh edge). Those triangles will be "
+                "skipped and the returned curves may be incomplete.",
+                stacklevel=2,
             )
-        )[0]
 
-        if t_idx.size == 0:
-            return []
+        # ------------------------------------------------------------------
+        # Step 3: select intersecting triangles, excluding any that touch a
+        #         special vertex (they would produce degenerate intersections)
+        # ------------------------------------------------------------------
+        touches_special = on_level[self.t].any(axis=1)   # bool, shape (n_trias,)
 
-        # Reduce to triangles that intersect with level
-        t_level = self.t[t_idx, :]
-        intersect = intersect[t_idx, :]
+        intersect = vfunc[self.t] > level
+        row_sum = intersect.sum(axis=1)
+        is_crossing = (row_sum == 1) | (row_sum == 2)
+        t_idx = np.where(is_crossing & ~touches_special)[0]
 
-        # Invert triangles with two true values so single vertex is true
-        intersect[np.sum(intersect, axis=1) > 1, :] = np.logical_not(
-            intersect[np.sum(intersect, axis=1) > 1, :]
-        )
+        # ------------------------------------------------------------------
+        # Step 4: extract fragments from the masked triangle set
+        # ------------------------------------------------------------------
+        fragments = self._extract_level_paths_core(vfunc, level, t_idx)
 
-        # Get index within triangle with single vertex
-        idx_single = np.argmax(intersect, axis=1)
-        idx_o1 = (idx_single + 1) % 3
-        idx_o2 = (idx_single + 2) % 3
+        if len(special_verts) == 0:
+            # Fast path: no special vertices, nothing to reconnect
+            return fragments
 
-        # Get global indices
-        gidx0 = t_level[np.arange(t_level.shape[0]), idx_single]
-        gidx1 = t_level[np.arange(t_level.shape[0]), idx_o1]
-        gidx2 = t_level[np.arange(t_level.shape[0]), idx_o2]
+        # ------------------------------------------------------------------
+        # Step 5: build a lookup from sorted edge pair -> special vertex.
+        #
+        # When we mask the triangles that touch special vertex sv, the fragment
+        # endpoints land on the *opposite* edges of those masked triangles —
+        # i.e., edges (a, b) where triangle (sv, a, b) was masked out.
+        # These edges do NOT contain sv as a vertex, so we cannot detect them
+        # by looking for sv in the edge endpoints.  Instead we build a map:
+        #   sorted (a, b) -> sv_idx
+        # for every masked triangle at sv.  Then we match fragment endpoint
+        # edges against this map.
+        # ------------------------------------------------------------------
+        from collections import defaultdict
+        # opposite_edge_to_sv: tuple(a,b) (sorted) -> sv_idx
+        opposite_edge_to_sv: dict[tuple[int, int], int] = {}
+        for sv_idx in special_verts.tolist():
+            # All triangles that contain sv AND were masked
+            sv_mask = touches_special & np.any(self.t == sv_idx, axis=1)
+            for tri in self.t[sv_mask]:
+                opp = sorted(int(v) for v in tri if v != sv_idx)
+                if len(opp) == 2:
+                    key = (opp[0], opp[1])
+                    opposite_edge_to_sv[key] = sv_idx
 
-        # Sort edge indices (rows are triangles, cols are the two vertex ids)
-        # This creates unique edge identifiers
-        gg1 = np.sort(
-            np.concatenate((gidx0[:, np.newaxis], gidx1[:, np.newaxis]), axis=1)
-        )
-        gg2 = np.sort(
-            np.concatenate((gidx0[:, np.newaxis], gidx2[:, np.newaxis]), axis=1)
-        )
+        def _sv_of_endpoint(frag, end):
+            """Return the special-vertex index whose opposite edge matches this endpoint, or None."""
+            ev = frag.edge_vidx[end]   # shape (2,), already sorted (gg_unique is sorted)
+            key = (int(min(ev)), int(max(ev)))
+            return opposite_edge_to_sv.get(key, None)
 
-        # Concatenate all edges and get unique ones
-        gg = np.concatenate((gg1, gg2), axis=0)
-        gg_unique = np.unique(gg, axis=0)
+        # Map: sv_idx -> list of (frag_idx, which_end)
+        # which_end is 0 (start of fragment) or -1 (end of fragment)
+        sv_to_ends: dict[int, list[tuple[int, int]]] = defaultdict(list)
 
-        # Generate level set intersection points for unique edges
-        # Barycentric coordinate (0=first vertex, 1=second vertex)
-        xl = ((level - vfunc[gg_unique[:, 0]])
-              / (vfunc[gg_unique[:, 1]] - vfunc[gg_unique[:, 0]]))
+        for fi, frag in enumerate(fragments):
+            for end in (0, -1):
+                sv = _sv_of_endpoint(frag, end)
+                if sv is not None:
+                    sv_to_ends[sv].append((fi, end))
 
-        # 3D points on unique edges
-        p = ((1 - xl)[:, np.newaxis] * self.v[gg_unique[:, 0]]
-             + xl[:, np.newaxis] * self.v[gg_unique[:, 1]])
+        # ------------------------------------------------------------------
+        # Helper: build Polygon from point array + metadata arrays
+        # ------------------------------------------------------------------
+        def _make_poly(pts, tria_idx, edge_vidx, edge_bary, closed_hint=None):
+            n_before = pts.shape[0]
+            poly = polygon.Polygon(pts, closed=closed_hint)
+            n_after = poly.points.shape[0]
+            if n_after < n_before:
+                edge_vidx = edge_vidx[:n_after]
+                edge_bary = edge_bary[:n_after]
+            poly.tria_idx = tria_idx
+            poly.edge_vidx = edge_vidx
+            poly.edge_bary = edge_bary
+            return poly
 
-        # Fill sparse matrix with new point indices (+1 to distinguish from zero)
-        a_mat = sparse.csc_matrix(
-            (np.arange(gg_unique.shape[0]) + 1, (gg_unique[:, 0], gg_unique[:, 1]))
-        )
+        def _frag_arrays(frag):
+            """Return (pts, tria_idx, edge_vidx, edge_bary) all in forward order."""
+            return frag.points, frag.tria_idx, frag.edge_vidx, frag.edge_bary
 
-        # For each triangle, create edge pair via lookup in matrix
-        edge_idxs = (np.concatenate((a_mat[gg1[:, 0], gg1[:, 1]],
-                                      a_mat[gg2[:, 0], gg2[:, 1]]), axis=0).T - 1)
+        def _frag_reversed(frag):
+            """Return fragment arrays in reversed order."""
+            pts = frag.points[::-1]
+            tria_idx = frag.tria_idx[::-1]
+            edge_vidx = frag.edge_vidx[::-1]
+            edge_bary = frag.edge_bary[::-1]
+            return pts, tria_idx, edge_vidx, edge_bary
 
-        # Reduce edges to paths (returns list of paths for multiple components)
-        paths, path_edge_idxs = self._TriaMesh__reduce_edges_to_path(edge_idxs, get_edge_idx=True)
+        def _sv_point_and_meta(sv_idx):
+            """1-point arrays representing the special vertex itself."""
+            pt = self.v[sv_idx][np.newaxis, :]                      # (1,3)
+            ev = np.array([[sv_idx, sv_idx]])                        # (1,2) sentinel
+            eb = np.array([0.0])
+            return pt, ev, eb
 
-        # Build polygon objects for each connected component
-        polygons = []
-        for path_nodes, path_edge_idx in zip(paths, path_edge_idxs, strict=True):
-            # Get 3D coordinates for this path
-            poly_v = p[path_nodes, :]
+        # ------------------------------------------------------------------
+        # Step 6: process each special vertex
+        #
+        # For each special vertex sv we have a list of (frag_idx, which_end)
+        # pairs.  We resolve them in priority order:
+        #   1. Self-loop: fragment has BOTH its ends touching sv → close it.
+        #   2. Regular connector: exactly two *different* fragments each have
+        #      ONE end at sv → connect them through sv.
+        #   3. Saddle / boundary: remaining unmatched ends (count ≥ 4 or odd)
+        #      → emit each fragment separately with sv inserted at its endpoint.
+        # ------------------------------------------------------------------
+        result: list[polygon.Polygon] = []
+        used: set[int] = set()
 
-            # Remove duplicate vertices (when levelset hits a vertex almost perfectly)
-            dd = ((poly_v[0:-1, :] - poly_v[1:, :]) ** 2).sum(1)
-            dd = np.append(dd, 1)  # Never delete last node
-            eps = 0.000001
-            keep_ids = dd > eps
-            poly_v = poly_v[keep_ids, :]
+        for sv_idx, ends in sv_to_ends.items():
+            sv_pt, sv_ev, sv_eb = _sv_point_and_meta(sv_idx)
 
-            # Get triangle indices for each edge
-            poly_tria_idx = t_idx[path_edge_idx[keep_ids[:-1]]]
+            # --- Pass 1: close self-loops (fi appears twice in ends) -------
+            from collections import Counter
+            fi_counts = Counter(fi for fi, _ in ends)
+            self_loop_fis = {fi for fi, cnt in fi_counts.items() if cnt == 2}
 
-            # Get edge vertex indices
-            poly_edge_vidx = gg_unique[path_nodes[keep_ids], :]
+            for fi in sorted(self_loop_fis):
+                if fi in used:
+                    continue
+                used.add(fi)
+                frag = fragments[fi]
+                pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
+                # Both ends of this fragment touch sv.
+                # Build: sv -> fragment_body -> sv (Polygon auto-detects closure)
+                pts = np.vstack([sv_pt, pts_f, sv_pt])
+                ti  = ti_f
+                ev  = np.vstack([sv_ev, ev_f, sv_ev])
+                eb  = np.concatenate([sv_eb, eb_f, sv_eb])
+                result.append(_make_poly(pts, ti, ev, eb, closed_hint=None))
 
-            # Get barycentric coordinates
-            poly_edge_bary = xl[path_nodes[keep_ids]]
+            # Remaining ends after removing self-loops
+            remaining = [(fi, end) for fi, end in ends if fi not in self_loop_fis and fi not in used]
 
-            # Create polygon with metadata
-            # Use closed=None to let Polygon auto-detect based on endpoints
-            # This will automatically remove duplicate endpoint if present
-            n_points_before = poly_v.shape[0]
-            poly = polygon.Polygon(poly_v, closed=None)
-            n_points_after = poly.points.shape[0]
+            if len(remaining) == 0:
+                continue
 
-            # If Polygon removed duplicate endpoint, adjust metadata
-            if n_points_after < n_points_before:
-                # Remove last entry from metadata to match polygon points
-                poly_edge_vidx = poly_edge_vidx[:n_points_after]
-                poly_edge_bary = poly_edge_bary[:n_points_after]
+            if len(remaining) == 2:
+                # --- Pass 2: connect two different fragments through sv ----
+                (fi0, end0), (fi1, end1) = remaining
+                if fi0 in used or fi1 in used:
+                    continue
+                used.add(fi0)
+                used.add(fi1)
 
-            poly.tria_idx = poly_tria_idx
-            poly.edge_vidx = poly_edge_vidx
-            poly.edge_bary = poly_edge_bary
+                frag0 = fragments[fi0]
+                frag1 = fragments[fi1]
 
-            polygons.append(poly)
+                # Orient so sv-end is at the TAIL of each fragment
+                if end0 == 0:
+                    p0, t0, e0, b0 = _frag_reversed(frag0)
+                else:
+                    p0, t0, e0, b0 = _frag_arrays(frag0)
 
-        return polygons
+                if end1 == -1:
+                    p1, t1, e1, b1 = _frag_reversed(frag1)
+                else:
+                    p1, t1, e1, b1 = _frag_arrays(frag1)
+
+                # Concatenate: frag0 ... sv ... frag1
+                pts = np.vstack([p0, sv_pt, p1])
+                ti  = np.concatenate([t0, t1])
+                ev  = np.vstack([e0, sv_ev, e1])
+                eb  = np.concatenate([b0, sv_eb, b1])
+                result.append(_make_poly(pts, ti, ev, eb, closed_hint=None))
+
+            else:
+                # --- Pass 3: saddle, boundary, or boundary-saddle ---------
+                # remaining has 1 end (boundary vertex) or 4+ ends (saddle).
+                # In both cases: emit each fragment with sv at its endpoint.
+                n_remaining = len(remaining)
+                if n_remaining >= 4:
+                    logger.info(
+                        "Vertex %d is a saddle on the level set with %d branch ends "
+                        "at level %s. Emitting %d separate curves.",
+                        sv_idx, n_remaining, level, n_remaining,
+                    )
+                for fi, end in remaining:
+                    if fi in used:
+                        continue
+                    used.add(fi)
+                    frag = fragments[fi]
+                    if end == 0:
+                        pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
+                        pts = np.vstack([sv_pt, pts_f])
+                        ti  = ti_f
+                        ev  = np.vstack([sv_ev, ev_f])
+                        eb  = np.concatenate([sv_eb, eb_f])
+                    else:
+                        pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
+                        pts = np.vstack([pts_f, sv_pt])
+                        ti  = ti_f
+                        ev  = np.vstack([ev_f, sv_ev])
+                        eb  = np.concatenate([eb_f, sv_eb])
+                    result.append(_make_poly(pts, ti, ev, eb, closed_hint=False))
+
+        # ------------------------------------------------------------------
+        # Step 7: pass through fragments that don't touch any special vertex
+        # ------------------------------------------------------------------
+        for fi, frag in enumerate(fragments):
+            if fi not in used:
+                result.append(frag)
+
+        return result
 
     def level_path(
         self,

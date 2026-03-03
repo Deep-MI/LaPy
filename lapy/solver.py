@@ -729,8 +729,11 @@ class Solver:
         Parameters
         ----------
         h : float or np.ndarray, default=0.0
-            Right hand side, can be constant or array with vertex values.
-            The default ``0.0`` corresponds to Laplace equation ``A x = 0``.
+            Right hand side, can be a scalar, a 1-D array of shape
+            ``(n_vertices,)``, or a 2-D array of shape
+            ``(n_vertices, n_functions)`` to solve for multiple functions
+            simultaneously.  The default ``0.0`` corresponds to the Laplace
+            equation ``A x = 0``.
         dtup : tuple, default=()
             Dirichlet boundary condition as a tuple containing the index and
             data arrays of same length. The default, an empty tuple,
@@ -743,7 +746,9 @@ class Solver:
         Returns
         -------
         np.ndarray
-            Array with vertex values of the solution, shape (n_vertices,).
+            Array with vertex values of the solution, shape ``(n_vertices,)``
+            for a scalar or 1-D input, or ``(n_vertices, n_functions)`` for a
+            2-D input.
 
         Raises
         ------
@@ -768,17 +773,30 @@ class Solver:
                 "Error: Square input matrices should have same number of rows and "
                 "columns."
             )
-        # create vector h
+        # create vector/matrix h
         if np.isscalar(h):
             h = np.full((dim, 1), h, dtype=dtype)
         else:
             h = np.asarray(h, dtype=dtype)
-            if h.size != dim:
+            if h.ndim == 1:
+                if h.size != dim:
+                    raise ValueError(
+                        "h should be either scalar or column vector with row num of A"
+                    )
+                h = h[:, np.newaxis]
+            elif h.ndim == 2:
+                if h.shape[0] != dim:
+                    raise ValueError(
+                        "h should be either scalar or array with first dim matching A"
+                    )
+            else:
                 raise ValueError(
-                    "h should be either scalar or column vector with row num of A"
+                    "h should be either scalar or 1-D/2-D array"
                 )
-        if h.ndim == 1:
-            h = h[:, np.newaxis]
+        # number of right-hand sides
+        n_rhs = h.shape[1]
+        scalar_rhs = n_rhs == 1  # remember whether caller passed 1-D / scalar
+
         # create vector d
         didx = []
         dvec = []
@@ -794,8 +812,12 @@ class Solver:
                 raise ValueError(
                     "dtup should contain index and data arrays (same lengths > 0)"
                 )
+            # broadcast Dirichlet values across all rhs columns
             dvec = sparse.csc_matrix(
-                (ddat, (didx, np.zeros(len(didx), dtype=np.uint32))), (dim, 1), dtype=dtype
+                (np.tile(ddat, n_rhs),
+                 (np.tile(didx, n_rhs),
+                  np.repeat(np.arange(n_rhs), len(didx)))),
+                (dim, n_rhs), dtype=dtype
             )
 
         # create vector n
@@ -810,7 +832,10 @@ class Solver:
                     "dtup should contain index and data arrays (same lengths > 0)"
                 )
             nvec = sparse.csc_matrix(
-                (ndat, (nidx, np.zeros(len(nidx), dtype=np.uint32))), (dim, 1), dtype=dtype
+                (np.tile(ndat, n_rhs),
+                 (np.tile(nidx, n_rhs),
+                  np.repeat(np.arange(n_rhs), len(nidx)))),
+                (dim, n_rhs), dtype=dtype
             )
         # compute right hand side
         mass = self.mass.astype(dtype, copy=False)
@@ -836,7 +861,7 @@ class Solver:
                 raise ValueError("A matrix needs to be sparse CSC or CSR")
         else:
             a = self.stiffness
-        # solve A x = b
+        # solve A x = b  (both splu.solve and cholmod accept 2-D b natively)
         logger.debug("Matrix format now: %s", a.getformat())
         if self.use_cholmod:
             logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
@@ -848,11 +873,15 @@ class Solver:
             logger.info("Solver: spsolve (LU decomposition) ...")
             lu = splu(a)
             x = lu.solve(b.astype(dtype))
-        x = np.squeeze(np.array(x))
-        # pad Dirichlet nodes
+        # pad Dirichlet nodes back in
         if len(didx) > 0:
-            xfull = np.zeros(dim)
-            xfull[mask] = x
-            xfull[didx] = ddat
-            return xfull
+            xfull = np.zeros((dim, n_rhs), dtype=dtype)
+            xfull[mask, :] = x
+            xfull[didx, :] = dvec[didx, :].toarray()
+            x = xfull
+        # squeeze back to 1-D if the caller passed a scalar or 1-D rhs
+        if scalar_rhs:
+            x = np.squeeze(np.array(x))
+        else:
+            x = np.array(x)
         return x

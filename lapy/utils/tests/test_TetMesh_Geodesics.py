@@ -74,13 +74,6 @@ def test_evals_evec_dimension(load_tet_mesh, loaded_data):
 def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
     """
     Test the computation of gradients, normalization, and divergence for a TetMesh.
-
-    Parameters:
-        load_tet_mesh (fixture): Fixture to load a TetMesh for testing.
-        loaded_data (dict): Dictionary containing loaded test data.
-
-    Raises:
-        AssertionError: If any test condition is not met.
     """
     T = load_tet_mesh
     tria = T.boundary_tria()
@@ -90,20 +83,12 @@ def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
     # Compute gradients
     tfunc = compute_gradient(T, u)
 
-    # Define the expected shape of tfunc (gradient)
-    expected_tfunc_shape = (48000, 3)
-
-    # Assert that the shape of tfunc matches the expected shape
-    assert tfunc.shape == expected_tfunc_shape
+    assert tfunc.shape == (48000, 3)
 
     # Flip and normalize
     X = -tfunc / np.sqrt((tfunc**2).sum(1))[:, np.newaxis]
 
-    # Define the expected shape of X (normalized gradient)
-    expected_X_shape = (48000, 3)
-
-    # Assert that the shape of X matches the expected shape
-    assert X.shape == expected_X_shape
+    assert X.shape == (48000, 3)
 
     # Load the expected maximum and minimum values for each column of X
     expected_max_col_values = loaded_data["expected_outcomes"][
@@ -113,47 +98,29 @@ def test_gradients_normalization_and_divergence(load_tet_mesh, loaded_data):
         "test_TetMesh_Geodesics"
     ]["expected_min_col_values"]
 
-    # Assert maximum and minimum values of each column of X match the expected values
     for col in range(X.shape[1]):
         assert np.allclose(np.max(X[:, col]), expected_max_col_values[col], atol=1e-6)
         assert np.allclose(np.min(X[:, col]), expected_min_col_values[col], atol=1e-6)
 
     # Compute divergence
     divx = compute_divergence(T, X)
-
-    # Define the expected shape of divx (divergence)
-    expected_divx_shape = (9261,)
-
-    # Assert that the shape of divx matches the expected shape
-    assert divx.shape == expected_divx_shape
+    assert divx.shape == (9261,)
 
 
 def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     """
-    Test if matrix format, solver settings, max distance,
-    and computed values match the expected outcomes.
-
-    Parameters:
-    - loaded_data (dict): Dictionary containing loaded test data.
-
-    Raises:
-    - AssertionError: If any test condition is not met.
+    Test matrix format, solver settings, max distance, and computed values.
     """
-
     T = load_tet_mesh
     tria = T.boundary_tria()
     bvert = np.unique(tria.t)
     u = diffusion(T, bvert, m=1)
 
-    # get gradients
     tfunc = compute_gradient(T, u)
-    # flip and normalize
     X = -tfunc / np.sqrt((tfunc**2).sum(1))[:, np.newaxis]
     X = np.nan_to_num(X)
-    # compute divergence
     divx = compute_divergence(T, X)
 
-    # compute distance
     useCholmod = True
     try:
         from sksparse.cholmod import cholesky
@@ -161,12 +128,11 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
         useCholmod = False
 
     fem = Solver(T, lump=True)
-    A, B = fem.stiffness, fem.mass  # computed above when creating Solver
+    A, B = fem.stiffness, fem.mass
 
     H = A
     b0 = -divx
 
-    # solve H x = b0
     if useCholmod:
         print("Solver: cholesky decomp - performance optimal ...")
         chol = cholesky(H)
@@ -178,12 +144,9 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
 
     x = x - np.min(x)
 
-    # get heat diffusion
-
     v1func = T.v[:, 0] * T.v[:, 0] + T.v[:, 1] * T.v[:, 1] + T.v[:, 2] * T.v[:, 2]
     grad = compute_gradient(T, v1func)
     glength = np.sqrt(np.sum(grad * grad, axis=1))
-    A, B = fem.stiffness, fem.mass
     Bi = B.copy()
     Bi.data **= -1
     divx2 = Bi * divx

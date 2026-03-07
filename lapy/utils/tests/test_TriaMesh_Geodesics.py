@@ -119,7 +119,7 @@ def test_heat_diffusion_shape(load_square_mesh):
         None
     """
     T = load_square_mesh
-    bvert = T.boundary_loops()
+    bvert = np.concatenate(T.boundary_loops())
     u = diffusion(T, bvert, m=1)
     expected_shape = (len(T.v),)
     assert u.shape == expected_shape
@@ -130,7 +130,7 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
     Test geodesics format and accuracy.
     """
     T = load_square_mesh
-    bvert = T.boundary_loops()
+    bvert = np.concatenate(T.boundary_loops())
     u = diffusion(T, bvert, m=1)
     # compute gradient of heat diffusion
     tfunc = compute_gradient(T, u)

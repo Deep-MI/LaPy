@@ -1934,7 +1934,7 @@ class TriaMesh:
         level: float,
         t_idx: np.ndarray,
     ) -> list[polygon.Polygon]:
-        """Core level-path extraction on a pre-selected subset of triangles.
+        """Core level-path extraction on a preselected subset of triangles.
 
         Internal helper used by extract_level_paths. Computes edge-edge intersections
         with the level set for the given triangle indices and assembles them into

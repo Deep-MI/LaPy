@@ -112,7 +112,7 @@ def kernel(
 
 def diffusion(
     geometry: object,
-    vids: Union[int, np.ndarray],
+    vids: int | np.ndarray | list[int] | list[list[int]] | list[np.ndarray],
     m: float = 1.0,
     aniso: Optional[int] = None,
     use_cholmod: bool = False,
@@ -126,8 +126,32 @@ def diffusion(
     ----------
     geometry : TriaMesh or TetMesh
         Geometric object on which to run diffusion.
-    vids : int or np.ndarray
+    vids : int, np.ndarray, list[int], list[list[int]], or list[np.ndarray]
         Vertex index or indices where initial heat is applied.
+
+        The nesting level determines whether one or multiple seed sets are
+        computed:
+
+        - **Single seed set** — ``int``, ``np.ndarray``, or ``list[int]``:
+          heat is seeded at those vertices and a 1-D result array of shape
+          ``(n_vertices,)`` is returned.
+        - **Multiple seed sets** — ``list[list[int]]`` or
+          ``list[np.ndarray]``: each inner sequence defines one independent
+          seed set.  The heat matrix is factorised only once and reused for
+          all sets.  A 2-D array of shape ``(n_vertices, n_cases)`` is
+          returned, where column ``k`` corresponds to ``vids[k]``.
+
+        .. note::
+            The direct output of :func:`~lapy.TriaMesh.boundary_loops` is a
+            ``list[list[int]]`` and therefore treated as **multiple seed
+            sets** (one diffusion per boundary loop).  To compute the
+            distance from *all* boundary vertices at once, concatenate the
+            loops first::
+
+                loops = tria.boundary_loops()
+                all_bnd = np.concatenate(loops)
+                vfunc = diffusion(tria, all_bnd)
+
     m : float, default=1.0
         Factor to compute time of heat evolution.
     aniso : int, default=None
@@ -139,7 +163,8 @@ def diffusion(
     Returns
     -------
     np.ndarray
-        Heat diffusion values at vertices, shape (n_vertices,).
+        Heat diffusion values at vertices.  Shape ``(n_vertices,)`` for a
+        single seed set, or ``(n_vertices, n_cases)`` for multiple seed sets.
 
     Raises
     ------
@@ -156,18 +181,38 @@ def diffusion(
     from . import Solver
 
     nv = len(geometry.v)
-    vids = np.asarray(vids, dtype=int)
-    if np.any(vids < 0) or np.any(vids >= nv):
-        raise ValueError("vids contains out-of-range vertex indices")
+
+    # ------------------------------------------------------------------
+    # Nesting level determines single vs. multiple seed sets:
+    #   Multiple: list[list[int]] or list[np.ndarray]  → scalar_input=False
+    #   Single  : int, np.ndarray, or list[int]        → scalar_input=True
+    # ------------------------------------------------------------------
+    if isinstance(vids, list) and len(vids) > 0 and isinstance(
+        vids[0], (list, np.ndarray)
+    ):
+        scalar_input = False
+        vids_list = [np.asarray(v, dtype=int).ravel() for v in vids]
+    else:
+        scalar_input = True
+        vids_list = [np.asarray(vids, dtype=int).ravel()]
+
+    for v in vids_list:
+        if np.any(v < 0) or np.any(v >= nv):
+            raise ValueError("vids contains out-of-range vertex indices")
+
     fem = Solver(geometry, lump=True, aniso=aniso)
     # time of heat evolution:
     t = m * geometry.avg_edge_length() ** 2
-    # backward Euler matrix:
+    # backward Euler matrix (same for all cases):
     hmat = fem.mass + t * fem.stiffness
-    # set initial heat
-    b0 = np.zeros((nv,))
-    b0[vids] = 1.0
-    # solve H x = b0
+
+    # Build rhs matrix — each column is one initial-heat vector
+    n_cases = len(vids_list)
+    b0 = np.zeros((nv, n_cases))
+    for k, v in enumerate(vids_list):
+        b0[v, k] = 1.0
+
+    # Solve — both splu.solve and cholmod accept 2-D rhs natively
     logger.debug("Matrix Format: %s", hmat.getformat())
     if use_cholmod:
         logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod")
@@ -178,5 +223,9 @@ def diffusion(
 
         logger.info("Solver: LU decomposition via splu")
         lu = splu(hmat)
-        vfunc = lu.solve(np.float32(b0))
+        vfunc = lu.solve(b0.astype(np.float64))
+
+    # Return 1-D array for the single-case (backward compatible) path
+    if scalar_input:
+        return vfunc[:, 0]
     return vfunc

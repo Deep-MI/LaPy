@@ -278,7 +278,7 @@
 mesh geometries (tet or tria mesh) for heat diffusion.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.diagonal">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L18-L59"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diagonal" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L19-L60"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diagonal" title="Link to this definition">¶</a></dt>
 <dd><p>Compute heat kernel diagonal K(t,x,x).</p>
 <p>For a given time t (can be a vector) using only the first n smallest
 eigenvalues and eigenvectors.</p>
@@ -316,7 +316,7 @@ in x, columns to times in t.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.diffusion">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L113-L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aniso</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L114-L232"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.diffusion" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the heat diffusion from initial vertices in vids.</p>
 <p>Uses the backward Euler solution with time <span class="math notranslate nohighlight">\(t = m l^2\)</span>, where l
 describes the average edge length.</p>
@@ -325,7 +325,32 @@ describes the average edge length.</p>
 <dd class="field-odd"><dl>
 <dt><strong>geometry</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> or <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Geometric object on which to run diffusion.</p>
 </dd>
-<dt><strong>vids</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Vertex index or indices where initial heat is applied.</p>
+<dt><strong>vids</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v2.4)"><span>array_like</span></a></span></dt><dd><p>Vertex index or indices where initial heat is applied.</p>
+<p>The nesting level determines whether one or multiple seed sets are
+computed:</p>
+<ul class="simple">
+<li><p><strong>Single seed set</strong> — an <code class="docutils literal notranslate"><span class="pre">int</span></code>, a 1-D <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>, or a plain
+<code class="docutils literal notranslate"><span class="pre">list[int]</span></code>: heat is seeded at those vertices and a 1-D result
+array of shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code> is returned.</p></li>
+<li><p><strong>Multiple seed sets</strong> — a <code class="docutils literal notranslate"><span class="pre">list[list[int]]</span></code> or a
+<code class="docutils literal notranslate"><span class="pre">list[np.ndarray]</span></code>: each inner sequence defines one independent
+seed set.  The heat matrix is factorised only once and reused for
+all sets.  A 2-D array of shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_cases)</span></code> is
+returned, where column <code class="docutils literal notranslate"><span class="pre">k</span></code> corresponds to <code class="docutils literal notranslate"><span class="pre">vids[k]</span></code>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The direct output of <a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh.boundary_loops" title="lapy.TriaMesh.boundary_loops"><code class="xref py py-func docutils literal notranslate"><span class="pre">boundary_loops()</span></code></a> is a
+<code class="docutils literal notranslate"><span class="pre">list[list[int]]</span></code> and therefore treated as <strong>multiple seed
+sets</strong> (one diffusion per boundary loop).  To compute the
+distance from <em>all</em> boundary vertices at once, concatenate the
+loops first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loops</span> <span class="o">=</span> <span class="n">tria</span><span class="o">.</span><span class="n">boundary_loops</span><span class="p">()</span>
+<span class="n">all_bnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span>
+<span class="n">vfunc</span> <span class="o">=</span> <span class="n">diffusion</span><span class="p">(</span><span class="n">tria</span><span class="p">,</span> <span class="n">all_bnd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </dd>
 <dt><strong>m</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1.0</span></dt><dd><p>Factor to compute time of heat evolution.</p>
 </dd>
@@ -338,7 +363,8 @@ scikit-sparse cholmod. If False, use spsolve (LU decomposition).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Heat diffusion values at vertices, shape (n_vertices,).</p>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Heat diffusion values at vertices.  Shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code> for a
+single seed set, or <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_cases)</span></code> for multiple seed sets.</p>
 </dd>
 </dl>
 </dd>
@@ -355,7 +381,7 @@ scikit-sparse cholmod. If False, use spsolve (LU decomposition).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.heat.kernel">
-<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L62-L110"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.kernel" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.heat.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/heat.py#L63-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.heat.kernel" title="Link to this definition">¶</a></dt>
 <dd><p>Compute heat kernel from all points to a fixed point.</p>
 <p>For a given time t, computes K_t(p,q) using only the first n smallest
 eigenvalues and eigenvectors:</p>

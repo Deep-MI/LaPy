@@ -256,9 +256,11 @@
     }
    ],
    "source": [
+    "import numpy as np\n",
+    "\n",
     "from lapy import heat\n",
     "\n",
-    "bvert = T.boundary_loops()\n",
+    "bvert = np.concatenate(T.boundary_loops())\n",
     "u = heat.diffusion(T, bvert, m=1)"
    ]
   },

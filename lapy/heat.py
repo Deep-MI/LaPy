@@ -127,16 +127,16 @@ def diffusion(
     ----------
     geometry : TriaMesh or TetMesh
         Geometric object on which to run diffusion.
-    vids : int, np.ndarray, list[int], list[list[int]], or list[np.ndarray]
+    vids : int or array-like
         Vertex index or indices where initial heat is applied.
 
         The nesting level determines whether one or multiple seed sets are
         computed:
 
-        - **Single seed set** — ``int``, ``np.ndarray``, or ``list[int]``:
-          heat is seeded at those vertices and a 1-D result array of shape
-          ``(n_vertices,)`` is returned.
-        - **Multiple seed sets** — ``list[list[int]]`` or
+        - **Single seed set** — an ``int``, a 1-D ``np.ndarray``, or a plain
+          ``list[int]``: heat is seeded at those vertices and a 1-D result
+          array of shape ``(n_vertices,)`` is returned.
+        - **Multiple seed sets** — a ``list[list[int]]`` or a
           ``list[np.ndarray]``: each inner sequence defines one independent
           seed set.  The heat matrix is factorised only once and reused for
           all sets.  A 2-D array of shape ``(n_vertices, n_cases)`` is

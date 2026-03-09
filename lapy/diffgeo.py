@@ -113,7 +113,11 @@ def compute_rotated_f(geom: "TriaMesh", vfunc: np.ndarray) -> np.ndarray:
         raise ValueError('Geometry type "' + type(geom).__name__ + '" not implemented')
 
 
-def compute_geodesic_f(geom: Union["TriaMesh", "TetMesh"], vfunc: np.ndarray) -> np.ndarray:
+def compute_geodesic_f(
+    geom: Union["TriaMesh", "TetMesh"],
+    vfunc: np.ndarray,
+    use_cholmod: bool = False,
+) -> np.ndarray:
     """Compute function with normalized gradient (geodesic distance).
 
     Computes gradient, normalizes it, and computes function with this normalized
@@ -127,6 +131,9 @@ def compute_geodesic_f(geom: Union["TriaMesh", "TetMesh"], vfunc: np.ndarray) ->
     vfunc : np.ndarray
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
+    use_cholmod : bool, default=False
+        If True, use Cholesky decomposition from scikit-sparse cholmod for the
+        linear solve. If False, use spsolve (LU decomposition).
 
     Returns
     -------
@@ -138,7 +145,7 @@ def compute_geodesic_f(geom: Union["TriaMesh", "TetMesh"], vfunc: np.ndarray) ->
     scalar_input = vfunc.ndim == 1
 
     gradf = compute_gradient(geom, vfunc)
-    fem = Solver(geom, lump=True)
+    fem = Solver(geom, lump=True, use_cholmod=use_cholmod)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
 
     if scalar_input:
@@ -158,20 +165,27 @@ def compute_geodesic_f(geom: Union["TriaMesh", "TetMesh"], vfunc: np.ndarray) ->
     return vf
 
 
-def tria_compute_geodesic_f(tria: TriaMesh, vfunc: np.ndarray) -> np.ndarray:
-    """Compute function with normalized gradient (geodesic distance).
+def tria_compute_geodesic_f(
+    tria: TriaMesh,
+    vfunc: np.ndarray,
+    use_cholmod: bool = False,
+) -> np.ndarray:
+    """Compute geodesic distance on a triangle mesh.
 
-    Computes gradient, normalizes it and computes function with this normalized
-    gradient by solving the Poisson equation with the divergence of grad.
-    This idea is also described in the paper "Geodesics in Heat".
+    Follows the idea of "Geodesics in Heat" by solving the Poisson equation
+    with the divergence of the normalized gradient to obtain the geodesic
+    distance function.
 
     Parameters
     ----------
     tria : TriaMesh
-        Triangle mesh.
+        Triangle mesh geometry.
     vfunc : np.ndarray
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
+    use_cholmod : bool, default=False
+        If True, use Cholesky decomposition from scikit-sparse cholmod for the
+        linear solve. If False, use spsolve (LU decomposition).
 
     Returns
     -------
@@ -183,7 +197,7 @@ def tria_compute_geodesic_f(tria: TriaMesh, vfunc: np.ndarray) -> np.ndarray:
     scalar_input = vfunc.ndim == 1
 
     gradf = tria_compute_gradient(tria, vfunc)
-    fem = Solver(tria)
+    fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
     # div is the integrated divergence (so it is already B*div);
     # pass identity instead of B here
     fem.mass = sparse.eye(fem.stiffness.shape[0])
@@ -455,36 +469,40 @@ def tria_compute_divergence2(tria: TriaMesh, tfunc: np.ndarray) -> np.ndarray:
     return vfunc
 
 
-def tria_compute_rotated_f(tria: TriaMesh, vfunc: np.ndarray) -> np.ndarray:
-    """Compute function whose level sets are orthgonal to the ones of vfunc.
+def tria_compute_rotated_f(
+    tria: TriaMesh,
+    vfunc: np.ndarray,
+    use_cholmod: bool = False,
+) -> np.ndarray:
+    """Compute function with rotated gradient on a triangle mesh.
 
-    This is done by rotating the gradient around the normal by 90 degrees,
-    then solving the Poisson equations with the divergence of rotated grad.
+    Solves the Poisson equation for the divergence of the rotated
+    gradient function of vfunc. The rotation is 90 degrees around the
+    mesh normals.
 
     Parameters
     ----------
     tria : TriaMesh
-        Triangle mesh.
+        Triangle mesh geometry.
     vfunc : np.ndarray
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
+    use_cholmod : bool, default=False
+        If True, use Cholesky decomposition from scikit-sparse cholmod for the
+        linear solve. If False, use spsolve (LU decomposition).
 
     Returns
     -------
     np.ndarray
-        Rotated scalar function at vertices, shape ``(n_vertices,)`` or
+        Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
-
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
     """
     vfunc = np.asarray(vfunc)
     scalar_input = vfunc.ndim == 1
 
     gradf = tria_compute_gradient(tria, vfunc)
     tn = tria.tria_normals()
-    fem = Solver(tria)
+    fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
     fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     dtup = (np.array([0]), np.array([0.0]))
 

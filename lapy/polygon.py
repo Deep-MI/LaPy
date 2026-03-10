@@ -27,9 +27,11 @@ class Polygon:
         marked as closed automatically.
     closed : bool or None, default=None
         - If None (default): Auto-detect by checking if first and last points
-          are identical. If they are, removes duplicate endpoint and sets closed=True.
-        - If True: Treats the path as a closed polygon. If the last point duplicates
-          the first, it will be removed.
+          are **exactly** equal (``np.array_equal``).  Only an exact duplicate
+          is removed; nearly-equal but geometrically distinct endpoints are left
+          untouched and the polygon is treated as open.
+        - If True: Treats the path as a closed polygon.  If the last point is
+          nearly equal to the first (``np.allclose``), it is removed.
         - If False: Treats the path as an open polyline regardless of endpoints.
 
     Attributes
@@ -100,16 +102,19 @@ class Polygon:
 
         # Auto-detect closed polygons or handle explicit closed parameter
         if closed is None:
-            # Auto-detect: check if first and last points are identical
-            if len(self.points) > 1 and np.allclose(self.points[0], self.points[-1]):
-                # Remove duplicate endpoint
+            # Auto-detect: strip duplicate endpoint only when first and last
+            # points are exactly identical.  np.allclose is intentionally
+            # avoided here — nearly-equal but distinct endpoints should not
+            # be silently removed when the caller has not requested closure.
+            if len(self.points) > 1 and np.array_equal(self.points[0], self.points[-1]):
                 self.points = self.points[:-1]
                 self.closed = True
             else:
-                # Not closed (endpoints differ)
                 self.closed = False
         elif closed:
-            # Explicitly closed: remove duplicate endpoint if present
+            # Explicitly closed: remove duplicate endpoint if present.
+            # np.allclose is used here because the caller has explicitly
+            # requested closure, so stripping a near-duplicate is intentional.
             if len(self.points) > 1 and np.allclose(self.points[0], self.points[-1]):
                 self.points = self.points[:-1]
             self.closed = True
@@ -140,9 +145,11 @@ class Polygon:
     def close(self) -> "Polygon":
         """Mark the polygon as closed in-place.
 
-        If the last point duplicates the first it is removed; otherwise the
-        polygon is simply flagged as closed (the closing segment is implicit,
-        from the last point back to the first).
+        If the last point is nearly equal to the first (``np.allclose``), it is
+        removed; otherwise the polygon is simply flagged as closed (the closing
+        segment from the last point back to the first is implicit).  Using
+        ``np.allclose`` here is intentional: the caller has explicitly requested
+        closure, so stripping a near-duplicate endpoint is the expected behaviour.
 
         Returns
         -------

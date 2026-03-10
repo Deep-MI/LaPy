@@ -10,6 +10,137 @@ from . import polygon
 
 logger = logging.getLogger(__name__)
 
+
+def _reduce_edges_to_path(
+    edges: np.ndarray,
+    start_idx: int | None = None,
+    get_edge_idx: bool = False,
+) -> list | tuple[list, list]:
+    """Reduce undirected unsorted edges to ordered path(s).
+
+    Converts unordered edge pairs into ordered paths by finding traversals.
+    Handles single open paths, closed loops, and multiple disconnected components.
+    Always returns lists to handle multiple components uniformly.
+
+    Parameters
+    ----------
+    edges : np.ndarray
+        Array of shape (n, 2) with pairs of positive integer node indices
+        representing undirected edges. Node indices can have gaps (i.e., not all
+        indices from 0 to max need to appear in the edges). Only nodes that
+        actually appear in edges are processed.
+    start_idx : int or None, default=None
+        Preferred start node. If None, selects an endpoint (degree 1) automatically,
+        or arbitrary node for closed loops. Must be a node that appears in edges.
+    get_edge_idx : bool, default=False
+        If True, also return edge indices for each path segment.
+
+    Returns
+    -------
+    paths : list[np.ndarray]
+        List of ordered paths, one per connected component. For closed loops,
+        first node is repeated at end.
+    edge_idxs : list[np.ndarray]
+        List of edge index arrays, one per component. Only returned if
+        get_edge_idx=True.
+
+    Raises
+    ------
+    ValueError
+        If start_idx is invalid.
+        If graph has degree > 2 (branching or self-intersections).
+    """
+    edges = np.array(edges)
+    if edges.shape[0] == 0:
+        return ([], []) if get_edge_idx else []
+
+    # Build adjacency matrix
+    i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
+    j = np.column_stack((edges[:, 1], edges[:, 0])).reshape(-1)
+    dat = np.ones(i.shape)
+    n = edges.max() + 1
+    adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
+    degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
+
+    # Find connected components
+    n_comp, labels = sparse.csgraph.connected_components(adj_matrix, directed=False)
+
+    # Build edge index lookup matrix
+    edge_dat = np.arange(edges.shape[0]) + 1
+    edge_dat = np.column_stack((edge_dat, edge_dat)).reshape(-1)
+    eidx_matrix = sparse.csr_matrix((edge_dat, (i, j)), shape=(n, n))
+
+    paths = []
+    edge_idxs = []
+
+    for comp_id in range(n_comp):
+        comp_nodes = np.where(labels == comp_id)[0]
+        if len(comp_nodes) == 0:
+            continue
+
+        comp_degrees = degrees[comp_nodes]
+
+        # Skip isolated nodes (degree 0) that exist only due to matrix sizing.
+        if np.all(comp_degrees == 0):
+            continue
+
+        # Reject graphs with nodes of degree > 2 (branching / self-intersections)
+        max_degree = comp_degrees.max()
+        if max_degree > 2:
+            high_degree_nodes = comp_nodes[comp_degrees > 2]
+            raise ValueError(
+                f"Component {comp_id}: found {len(high_degree_nodes)} node(s) with "
+                f"degree > 2 (max degree: {max_degree}). "
+                f"Only simple paths and simple closed loops are supported."
+            )
+
+        # Determine if closed loop: all nodes have degree 2
+        is_closed = np.all(comp_degrees == 2)
+
+        # For closed loops: break one edge to convert to open path for traversal
+        if is_closed:
+            start = start_idx if (start_idx is not None and start_idx in comp_nodes) else comp_nodes[0]
+            neighbors = adj_matrix[start, :].nonzero()[1]
+            neighbors_in_comp = [nb for nb in neighbors if nb in comp_nodes]
+            if len(neighbors_in_comp) < 2:
+                raise ValueError(
+                    f"Component {comp_id}: closed loop node {start} has fewer than 2 neighbours."
+                )
+            adj_matrix = adj_matrix.tolil()
+            break_neighbor = neighbors_in_comp[0]
+            adj_matrix[start, break_neighbor] = 0
+            adj_matrix[break_neighbor, start] = 0
+            adj_matrix = adj_matrix.tocsr()
+            degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
+            comp_degrees = degrees[comp_nodes]
+
+        endpoints = comp_nodes[comp_degrees == 1]
+        if len(endpoints) != 2:
+            raise ValueError(
+                f"Component {comp_id}: expected 2 endpoints, found {len(endpoints)}."
+            )
+
+        if not is_closed:
+            start = start_idx if (start_idx is not None and start_idx in endpoints) else endpoints[0]
+
+        dist = sparse.csgraph.shortest_path(adj_matrix, indices=start, directed=False)
+        if np.isinf(dist[comp_nodes]).any():
+            raise ValueError(f"Component {comp_id} is not fully connected.")
+
+        path = comp_nodes[dist[comp_nodes].argsort()]
+        if is_closed:
+            path = np.append(path, path[0])
+        paths.append(path)
+
+        if get_edge_idx:
+            ei = path[:-1]
+            ej = path[1:]
+            eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
+            edge_idxs.append(eidx)
+
+    return (paths, edge_idxs) if get_edge_idx else paths
+
+
 class TriaMesh:
     """Class representing a triangle mesh.
 
@@ -1685,6 +1816,10 @@ class TriaMesh:
         self.v = vfunc
         return
 
+    # ------------------------------------------------------------------
+    # Level-set methods
+    # ------------------------------------------------------------------
+
     def level_length(self, vfunc: np.ndarray, level: float | np.ndarray) -> float | np.ndarray:
         """Compute the length of level sets.
 
@@ -1759,174 +1894,6 @@ class TriaMesh:
         else:
             raise ValueError("No lengths computed, should never get here.")
 
-    @staticmethod
-    def __reduce_edges_to_path(
-        edges: np.ndarray,
-        start_idx: int | None = None,
-        get_edge_idx: bool = False,
-    ) -> list | tuple[list, list]:
-        """Reduce undirected unsorted edges to ordered path(s).
-
-        Converts unordered edge pairs into ordered paths by finding traversals.
-        Handles single open paths, closed loops, and multiple disconnected components.
-        Always returns lists to handle multiple components uniformly.
-
-        Parameters
-        ----------
-        edges : np.ndarray
-            Array of shape (n, 2) with pairs of positive integer node indices
-            representing undirected edges. Node indices can have gaps (i.e., not all
-            indices from 0 to max need to appear in the edges). Only nodes that
-            actually appear in edges are processed.
-        start_idx : int or None, default=None
-            Preferred start node. If None, selects an endpoint (degree 1) automatically,
-            or arbitrary node for closed loops. Must be a node that appears in edges.
-        get_edge_idx : bool, default=False
-            If True, also return edge indices for each path segment.
-
-        Returns
-        -------
-        paths : list[np.ndarray]
-            List of ordered paths, one per connected component. For closed loops,
-            first node is repeated at end.
-        edge_idxs : list[np.ndarray]
-            List of edge index arrays, one per component. Only returned if
-            get_edge_idx=True.
-
-        Raises
-        ------
-        ValueError
-            If start_idx is invalid.
-            If graph has degree > 2 (branching or self-intersections).
-        """
-        edges = np.array(edges)
-        if edges.shape[0] == 0:
-            return ([], []) if get_edge_idx else []
-
-        # Build adjacency matrix
-        i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
-        j = np.column_stack((edges[:, 1], edges[:, 0])).reshape(-1)
-        dat = np.ones(i.shape)
-        n = edges.max() + 1
-        adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
-        degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
-
-        # Find connected components
-        n_comp, labels = sparse.csgraph.connected_components(adj_matrix, directed=False)
-
-        # Build edge index lookup matrix
-        edge_dat = np.arange(edges.shape[0]) + 1
-        edge_dat = np.column_stack((edge_dat, edge_dat)).reshape(-1)
-        eidx_matrix = sparse.csr_matrix((edge_dat, (i, j)), shape=(n, n))
-
-        paths = []
-        edge_idxs = []
-
-        for comp_id in range(n_comp):
-            comp_nodes = np.where(labels == comp_id)[0]
-            if len(comp_nodes) == 0:
-                continue
-
-            comp_degrees = degrees[comp_nodes]
-
-            # Skip isolated nodes (degree 0) that exist only due to matrix sizing.
-            # When edges use indices [0, 5, 10], we create a matrix of size 11x11.
-            # Indices [1,2,3,4,6,7,8,9] don't appear in any edges (have degree 0).
-            # connected_components treats each as a separate component, but they're
-            # not real nodes - just phantom entries from sizing matrix to max_index+1.
-            if np.all(comp_degrees == 0):
-                continue
-
-            # SAFETY CHECK: Reject graphs with nodes of degree > 2
-            # This single check catches all problematic cases:
-            # - Branching structures (Y-shape, star graph)
-            # - Self-intersections (figure-8, etc.)
-            # - Trees with multiple endpoints
-            # Valid graphs have only degree 1 (endpoints) and degree 2 (path nodes)
-            max_degree = comp_degrees.max()
-            if max_degree > 2:
-                high_degree_nodes = comp_nodes[comp_degrees > 2]
-                raise ValueError(
-                    f"Component {comp_id}: found {len(high_degree_nodes)} node(s) with degree > 2 "
-                    f"(max degree: {max_degree}). Degrees: {np.sort(comp_degrees)}. "
-                    f"This indicates branching or self-intersecting structure. "
-                    f"Only simple paths and simple closed loops are supported."
-                )
-
-            # Determine if closed loop: all nodes have degree 2
-            is_closed = np.all(comp_degrees == 2)
-
-            # For closed loops: break one edge to convert to open path
-            if is_closed:
-                # Pick start node
-                if start_idx is not None and start_idx in comp_nodes:
-                    start = start_idx
-                else:
-                    start = comp_nodes[0]
-
-                # Find neighbors of start node to break one edge
-                neighbors = adj_matrix[start, :].nonzero()[1]
-                neighbors_in_comp = [n for n in neighbors if n in comp_nodes]
-
-                if len(neighbors_in_comp) < 2:
-                    raise ValueError(f"Component {comp_id}: Closed loop node {start} should have 2 neighbors")
-
-                # Break the edge from start to first neighbor (temporarily)
-                adj_matrix = adj_matrix.tolil()
-                break_neighbor = neighbors_in_comp[0]
-                adj_matrix[start, break_neighbor] = 0
-                adj_matrix[break_neighbor, start] = 0
-                adj_matrix = adj_matrix.tocsr()
-
-                # Update degrees after breaking edge
-                degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
-                comp_degrees = degrees[comp_nodes]
-
-            # Now handle as open path (both originally open and converted closed loops)
-            endpoints = comp_nodes[comp_degrees == 1]
-
-            if len(endpoints) != 2:
-                raise ValueError(
-                    f"Component {comp_id}: Expected 2 endpoints after breaking loop, found {len(endpoints)}"
-                )
-
-            # Select start node
-            if is_closed:
-                # For closed loops, start is already selected above
-                pass
-            elif start_idx is not None and start_idx in endpoints:
-                start = start_idx
-            else:
-                # For originally open paths, pick first endpoint
-                start = endpoints[0]
-
-            # Use shortest_path to order nodes by distance from start
-            dist = sparse.csgraph.shortest_path(adj_matrix, indices=start, directed=False)
-
-            if np.isinf(dist[comp_nodes]).any():
-                raise ValueError(f"Component {comp_id} is not fully connected.")
-
-            # Sort nodes by distance from start
-            path = comp_nodes[dist[comp_nodes].argsort()]
-
-            # For closed loops: append start again to close the loop
-            if is_closed:
-                path = np.append(path, path[0])
-
-            paths.append(path)
-
-            # Get edge indices if requested
-            if get_edge_idx:
-                ei = path[:-1]
-                ej = path[1:]
-                eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
-                edge_idxs.append(eidx)
-
-        # Always return lists
-        if get_edge_idx:
-            return paths, edge_idxs
-        else:
-            return paths
 
     def _extract_level_paths_core(
         self,
@@ -2013,7 +1980,7 @@ class TriaMesh:
         )
 
         # Reduce edges to ordered paths / loops
-        paths, path_edge_idxs = self._TriaMesh__reduce_edges_to_path(
+        paths, path_edge_idxs = _reduce_edges_to_path(
             edge_idxs, get_edge_idx=True
         )
 
@@ -2057,21 +2024,16 @@ class TriaMesh:
     ) -> list[polygon.Polygon]:
         """Extract level set paths as Polygon objects with triangle/edge metadata.
 
-        For a given scalar function on mesh vertices, extracts all paths where
-        the function equals the specified level. Returns polygons with embedded
-        metadata about which triangles and edges were intersected.
+        Extracts all paths where ``vfunc`` equals ``level`` on the mesh surface.
+        Handles open paths, closed loops, multiple disconnected components, and
+        level sets that pass exactly through mesh vertices:
 
-        Handles single open paths, closed loops, multiple disconnected components,
-        and level sets that pass exactly through mesh vertices (including saddle
-        vertices). When the level set hits a vertex exactly:
-
-        - At a **regular vertex**: the two path fragments are reconnected through
+        - **Regular vertex**: the two adjacent fragments are reconnected through
           the vertex into a single continuous path or loop.
-        - At a **saddle vertex**: the level set splits into separate curves (one per
-          lobe). Each curve is emitted as an independent Polygon. An info message
-          is logged when this happens.
-        - At a **boundary vertex**: the open path fragment is extended to include
-          the vertex as its endpoint.
+        - **Saddle vertex**: the level set splits; each branch is emitted as an
+          independent Polygon (potentially closed) and an info message is logged.
+        - **Boundary vertex**: the open fragment is extended to include the vertex
+          as its endpoint.
 
         Parameters
         ----------
@@ -2086,17 +2048,17 @@ class TriaMesh:
         Returns
         -------
         list[polygon.Polygon]
-            List of Polygon objects, one for each connected level curve component.
-            Each polygon has the following additional attributes:
+            One Polygon per connected level curve component.  Each polygon
+            carries extra attributes set after construction:
 
-            - points : np.ndarray of shape (n_points, 3) - 3D coordinates on level curve
-            - closed : bool - whether the curve is closed
-            - tria_idx : np.ndarray of shape (n_segments,) - triangle index for each segment
-            - edge_vidx : np.ndarray of shape (n_points, 2) - mesh vertex indices for the
-              intersected edge (original mesh vertex indices)
-            - edge_bary : np.ndarray of shape (n_points,) - barycentric coordinate [0,1]
-              along each edge where the level set intersects
-              (0 = first vertex of edge, 1 = second vertex)
+            - ``tria_idx`` : np.ndarray, shape (n_segments,) — triangle index
+              per segment; ``-1`` for segments adjacent to a special vertex.
+            - ``edge_vidx`` : np.ndarray, shape (n_points, 2) — mesh vertex
+              indices of the intersected edge per point.  For special-vertex
+              points both indices are equal (degenerate edge).
+            - ``edge_bary`` : np.ndarray, shape (n_points,) — barycentric
+              coordinate in [0, 1] along each edge (0 = first vertex, 1 =
+              second vertex); 0.0 for special-vertex points.
 
         Raises
         ------
@@ -2105,13 +2067,9 @@ class TriaMesh:
 
         Notes
         -----
-        When two or more vertices of the same triangle are exactly on the level set
-        (the level set runs along a mesh edge), a warning is issued and those triangles
-        are skipped. The returned curves may be incomplete in that case.
-
-        For saddle vertices at the same level value (saddle-to-saddle paths), an info
-        message is logged and the fragments are emitted separately with the shared
-        vertex appended to each endpoint.
+        When two or more vertices of the same triangle lie exactly on the level
+        set (level set runs along a mesh edge), a warning is issued and those
+        triangles are skipped.  The returned curves may be incomplete.
         """
         if vfunc.ndim > 1:
             raise ValueError(f"vfunc needs to be 1-dim, but is {vfunc.ndim}-dim!")
@@ -2158,49 +2116,121 @@ class TriaMesh:
             return fragments
 
         # ------------------------------------------------------------------
-        # Step 5: build a lookup from sorted edge pair -> special vertex.
+        # Step 5: for each fragment endpoint edge (i,j), check whether it
+        # borders a masked triangle whose third vertex is a special vertex,
+        # and if so prepend/append that sv point directly into the fragment.
         #
-        # When we mask the triangles that touch special vertex sv, the fragment
-        # endpoints land on the *opposite* edges of those masked triangles —
-        # i.e., edges (a, b) where triangle (sv, a, b) was masked out.
-        # These edges do NOT contain sv as a vertex, so we cannot detect them
-        # by looking for sv in the edge endpoints.  Instead we build a map:
-        #   sorted (a, b) -> sv_idx
-        # for every masked triangle at sv.  Then we match fragment endpoint
-        # edges against this map.
+        # We search masked_trias (the small set of triangles touching any sv)
+        # for a row containing both i and j.  If found, the third vertex is
+        # by construction a special vertex — no separate sv lookup needed.
+        #
+        # A special-vertex point is encoded as:
+        #   edge_vidx = [sv_idx, sv_idx]  (degenerate edge)
+        #   edge_bary = 0.0
+        #   tria_idx  = -1                (sentinel, no triangle crossing)
         # ------------------------------------------------------------------
-        from collections import defaultdict
-        # opposite_edge_to_sv: tuple(a,b) (sorted) -> sv_idx
-        opposite_edge_to_sv: dict[tuple[int, int], int] = {}
-        for sv_idx in special_verts.tolist():
-            # All triangles that contain sv AND were masked
-            sv_mask = touches_special & np.any(self.t == sv_idx, axis=1)
-            for tri in self.t[sv_mask]:
-                opp = sorted(int(v) for v in tri if v != sv_idx)
-                if len(opp) == 2:
-                    key = (opp[0], opp[1])
-                    opposite_edge_to_sv[key] = sv_idx
 
-        def _sv_of_endpoint(frag, end):
-            """Return the special-vertex index whose opposite edge matches this endpoint, or None."""
-            ev = frag.edge_vidx[end]   # shape (2,), already sorted (gg_unique is sorted)
-            key = (int(min(ev)), int(max(ev)))
-            return opposite_edge_to_sv.get(key, None)
+        masked_trias = self.t[touches_special]           # (n_masked, 3)
 
-        # Map: sv_idx -> list of (frag_idx, which_end)
-        # which_end is 0 (start of fragment) or -1 (end of fragment)
-        sv_to_ends: dict[int, list[tuple[int, int]]] = defaultdict(list)
+        def _sv_of_edge(i: int, j: int) -> int | None:
+            """Return the special vertex opposite edge (i,j) in a masked triangle, or None."""
+            rows = np.where(
+                np.any(masked_trias == i, axis=1) & np.any(masked_trias == j, axis=1)
+            )[0]
+            if rows.size == 0:
+                return None
+            tri = masked_trias[rows[0]]
+            return int(tri[(tri != i) & (tri != j)][0])
 
-        for fi, frag in enumerate(fragments):
-            for end in (0, -1):
-                sv = _sv_of_endpoint(frag, end)
-                if sv is not None:
-                    sv_to_ends[sv].append((fi, end))
+        def _sv_arrays(sv_idx: int):
+            """Arrays for a single special-vertex point."""
+            return (
+                self.v[sv_idx][np.newaxis, :],           # pts  (1, 3)
+                np.array([-1], dtype=np.intp),    # ti   (1,)
+                np.array([[sv_idx, sv_idx]]),            # ev   (1, 2)
+                np.array([0.0]),                         # eb   (1,)
+            )
+
+        # Extend each fragment by prepending/appending its adjacent sv point(s).
+        # Fragments that are already closed, or that don't touch any sv, are
+        # moved straight to result.  Fragments that are modified (sv prepended
+        # or appended) are collected in sv_frags for step 6 reassembly.
+        result: list[polygon.Polygon] = []
+        sv_frags: list[polygon.Polygon] = []
+        for frag in fragments:
+            if frag.closed:
+                # Already a closed loop — no open endpoints to attach sv to.
+                result.append(frag)
+                continue
+
+            ev = frag.edge_vidx
+            sv_start = _sv_of_edge(int(ev[0, 0]), int(ev[0, 1]))
+            sv_end   = _sv_of_edge(int(ev[-1, 0]), int(ev[-1, 1]))
+
+            if sv_start is not None and sv_start == sv_end:
+                # Both ends touch the same sv: closed loop.
+                # Prepend the sv point directly onto the fragment and close it.
+                sp, st, se, sb = _sv_arrays(sv_start)
+                frag.points    = np.vstack([sp, frag.points])
+                frag.tria_idx  = np.concatenate([st, frag.tria_idx])
+                frag.edge_vidx = np.vstack([se, frag.edge_vidx])
+                frag.edge_bary = np.concatenate([sb, frag.edge_bary])
+                frag.close()
+                result.append(frag)
+                continue
+
+            if sv_start is None and sv_end is None:
+                # No sv at either end — fragment is complete as-is.
+                result.append(frag)
+                continue
+
+            if sv_start is not None:
+                sp, st, se, sb = _sv_arrays(sv_start)
+                frag.points    = np.vstack([sp, frag.points])
+                frag.tria_idx  = np.concatenate([st, frag.tria_idx])
+                frag.edge_vidx = np.vstack([se, frag.edge_vidx])
+                frag.edge_bary = np.concatenate([sb, frag.edge_bary])
+
+            if sv_end is not None:
+                sp, st, se, sb = _sv_arrays(sv_end)
+                frag.points    = np.vstack([frag.points, sp])
+                frag.tria_idx  = np.concatenate([frag.tria_idx, st])
+                frag.edge_vidx = np.vstack([frag.edge_vidx, se])
+                frag.edge_bary = np.concatenate([frag.edge_bary, sb])
+
+            sv_frags.append(frag)
 
         # ------------------------------------------------------------------
-        # Helper: build Polygon from point array + metadata arrays
+        # Step 6: assemble sv_frags (fragments with sv endpoints) into final
+        # polygons.
+        #
+        # Repeatedly merge fragment pairs that share a degree-2 sv endpoint
+        # until no such sv remains.  A merged fragment may expose new degree-2
+        # endpoints, so this is done iteratively.
+        # Remaining fragments (degree-1 boundary or degree ≥ 3 saddle) are
+        # emitted as-is; saddle vertices are logged.
         # ------------------------------------------------------------------
+
         def _make_poly(pts, tria_idx, edge_vidx, edge_bary, closed_hint=None):
+            """Build a Polygon and attach level-set metadata.
+
+            Parameters
+            ----------
+            pts : np.ndarray, shape (n, 3)
+                3D point coordinates.
+            tria_idx : np.ndarray, shape (n_segments,)
+                Triangle index per segment (-1 for sv segments).
+            edge_vidx : np.ndarray, shape (n, 2)
+                Mesh vertex indices of the intersected edge per point.
+            edge_bary : np.ndarray, shape (n,)
+                Barycentric coordinate along each edge.
+            closed_hint : bool or None
+                Passed to Polygon constructor.  When True the caller guarantees
+                no duplicate endpoint, so no metadata trimming is needed.
+                When None, Polygon.__init__ may remove a duplicate last point
+                (closed loop detected by equal first/last point), in which case
+                edge_vidx and edge_bary are trimmed to match.
+            """
             n_before = pts.shape[0]
             poly = polygon.Polygon(pts, closed=closed_hint)
             n_after = poly.points.shape[0]
@@ -2212,132 +2242,106 @@ class TriaMesh:
             poly.edge_bary = edge_bary
             return poly
 
-        def _frag_arrays(frag):
-            """Return (pts, tria_idx, edge_vidx, edge_bary) all in forward order."""
-            return frag.points, frag.tria_idx, frag.edge_vidx, frag.edge_bary
+        def _is_sv_point(ev_row) -> bool:
+            """True if this endpoint encodes a special vertex (degenerate edge)."""
+            return int(ev_row[0]) == int(ev_row[1])
 
-        def _frag_reversed(frag):
-            """Return fragment arrays in reversed order."""
-            pts = frag.points[::-1]
-            tria_idx = frag.tria_idx[::-1]
-            edge_vidx = frag.edge_vidx[::-1]
-            edge_bary = frag.edge_bary[::-1]
-            return pts, tria_idx, edge_vidx, edge_bary
+        def _merge_frags(frag0, frag1, sv_idx: int) -> polygon.Polygon:
+            """Merge frag1 onto the tail of frag0 at their shared sv endpoint.
 
-        def _sv_point_and_meta(sv_idx):
-            """1-point arrays representing the special vertex itself."""
-            pt = self.v[sv_idx][np.newaxis, :]                      # (1,3)
-            ev = np.array([[sv_idx, sv_idx]])                        # (1,2) sentinel
-            eb = np.array([0.0])
-            return pt, ev, eb
+            The duplicate sv point at the junction is dropped.
+            Warns and returns frag0 unchanged if sv_idx is not an endpoint of
+            either fragment.
 
-        # ------------------------------------------------------------------
-        # Step 6: process each special vertex
-        #
-        # For each special vertex sv we have a list of (frag_idx, which_end)
-        # pairs.  We resolve them in priority order:
-        #   1. Self-loop: fragment has BOTH its ends touching sv → close it.
-        #   2. Regular connector: exactly two *different* fragments each have
-        #      ONE end at sv → connect them through sv.
-        #   3. Saddle / boundary: remaining unmatched ends (count ≥ 4 or odd)
-        #      → emit each fragment separately with sv inserted at its endpoint.
-        # ------------------------------------------------------------------
-        result: list[polygon.Polygon] = []
-        used: set[int] = set()
+            Parameters
+            ----------
+            frag0 : Polygon
+                First fragment; mutated in-place.
+            frag1 : Polygon
+                Second fragment; its sv endpoint is consumed in the merge.
+            sv_idx : int
+                The special vertex index shared between the two fragments.
 
-        for sv_idx, ends in sv_to_ends.items():
-            sv_pt, sv_ev, sv_eb = _sv_point_and_meta(sv_idx)
+            Returns
+            -------
+            Polygon
+                frag0 after merging (same object, mutated in-place).
+            """
+            def _has_sv_at_start(frag):
+                return _is_sv_point(frag.edge_vidx[0]) and int(frag.edge_vidx[0, 0]) == sv_idx
+            def _has_sv_at_end(frag):
+                return _is_sv_point(frag.edge_vidx[-1]) and int(frag.edge_vidx[-1, 0]) == sv_idx
+            # Step 1: validate that sv_idx is an endpoint of both fragments
+            frag0_has_sv = _has_sv_at_start(frag0) or _has_sv_at_end(frag0)
+            frag1_has_sv = _has_sv_at_start(frag1) or _has_sv_at_end(frag1)
+            if not frag0_has_sv or not frag1_has_sv:
+                warnings.warn(
+                    f"Cannot merge fragments at sv {sv_idx}: sv not found at an "
+                    f"endpoint of {'frag0' if not frag0_has_sv else 'frag1'}.",
+                    stacklevel=2,
+                )
+                return frag0
+            # Step 2: orient frag0 so sv_idx is at its TAIL
+            if _has_sv_at_start(frag0):
+                frag0.points    = frag0.points[::-1]
+                frag0.tria_idx  = frag0.tria_idx[::-1]
+                frag0.edge_vidx = frag0.edge_vidx[::-1]
+                frag0.edge_bary = frag0.edge_bary[::-1]
+            # Step 3: orient frag1 so sv_idx is at its HEAD
+            if _has_sv_at_end(frag1):
+                frag1.points    = frag1.points[::-1]
+                frag1.tria_idx  = frag1.tria_idx[::-1]
+                frag1.edge_vidx = frag1.edge_vidx[::-1]
+                frag1.edge_bary = frag1.edge_bary[::-1]
+            # Step 4: concatenate, dropping the duplicate leading sv point of frag1
+            frag0.points    = np.vstack([frag0.points,    frag1.points[1:]])
+            frag0.tria_idx  = np.concatenate([frag0.tria_idx,  frag1.tria_idx])
+            frag0.edge_vidx = np.vstack([frag0.edge_vidx, frag1.edge_vidx[1:]])
+            frag0.edge_bary = np.concatenate([frag0.edge_bary, frag1.edge_bary[1:]])
+            return frag0
 
-            # --- Pass 1: close self-loops (fi appears twice in ends) -------
-            from collections import Counter
-            fi_counts = Counter(fi for fi, _ in ends)
-            self_loop_fis = {fi for fi, cnt in fi_counts.items() if cnt == 2}
+        # Iteratively merge at degree-2 sv endpoints until none remain.
+        from collections import defaultdict
+        active = list(sv_frags)   # mutable working list of open fragments
+        while True:
+            # Build sv_idx -> list of active indices with that sv as an endpoint
+            sv_open = defaultdict(list)
+            for fi, frag in enumerate(active):
+                ev = frag.edge_vidx
+                for end in (0, -1):
+                    if _is_sv_point(ev[end]):
+                        sv_open[int(ev[end, 0])].append(fi)
 
-            for fi in sorted(self_loop_fis):
-                if fi in used:
-                    continue
-                used.add(fi)
-                frag = fragments[fi]
-                pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
-                # Both ends of this fragment touch sv.
-                # Build: sv -> fragment_body -> sv (Polygon auto-detects closure)
-                pts = np.vstack([sv_pt, pts_f, sv_pt])
-                ti  = ti_f
-                ev  = np.vstack([sv_ev, ev_f, sv_ev])
-                eb  = np.concatenate([sv_eb, eb_f, sv_eb])
-                result.append(_make_poly(pts, ti, ev, eb, closed_hint=None))
+            # Find the first degree-2 sv
+            merge_sv = next(
+                (sv for sv, fis in sv_open.items()
+                 if len(dict.fromkeys(fis)) == 2),
+                None,
+            )
+            if merge_sv is None:
+                break   # no more degree-2 sv endpoints — done
 
-            # Remaining ends after removing self-loops
-            remaining = [(fi, end) for fi, end in ends if fi not in self_loop_fis and fi not in used]
+            fi0, fi1 = list(dict.fromkeys(sv_open[merge_sv]))
+            merged_frag = _merge_frags(active[fi0], active[fi1], merge_sv)
 
-            if len(remaining) == 0:
-                continue
+            # Store merged result at the lower index, remove the higher index
+            lo, hi = (fi0, fi1) if fi0 < fi1 else (fi1, fi0)
+            active[lo] = merged_frag
+            active.pop(hi)
 
-            if len(remaining) == 2:
-                # --- Pass 2: connect two different fragments through sv ----
-                (fi0, end0), (fi1, end1) = remaining
-                if fi0 in used or fi1 in used:
-                    continue
-                used.add(fi0)
-                used.add(fi1)
+        # Log saddle vertices (degree ≥ 3 after all merges are exhausted)
+        for sv_idx, fis in sv_open.items():
+            if len(dict.fromkeys(fis)) >= 3:
+                logger.info(
+                    "Vertex %d is a saddle on the level set with %d open branch ends "
+                    "at level %s. Emitting %d separate curves.",
+                    sv_idx, len(dict.fromkeys(fis)), level, len(dict.fromkeys(fis)),
+                )
 
-                frag0 = fragments[fi0]
-                frag1 = fragments[fi1]
-
-                # Orient so sv-end is at the TAIL of each fragment
-                if end0 == 0:
-                    p0, t0, e0, b0 = _frag_reversed(frag0)
-                else:
-                    p0, t0, e0, b0 = _frag_arrays(frag0)
-
-                if end1 == -1:
-                    p1, t1, e1, b1 = _frag_reversed(frag1)
-                else:
-                    p1, t1, e1, b1 = _frag_arrays(frag1)
-
-                # Concatenate: frag0 ... sv ... frag1
-                pts = np.vstack([p0, sv_pt, p1])
-                ti  = np.concatenate([t0, t1])
-                ev  = np.vstack([e0, sv_ev, e1])
-                eb  = np.concatenate([b0, sv_eb, b1])
-                result.append(_make_poly(pts, ti, ev, eb, closed_hint=None))
-
-            else:
-                # --- Pass 3: saddle, boundary, or boundary-saddle ---------
-                # remaining has 1 end (boundary vertex) or 4+ ends (saddle).
-                # In both cases: emit each fragment with sv at its endpoint.
-                n_remaining = len(remaining)
-                if n_remaining >= 4:
-                    logger.info(
-                        "Vertex %d is a saddle on the level set with %d branch ends "
-                        "at level %s. Emitting %d separate curves.",
-                        sv_idx, n_remaining, level, n_remaining,
-                    )
-                for fi, end in remaining:
-                    if fi in used:
-                        continue
-                    used.add(fi)
-                    frag = fragments[fi]
-                    if end == 0:
-                        pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
-                        pts = np.vstack([sv_pt, pts_f])
-                        ti  = ti_f
-                        ev  = np.vstack([sv_ev, ev_f])
-                        eb  = np.concatenate([sv_eb, eb_f])
-                    else:
-                        pts_f, ti_f, ev_f, eb_f = _frag_arrays(frag)
-                        pts = np.vstack([pts_f, sv_pt])
-                        ti  = ti_f
-                        ev  = np.vstack([ev_f, sv_ev])
-                        eb  = np.concatenate([eb_f, sv_eb])
-                    result.append(_make_poly(pts, ti, ev, eb, closed_hint=False))
-
-        # ------------------------------------------------------------------
-        # Step 7: pass through fragments that don't touch any special vertex
-        # ------------------------------------------------------------------
-        for fi, frag in enumerate(fragments):
-            if fi not in used:
-                result.append(frag)
+        # Emit all remaining active fragments (boundary ends and saddle branches)
+        for frag in active:
+            result.append(_make_poly(frag.points, frag.tria_idx,
+                                     frag.edge_vidx, frag.edge_bary))
 
         return result
 
@@ -2349,31 +2353,16 @@ class TriaMesh:
         get_edges: bool = False,
         n_points: int | None = None,
     ) -> tuple[np.ndarray, ...]:
-        """Extract levelset of vfunc at a specific level as a path of 3D points.
+        """Extract a single level set path as an array of 3D points.
 
-        For a given real-valued scalar map on the surface mesh (vfunc), this
-        function computes the edges that intersect with a given level set (level).
-        It then finds the point on each mesh edge where the level set intersects.
-        The points are sorted and returned as an ordered array of 3D coordinates
-        together with the length of the level set path.
+        Thin wrapper around :meth:`extract_level_paths` for the common case of
+        a single connected level curve.  Raises ``ValueError`` if the level set
+        has more (or fewer) than one connected component; use
+        :meth:`extract_level_paths` directly for those cases.
 
-        This implementation uses extract_level_paths internally to compute the
-        level set, ensuring consistent handling of closed loops and metadata.
-
-        .. note::
-
-            Works for level sets that represent a single path or closed loop.
-            For closed loops, the first and last points are identical (duplicated)
-            so you can detect closure via ``np.allclose(path[0], path[-1])``.
-            For open paths, the path has two distinct endpoints.
-            This function is kept mainly for backward compatibility.
-
-            **For more advanced use cases, consider using extract_level_paths() directly:**
-
-            - Multiple disconnected components: extract_level_paths returns all components
-            - Custom resampling: Get Polygon objects and use Polygon.resample() directly
-            - Metadata analysis: Access triangle indices and edge information per component
-            - Closed loop detection: Polygon objects have a ``closed`` attribute
+        For closed loops the returned ``path`` has a duplicate last point equal
+        to the first, so closure can be detected via
+        ``np.allclose(path[0], path[-1])``.
 
         Parameters
         ----------
@@ -2382,77 +2371,43 @@ class TriaMesh:
         level : float
             Level set value to extract.
         get_tria_idx : bool, default=False
-            If True, also return array of triangle indices for each path segment.
-            For closed loops with n points (including duplicate), returns n-1 triangle
-            indices. For open paths with n points, returns n-1 triangle indices.
+            If True, also return triangle indices for each path segment.
         get_edges : bool, default=False
-            If True, also return arrays of vertex indices (i,j) and relative
-            positions for each 3D point along the intersecting edge.
+            If True, also return mesh vertex indices and barycentric positions
+            for each point on the path.
         n_points : int or None, default=None
-            If specified, resample level set into n equidistant points. Cannot
-            be combined with get_tria_idx=True or get_edges=True.
+            If given, resample the path to this many equidistant points.
+            Cannot be combined with ``get_tria_idx=True`` or ``get_edges=True``.
 
         Returns
         -------
-        path : np.ndarray
-            Array of shape (n, 3) containing 3D coordinates of vertices on the
-            level path. For closed loops, the last point duplicates the first point,
-            so ``np.allclose(path[0], path[-1])`` will be True.
+        path : np.ndarray, shape (n, 3)
+            3D coordinates along the level curve.  For closed loops the last
+            point duplicates the first.
         length : float
-            Total length of the level set path. For closed loops, includes the
-            closing segment from last to first point.
-        tria_idx : np.ndarray
-            Array of triangle indices for each segment on the path, shape (n-1,)
-            where n is the number of points (including duplicate for closed loops).
-            Only returned if get_tria_idx is True.
-        edges_vidxs : np.ndarray
-            Array of shape (n, 2) with vertex indices (i,j) for each 3D point,
-            defining the vertices of the original mesh edge intersecting the
-            level set at this point. Only returned if get_edges is True.
-        edges_relpos : np.ndarray
-            Array of floats defining the relative position for each 3D point
-            along the edges of the original mesh (defined by edges_vidxs).
-            Value 0 corresponds to first vertex, 1 to second vertex.
-            The 3D point is computed as: (1 - relpos) * v_i + relpos * v_j.
-            Only returned if get_edges is True.
+            Total arc length of the path.
+        tria_idx : np.ndarray, shape (n-1,)
+            Triangle index for each segment.  Only returned if
+            ``get_tria_idx=True``.
+        edges_vidxs : np.ndarray, shape (n, 2)
+            Mesh vertex indices ``(i, j)`` of the intersected edge for each
+            point.  Only returned if ``get_edges=True``.
+        edges_relpos : np.ndarray, shape (n,)
+            Barycentric position along each edge (0 = vertex i, 1 = vertex j).
+            The 3D point equals ``(1 - t) * v_i + t * v_j``.
+            Only returned if ``get_edges=True``.
 
         Raises
         ------
         ValueError
             If vfunc is not 1-dimensional.
-            If multiple disconnected level paths are found (use extract_level_paths).
-            If n_points is combined with get_tria_idx=True.
-            If n_points is combined with get_edges=True.
+            If the level set has more or fewer than one connected component.
+            If ``n_points`` is combined with ``get_tria_idx=True`` or
+            ``get_edges=True``.
 
         See Also
         --------
-        extract_level_paths : Extract multiple disconnected level paths as Polygon objects.
-            Recommended for advanced use cases with multiple components, custom resampling,
-            or when you need explicit closed/open information.
-
-        Examples
-        --------
-        >>> # Extract a simple level curve
-        >>> path, length = mesh.level_path(vfunc, 0.5)
-        >>> print(f"Path has {path.shape[0]} points, length {length:.2f}")
-
-        >>> # Check if the path is closed
-        >>> is_closed = np.allclose(path[0], path[-1])
-        >>> print(f"Path is closed: {is_closed}")
-
-        >>> # Get triangle indices for each segment
-        >>> path, length, tria_idx = mesh.level_path(vfunc, 0.5, get_tria_idx=True)
-
-        >>> # Get complete edge metadata
-        >>> path, length, edges, relpos = mesh.level_path(vfunc, 0.5, get_edges=True)
-
-        >>> # Resample to fixed number of points
-        >>> path, length = mesh.level_path(vfunc, 0.5, n_points=100)
-
-        >>> # For multiple components, use extract_level_paths instead
-        >>> curves = mesh.extract_level_paths(vfunc, 0.5)
-        >>> for i, curve in enumerate(curves):
-        >>>     print(f"Component {i}: {curve.points.shape[0]} points, closed={curve.closed}")
+        extract_level_paths : Returns all connected components as Polygon objects.
         """
         # Use extract_level_paths to get polygons
         curves = self.extract_level_paths(vfunc, level)

@@ -137,6 +137,23 @@ class Polygon:
         """
         return self.closed
 
+    def close(self) -> "Polygon":
+        """Mark the polygon as closed in-place.
+
+        If the last point duplicates the first it is removed; otherwise the
+        polygon is simply flagged as closed (the closing segment is implicit,
+        from the last point back to the first).
+
+        Returns
+        -------
+        Polygon
+            Self, for method chaining.
+        """
+        if len(self.points) > 1 and np.allclose(self.points[0], self.points[-1]):
+            self.points = self.points[:-1]
+        self.closed = True
+        return self
+
     def n_points(self) -> int:
         """Get number of points in polygon.
 

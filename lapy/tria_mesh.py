@@ -2255,7 +2255,7 @@ class TriaMesh:
             return poly
 
         def _is_sv_point(ev_row) -> bool:
-            """True if this endpoint encodes a special vertex (degenerate edge)."""
+            """Check if this endpoint encodes a special vertex (degenerate edge)."""
             return int(ev_row[0]) == int(ev_row[1])
 
         def _merge_frags(frag0, frag1, sv_idx: int) -> polygon.Polygon:

@@ -25,10 +25,10 @@ def _reduce_edges_to_path(
     Parameters
     ----------
     edges : np.ndarray
-        Array of shape (n, 2) with pairs of positive integer node indices
-        representing undirected edges. Node indices can have gaps (i.e., not all
-        indices from 0 to max need to appear in the edges). Only nodes that
-        actually appear in edges are processed.
+        Array of shape (n, 2) with pairs of non-negative integer node indices
+        representing undirected edges. Node indices may have arbitrary gaps —
+        they are remapped to a dense 0..N-1 range internally, so the adjacency
+        matrix size is always proportional to the number of unique nodes.
     start_idx : int or None, default=None
         Preferred start node. If None, an endpoint (degree 1) is selected
         automatically for open paths, or an arbitrary node for closed loops.
@@ -61,22 +61,31 @@ def _reduce_edges_to_path(
     if edges.shape[0] == 0:
         return ([], []) if get_edge_idx else []
 
-    # Build adjacency matrix
-    i = np.column_stack((edges[:, 0], edges[:, 1])).reshape(-1)
-    j = np.column_stack((edges[:, 1], edges[:, 0])).reshape(-1)
-    dat = np.ones(i.shape)
-    n = edges.max() + 1
-    adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
-    degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
+    # Remap node ids to a dense 0..N-1 range so the adjacency matrix is
+    # proportional to the number of unique nodes, not the maximum id.
+    # This avoids allocating a huge matrix when node ids have large gaps.
+    unique_nodes, inverse = np.unique(edges, return_inverse=True)
+    dense_edges = inverse.reshape(edges.shape)   # same shape as edges, dense ids
 
-    # Validate start_idx: must be a real node (degree > 0) if provided.
+    # Validate start_idx against original node ids before remapping.
     if start_idx is not None:
-        real_nodes = np.where(degrees > 0)[0]
-        if start_idx not in real_nodes:
+        if start_idx not in unique_nodes:
             raise ValueError(
                 f"start_idx {start_idx} is not a node in the edge graph "
-                f"(real nodes range: {real_nodes.min()}–{real_nodes.max()})."
+                f"(known nodes: {unique_nodes.tolist()})."
             )
+        # Map start_idx to its dense counterpart
+        dense_start = int(np.searchsorted(unique_nodes, start_idx))
+    else:
+        dense_start = None
+
+    # Build adjacency matrix on dense ids
+    i = np.column_stack((dense_edges[:, 0], dense_edges[:, 1])).reshape(-1)
+    j = np.column_stack((dense_edges[:, 1], dense_edges[:, 0])).reshape(-1)
+    dat = np.ones(i.shape)
+    n = len(unique_nodes)
+    adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
+    degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
 
     # Find connected components
     n_comp, labels = sparse.csgraph.connected_components(adj_matrix, directed=False)
@@ -115,10 +124,10 @@ def _reduce_edges_to_path(
 
         # For closed loops: break one edge to convert to open path for traversal
         if is_closed:
-            # Use start_idx if it belongs to this component, else fall back to first node.
+            # Use dense_start if it belongs to this component, else fall back to first node.
             start = comp_nodes[0]
-            if start_idx is not None and start_idx in comp_nodes:
-                start = start_idx
+            if dense_start is not None and dense_start in comp_nodes:
+                start = dense_start
             neighbors = adj_matrix[start, :].nonzero()[1]
             neighbors_in_comp = [nb for nb in neighbors if nb in comp_nodes]
             if len(neighbors_in_comp) < 2:
@@ -140,13 +149,13 @@ def _reduce_edges_to_path(
             )
 
         if not is_closed:
-            if start_idx is not None and start_idx in comp_nodes:
-                if start_idx not in endpoints:
+            if dense_start is not None and dense_start in comp_nodes:
+                if dense_start not in endpoints:
                     raise ValueError(
                         f"start_idx {start_idx} is in component {comp_id} but is not "
-                        f"an endpoint (endpoints: {endpoints.tolist()})."
+                        f"an endpoint (endpoints: {unique_nodes[endpoints].tolist()})."
                     )
-                start = start_idx
+                start = dense_start
             else:
                 start = endpoints[0]
 
@@ -154,14 +163,16 @@ def _reduce_edges_to_path(
         if np.isinf(dist[comp_nodes]).any():
             raise ValueError(f"Component {comp_id} is not fully connected.")
 
-        path = comp_nodes[dist[comp_nodes].argsort()]
+        dense_path = comp_nodes[dist[comp_nodes].argsort()]
         if is_closed:
-            path = np.append(path, path[0])
-        paths.append(path)
+            dense_path = np.append(dense_path, dense_path[0])
+
+        # Map dense ids back to original node ids
+        paths.append(unique_nodes[dense_path])
 
         if get_edge_idx:
-            ei = path[:-1]
-            ej = path[1:]
+            ei = dense_path[:-1]
+            ej = dense_path[1:]
             eidx = np.asarray(eidx_matrix[ei, ej] - 1).ravel()
             edge_idxs.append(eidx)
 

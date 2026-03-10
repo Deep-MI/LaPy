@@ -30,8 +30,14 @@ def _reduce_edges_to_path(
         indices from 0 to max need to appear in the edges). Only nodes that
         actually appear in edges are processed.
     start_idx : int or None, default=None
-        Preferred start node. If None, selects an endpoint (degree 1) automatically,
-        or arbitrary node for closed loops. Must be a node that appears in edges.
+        Preferred start node. If None, an endpoint (degree 1) is selected
+        automatically for open paths, or an arbitrary node for closed loops.
+        If provided, must be a node that actually appears in ``edges``; raises
+        ``ValueError`` otherwise.  For open paths, if ``start_idx`` belongs to
+        the component it must also be one of its two endpoints, or ``ValueError``
+        is raised.  For multiple paths, if ``start_idx`` is not in the current
+        component it is silently ignored and the default is used (this is normal
+        behaviour for multi-component graphs).
     get_edge_idx : bool, default=False
         If True, also return edge indices for each path segment.
 
@@ -47,7 +53,8 @@ def _reduce_edges_to_path(
     Raises
     ------
     ValueError
-        If start_idx is invalid.
+        If ``start_idx`` is not a real node in the edge graph.
+        If ``start_idx`` is in an open-path component but is not an endpoint.
         If graph has degree > 2 (branching or self-intersections).
     """
     edges = np.array(edges)
@@ -61,6 +68,15 @@ def _reduce_edges_to_path(
     n = edges.max() + 1
     adj_matrix = sparse.csr_matrix((dat, (i, j)), shape=(n, n))
     degrees = np.asarray(adj_matrix.sum(axis=1)).ravel()
+
+    # Validate start_idx: must be a real node (degree > 0) if provided.
+    if start_idx is not None:
+        real_nodes = np.where(degrees > 0)[0]
+        if start_idx not in real_nodes:
+            raise ValueError(
+                f"start_idx {start_idx} is not a node in the edge graph "
+                f"(real nodes range: {real_nodes.min()}–{real_nodes.max()})."
+            )
 
     # Find connected components
     n_comp, labels = sparse.csgraph.connected_components(adj_matrix, directed=False)
@@ -99,7 +115,10 @@ def _reduce_edges_to_path(
 
         # For closed loops: break one edge to convert to open path for traversal
         if is_closed:
-            start = start_idx if (start_idx is not None and start_idx in comp_nodes) else comp_nodes[0]
+            # Use start_idx if it belongs to this component, else fall back to first node.
+            start = comp_nodes[0]
+            if start_idx is not None and start_idx in comp_nodes:
+                start = start_idx
             neighbors = adj_matrix[start, :].nonzero()[1]
             neighbors_in_comp = [nb for nb in neighbors if nb in comp_nodes]
             if len(neighbors_in_comp) < 2:
@@ -121,7 +140,15 @@ def _reduce_edges_to_path(
             )
 
         if not is_closed:
-            start = start_idx if (start_idx is not None and start_idx in endpoints) else endpoints[0]
+            if start_idx is not None and start_idx in comp_nodes:
+                if start_idx not in endpoints:
+                    raise ValueError(
+                        f"start_idx {start_idx} is in component {comp_id} but is not "
+                        f"an endpoint (endpoints: {endpoints.tolist()})."
+                    )
+                start = start_idx
+            else:
+                start = endpoints[0]
 
         dist = sparse.csgraph.shortest_path(adj_matrix, indices=start, directed=False)
         if np.isinf(dist[comp_nodes]).any():

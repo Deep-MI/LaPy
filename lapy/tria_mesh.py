@@ -1265,6 +1265,8 @@ class TriaMesh:
         saddle_orders : np.ndarray
             Array of saddle orders for each saddle vertex (same length as saddles), shape (n_saddles,).
             Order 2 = simple saddle (4 sign flips), order 3+ = higher-order saddles.
+            Computed as ``ceil(n_flips / 2)``; for boundary saddles with an odd
+            flip count the ceiling accounts for the implicit flip across the boundary.
 
         Notes
         -----
@@ -1340,7 +1342,7 @@ class TriaMesh:
         # CLASSIFY SADDLES
         # Saddles have 4+ flips (regular points have 2, minima/maxima have 0)
         # Boundary vertices can have 3 flips (or more) to be a saddle, assuming an additional flip outside
-        # Order = n_flips / 2
+        # Order = ceil(n_flips / 2)
         is_saddle = sign_flips >= 3
         saddles = np.where(is_saddle)[0]
         saddle_orders = (sign_flips[saddles] + 1) // 2
@@ -2052,7 +2054,8 @@ class TriaMesh:
             carries extra attributes set after construction:
 
             - ``tria_idx`` : np.ndarray, shape (n_segments,) — triangle index
-              per segment; ``-1`` for segments adjacent to a special vertex.
+              per segment.  For closed curves n_segments == n_points; for open
+              curves n_segments == n_points - 1.
             - ``edge_vidx`` : np.ndarray, shape (n_points, 2) — mesh vertex
               indices of the intersected edge per point.  For special-vertex
               points both indices are equal (degenerate edge).

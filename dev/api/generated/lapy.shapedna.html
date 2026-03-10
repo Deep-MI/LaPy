@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="lapy.heat" href="lapy.heat.html"><link rel="prev" title="lapy.io" href="lapy.io.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>lapy.shapedna - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
@@ -282,7 +282,7 @@ of the Laplace-Beltrami operator and can be used for shape analysis
 and comparison.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.compute_distance">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L253-L291"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">compute_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euc'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L258-L296"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.compute_distance" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the shape dissimilarity from two shapeDNA descriptors.</p>
 <p>Computes a distance metric between two sets of eigenvalues to quantify
 the dissimilarity between two shapes.</p>
@@ -308,6 +308,16 @@ the dissimilarity between two shapes.</p>
 <dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If dist is not ‘euc’ (other distance metrics not yet implemented).</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ev1</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>ev2</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>dist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -360,14 +370,27 @@ decomposition.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geom</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><em>TriaMesh</em></a><em> | </em><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><em>TetMesh</em></a>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>aniso</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>aniso_smooth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.normalize_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L169-L222"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
-<dd><p>Normalize eigenvalues for a surface or a volume.</p>
-<p>Normalizes eigenvalues to account for different mesh sizes and dimensions,
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">normalize_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geometry'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L169-L227"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.normalize_ev" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize eigenvalues for a 2D surface or a 3D solid.</p>
+<p>Normalizes eigenvalues to unit surface area or unit volume,
 enabling meaningful comparison between different shapes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -378,8 +401,8 @@ enabling meaningful comparison between different shapes.</p>
 </dd>
 <dt><strong>method</strong><span class="classifier">{‘surface’, ‘volume’, ‘geometry’}, default=’geometry’</span></dt><dd><p>Normalization method:</p>
 <ul class="simple">
-<li><p>‘surface’: Normalize by surface area (for 2D surfaces)</p></li>
-<li><p>‘volume’: Normalize by enclosed volume (for 3D objects)</p></li>
+<li><p>‘surface’: Normalize to unit surface area</p></li>
+<li><p>‘volume’: Normalize to unit volume</p></li>
 <li><p>‘geometry’: Automatically choose surface for TriaMesh, volume for TetMesh</p></li>
 </ul>
 </dd>
@@ -393,18 +416,31 @@ enabling meaningful comparison between different shapes.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If method is not one of ‘surface’, ‘volume’, or ‘geometry’.
-If geometry type is unsupported for the chosen normalization.
-If the measure (area/volume) is not positive.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If the method is not one of ‘surface’, ‘volume’, or ‘geometry’.
+If the geometry type is unsupported for the chosen normalization.
+If method=volume and the volume of a surface is not defined.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>geom</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><em>TriaMesh</em></a><em> | </em><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><em>TetMesh</em></a>)</p></li>
+<li><p><strong>evals</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>For TriaMesh with ‘volume’ method, the mesh must be closed and oriented
+to compute a valid enclosed volume.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.shapedna.reweight_ev">
-<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L225-L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.shapedna.</span></span><span class="sig-name descname"><span class="pre">reweight_ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/shapedna.py#L230-L255"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.shapedna.reweight_ev" title="Link to this definition">¶</a></dt>
 <dd><p>Apply linear re-weighting to eigenvalues.</p>
 <p>Divides each eigenvalue by its index to reduce the influence of higher
 eigenvalues, which tend to be less stable.</p>
@@ -421,6 +457,12 @@ eigenvalues, which tend to be less stable.</p>
 divided by its 1-based index: <code class="docutils literal notranslate"><span class="pre">evals[i]</span> <span class="pre">/</span> <span class="pre">(i+1)</span></code>.</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>evals</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -461,7 +503,8 @@ are typically more sensitive to discretization and numerical errors.</p>
             <div class="copyright">
                 Copyright &#169; 2026, Martin Reuter
             </div>
-            Made with 
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             
           </div>
@@ -508,8 +551,8 @@ are typically more sensitive to discretization and numerical errors.</p>
     </aside>
   </div>
 </div><script src="../../_static/documentation_options.js?v=b1514d62"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>

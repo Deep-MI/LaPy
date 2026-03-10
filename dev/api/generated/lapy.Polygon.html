@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Solver" href="../lapy.solver.html"><link rel="prev" title="lapy.TetMesh" href="lapy.TetMesh.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>lapy.Polygon - LaPy</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
@@ -275,7 +275,7 @@
 <h1>lapy.Polygon<a class="headerlink" href="#lapy-polygon" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.Polygon">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L14-L441"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L14-L490"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon" title="Link to this definition">¶</a></dt>
 <dd><p>Class representing a polygon path (open or closed).</p>
 <p>This class handles 2D and 3D polygon paths with operations for resampling,
 smoothing, and computing geometric properties like length, centroid, and area.</p>
@@ -284,12 +284,27 @@ smoothing, and computing geometric properties like length, centroid, and area.</
 <dd class="field-odd"><dl>
 <dt><strong>points</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array of shape (n, d) containing coordinates of polygon vertices
 in order, where d is 2 or 3 for 2D (x, y) or 3D (x, y, z) paths.
-For closed polygons, the last point should not duplicate the first point.</p>
+If the last point duplicates the first point and closed is None,
+the duplicate endpoint will be removed and the polygon will be
+marked as closed automatically.</p>
 </dd>
-<dt><strong>closed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, treats the path as a closed polygon. If False, treats it as
-an open polyline.</p>
+<dt><strong>closed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><ul class="simple">
+<li><p>If None (default): Auto-detect by checking if first and last points
+are <strong>exactly</strong> equal (<code class="docutils literal notranslate"><span class="pre">np.array_equal</span></code>).  Only an exact duplicate
+is removed; nearly-equal but geometrically distinct endpoints are left
+untouched and the polygon is treated as open.</p></li>
+<li><p>If True: Treats the path as a closed polygon.  If the last point is
+nearly equal to the first (<code class="docutils literal notranslate"><span class="pre">np.allclose</span></code>), it is removed.</p></li>
+<li><p>If False: Treats the path as an open polyline regardless of endpoints.</p></li>
+</ul>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>closed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Attributes</p>
@@ -297,7 +312,7 @@ an open polyline.</p>
 <table class="docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><strong>points</strong></p></td>
-<td><p>(np.ndarray) Polygon vertex coordinates, shape (n_points, d).</p></td>
+<td><p>(np.ndarray) Polygon vertex coordinates, shape (n_points, d). For closed polygons, the last point does not duplicate the first.</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>closed</strong></p></td>
 <td><p>(bool) Whether the polygon is closed or open.</p></td>
@@ -318,28 +333,31 @@ an open polyline.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.centroid" title="lapy.Polygon.centroid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">centroid</span></code></a>()</p></td>
 <td><p>Compute centroid of polygon.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.get_points" title="lapy.Polygon.get_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_points</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.close" title="lapy.Polygon.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>Mark the polygon as closed in-place.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.get_points" title="lapy.Polygon.get_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_points</span></code></a>()</p></td>
 <td><p>Get polygon points.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.is_2d" title="lapy.Polygon.is_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_2d</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.is_2d" title="lapy.Polygon.is_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_2d</span></code></a>()</p></td>
 <td><p>Check if the polygon is 2D.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.is_closed" title="lapy.Polygon.is_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_closed</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.is_closed" title="lapy.Polygon.is_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_closed</span></code></a>()</p></td>
 <td><p>Check if the polygon is closed.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.length" title="lapy.Polygon.length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.length" title="lapy.Polygon.length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></a>()</p></td>
 <td><p>Compute total length of polygon path.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.n_points" title="lapy.Polygon.n_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_points</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.n_points" title="lapy.Polygon.n_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_points</span></code></a>()</p></td>
 <td><p>Get number of points in polygon.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.resample" title="lapy.Polygon.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a>([n_points, n_iter, inplace])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.resample" title="lapy.Polygon.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a>([n_points, n_iter, inplace])</p></td>
 <td><p>Resample polygon to have equidistant points.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.smooth_laplace" title="lapy.Polygon.smooth_laplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth_laplace</span></code></a>([n, lambda_, inplace])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.smooth_laplace" title="lapy.Polygon.smooth_laplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth_laplace</span></code></a>([n, lambda_, inplace])</p></td>
 <td><p>Smooth polygon using Laplace smoothing.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lapy.Polygon.smooth_taubin" title="lapy.Polygon.smooth_taubin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth_taubin</span></code></a>([n, lambda_, mu, inplace])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lapy.Polygon.smooth_taubin" title="lapy.Polygon.smooth_taubin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth_taubin</span></code></a>([n, lambda_, mu, inplace])</p></td>
 <td><p>Smooth polygon using Taubin smoothing.</p></td>
 </tr>
 </tbody>
@@ -353,27 +371,33 @@ If points don’t have 2 or 3 coordinates.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>closed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lapy.polygon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polygon</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a 2D closed polygon (square)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">square</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span><span class="o">.</span><span class="n">is_2d</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a 2D closed polygon (square) - auto-detected</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">square</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">square</span><span class="p">)</span>  <span class="c1"># closed=None, will auto-detect and remove duplicate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span><span class="o">.</span><span class="n">closed</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span><span class="o">.</span><span class="n">length</span><span class="p">()</span>
-<span class="go">4.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a 3D open path</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">poly3d</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">path_3d</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">poly3d</span><span class="o">.</span><span class="n">is_2d</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Explicitly open polygon</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly3d</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly3d</span><span class="o">.</span><span class="n">closed</span>
 <span class="go">False</span>
 </pre></div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.area">
-<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L201-L230"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.area" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L249-L278"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.area" title="Link to this definition">¶</a></dt>
 <dd><p>Compute area enclosed by closed 2D polygon.</p>
 <p>Uses the shoelace formula. Only valid for closed 2D polygons.</p>
 <dl class="field-list simple">
@@ -389,12 +413,15 @@ If points don’t have 2 or 3 coordinates.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.centroid">
-<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L155-L199"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.centroid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L203-L247"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.centroid" title="Link to this definition">¶</a></dt>
 <dd><p>Compute centroid of polygon.</p>
 <p>For open polygons or closed 3D polygons, returns the simple arithmetic mean
 of all vertex coordinates.</p>
@@ -410,6 +437,9 @@ account for how vertices are distributed around the polygon’s boundary.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>For closed 2D polygons, uses the standard formula:
@@ -419,8 +449,30 @@ where A is the polygon area.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="lapy.Polygon.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L145-L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.close" title="Link to this definition">¶</a></dt>
+<dd><p>Mark the polygon as closed in-place.</p>
+<p>If the last point is nearly equal to the first (<code class="docutils literal notranslate"><span class="pre">np.allclose</span></code>), it is
+removed; otherwise the polygon is simply flagged as closed (the closing
+segment from the last point back to the first is implicit).  Using
+<code class="docutils literal notranslate"><span class="pre">np.allclose</span></code> here is intentional: the caller has explicitly requested
+closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#lapy.Polygon" title="lapy.Polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polygon</span></code></a></dt><dd><p>Self, for method chaining.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lapy.Polygon" title="lapy.polygon.Polygon"><em>Polygon</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.get_points">
-<span class="sig-name descname"><span class="pre">get_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L126-L134"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.get_points" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L174-L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.get_points" title="Link to this definition">¶</a></dt>
 <dd><p>Get polygon points.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -429,12 +481,15 @@ where A is the polygon area.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.is_2d">
-<span class="sig-name descname"><span class="pre">is_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L96-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_2d" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L125-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_2d" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the polygon is 2D.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -443,12 +498,15 @@ where A is the polygon area.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.is_closed">
-<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L106-L114"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_closed" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L135-L143"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_closed" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the polygon is closed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -457,12 +515,15 @@ where A is the polygon area.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.length">
-<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L136-L153"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L184-L201"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.length" title="Link to this definition">¶</a></dt>
 <dd><p>Compute total length of polygon path.</p>
 <p>For closed polygons, includes the segment from last to first point.</p>
 <dl class="field-list simple">
@@ -472,12 +533,15 @@ where A is the polygon area.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.n_points">
-<span class="sig-name descname"><span class="pre">n_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L116-L124"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.n_points" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">n_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L164-L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.n_points" title="Link to this definition">¶</a></dt>
 <dd><p>Get number of points in polygon.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -486,12 +550,15 @@ where A is the polygon area.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L232-L286"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.resample" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L280-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.resample" title="Link to this definition">¶</a></dt>
 <dd><p>Resample polygon to have equidistant points.</p>
 <p>Creates n_points that are approximately equidistantly spaced along
 the cumulative Euclidean distance. Uses linear interpolation.</p>
@@ -513,12 +580,22 @@ better equidistant spacing. Must be at least 1.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>n_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lapy.Polygon" title="lapy.polygon.Polygon"><em>Polygon</em></a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.smooth_laplace">
-<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L348-L390"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_laplace" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L396-L438"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_laplace" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth polygon using Laplace smoothing.</p>
 <p>Applies iterative smoothing: p_new = (1-lambda)*p + lambda * M*p
 where M is the neighbor-averaging matrix.</p>
@@ -539,12 +616,22 @@ where M is the neighbor-averaging matrix.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>lambda_</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lapy.Polygon" title="lapy.polygon.Polygon"><em>Polygon</em></a></p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.smooth_taubin">
-<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L392-L441"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_taubin" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L440-L490"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_taubin" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth polygon using Taubin smoothing.</p>
 <p>Alternates between shrinking (positive lambda) and expanding (negative mu)
 steps to reduce shrinkage while smoothing.</p>
@@ -566,6 +653,17 @@ steps to reduce shrinkage while smoothing.</p>
 <dt><a class="reference internal" href="#lapy.Polygon" title="lapy.Polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polygon</span></code></a></dt><dd><p>Smoothed polygon. Returns self if inplace=True, new instance otherwise.</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>lambda_</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lapy.Polygon" title="lapy.polygon.Polygon"><em>Polygon</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -605,7 +703,8 @@ steps to reduce shrinkage while smoothing.</p>
             <div class="copyright">
                 Copyright &#169; 2026, Martin Reuter
             </div>
-            Made with 
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             
           </div>
@@ -639,6 +738,7 @@ steps to reduce shrinkage while smoothing.</p>
 <li><a class="reference internal" href="#lapy.Polygon"><code class="docutils literal notranslate"><span class="pre">Polygon</span></code></a><ul>
 <li><a class="reference internal" href="#lapy.Polygon.area"><code class="docutils literal notranslate"><span class="pre">Polygon.area()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.Polygon.centroid"><code class="docutils literal notranslate"><span class="pre">Polygon.centroid()</span></code></a></li>
+<li><a class="reference internal" href="#lapy.Polygon.close"><code class="docutils literal notranslate"><span class="pre">Polygon.close()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.Polygon.get_points"><code class="docutils literal notranslate"><span class="pre">Polygon.get_points()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.Polygon.is_2d"><code class="docutils literal notranslate"><span class="pre">Polygon.is_2d()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.Polygon.is_closed"><code class="docutils literal notranslate"><span class="pre">Polygon.is_closed()</span></code></a></li>
@@ -661,8 +761,8 @@ steps to reduce shrinkage while smoothing.</p>
     </aside>
   </div>
 </div><script src="../../_static/documentation_options.js?v=b1514d62"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>

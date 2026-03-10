@@ -755,160 +755,65 @@ def test_critical_points_boundary():
     assert len(minima) >= 1, f"Expected at least one minimum, got {len(minima)}"
 
 
-def test_extract_level_paths_simple():
+def test_extract_level_paths_torus():
+    """Test extract_level_paths on torus.off covering normal, saddle and empty cases.
+
+    The x-coordinate of torus.off has exactly two order-2 saddles at x ≈ ±0.36.
+    Between the saddles a generic level crosses the torus in two separate closed
+    loops.  At the saddle level the loop splits and each component must start or
+    end exactly at the saddle vertex.
     """
-    Test extract_level_paths on a simple mesh with single level curve.
-    """
-    # Create a simple mesh: unit square in xy-plane
-    vertices = np.array([
-        [0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
-        [1.0, 1.0, 1.0],
-        [0.0, 1.0, 1.0],
-    ])
-    triangles = np.array([
-        [0, 1, 2],
-        [0, 2, 3],
-    ])
-    mesh = TriaMesh(vertices, triangles)
+    import os
+    mesh = TriaMesh.read_off(
+        os.path.join(os.path.dirname(__file__), "../../../data/torus.off")
+    )
+    vfunc = mesh.v[:, 0].copy()
 
-    # Height function (z-coordinate)
-    vfunc = vertices[:, 2]
+    # --- helper: check metadata consistency for a single curve ---------------
+    def _check_curve(c):
+        n = c.points.shape[0]
+        n_segs = n if c.closed else n - 1
+        assert c.points.shape == (n, 3)
+        assert c.tria_idx.shape == (n_segs,), (
+            f"tria_idx shape {c.tria_idx.shape} != ({n_segs},)"
+        )
+        assert c.edge_vidx.shape == (n, 2)
+        assert c.edge_bary.shape == (n,)
+        assert np.all(c.edge_bary >= 0) and np.all(c.edge_bary <= 1)
 
-    # Extract level curve at z=0.5
-    curves = mesh.extract_level_paths(vfunc, 0.5)
+    # --- 1. normal level: two closed loops, no special vertices --------------
+    # level 0.2 lies strictly between the two saddles at ±0.36
+    curves = mesh.extract_level_paths(vfunc, 0.2)
+    assert len(curves) == 2, f"Expected 2 closed loops at normal level, got {len(curves)}"
+    for c in curves:
+        assert c.closed, "Expected closed loop at normal level"
+        _check_curve(c)
 
-    # Should have at least one curve
-    assert len(curves) > 0, "Expected at least one level curve"
+    # --- 2. saddle level: two curves each anchored at the saddle vertex ------
+    minima, maxima, saddles, orders = mesh.critical_points(vfunc)
+    assert len(saddles) >= 1, "Expected at least one saddle on torus x-function"
+    saddle_v = int(saddles[orders == 2][0])
+    saddle_level = float(vfunc[saddle_v])
+    saddle_coord = mesh.v[saddle_v]
 
-    # Check that returned objects are Polygon
-    from ...polygon import Polygon
-    for curve in curves:
-        assert isinstance(curve, Polygon), f"Expected Polygon, got {type(curve)}"
+    curves_saddle = mesh.extract_level_paths(vfunc, saddle_level)
+    assert len(curves_saddle) >= 2, (
+        f"Expected >=2 curves at saddle level, got {len(curves_saddle)}"
+    )
+    for c in curves_saddle:
+        _check_curve(c)
+        # each curve must start or end at the saddle vertex
+        dist = min(
+            np.linalg.norm(c.points[0]  - saddle_coord),
+            np.linalg.norm(c.points[-1] - saddle_coord),
+        )
+        assert dist < 1e-6, (
+            f"Curve does not touch saddle vertex (min dist = {dist:.2e})"
+        )
 
-    # Check that polygons have required attributes
-    for curve in curves:
-        assert hasattr(curve, 'points'), "Polygon should have 'points' attribute"
-        assert hasattr(curve, 'closed'), "Polygon should have 'closed' attribute"
-        assert hasattr(curve, 'tria_idx'), "Polygon should have 'tria_idx' attribute"
-        assert hasattr(curve, 'edge_vidx'), "Polygon should have 'edge_vidx' attribute"
-        assert hasattr(curve, 'edge_bary'), "Polygon should have 'edge_bary' attribute"
-
-    # Check that points are 3D
-    for curve in curves:
-        assert curve.points.shape[1] == 3, f"Expected 3D points, got shape {curve.points.shape}"
-
-
-def test_extract_level_paths_closed_loop():
-    """
-    Test extract_level_paths on a mesh with closed loop level curve.
-    """
-    # Create a pyramid mesh
-    vertices = np.array([
-        [0.0, 0.0, 0.0],  # base
-        [1.0, 0.0, 0.0],  # base
-        [1.0, 1.0, 0.0],  # base
-        [0.0, 1.0, 0.0],  # base
-        [0.5, 0.5, 1.0],  # apex
-    ])
-    triangles = np.array([
-        [0, 1, 4],
-        [1, 2, 4],
-        [2, 3, 4],
-        [3, 0, 4],
-        [0, 2, 1],
-        [0, 3, 2],
-    ])
-    mesh = TriaMesh(vertices, triangles)
-
-    # Height function
-    vfunc = vertices[:, 2]
-
-    # Extract level curve at mid-height (should create closed loop around pyramid)
-    curves = mesh.extract_level_paths(vfunc, 0.5)
-
-    assert len(curves) == 1, "Expected one level curve"
-
-    # Curve should be closed
-    assert curves[0].closed, "Expected closed level curve"
-
-    # Note: May or may not be closed depending on mesh topology
-
-    # All points should be approximately at z=0.5
-    for curve in curves:
-        z_coords = curve.points[:, 2]
-        np.testing.assert_allclose(z_coords, 0.5, atol=1e-5,
-                                   err_msg="Level curve points should be at z=0.5")
-
-
-def test_extract_level_paths_no_intersection():
-    """
-    Test extract_level_paths when level doesn't intersect mesh.
-    """
-    # Simple triangle
-    vertices = np.array([
-        [0.0, 0.0, 0.0],
-        [1.0, 0.0, 1.0],
-        [0.0, 1.0, 1.0],
-    ])
-    triangles = np.array([[0, 1, 2]])
-    mesh = TriaMesh(vertices, triangles)
-
-    # Height function
-    vfunc = vertices[:, 2]
-
-    # Extract level curve at z=10.0 (way above mesh)
-    curves = mesh.extract_level_paths(vfunc, 10.0)
-
-    # Should return empty list
-    assert len(curves) == 0, f"Expected no curves, got {len(curves)}"
-
-
-def test_extract_level_paths_metadata():
-    """
-    Test that extract_level_paths returns correct metadata.
-    """
-    # Create a simple mesh
-    vertices = np.array([
-        [0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.5],
-        [1.0, 1.0, 1.0],
-        [0.0, 1.0, 0.5],
-    ])
-    triangles = np.array([
-        [0, 1, 2],
-        [0, 2, 3],
-    ])
-    mesh = TriaMesh(vertices, triangles)
-
-    # Height function
-    vfunc = vertices[:, 2]
-
-    # Extract level curve
-    curves = mesh.extract_level_paths(vfunc, 0.5)
-
-    for curve in curves:
-        n_points = curve.points.shape[0]
-
-        # Check tria_idx
-        assert hasattr(curve, 'tria_idx'), "Missing tria_idx"
-        # Number of segments (tria_idx) depends on whether curve is closed
-        expected_tria_len = n_points if curve.closed else n_points - 1
-        assert curve.tria_idx.shape == (expected_tria_len,), \
-            f"tria_idx should be ({expected_tria_len},), got {curve.tria_idx.shape}"
-
-        # Check edge_vidx
-        assert hasattr(curve, 'edge_vidx'), "Missing edge_vidx"
-        assert curve.edge_vidx.shape == (n_points, 2), \
-            f"edge_vidx should be (n_points, 2), got {curve.edge_vidx.shape}"
-
-        # Check edge_bary
-        assert hasattr(curve, 'edge_bary'), "Missing edge_bary"
-        assert curve.edge_bary.shape == (n_points,), \
-            f"edge_bary should be (n_points,), got {curve.edge_bary.shape}"
-        # Barycentric coordinates should be in [0, 1]
-        assert np.all(curve.edge_bary >= 0) and np.all(curve.edge_bary <= 1), \
-            "edge_bary should be in [0, 1]"
+    # --- 3. level out of range: empty result ---------------------------------
+    curves_empty = mesh.extract_level_paths(vfunc, vfunc.max() + 1.0)
+    assert len(curves_empty) == 0, "Expected no curves above mesh range"
 
 
 def test_level_path():

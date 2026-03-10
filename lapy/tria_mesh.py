@@ -2123,32 +2123,37 @@ class TriaMesh:
         # We search masked_trias (the small set of triangles touching any sv)
         # for a row containing both i and j.  If found, the third vertex is
         # by construction a special vertex — no separate sv lookup needed.
+        # The triangle index is also returned so it can be stored in tria_idx
+        # (the segment from the edge point to/from the sv passes through that
+        # masked triangle).
         #
         # A special-vertex point is encoded as:
         #   edge_vidx = [sv_idx, sv_idx]  (degenerate edge)
         #   edge_bary = 0.0
-        #   tria_idx  = -1                (sentinel, no triangle crossing)
         # ------------------------------------------------------------------
 
         masked_trias = self.t[touches_special]           # (n_masked, 3)
+        touches_special_idx = np.where(touches_special)[0]  # actual tria indices
 
-        def _sv_of_edge(i: int, j: int) -> int | None:
-            """Return the special vertex opposite edge (i,j) in a masked triangle, or None."""
+        def _sv_of_edge(i: int, j: int) -> tuple[int, int] | None:
+            """Return (sv_idx, tria_idx) for the masked triangle opposite edge (i,j), or None."""
             rows = np.where(
                 np.any(masked_trias == i, axis=1) & np.any(masked_trias == j, axis=1)
             )[0]
             if rows.size == 0:
                 return None
-            tri = masked_trias[rows[0]]
-            return int(tri[(tri != i) & (tri != j)][0])
+            row = rows[0]
+            tri = masked_trias[row]
+            sv_idx = int(tri[(tri != i) & (tri != j)][0])
+            return sv_idx, int(touches_special_idx[row])
 
-        def _sv_arrays(sv_idx: int):
+        def _sv_arrays(sv_idx: int, tria_idx: int):
             """Arrays for a single special-vertex point."""
             return (
-                self.v[sv_idx][np.newaxis, :],           # pts  (1, 3)
-                np.array([-1], dtype=np.intp),    # ti   (1,)
-                np.array([[sv_idx, sv_idx]]),            # ev   (1, 2)
-                np.array([0.0]),                         # eb   (1,)
+                self.v[sv_idx][np.newaxis, :],               # pts  (1, 3)
+                np.array([tria_idx], dtype=np.intp),  # ti   (1,)
+                np.array([[sv_idx, sv_idx]]),                # ev   (1, 2)
+                np.array([0.0]),                             # eb   (1,)
             )
 
         # Extend each fragment by prepending/appending its adjacent sv point(s).
@@ -2164,35 +2169,42 @@ class TriaMesh:
                 continue
 
             ev = frag.edge_vidx
-            sv_start = _sv_of_edge(int(ev[0, 0]), int(ev[0, 1]))
-            sv_end   = _sv_of_edge(int(ev[-1, 0]), int(ev[-1, 1]))
+            res_start = _sv_of_edge(int(ev[0, 0]),  int(ev[0, 1]))
+            res_end   = _sv_of_edge(int(ev[-1, 0]), int(ev[-1, 1]))
 
-            if sv_start is not None and sv_start == sv_end:
+            if res_start is not None and res_end is not None and res_start[0] == res_end[0]:
                 # Both ends touch the same sv: closed loop.
-                # Prepend the sv point directly onto the fragment and close it.
-                sp, st, se, sb = _sv_arrays(sv_start)
+                # Prepend sv with the start-edge's triangle.
+                # The closing segment (last point → sv) passes through the
+                # end-edge's triangle, so append that triangle index too.
+                sv_idx, ti_start = res_start
+                _,      ti_end   = res_end
+                sp, st, se, sb = _sv_arrays(sv_idx, ti_start)
                 frag.points    = np.vstack([sp, frag.points])
-                frag.tria_idx  = np.concatenate([st, frag.tria_idx])
+                frag.tria_idx  = np.concatenate([st, frag.tria_idx,
+                                                 np.array([ti_end], dtype=np.intp)])
                 frag.edge_vidx = np.vstack([se, frag.edge_vidx])
                 frag.edge_bary = np.concatenate([sb, frag.edge_bary])
                 frag.close()
                 result.append(frag)
                 continue
 
-            if sv_start is None and sv_end is None:
+            if res_start is None and res_end is None:
                 # No sv at either end — fragment is complete as-is.
                 result.append(frag)
                 continue
 
-            if sv_start is not None:
-                sp, st, se, sb = _sv_arrays(sv_start)
+            if res_start is not None:
+                sv_idx, ti = res_start
+                sp, st, se, sb = _sv_arrays(sv_idx, ti)
                 frag.points    = np.vstack([sp, frag.points])
                 frag.tria_idx  = np.concatenate([st, frag.tria_idx])
                 frag.edge_vidx = np.vstack([se, frag.edge_vidx])
                 frag.edge_bary = np.concatenate([sb, frag.edge_bary])
 
-            if sv_end is not None:
-                sp, st, se, sb = _sv_arrays(sv_end)
+            if res_end is not None:
+                sv_idx, ti = res_end
+                sp, st, se, sb = _sv_arrays(sv_idx, ti)
                 frag.points    = np.vstack([frag.points, sp])
                 frag.tria_idx  = np.concatenate([frag.tria_idx, st])
                 frag.edge_vidx = np.vstack([frag.edge_vidx, se])

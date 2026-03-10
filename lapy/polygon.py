@@ -22,15 +22,23 @@ class Polygon:
     points : np.ndarray
         Array of shape (n, d) containing coordinates of polygon vertices
         in order, where d is 2 or 3 for 2D (x, y) or 3D (x, y, z) paths.
-        For closed polygons, the last point should not duplicate the first point.
-    closed : bool, default=False
-        If True, treats the path as a closed polygon. If False, treats it as
-        an open polyline.
+        If the last point duplicates the first point and closed is None,
+        the duplicate endpoint will be removed and the polygon will be
+        marked as closed automatically.
+    closed : bool or None, default=None
+        - If None (default): Auto-detect by checking if first and last points
+          are **exactly** equal (``np.array_equal``).  Only an exact duplicate
+          is removed; nearly-equal but geometrically distinct endpoints are left
+          untouched and the polygon is treated as open.
+        - If True: Treats the path as a closed polygon.  If the last point is
+          nearly equal to the first (``np.allclose``), it is removed.
+        - If False: Treats the path as an open polyline regardless of endpoints.
 
     Attributes
     ----------
     points : np.ndarray
-        Polygon vertex coordinates, shape (n_points, d).
+        Polygon vertex coordinates, shape (n_points, d). For closed polygons,
+        the last point does not duplicate the first.
     closed : bool
         Whether the polygon is closed or open.
     _is_2d : bool
@@ -46,23 +54,22 @@ class Polygon:
     --------
     >>> import numpy as np
     >>> from lapy.polygon import Polygon
-    >>> # Create a 2D closed polygon (square)
-    >>> square = np.array([[0, 0], [1, 0], [1, 1], [0, 1]])
-    >>> poly = Polygon(square, closed=True)
-    >>> poly.is_2d()
+    >>> # Create a 2D closed polygon (square) - auto-detected
+    >>> square = np.array([[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]])
+    >>> poly = Polygon(square)  # closed=None, will auto-detect and remove duplicate
+    >>> poly.closed
     True
-    >>> poly.length()
-    4.0
-    >>> # Create a 3D open path
-    >>> path_3d = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]])
-    >>> poly3d = Polygon(path_3d, closed=False)
-    >>> poly3d.is_2d()
+    >>> poly.points.shape[0]
+    4
+    >>> # Explicitly open polygon
+    >>> path = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]])
+    >>> poly3d = Polygon(path, closed=False)
+    >>> poly3d.closed
     False
     """
 
-    def __init__(self, points: np.ndarray, closed: bool = False):
+    def __init__(self, points: np.ndarray, closed: bool | None = None):
         self.points = np.array(points)
-        self.closed = closed
 
         # Validate non-empty polygon
         if self.points.size == 0:
@@ -93,6 +100,28 @@ class Polygon:
         else:
             raise ValueError("Points should have 2 or 3 coordinates")
 
+        # Auto-detect closed polygons or handle explicit closed parameter
+        if closed is None:
+            # Auto-detect: strip duplicate endpoint only when first and last
+            # points are exactly identical.  np.allclose is intentionally
+            # avoided here — nearly-equal but distinct endpoints should not
+            # be silently removed when the caller has not requested closure.
+            if len(self.points) > 1 and np.array_equal(self.points[0], self.points[-1]):
+                self.points = self.points[:-1]
+                self.closed = True
+            else:
+                self.closed = False
+        elif closed:
+            # Explicitly closed: remove duplicate endpoint if present.
+            # np.allclose is used here because the caller has explicitly
+            # requested closure, so stripping a near-duplicate is intentional.
+            if len(self.points) > 1 and np.allclose(self.points[0], self.points[-1]):
+                self.points = self.points[:-1]
+            self.closed = True
+        else:
+            # Explicitly open
+            self.closed = False
+
     def is_2d(self) -> bool:
         """Check if the polygon is 2D.
 
@@ -112,6 +141,25 @@ class Polygon:
             True if polygon is closed, False if open.
         """
         return self.closed
+
+    def close(self) -> "Polygon":
+        """Mark the polygon as closed in-place.
+
+        If the last point is nearly equal to the first (``np.allclose``), it is
+        removed; otherwise the polygon is simply flagged as closed (the closing
+        segment from the last point back to the first is implicit).  Using
+        ``np.allclose`` here is intentional: the caller has explicitly requested
+        closure, so stripping a near-duplicate endpoint is the expected behaviour.
+
+        Returns
+        -------
+        Polygon
+            Self, for method chaining.
+        """
+        if len(self.points) > 1 and np.allclose(self.points[0], self.points[-1]):
+            self.points = self.points[:-1]
+        self.closed = True
+        return self
 
     def n_points(self) -> int:
         """Get number of points in polygon.
@@ -417,12 +465,13 @@ class Polygon:
         Polygon
             Smoothed polygon. Returns self if inplace=True, new instance otherwise.
         """
-        if n <= 0:
-            raise ValueError("n must be a positive integer")
+        # Input validation to enforce documented parameter ranges
+        if not isinstance(n, int) or n <= 0:
+            raise ValueError(f"n must be a positive integer, got {n!r}")
         if lambda_ <= 0:
-            raise ValueError("lambda_ must be positive")
+            raise ValueError(f"lambda_ must be positive, got {lambda_!r}")
         if mu >= 0:
-            raise ValueError("mu must be negative")
+            raise ValueError(f"mu must be negative, got {mu!r}")
         mat = self._construct_smoothing_matrix()
         points_smooth = self.points.copy()
 

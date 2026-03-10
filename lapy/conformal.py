@@ -18,7 +18,7 @@ SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
 import importlib
 import logging
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 from scipy import sparse
@@ -535,7 +535,7 @@ def linear_beltrami_solver(
 
 def _sparse_symmetric_solve(
         A: csr_matrix,
-        b: Union[np.ndarray, csr_matrix],
+        b: np.ndarray | csr_matrix,
         use_cholmod: bool = False
 ) -> np.ndarray:
     """Solve a sparse symmetric linear system of equations Ax = b.

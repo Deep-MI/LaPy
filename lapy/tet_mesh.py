@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 from scipy import sparse
@@ -195,7 +195,7 @@ class TetMesh:
         return edgelens.mean()
 
     def boundary_tria(
-        self, tetfunc: Optional[np.ndarray] = None
+        self, tetfunc: np.ndarray | None = None
     ) -> Union["TriaMesh", tuple["TriaMesh", np.ndarray]]:
         """Get boundary triangle mesh of tetrahedra.
 

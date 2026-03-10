@@ -27,7 +27,7 @@ gh_url = "https://github.com/Deep-MI/LaPy"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "5.0"
+needs_sphinx = "7.0"
 
 # The document name of the “root” document, that is, the document that contains
 # the root toctree directive.
@@ -87,7 +87,6 @@ html_css_files = [
     "css/style.css",
 ]
 html_title = project
-html_show_sphinx = False
 
 # Documentation to change footer icons:
 # https://pradyunsg.me/furo/customisation/footer/#changing-footer-icons
@@ -110,10 +109,9 @@ html_theme_options = {
 autosummary_generate = True
 
 # -- autodoc -----------------------------------------------------------------
-autodoc_typehints = "none"
+autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
 autodoc_warningiserror = True
-autoclass_content = "class"
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
@@ -143,6 +141,7 @@ numpydoc_xref_aliases = {
     # LaPy
     "TetMesh": "lapy.TetMesh",
     "TriaMesh": "lapy.TriaMesh",
+    "Polygon": "lapy.Polygon",
     # Matplotlib
     "Axes": "matplotlib.axes.Axes",
     "Figure": "matplotlib.figure.Figure",
@@ -184,6 +183,12 @@ numpydoc_validation_exclude = {  # regex to ignore during docstring check
     r"\.__iter__",
     r"\.__div__",
     r"\.__neg__",
+    # Imported third-party objects (not part of LaPy API)
+    r"\.Any$",  # typing.Any
+    r"\.csr_matrix$",  # scipy.sparse.csr_matrix
+    r"\.minimize$",  # scipy.optimize.minimize
+    r"\.bisect$",  # bisect.bisect
+    r"\.LinearSegmentedColormap$",  # matplotlib.colors.LinearSegmentedColormap
 }
 
 # -- sphinxcontrib-bibtex ----------------------------------------------------
@@ -253,27 +258,9 @@ sphinx_gallery_conf = {
     "within_subsection_order": FileNameSortKey,
 }
 
-# -- make sure pandoc gets installed -----------------------------------------
-from inspect import getsourcefile
-import os
-
-# Get path to directory containing this file, conf.py.
-DOCS_DIRECTORY = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
-
-def ensure_pandoc_installed(_):
-    import pypandoc
-
-    # Download pandoc if necessary. If pandoc is already installed and on
-    # the PATH, the installed version will be used. Otherwise, we will
-    # download a copy of pandoc into docs/bin/ and add that to our PATH.
-    pandoc_dir = os.path.join(DOCS_DIRECTORY, "bin")
-    # Add dir containing pandoc binary to the PATH environment variable
-    if pandoc_dir not in os.environ["PATH"].split(os.pathsep):
-        os.environ["PATH"] += os.pathsep + pandoc_dir
-    pypandoc.ensure_pandoc_installed(
-        targetfolder=pandoc_dir,
-        delete_installer=True,
-    )
-
-def setup(app):
-    app.connect("builder-inited", ensure_pandoc_installed)
+# -- Pandoc requirement ------------------------------------------------------
+# Note: Pandoc must be installed on the system for nbsphinx to convert notebooks.
+# Install via system package manager (apt, brew, etc.) or conda/mamba.
+# See: https://pandoc.org/installing.html
+#
+# For CI/CD, ensure pandoc is installed in the workflow (see .github/workflows/doc.yml)

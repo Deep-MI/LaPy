@@ -11,7 +11,6 @@ For visualizing results in a juypter notebook use this::
 
 import re
 from bisect import bisect
-from typing import Optional, Union
 
 import numpy as np
 import plotly
@@ -21,7 +20,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from . import TetMesh, TriaMesh
 
 
-def _get_color_levels() -> list[list[Union[float, str]]]:
+def _get_color_levels() -> list[list[float | str]]:
     """Return a pre-set colorscale.
 
     Returns
@@ -75,7 +74,7 @@ def _get_color_levels() -> list[list[Union[float, str]]]:
     return colorscale
 
 
-def _get_colorscale(vmin: float, vmax: float) -> list[list[Union[float, str]]]:
+def _get_colorscale(vmin: float, vmax: float) -> list[list[float | str]]:
     """Put together a colorscale map depending on the range of v-values.
 
     Parameters
@@ -143,7 +142,7 @@ def _get_colorscale(vmin: float, vmax: float) -> list[list[Union[float, str]]]:
     return colorscale
 
 
-def _get_colorval(t: float, colormap: list[list[Union[float, str]]]) -> str:
+def _get_colorval(t: float, colormap: list[list[float | str]]) -> str:
     """Turn a scalar value into a color value.
 
     Parameters
@@ -171,7 +170,7 @@ def _get_colorval(t: float, colormap: list[list[Union[float, str]]]) -> str:
         return colormap[-1][1]
     # ok here we need to interpolate
     # first find two colors before and after
-    columns = list(zip(*colormap))
+    columns = list(zip(*colormap, strict=True))
     pos = bisect(columns[0], t)
     # compute param between pos-1 and pos values
     if len(columns[0]) < pos + 1 or pos == 0:
@@ -192,7 +191,7 @@ def _get_colorval(t: float, colormap: list[list[Union[float, str]]]) -> str:
 
 def _map_z2color(
     zval: float,
-    colormap: Union[LinearSegmentedColormap, list[list[Union[float, str]]]],
+    colormap: LinearSegmentedColormap | list[list[float | str]],
     zmin: float,
     zmax: float,
 ) -> str:
@@ -242,21 +241,21 @@ def _map_z2color(
 
 def plot_tet_mesh(
     tetra: "TetMesh",
-    vfunc: Optional[np.ndarray] = None,
+    vfunc: np.ndarray | None = None,
     plot_edges: bool = False,
     plot_levels: bool = False,
-    tfunc: Optional[np.ndarray] = None,
-    cutting: Optional[Union[str, list[str]]] = None,
+    tfunc: np.ndarray | None = None,
+    cutting: str | list[str] | None = None,
     edge_color: str = "rgb(50,50,50)",
     html_output: bool = False,
     width: int = 800,
     height: int = 800,
     flatshading: bool = False,
-    xrange: Optional[Union[list[float], tuple[float, float]]] = None,
-    yrange: Optional[Union[list[float], tuple[float, float]]] = None,
-    zrange: Optional[Union[list[float], tuple[float, float]]] = None,
+    xrange: list[float] | tuple[float, float] | None = None,
+    yrange: list[float] | tuple[float, float] | None = None,
+    zrange: list[float] | tuple[float, float] | None = None,
     showcaxis: bool = False,
-    caxis: Optional[Union[list[float], tuple[float, float]]] = None,
+    caxis: list[float] | tuple[float, float] | None = None,
 ) -> None:
     """Plot tetra meshes.
 
@@ -394,26 +393,26 @@ def plot_tet_mesh(
 
 def plot_tria_mesh(
     tria: "TriaMesh",
-    vfunc: Optional[np.ndarray] = None,
-    tfunc: Optional[np.ndarray] = None,
-    vcolor: Optional[list[str]] = None,
-    tcolor: Optional[list[str]] = None,
+    vfunc: np.ndarray | None = None,
+    tfunc: np.ndarray | None = None,
+    vcolor: list[str] | None = None,
+    tcolor: list[str] | None = None,
     showcaxis: bool = False,
-    caxis: Optional[Union[list[float], tuple[float, float]]] = None,
-    xrange: Optional[Union[list[float], tuple[float, float]]] = None,
-    yrange: Optional[Union[list[float], tuple[float, float]]] = None,
-    zrange: Optional[Union[list[float], tuple[float, float]]] = None,
+    caxis: list[float] | tuple[float, float] | None = None,
+    xrange: list[float] | tuple[float, float] | None = None,
+    yrange: list[float] | tuple[float, float] | None = None,
+    zrange: list[float] | tuple[float, float] | None = None,
     plot_edges: bool = False,
     plot_levels: bool = False,
     edge_color: str = "rgb(50,50,50)",
     tic_color: str = "rgb(50,200,10)",
-    background_color: Optional[str] = None,
+    background_color: str | None = None,
     flatshading: bool = False,
     width: int = 800,
     height: int = 800,
-    camera: Optional[dict[str, dict[str, float]]] = None,
+    camera: dict[str, dict[str, float]] | None = None,
     html_output: bool = False,
-    export_png: Optional[str] = None,
+    export_png: str | None = None,
     scale_png: float = 1.0,
     no_display: bool = False,
 ) -> None:
@@ -496,8 +495,8 @@ def plot_tria_mesh(
             " but not both at the same time"
         )
 
-    x, y, z = zip(*tria.v)
-    i, j, k = zip(*tria.t)
+    x, y, z = zip(*tria.v, strict=True)
+    i, j, k = zip(*tria.t, strict=True)
 
     vlines = []
     if vfunc is None:

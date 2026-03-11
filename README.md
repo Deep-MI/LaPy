@@ -18,8 +18,9 @@ Key design goals:
 - [References](#references)
 
 ## Features
-- `TriaMesh`: triangle mesh class with orientation checking, boundary handling, normals, smoothing and quality metrics; efficient edge and adjacency representations; IO for OFF, VTK and related formats.
+- `TriaMesh`: triangle mesh class with orientation checking, boundary handling, normals, smoothing and quality metrics; efficient edge and adjacency representations; IO for OFF, VTK; Gifti and related formats.
 - `TetMesh`: tetrahedral mesh utilities, boundary handling and IO.
+- `Polygon`: polygon class representing open and closed polygon curves.
 - `Solver`: FEM routines producing stiffness and mass matrices, sparse eigenvalue solvers, Poisson and heat equation solvers, and support for anisotropic operators.
 - `diffgeo`: gradient, divergence, mean-curvature flow and related differential operators.
 - `heat`: heat kernel and diffusion utilities, geodesics via heat method.

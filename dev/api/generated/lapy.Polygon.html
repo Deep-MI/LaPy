@@ -275,7 +275,7 @@
 <h1>lapy.Polygon<a class="headerlink" href="#lapy-polygon" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lapy.Polygon">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L14-L490"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">lapy.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon" title="Link to this definition">¶</a></dt>
 <dd><p>Class representing a polygon path (open or closed).</p>
 <p>This class handles 2D and 3D polygon paths with operations for resampling,
 smoothing, and computing geometric properties like length, centroid, and area.</p>
@@ -397,7 +397,7 @@ If points don’t have 2 or 3 coordinates.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.area">
-<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L249-L278"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.area" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.area" title="Link to this definition">¶</a></dt>
 <dd><p>Compute area enclosed by closed 2D polygon.</p>
 <p>Uses the shoelace formula. Only valid for closed 2D polygons.</p>
 <dl class="field-list simple">
@@ -421,7 +421,7 @@ If points don’t have 2 or 3 coordinates.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.centroid">
-<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L203-L247"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.centroid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.centroid" title="Link to this definition">¶</a></dt>
 <dd><p>Compute centroid of polygon.</p>
 <p>For open polygons or closed 3D polygons, returns the simple arithmetic mean
 of all vertex coordinates.</p>
@@ -450,7 +450,7 @@ where A is the polygon area.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L145-L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.close" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.close" title="Link to this definition">¶</a></dt>
 <dd><p>Mark the polygon as closed in-place.</p>
 <p>If the last point is nearly equal to the first (<code class="docutils literal notranslate"><span class="pre">np.allclose</span></code>), it is
 removed; otherwise the polygon is simply flagged as closed (the closing
@@ -472,7 +472,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.get_points">
-<span class="sig-name descname"><span class="pre">get_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L174-L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.get_points" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.get_points" title="Link to this definition">¶</a></dt>
 <dd><p>Get polygon points.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -489,7 +489,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.is_2d">
-<span class="sig-name descname"><span class="pre">is_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L125-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_2d" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.is_2d" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the polygon is 2D.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -506,7 +506,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.is_closed">
-<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L135-L143"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.is_closed" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.is_closed" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the polygon is closed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -523,7 +523,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.length">
-<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L184-L201"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.length" title="Link to this definition">¶</a></dt>
 <dd><p>Compute total length of polygon path.</p>
 <p>For closed polygons, includes the segment from last to first point.</p>
 <dl class="field-list simple">
@@ -541,7 +541,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.n_points">
-<span class="sig-name descname"><span class="pre">n_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L164-L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.n_points" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">n_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.n_points" title="Link to this definition">¶</a></dt>
 <dd><p>Get number of points in polygon.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -558,7 +558,7 @@ closure, so stripping a near-duplicate endpoint is the expected behaviour.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L280-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.resample" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.resample" title="Link to this definition">¶</a></dt>
 <dd><p>Resample polygon to have equidistant points.</p>
 <p>Creates n_points that are approximately equidistantly spaced along
 the cumulative Euclidean distance. Uses linear interpolation.</p>
@@ -595,7 +595,7 @@ better equidistant spacing. Must be at least 1.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.smooth_laplace">
-<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L396-L438"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_laplace" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.smooth_laplace" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth polygon using Laplace smoothing.</p>
 <p>Applies iterative smoothing: p_new = (1-lambda)*p + lambda * M*p
 where M is the neighbor-averaging matrix.</p>
@@ -631,7 +631,7 @@ where M is the neighbor-averaging matrix.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lapy.Polygon.smooth_taubin">
-<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/polygon.py#L440-L490"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.Polygon.smooth_taubin" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">smooth_taubin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.53</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.Polygon.smooth_taubin" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth polygon using Taubin smoothing.</p>
 <p>Alternates between shrinking (positive lambda) and expanding (negative mu)
 steps to reduce shrinkage while smoothing.</p>
@@ -760,7 +760,7 @@ steps to reduce shrinkage while smoothing.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=b1514d62"></script>
+</div><script src="../../_static/documentation_options.js?v=72d88caf"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

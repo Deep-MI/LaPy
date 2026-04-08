@@ -784,6 +784,7 @@ class Solver:
         h: float | np.ndarray = 0.0,
         dtup: tuple = (),
         ntup: tuple = (),
+        integrate: bool = True,
     ) -> np.ndarray:
         """Solver for the Poisson equation with boundary conditions.
 
@@ -808,6 +809,11 @@ class Solver:
             Neumann boundary condition as a tuple containing the index and
             data arrays of same length. The default, an empty tuple,
             corresponds to Neumann on all boundaries.
+        integrate: bool, default=True
+            Whether to integrate the right hand side over the surface using 
+            the mass matrix. If True, the right hand side is effectively 
+            replaced by ``B h``. If False, the right hand side is used as is, 
+            which corresponds to ``A x = h``. 
 
         Returns
         -------
@@ -904,8 +910,9 @@ class Solver:
                 (dim, n_rhs), dtype=dtype
             )
         # compute right hand side
-        mass = self.mass.astype(dtype, copy=False)
-        b = mass * (h - nvec)
+        b = h - nvec
+        if integrate:
+            b = self.mass.astype(dtype, copy=False) * b
         if len(didx) > 0:
             b = b - self.stiffness * dvec
         # remove Dirichlet Nodes

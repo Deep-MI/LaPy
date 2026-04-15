@@ -1,8 +1,8 @@
 """Tests for Solver.eigs and Solver.poisson — parameters and 2-D rhs support."""
 
 import numpy as np
-from scipy import sparse
 import pytest
+from scipy import sparse
 
 from ...solver import Solver
 from ...tria_mesh import TriaMesh

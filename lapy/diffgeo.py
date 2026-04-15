@@ -146,8 +146,9 @@ def compute_geodesic_f(
 
     gradf = compute_gradient(geom, vfunc)
     fem = Solver(geom, lump=True, use_cholmod=use_cholmod)
-    # fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
 
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_elements, 3)
         gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
@@ -198,10 +199,9 @@ def tria_compute_geodesic_f(
 
     gradf = tria_compute_gradient(tria, vfunc)
     fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
-    # div is the integrated divergence (so it is already B*div);
-    # pass identity instead of B here
-    # fem.mass = sparse.eye(fem.stiffness.shape[0])
 
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_triangles, 3)
         gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
@@ -503,9 +503,10 @@ def tria_compute_rotated_f(
     gradf = tria_compute_gradient(tria, vfunc)
     tn = tria.tria_normals()
     fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
-    # fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     dtup = (np.array([0]), np.array([0.0]))
-
+    
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_triangles, 3)
         gradf = np.cross(tn, gradf)

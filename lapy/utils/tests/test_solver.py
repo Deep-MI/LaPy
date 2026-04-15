@@ -1,6 +1,7 @@
 """Tests for Solver.eigs and Solver.poisson — parameters and 2-D rhs support."""
 
 import numpy as np
+from scipy import sparse
 import pytest
 
 from ...solver import Solver
@@ -100,3 +101,19 @@ def test_poisson_2d_rhs_with_dirichlet(tria_mesh):
             err_msg=f"poisson 2-D Dirichlet mismatch at column {k}",
         )
 
+def test_poisson_with_integrate_false(tria_mesh):
+    """poisson with integrate=False must solve A x = h, not A x = B h."""
+    fem1 = Solver(tria_mesh, lump=True)
+    _, evec = fem1.eigs(k=5)
+    rhs = evec[:, 1:4]  # (n_vertices, 3)
+
+    res1 = fem1.poisson(rhs, integrate=False)
+
+    fem2 = Solver(tria_mesh, lump=True)
+    fem2.mass = sparse.eye(fem2.stiffness.shape[0], dtype=fem2.stiffness.dtype)
+    res2 = fem2.poisson(rhs, integrate=True)
+
+    np.testing.assert_allclose(
+        res1, res2, rtol=1e-6, atol=1e-9,
+        err_msg="poisson with integrate=False does not match poisson with identity mass matrix",
+    )

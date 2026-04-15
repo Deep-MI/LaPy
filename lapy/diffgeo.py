@@ -146,21 +146,22 @@ def compute_geodesic_f(
 
     gradf = compute_gradient(geom, vfunc)
     fem = Solver(geom, lump=True, use_cholmod=use_cholmod)
-    fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=fem.stiffness.dtype)
 
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_elements, 3)
         gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
         gradnorm = np.nan_to_num(gradnorm)
         divf = compute_divergence(geom, gradnorm)
-        vf = fem.poisson(divf)
+        vf = fem.poisson(divf, integrate=False)
         vf -= vf.min()
     else:
         # gradf: (n_elements, n_functions, 3) — norm along last axis
         gradnorm = gradf / np.sqrt((gradf**2).sum(-1))[:, :, np.newaxis]
         gradnorm = np.nan_to_num(gradnorm)
         divf = compute_divergence(geom, gradnorm)  # (n_vertices, n_functions)
-        vf = fem.poisson(divf)                     # (n_vertices, n_functions)
+        vf = fem.poisson(divf, integrate=False)     # (n_vertices, n_functions)
         vf -= vf.min(axis=0)
     return vf
 
@@ -198,23 +199,22 @@ def tria_compute_geodesic_f(
 
     gradf = tria_compute_gradient(tria, vfunc)
     fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
-    # div is the integrated divergence (so it is already B*div);
-    # pass identity instead of B here
-    fem.mass = sparse.eye(fem.stiffness.shape[0])
 
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_triangles, 3)
         gradnorm = gradf / np.sqrt((gradf**2).sum(1))[:, np.newaxis]
         gradnorm = np.nan_to_num(gradnorm)
         divf = tria_compute_divergence(tria, gradnorm)
-        vf = fem.poisson(divf)
+        vf = fem.poisson(divf, integrate=False)
         vf -= vf.min()
     else:
         # gradf: (n_triangles, n_functions, 3) — norm along last axis
         gradnorm = gradf / np.sqrt((gradf**2).sum(-1))[:, :, np.newaxis]
         gradnorm = np.nan_to_num(gradnorm)
         divf = tria_compute_divergence(tria, gradnorm)  # (n_vertices, n_functions)
-        vf = fem.poisson(divf)                          # (n_vertices, n_functions)
+        vf = fem.poisson(divf, integrate=False)          # (n_vertices, n_functions)
         vf -= vf.min(axis=0)
     return vf
 
@@ -503,20 +503,21 @@ def tria_compute_rotated_f(
     gradf = tria_compute_gradient(tria, vfunc)
     tn = tria.tria_normals()
     fem = Solver(tria, lump=True, use_cholmod=use_cholmod)
-    fem.mass = sparse.eye(fem.stiffness.shape[0], dtype=vfunc.dtype)
     dtup = (np.array([0]), np.array([0.0]))
-
+    
+    # divf is the integrated divergence (so it is already B*div)
+    # we can solve by passing in integrate=False to avoid multiplying with B again
     if scalar_input:
         # gradf: (n_triangles, 3)
         gradf = np.cross(tn, gradf)
         divf = tria_compute_divergence(tria, gradf)
-        vf = fem.poisson(divf, dtup)
+        vf = fem.poisson(divf, dtup, integrate=False)
     else:
         # gradf: (n_triangles, n_functions, 3)
         # tn: (n_triangles, 3) -> broadcast via (n_triangles, 1, 3)
         gradf = np.cross(tn[:, np.newaxis, :], gradf)  # (n_triangles, n_functions, 3)
         divf = tria_compute_divergence(tria, gradf)    # (n_vertices, n_functions)
-        vf = fem.poisson(divf, dtup)                   # (n_vertices, n_functions)
+        vf = fem.poisson(divf, dtup, integrate=False)   # (n_vertices, n_functions)
     return vf
 
 

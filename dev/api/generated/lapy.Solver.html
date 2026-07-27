@@ -303,7 +303,7 @@ speed. Requires the <code class="docutils literal notranslate"><span class="pre"
 will be thrown.
 If False, will use slower LU decomposition.</p>
 </dd>
-<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the stiffness and mass matrices. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>
+<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the stiffness and mass matrices. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>
 for numerical stability. Use <code class="docutils literal notranslate"><span class="pre">np.float32</span></code> explicitly if memory is constrained
 and precision is less critical.</p>
 </dd>
@@ -316,7 +316,7 @@ and precision is less critical.</p>
 <li><p><strong>aniso</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>aniso_smooth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 <li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>)</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><em>dtype</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -354,7 +354,7 @@ and can be used when only a mass matrix is needed.</p>
 </dd>
 <dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
 </dd>
-<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the output matrix. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> for numerical stability.</p>
+<dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the output matrix. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> for numerical stability.</p>
 </dd>
 </dl>
 </dd>
@@ -368,7 +368,7 @@ and can be used when only a mass matrix is needed.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
 <li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>)</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><em>dtype</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -405,7 +405,7 @@ the smallest Laplacian eigenvalues. Other options accepted by
 <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code> are <code class="docutils literal notranslate"><span class="pre">&quot;SM&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;LA&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;SA&quot;</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">&quot;BE&quot;</span></code>.</p>
 </dd>
-<dt><strong>v0</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_vertices,), default=None</span></dt><dd><p>Starting vector for the ARPACK iteration. Providing a fixed vector
+<dt><strong>v0</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_vertices,), default=None</span></dt><dd><p>Starting vector for the ARPACK iteration. Providing a fixed vector
 makes results reproducible. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, ARPACK uses a random
 starting vector seeded by <code class="docutils literal notranslate"><span class="pre">rng</span></code>.</p>
 </dd>
@@ -413,7 +413,7 @@ starting vector seeded by <code class="docutils literal notranslate"><span class
 <code class="docutils literal notranslate"><span class="pre">&quot;normal&quot;</span></code> is the standard choice for Laplacian spectra.
 Other valid values are <code class="docutils literal notranslate"><span class="pre">&quot;buckling&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;cayley&quot;</span></code>.</p>
 </dd>
-<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a>, default=None</span></dt><dd><p>Seed or generator used to produce a reproducible starting vector
+<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a>, default=None</span></dt><dd><p>Seed or generator used to produce a reproducible starting vector
 when <code class="docutils literal notranslate"><span class="pre">v0</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>. An integer seed is the most convenient
 choice, e.g. <code class="docutils literal notranslate"><span class="pre">rng=0</span></code>.
 When <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code> exposes an <code class="docutils literal notranslate"><span class="pre">rng</span></code> parameter,
@@ -427,12 +427,12 @@ initialisation); <code class="docutils literal notranslate"><span class="pre">rn
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array of k eigenvalues, shape (k,), sorted in ascending order.
+<dt><strong>eigenvalues</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array of k eigenvalues, shape (k,), sorted in ascending order.
 For closed meshes or Neumann boundary condition with the default
 small negative <code class="docutils literal notranslate"><span class="pre">sigma</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code> will be the first eigenvalue
 (with constant eigenvector).</p>
 </dd>
-<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array representing the k eigenvectors, shape (n_vertices, k).
+<dt><strong>eigenvectors</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Array representing the k eigenvectors, shape (n_vertices, k).
 The column <code class="docutils literal notranslate"><span class="pre">eigenvectors[:,</span> <span class="pre">i]</span></code> is the eigenvector corresponding
 to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</span></code>.</p>
 </dd>
@@ -443,13 +443,13 @@ to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</
 <li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 <li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 <li><p><strong>which</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>v0</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>v0</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.4)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -466,7 +466,7 @@ definite matrix of shape <code class="docutils literal notranslate"><span class=
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, default=0.0</span></dt><dd><p>Right hand side, can be a scalar, a 1-D array of shape
+<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, default=0.0</span></dt><dd><p>Right hand side, can be a scalar, a 1-D array of shape
 <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code>, or a 2-D array of shape
 <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_functions)</span></code> to solve for multiple functions
 simultaneously.  The default <code class="docutils literal notranslate"><span class="pre">0.0</span></code> corresponds to the Laplace
@@ -490,7 +490,7 @@ used as is, which corresponds to <code class="docutils literal notranslate"><spa
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Array with vertex values of the solution, shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Array with vertex values of the solution, shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code>
 for a scalar or 1-D input, or <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_functions)</span></code> for a
 2-D input.</p>
 </dd>
@@ -509,14 +509,14 @@ If matrix format is not CSC or CSR.</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
 <li><p><strong>dtup</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
 <li><p><strong>ntup</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
 <li><p><strong>integrate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

@@ -5,7 +5,11 @@ import pytest
 from scipy import sparse
 
 from ... import conformal
-from ...conformal import linear_beltrami_solver, spherical_conformal_map
+from ...conformal import (
+    _sparse_symmetric_solve,
+    linear_beltrami_solver,
+    spherical_conformal_map,
+)
 from ...tria_mesh import TriaMesh
 
 
@@ -24,12 +28,13 @@ def square():
     return TriaMesh.read_off("data/square-mesh.off")
 
 
-def test_solved_systems_are_symmetric(sphere, monkeypatch):
-    """Both systems must still be symmetric after the constraints are imposed.
+def test_solved_systems_are_real_and_symmetric(sphere, monkeypatch):
+    """Both systems must be real and still symmetric after the constraints.
 
     The Cholesky solver reads only the lower triangular part of the matrix, so
     a matrix that lost its symmetry would make the result depend on which
-    solver backend happens to be installed.
+    solver backend happens to be installed. Staying real keeps a real-only
+    Cholesky backend usable.
     """
     seen = []
     original = conformal._sparse_symmetric_solve
@@ -37,14 +42,29 @@ def test_solved_systems_are_symmetric(sphere, monkeypatch):
     def spy(A, b, use_cholmod=False):
         mat = sparse.csc_matrix(A)
         asym = abs(mat - mat.T)
-        seen.append(asym.max() if asym.nnz else 0.0)
+        seen.append(
+            (np.iscomplexobj(mat), np.iscomplexobj(b),
+             asym.max() if asym.nnz else 0.0)
+        )
         return original(A, b, use_cholmod=use_cholmod)
 
     monkeypatch.setattr(conformal, "_sparse_symmetric_solve", spy)
     spherical_conformal_map(sphere)
 
     assert len(seen) == 2, "expected the harmonic and the Beltrami solve"
-    assert max(seen) == 0.0
+    for complex_a, complex_b, asym in seen:
+        assert not complex_a
+        assert not complex_b
+        assert asym == 0.0
+
+
+def test_sparse_symmetric_solve_rejects_complex():
+    """Complex input must be refused rather than silently mis-factorised."""
+    A = sparse.eye(3, format="csc")
+    with pytest.raises(ValueError, match="real-valued"):
+        _sparse_symmetric_solve(A, np.ones(3, dtype=complex))
+    with pytest.raises(ValueError, match="real-valued"):
+        _sparse_symmetric_solve(A.astype(complex), np.ones(3))
 
 
 def test_linear_beltrami_solver_recovers_identity(square):

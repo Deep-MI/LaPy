@@ -150,7 +150,11 @@ skip = './.git,./build,./.mypy_cache,./.pytest_cache'
 [tool.pytest.ini_options]
 minversion = '6.0'
 addopts = '--durations 20 --junit-xml=junit-results.xml --verbose'
-filterwarnings = []
+# Our own deprecation warnings are bugs waiting to become errors: a removed
+# 2-D np.cross and an in-place .shape assignment both reached CI as hard
+# failures before this was turned on. Scoped to lapy so that a deprecation
+# inside numpy, scipy or plotly cannot break CI on a dependency bump.
+filterwarnings = ['error::DeprecationWarning:lapy.*']
 
 [tool.coverage.run]
 branch = true

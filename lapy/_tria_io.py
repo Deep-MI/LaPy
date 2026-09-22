@@ -89,10 +89,10 @@ def read_off(filename: str) -> "TriaMesh":
     # print(" tnum: {} pnum: {}".format(tnum,pnum))
     # read points as chunch
     v = np.fromfile(f, "float32", 3 * pnum, " ")
-    v.shape = (pnum, 3)
+    v = v.reshape(pnum, 3)
     # read trias as chunch
     t = np.fromfile(f, "int", 4 * tnum, " ")
-    t.shape = (tnum, 4)
+    t = t.reshape(tnum, 4)
     # print(" t0: {} ".format(t[0, :]))
     # make sure first column is equal to 3 (trias)
     # max0 = np.amax(t[:, 0])
@@ -173,7 +173,7 @@ def read_vtk(filename: str) -> "TriaMesh":
     pnum = int(larr[1])
     # read points as chunk
     v = np.fromfile(f, "float32", 3 * pnum, " ")
-    v.shape = (pnum, 3)
+    v = v.reshape(pnum, 3)
     # expect polygon or tria_strip line
     line = f.readline()
     larr = line.split()
@@ -186,7 +186,7 @@ def read_vtk(filename: str) -> "TriaMesh":
             logger.error(msg)
             raise OSError(msg)
         t = np.fromfile(f, "int", ttnum, " ")
-        t.shape = (tnum, 4)
+        t = t.reshape(tnum, 4)
         if t[tnum - 1][0] != 3:
             msg = "[can only read triangles] --> FAILED\n"
             logger.error(msg)
@@ -381,7 +381,7 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
                 assert numpy.int32(0).nbytes == int_size
                 assert numpy.float64(0.0).nbytes == data_size
                 dtype = [("index", numpy.int32), ("x", numpy.float64, (3,))]
-                data = numpy.fromstring(f.read(num_bytes), dtype=dtype)
+                data = numpy.frombuffer(f.read(num_bytes), dtype=dtype)
                 assert (data["index"] == range(1, num_nodes + 1)).all()
                 # vtk numpy support requires contiguous data
                 points = numpy.ascontiguousarray(data["x"])
@@ -446,7 +446,9 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
                     num_bytes = 4 * (num_elems0 * (1 + num_tags + num_nodes_per_elem))
                     shape = (num_elems0, 1 + num_tags + num_nodes_per_elem)
                     b = f.read(num_bytes)
-                    data = numpy.fromstring(b, dtype=numpy.int32).reshape(shape)
+                    # frombuffer gives a read-only view; the vstack below
+                    # allocates before anything mutates these.
+                    data = numpy.frombuffer(b, dtype=numpy.int32).reshape(shape)
 
                     if t not in cells:
                         cells[t] = []

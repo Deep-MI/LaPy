@@ -85,7 +85,7 @@ def read_gmsh(filename: str) -> "TetMesh":
     # read (nodes X 4) matrix as chunk
     # drop first column
     v = np.fromfile(f, "float32", 4 * pnum, " ")
-    v.shape = (pnum, 4)
+    v = v.reshape(pnum, 4)
     v = np.delete(v, 0, 1)
     line = f.readline()
     if not line.startswith("$EndNodes"):
@@ -112,7 +112,7 @@ def read_gmsh(filename: str) -> "TetMesh":
         raise ValueError(msg)
     # read (nodes X ?) matrix
     t = np.fromfile(f, "int", tnum * len(larr), " ")
-    t.shape = (tnum, len(larr))
+    t = t.reshape(tnum, len(larr))
     t = np.delete(t, np.s_[0 : len(larr) - 4], 1)
     line = f.readline()
     if not line.startswith("$EndElements"):
@@ -194,7 +194,7 @@ def read_vtk(filename: str) -> "TetMesh":
     pnum = int(larr[1])
     # read points as chunk
     v = np.fromfile(f, "float32", 3 * pnum, " ")
-    v.shape = (pnum, 3)
+    v = v.reshape(pnum, 3)
     # expect polygon or tria_strip line
     line = f.readline()
     larr = line.split()
@@ -207,7 +207,7 @@ def read_vtk(filename: str) -> "TetMesh":
             logger.error(msg)
             raise ValueError(msg)
         t = np.fromfile(f, "int", ttnum, " ")
-        t.shape = (tnum, 5)
+        t = t.reshape(tnum, 5)
         if t[tnum - 1][0] != 4:
             msg = "[can only read tetras] --> FAILED\n"
             logger.error(msg)

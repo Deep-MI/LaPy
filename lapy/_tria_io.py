@@ -89,10 +89,10 @@ def read_off(filename: str) -> "TriaMesh":
     # print(" tnum: {} pnum: {}".format(tnum,pnum))
     # read points as chunch
     v = np.fromfile(f, "float32", 3 * pnum, " ")
-    v.shape = (pnum, 3)
+    v = v.reshape(pnum, 3)
     # read trias as chunch
     t = np.fromfile(f, "int", 4 * tnum, " ")
-    t.shape = (tnum, 4)
+    t = t.reshape(tnum, 4)
     # print(" t0: {} ".format(t[0, :]))
     # make sure first column is equal to 3 (trias)
     # max0 = np.amax(t[:, 0])
@@ -173,7 +173,7 @@ def read_vtk(filename: str) -> "TriaMesh":
     pnum = int(larr[1])
     # read points as chunk
     v = np.fromfile(f, "float32", 3 * pnum, " ")
-    v.shape = (pnum, 3)
+    v = v.reshape(pnum, 3)
     # expect polygon or tria_strip line
     line = f.readline()
     larr = line.split()
@@ -186,7 +186,7 @@ def read_vtk(filename: str) -> "TriaMesh":
             logger.error(msg)
             raise OSError(msg)
         t = np.fromfile(f, "int", ttnum, " ")
-        t.shape = (tnum, 4)
+        t = t.reshape(tnum, 4)
         if t[tnum - 1][0] != 3:
             msg = "[can only read triangles] --> FAILED\n"
             logger.error(msg)

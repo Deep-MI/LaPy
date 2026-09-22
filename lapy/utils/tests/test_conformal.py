@@ -6,11 +6,18 @@ from scipy import sparse
 
 from ... import conformal
 from ...conformal import (
+    _inverse_stereographic_south,
     _sparse_symmetric_solve,
     linear_beltrami_solver,
     spherical_conformal_map,
 )
 from ...tria_mesh import TriaMesh
+
+
+def _signed_volume(v, t):
+    """Signed volume of a closed surface; the sign flips when it is mirrored."""
+    a, b, c = v[t[:, 0]], v[t[:, 1]], v[t[:, 2]]
+    return np.sum(np.einsum("ij,ij->i", a, np.cross(b, c))) / 6.0
 
 
 @pytest.fixture
@@ -123,6 +130,32 @@ def test_small_radius_is_not_a_degeneracy():
     np.testing.assert_allclose(
         np.linalg.norm(mapping, axis=1), 1.0, rtol=1e-8, atol=1e-10
     )
+
+
+def test_inverse_stereographic_south_round_trip():
+    """Projecting through the south pole and back must be the identity."""
+    rng = np.random.default_rng(0)
+    points = rng.standard_normal((200, 3))
+    points /= np.linalg.norm(points, axis=1)[:, np.newaxis]
+
+    chart = points[:, :2] / (1 + points[:, 2])[:, np.newaxis]
+
+    np.testing.assert_allclose(
+        _inverse_stereographic_south(chart), points, rtol=1e-10, atol=1e-12
+    )
+
+
+def test_spherical_conformal_map_preserves_orientation(sphere):
+    """The parameterisation must not mirror the surface.
+
+    The Beltrami solve happens in the south pole chart, so inverting it with the
+    northern formula returns the sphere mirrored in z. That flips the surface
+    orientation and makes the map anti-conformal rather than conformal.
+    """
+    mapping = spherical_conformal_map(sphere)
+
+    assert _signed_volume(mapping, sphere.t) > 0
+    assert _signed_volume(sphere.v, sphere.t) > 0
 
 
 def test_cholmod_matches_lu(sphere):

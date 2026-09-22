@@ -188,15 +188,23 @@ def test_spherical_tutte_map_is_an_oriented_sphere(sphere):
     assert _signed_volume(mapping, sphere.t) > 0
 
 
-def test_falls_back_to_tutte_map_on_nan(sphere, monkeypatch, caplog):
-    """A harmonic map that degenerates must fall back instead of raising."""
+@pytest.mark.parametrize("mode", ["nan", "raise"])
+def test_falls_back_to_tutte_map(sphere, monkeypatch, caplog, mode):
+    """A harmonic map that degenerates must fall back instead of raising.
+
+    A collapsed map reaches the caller either as NaN or as the ValueError the
+    rescale raises when the southernmost triangle has no extent. Both have to
+    route to the Tutte map, which only uses the connectivity.
+    """
     original = conformal._rescale_polar_triangles
     calls = []
 
     def poisoned(z, tria, bigtri):
         calls.append(1)
         if len(calls) == 1:  # the harmonic map
-            return np.full_like(z, np.nan)
+            if mode == "nan":
+                return np.full_like(z, np.nan)
+            raise ValueError("southernmost triangle radius contains zero entries")
         return original(z, tria, bigtri)
 
     monkeypatch.setattr(conformal, "_rescale_polar_triangles", poisoned)

@@ -235,16 +235,21 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     z = z[:, 0] + 1j * z[:, 1]
     z = z - np.mean(z, axis=0)
 
-    z = _rescale_polar_triangles(z, tria, bigtri)
+    # A harmonic map that failed on a very bad triangulation shows up in one of
+    # two ways: as NaN after the projection, or as a collapsed southernmost
+    # triangle, which makes the rescale raise. Both mean the same thing, so
+    # both fall back to the Tutte map, which only uses the connectivity.
+    try:
+        z = _rescale_polar_triangles(z, tria, bigtri)
+        S = inverse_stereographic(z)
+        failure = "the projection contains NaN values" if np.isnan(np.sum(S)) else None
+    except ValueError as err:
+        failure = str(err)
 
-    # Final inverse stereographic projection
-    S = inverse_stereographic(z)
-    if np.isnan(np.sum(S)):
-        # The harmonic map can fail on very bad triangulations. The Tutte map
-        # only uses the connectivity, so it still yields a valid sphere.
+    if failure is not None:
         logger.warning(
-            "Harmonic map contains NaN values; falling back to the spherical "
-            "Tutte map."
+            "Harmonic map failed (%s); falling back to the spherical Tutte map.",
+            failure,
         )
         z = _spherical_tutte_z(tria, bigtri, use_cholmod=use_cholmod)
         S = inverse_stereographic(z)

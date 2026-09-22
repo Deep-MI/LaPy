@@ -92,6 +92,17 @@ def test_dirichlet_system_rejects_duplicate_indices():
         _dirichlet_system(A, np.array([1, 1, 3]), target)
 
 
+def test_beltrami_coefficient_rejects_degenerate_triangle():
+    """A collinear triangle has zero area and must not be divided by."""
+    v = np.array(
+        [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+    )
+    tria = TriaMesh(v, np.array([[0, 1, 2], [0, 3, 1]]))
+
+    with pytest.raises(ValueError, match="triangle double area"):
+        conformal.beltrami_coefficient(tria, v)
+
+
 def test_linear_beltrami_solver_recovers_identity(square):
     """Without distortion and with the boundary pinned, the map is the identity.
 

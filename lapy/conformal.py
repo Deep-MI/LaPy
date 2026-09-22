@@ -570,6 +570,7 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
     ------
     ValueError
         If mesh is not planar.
+        If a triangle has zero area.
     """
     # Ensure the triangulation is planar
     _ensure_planar_mesh(tria, "Beltrami coefficient")
@@ -584,7 +585,9 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
 
     # Compute double areas of triangles: the z component of the cross product
     # of two planar edges. np.cross stopped accepting 2-vectors in NumPy 2.
+    # Signed, so it is negative for clockwise triangles.
     areas2 = e0[:, 0] * e1[:, 1] - e0[:, 1] * e1[:, 0]
+    _ensure_nonzero_array(areas2, "triangle double area")
 
     # Create Dx and Dy sparse matrices (summing area-normalized edge coordinates)
     nf = tria.t.shape[0]  # Number of triangles

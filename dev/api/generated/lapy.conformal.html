@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -290,7 +290,7 @@ SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.</p>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.beltrami_coefficient">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">beltrami_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L345-L415"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.beltrami_coefficient" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">beltrami_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L549-L623"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.beltrami_coefficient" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the Beltrami coefficient of a given mapping.</p>
 <p>The Beltrami coefficient is a complex-valued function that characterizes the
 distortion of a mapping in terms of conformality.</p>
@@ -313,7 +313,8 @@ parameterization.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not planar.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not planar.
+If a triangle has zero area.</p>
 </dd>
 </dl>
 </dd>
@@ -331,7 +332,7 @@ parameterization.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.inverse_stereographic">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">inverse_stereographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L613-L636"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.inverse_stereographic" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">inverse_stereographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L824-L847"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.inverse_stereographic" title="Link to this definition">¶</a></dt>
 <dd><p>Compute mapping from the complex plane to the sphere using inverse stereographic projection.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -359,7 +360,7 @@ parameterization.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.linear_beltrami_solver">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">linear_beltrami_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L418-L533"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.linear_beltrami_solver" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">linear_beltrami_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L626-L725"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.linear_beltrami_solver" title="Link to this definition">¶</a></dt>
 <dd><p>Solve the Linear Beltrami equation for a given mesh and target.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -373,7 +374,7 @@ Should be planar mapping on complex plane.</p>
 </dd>
 <dt><strong>target</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>2D target positions for the landmark vertices, shape (n_landmarks, 2).</p>
 </dd>
-<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Which solver to use. If True, use Cholesky decomposition from
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Which solver to use. If True, use Cholesky decomposition from
 scikit-sparse cholmod. If False, use spsolve (LU decomposition).</p>
 </dd>
 </dl>
@@ -387,11 +388,11 @@ aligned to the given landmarks.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not planar.
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not planar.
 If triangle areas are degenerate.
 If Beltrami denominator is close to zero.</p>
 </dd>
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a></dt><dd><p>If use_cholmod is True but scikit-sparse is not installed.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a></dt><dd><p>If use_cholmod is True but scikit-sparse is not installed.</p>
 </dd>
 </dl>
 </dd>
@@ -401,7 +402,7 @@ If Beltrami denominator is close to zero.</p>
 <li><p><strong>mu</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
 <li><p><strong>landmark</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
 <li><p><strong>target</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -412,7 +413,7 @@ If Beltrami denominator is close to zero.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.mobius_area_correction_spherical">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">mobius_area_correction_spherical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L256-L342"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.mobius_area_correction_spherical" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">mobius_area_correction_spherical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L460-L546"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.mobius_area_correction_spherical" title="Link to this definition">¶</a></dt>
 <dd><p>Find an improved Mobius transformation to reduce distortion.</p>
 <p>This helps reducing the area distortion of
 a spherical conformal parameterization using the method in
@@ -431,7 +432,7 @@ parameterization.</p>
 <dd class="field-even"><dl>
 <dt><strong>map_mobius</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Vertex coordinates of shape (n_vertices, 3) updated to minimize area distortion.</p>
 </dd>
-<dt><strong>result</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></span></dt><dd><p>Optimization result object containing optimal parameters (x) for the Mobius
+<dt><strong>result</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></span></dt><dd><p>Optimization result object containing optimal parameters (x) for the Mobius
 transformation, where</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -447,21 +448,21 @@ transformation, where</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.spherical_conformal_map">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">spherical_conformal_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L88-L253"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.spherical_conformal_map" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">spherical_conformal_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L173-L321"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.spherical_conformal_map" title="Link to this definition">¶</a></dt>
 <dd><p>Linear method for computing spherical conformal map of a genus-0 closed surface.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>A triangular mesh object representing a genus-0 closed surface.</p>
 </dd>
-<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Which solver to use. If True, use Cholesky decomposition from
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Which solver to use. If True, use Cholesky decomposition from
 scikit-sparse cholmod. If False, use spsolve (LU decomposition).</p>
 </dd>
 </dl>
@@ -475,18 +476,66 @@ parameterization.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not genus-0 (Euler characteristic != 2).
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not genus-0 (Euler characteristic != 2).
 If edge lengths are degenerate.
 If projection contains NaN values.</p>
 </dd>
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a></dt><dd><p>If use_cholmod is True but scikit-sparse is not installed.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a></dt><dd><p>If use_cholmod is True but scikit-sparse is not installed.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
-<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lapy.conformal.spherical_tutte_map">
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">spherical_tutte_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bigtri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L419-L457"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.spherical_tutte_map" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the spherical Tutte map of a genus-0 closed surface.</p>
+<p>Same construction as <a class="reference internal" href="#lapy.conformal.spherical_conformal_map" title="lapy.conformal.spherical_conformal_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">spherical_conformal_map()</span></code></a>, with the cotangent
+Laplacian replaced by the Tutte Laplacian. It ignores the vertex positions
+and uses only the connectivity, so it still produces a valid sphere where
+the harmonic map breaks down on a badly shaped triangulation.
+<a class="reference internal" href="#lapy.conformal.spherical_conformal_map" title="lapy.conformal.spherical_conformal_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">spherical_conformal_map()</span></code></a> falls back to it for exactly that reason.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>A triangular mesh object representing a genus-0 closed surface.</p>
+</dd>
+<dt><strong>bigtri</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=0</span></dt><dd><p>Index of the triangle to pin at the north pole.</p>
+</dd>
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Which solver to use. If True, use Cholesky decomposition from
+scikit-sparse cholmod. If False, use spsolve (LU decomposition).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Vertex coordinates of shape (n_vertices, 3) on the unit sphere.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If mesh is not genus-0 (Euler characteristic != 2).</p>
+</dd>
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportError</span></code></a></dt><dd><p>If use_cholmod is True but scikit-sparse is not installed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
+<li><p><strong>bigtri</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -497,7 +546,7 @@ If projection contains NaN values.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.conformal.stereographic">
-<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">stereographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L581-L610"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.stereographic" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.conformal.</span></span><span class="sig-name descname"><span class="pre">stereographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/conformal.py#L792-L821"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.conformal.stereographic" title="Link to this definition">¶</a></dt>
 <dd><p>Map points on a sphere to the complex plane using the stereographic projection.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -514,7 +563,7 @@ If projection contains NaN values.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If stereographic denominator (1 - z) is close to zero.</p>
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If stereographic denominator (1 - z) is close to zero.</p>
 </dd>
 </dl>
 </dd>
@@ -598,6 +647,7 @@ If projection contains NaN values.</p>
 <li><a class="reference internal" href="#lapy.conformal.linear_beltrami_solver"><code class="docutils literal notranslate"><span class="pre">linear_beltrami_solver()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.conformal.mobius_area_correction_spherical"><code class="docutils literal notranslate"><span class="pre">mobius_area_correction_spherical()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.conformal.spherical_conformal_map"><code class="docutils literal notranslate"><span class="pre">spherical_conformal_map()</span></code></a></li>
+<li><a class="reference internal" href="#lapy.conformal.spherical_tutte_map"><code class="docutils literal notranslate"><span class="pre">spherical_tutte_map()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.conformal.stereographic"><code class="docutils literal notranslate"><span class="pre">stereographic()</span></code></a></li>
 </ul>
 </li>

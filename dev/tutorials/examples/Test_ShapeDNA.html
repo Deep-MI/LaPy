@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -290,8 +290,8 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load data</span>
-<span class="n">tria</span> <span class="o">=</span> <span class="n">TriaMesh</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">&quot;../data/cubeTria.vtk&quot;</span><span class="p">)</span>
-<span class="n">tet</span> <span class="o">=</span> <span class="n">TetMesh</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">&quot;../data/cubeTetra.vtk&quot;</span><span class="p">)</span>
+<span class="n">tria</span> <span class="o">=</span> <span class="n">TriaMesh</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">"../data/cubeTria.vtk"</span><span class="p">)</span>
+<span class="n">tet</span> <span class="o">=</span> <span class="n">TetMesh</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">"../data/cubeTetra.vtk"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -315,8 +315,8 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute eigenvalues and eigenvectors for tria mesh</span>
 <span class="n">ev</span> <span class="o">=</span> <span class="n">shapedna</span><span class="o">.</span><span class="n">compute_shapedna</span><span class="p">(</span><span class="n">tria</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvectors&quot;</span><span class="p">]</span>
-<span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">]</span>
+<span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvectors"</span><span class="p">]</span>
+<span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -344,7 +344,7 @@ array([-4.0165149e-05,  4.1696410e+00,  4.1704664e+00], dtype=float32)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># volume / surface / geometry normalization of tria eigenvalues</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">normalize_ev</span><span class="p">(</span><span class="n">tria</span><span class="p">,</span> <span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">normalize_ev</span><span class="p">(</span><span class="n">tria</span><span class="p">,</span> <span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"geometry"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -363,7 +363,7 @@ array([-2.4099089e-04,  2.5017845e+01,  2.5022799e+01], dtype=float32)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># linear reweighting of tria eigenvalues</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">reweight_ev</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">])</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">reweight_ev</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -382,7 +382,7 @@ array([-4.01651487e-05,  2.08482051e+00,  1.39015547e+00])
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute distance for tria eigenvalues (trivial case)</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">compute_distance</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">],</span> <span class="n">ev</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">])</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">compute_distance</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">],</span> <span class="n">ev</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -403,8 +403,8 @@ array([-4.01651487e-05,  2.08482051e+00,  1.39015547e+00])
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute eigenvalues and eigenvectors for tet mesh</span>
 <span class="n">evTet</span> <span class="o">=</span> <span class="n">shapedna</span><span class="o">.</span><span class="n">compute_shapedna</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvectors&quot;</span><span class="p">]</span>
-<span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">]</span>
+<span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvectors"</span><span class="p">]</span>
+<span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -432,7 +432,7 @@ array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># volume / surface / geometry normalization of tet eigenvalues</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">normalize_ev</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span> <span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">normalize_ev</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span> <span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"geometry"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -460,7 +460,7 @@ array([8.4440224e-05, 9.8897915e+00, 9.8898811e+00], dtype=float32)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># linear reweighting of tet eigenvalues</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">reweight_ev</span><span class="p">(</span><span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">])</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">reweight_ev</span><span class="p">(</span><span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -479,7 +479,7 @@ array([8.44402239e-05, 4.94489574e+00, 3.29662704e+00])
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute distance for tria eigenvalues (trivial case)</span>
-<span class="n">shapedna</span><span class="o">.</span><span class="n">compute_distance</span><span class="p">(</span><span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">],</span> <span class="n">evTet</span><span class="p">[</span><span class="s2">&quot;Eigenvalues&quot;</span><span class="p">])</span>
+<span class="n">shapedna</span><span class="o">.</span><span class="n">compute_distance</span><span class="p">(</span><span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">],</span> <span class="n">evTet</span><span class="p">[</span><span class="s2">"Eigenvalues"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>

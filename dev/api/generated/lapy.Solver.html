@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -287,18 +287,18 @@ Poisson Solver (<a class="reference internal" href="#lapy.Solver.poisson" title=
 <dd class="field-odd"><dl>
 <dt><strong>geometry</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a> | <a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.TetMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TetMesh</span></code></a></span></dt><dd><p>Mesh geometry.</p>
 </dd>
-<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p>If True, lump the mass matrix (diagonal).</p>
+<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p>If True, lump the mass matrix (diagonal).</p>
 </dd>
-<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,)</span></dt><dd><p>Anisotropy for curvature-based anisotopic Laplace.
+<dt><strong>aniso</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a> of shape (2,)</span></dt><dd><p>Anisotropy for curvature-based anisotopic Laplace.
 If a tuple <code class="docutils literal notranslate"><span class="pre">(a_min,</span> <span class="pre">a_max),</span> <span class="pre">differentially</span> <span class="pre">affects</span> <span class="pre">the</span> <span class="pre">minimum</span> <span class="pre">and</span> <span class="pre">maximum</span>
 <span class="pre">curvature</span> <span class="pre">directions.</span> <span class="pre">e.g.</span> <span class="pre">``(0,</span> <span class="pre">50)</span></code> will set scaling to 1 into the minimum
 curvature direction, even if the maximum curvature is large in those regions
 (i.e. isotropic in regions with large maximum curvature and minimum curvature
 close to 0, i.e. a concave cylinder).</p>
 </dd>
-<dt><strong>aniso_smooth</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Number of smoothing iterations for curvature computation on vertices.</p>
+<dt><strong>aniso_smooth</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Number of smoothing iterations for curvature computation on vertices.</p>
 </dd>
-<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a></span></dt><dd><p>If True, attempts to use the Cholesky decomposition for improved execution
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#False" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a></span></dt><dd><p>If True, attempts to use the Cholesky decomposition for improved execution
 speed. Requires the <code class="docutils literal notranslate"><span class="pre">scikit-sparse</span></code> library. If it can not be found, an error
 will be thrown.
 If False, will use slower LU decomposition.</p>
@@ -312,10 +312,10 @@ and precision is less critical.</p>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>geometry</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a><em> | </em><a class="reference internal" href="lapy.TetMesh.html#lapy.TetMesh" title="lapy.tet_mesh.TetMesh"><em>TetMesh</em></a>)</p></li>
-<li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>aniso</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>aniso_smooth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>aniso</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>aniso_smooth</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><em>dtype</em></a>)</p></li>
 </ul>
 </dd>
@@ -352,7 +352,7 @@ and can be used when only a mass matrix is needed.</p>
 <dd class="field-odd"><dl>
 <dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Triangle mesh.</p>
 </dd>
-<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
+<dt><strong>lump</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, <code class="docutils literal notranslate"><span class="pre">B</span></code> should be lumped (diagonal).</p>
 </dd>
 <dt><strong>dtype</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, default=np.float64</span></dt><dd><p>Data type for the output matrix. Defaults to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> for numerical stability.</p>
 </dd>
@@ -367,7 +367,7 @@ and can be used when only a mass matrix is needed.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
-<li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>lump</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5)"><em>dtype</em></a>)</p></li>
 </ul>
 </dd>
@@ -388,17 +388,17 @@ via <code class="docutils literal notranslate"><span class="pre">B.sum()</span><
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=10</span></dt><dd><p>The number of eigenvalues and eigenvectors desired. <code class="docutils literal notranslate"><span class="pre">k</span></code> must be
+<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=10</span></dt><dd><p>The number of eigenvalues and eigenvectors desired. <code class="docutils literal notranslate"><span class="pre">k</span></code> must be
 smaller than <code class="docutils literal notranslate"><span class="pre">N</span></code> (number of vertices). It is not possible to
 compute all eigenvectors of a matrix.</p>
 </dd>
-<dt><strong>sigma</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=-0.01</span></dt><dd><p>Shift value for the shift-invert mode. The solver finds eigenvalues
+<dt><strong>sigma</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=-0.01</span></dt><dd><p>Shift value for the shift-invert mode. The solver finds eigenvalues
 near <code class="docutils literal notranslate"><span class="pre">sigma</span></code>. The default small negative value works well for
 finding the smallest non-negative Laplacian eigenvalues. Adjust if
 convergence issues occur. The returned eigenvalues are always sorted
 in ascending order regardless of <code class="docutils literal notranslate"><span class="pre">sigma</span></code>.</p>
 </dd>
-<dt><strong>which</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, default=”LM”</span></dt><dd><p>Which <code class="docutils literal notranslate"><span class="pre">k</span></code> eigenvalues to find. With shift-invert (<code class="docutils literal notranslate"><span class="pre">sigma</span></code> set),
+<dt><strong>which</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, default=”LM”</span></dt><dd><p>Which <code class="docutils literal notranslate"><span class="pre">k</span></code> eigenvalues to find. With shift-invert (<code class="docutils literal notranslate"><span class="pre">sigma</span></code> set),
 <code class="docutils literal notranslate"><span class="pre">&quot;LM&quot;</span></code> selects the <code class="docutils literal notranslate"><span class="pre">k</span></code> eigenvalues of the original problem
 closest to <code class="docutils literal notranslate"><span class="pre">sigma</span></code> — this is the standard choice for computing
 the smallest Laplacian eigenvalues. Other options accepted by
@@ -409,11 +409,11 @@ and <code class="docutils literal notranslate"><span class="pre">&quot;BE&quot;<
 makes results reproducible. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, ARPACK uses a random
 starting vector seeded by <code class="docutils literal notranslate"><span class="pre">rng</span></code>.</p>
 </dd>
-<dt><strong>mode</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, default=”normal”</span></dt><dd><p>Shift-invert mode passed to <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code>.
+<dt><strong>mode</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, default=”normal”</span></dt><dd><p>Shift-invert mode passed to <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code>.
 <code class="docutils literal notranslate"><span class="pre">&quot;normal&quot;</span></code> is the standard choice for Laplacian spectra.
 Other valid values are <code class="docutils literal notranslate"><span class="pre">&quot;buckling&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;cayley&quot;</span></code>.</p>
 </dd>
-<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a>, default=None</span></dt><dd><p>Seed or generator used to produce a reproducible starting vector
+<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a>, default=None</span></dt><dd><p>Seed or generator used to produce a reproducible starting vector
 when <code class="docutils literal notranslate"><span class="pre">v0</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>. An integer seed is the most convenient
 choice, e.g. <code class="docutils literal notranslate"><span class="pre">rng=0</span></code>.
 When <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code> exposes an <code class="docutils literal notranslate"><span class="pre">rng</span></code> parameter,
@@ -440,16 +440,16 @@ to <code class="docutils literal notranslate"><span class="pre">eigenvalues[i]</
 </dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>which</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>which</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 <li><p><strong>v0</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -466,21 +466,21 @@ definite matrix of shape <code class="docutils literal notranslate"><span class=
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, default=0.0</span></dt><dd><p>Right hand side, can be a scalar, a 1-D array of shape
+<dt><strong>h</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, default=0.0</span></dt><dd><p>Right hand side, can be a scalar, a 1-D array of shape
 <code class="docutils literal notranslate"><span class="pre">(n_vertices,)</span></code>, or a 2-D array of shape
 <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_functions)</span></code> to solve for multiple functions
 simultaneously.  The default <code class="docutils literal notranslate"><span class="pre">0.0</span></code> corresponds to the Laplace
 equation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
 </dd>
-<dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and
+<dt><strong>dtup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Dirichlet boundary condition as a tuple containing the index and
 data arrays of same length. The default, an empty tuple,
 corresponds to no Dirichlet condition.</p>
 </dd>
-<dt><strong>ntup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Neumann boundary condition as a tuple containing the index and
+<dt><strong>ntup</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, default=()</span></dt><dd><p>Neumann boundary condition as a tuple containing the index and
 data arrays of same length. The default, an empty tuple,
 corresponds to Neumann on all boundaries.</p>
 </dd>
-<dt><strong>integrate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Whether to integrate the right hand side over the surface using
+<dt><strong>integrate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Whether to integrate the right hand side over the surface using
 the mass matrix (after applying any Neumann conditions, but before
 applying Dirichlet conditions). If True, the right hand side is
 effectively replaced by <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">h</span></code>. If False, the right hand side is
@@ -498,7 +498,7 @@ for a scalar or 1-D input, or <code class="docutils literal notranslate"><span c
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If input matrices are not square or have different dimensions.
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If input matrices are not square or have different dimensions.
 If h is not scalar or array matching matrix dimensions.
 If dtup or ntup don’t contain exactly 2 arrays.
 If dtup indices are not unique.
@@ -509,10 +509,10 @@ If matrix format is not CSC or CSR.</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>dtup</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
-<li><p><strong>ntup</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
-<li><p><strong>integrate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>dtup</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
+<li><p><strong>ntup</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>)</p></li>
+<li><p><strong>integrate</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>

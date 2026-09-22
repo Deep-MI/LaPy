@@ -227,8 +227,8 @@ def read_vtk(filename: str) -> "TriaMesh":
     return TriaMesh(v, t)
 
 
-def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
-    """Load GMSH tetra mesh ASCII Format.
+def read_gmsh(filename: str) -> "TriaMesh":
+    """Load GMSH triangle mesh, MSH 2 ASCII format.
 
     Parameters
     ----------
@@ -237,23 +237,17 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
 
     Returns
     -------
-    points : np.ndarray
-        Array of point coordinates, shape (n_points, 3).
-    cells : dict
-        Dictionary mapping cell type strings to arrays of cell vertex indices.
-        Each array has shape (n_cells_of_type, n_vertices_per_cell).
-    point_data : dict
-        Dictionary of point data arrays.
-    cell_data : dict
-        Dictionary mapping cell type strings to dictionaries of data arrays.
-        Contains 'physical' and 'geometrical' tags where available.
-    field_data : dict
-        Dictionary mapping physical region names to their integer tags.
+    TriaMesh
+        Object of loaded GMSH triangle mesh.
 
     Raises
     ------
     OSError
         If file is not found or not readable.
+    ValueError
+        If the file is in binary format, which is not supported.
+        If the mesh format is not version 2.
+        If the file contains no triangles.
 
     Notes
     -----
@@ -262,8 +256,6 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
     LICENSE MIT
     https://github.com/nschloe/meshio
     """
-    import struct
-
     import numpy
 
     num_nodes_per_cell = {
@@ -323,12 +315,8 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
     cells = {}
     field_data = {}
     cell_data = {}
-    point_data = {}
 
     has_additional_tag_data = False
-    is_ascii = None
-    int_size = 4
-    data_size = None
     while True:
         line = f.readline()
         if not line:
@@ -342,17 +330,18 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
             # 2.2 0 8
             # into its components.
             str_list = list(filter(None, line.split()))
-            assert str_list[0][0] == "2", "Need mesh format 2"
-            assert str_list[1] in ["0", "1"]
-            is_ascii = str_list[1] == "0"
-            data_size = int(str_list[2])
-            if not is_ascii:
-                # The next line is the integer 1 in bytes. Useful to check
-                # endianness. Just assert that we get 1 here.
-                one = f.read(int_size)
-                assert struct.unpack("i", one)[0] == 1
-                line = f.readline()
-                assert line == "\n"
+            if str_list[0][0] != "2":
+                msg = f"[need mesh format 2, found {str_list[0]}] --> FAILED\n"
+                logger.error(msg)
+                f.close()
+                raise ValueError(msg)
+            if str_list[1] != "0":
+                # The file is opened in text mode, so the binary layout cannot
+                # be read from this handle at all.
+                msg = "[binary format not implemented] --> FAILED\n"
+                logger.error(msg)
+                f.close()
+                raise ValueError(msg)
             line = f.readline()
             assert line.strip() == "$EndMeshFormat"
         elif environ == "PhysicalNames":
@@ -369,24 +358,11 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
             # The first line is the number of nodes
             line = f.readline()
             num_nodes = int(line)
-            if is_ascii:
-                points = numpy.fromfile(f, count=num_nodes * 4, sep=" ").reshape(
-                    (num_nodes, 4)
-                )
-                # The first number is the index
-                points = points[:, 1:]
-            else:
-                # binary
-                num_bytes = num_nodes * (int_size + 3 * data_size)
-                assert numpy.int32(0).nbytes == int_size
-                assert numpy.float64(0.0).nbytes == data_size
-                dtype = [("index", numpy.int32), ("x", numpy.float64, (3,))]
-                data = numpy.frombuffer(f.read(num_bytes), dtype=dtype)
-                assert (data["index"] == range(1, num_nodes + 1)).all()
-                # vtk numpy support requires contiguous data
-                points = numpy.ascontiguousarray(data["x"])
-                line = f.readline()
-                assert line == "\n"
+            points = numpy.fromfile(f, count=num_nodes * 4, sep=" ").reshape(
+                (num_nodes, 4)
+            )
+            # The first number is the index
+            points = points[:, 1:]
 
             line = f.readline()
             assert line.strip() == "$EndNodes"
@@ -395,81 +371,40 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
             # The first line is the number of elements
             line = f.readline()
             total_num_cells = int(line)
-            if is_ascii:
-                for _ in range(total_num_cells):
-                    line = f.readline()
-                    data = [int(k) for k in filter(None, line.split())]
-                    t = _gmsh_to_meshio_type[data[1]]
-                    num_nodes_per_elem = num_nodes_per_cell[t]
-
-                    if t not in cells:
-                        cells[t] = []
-                    cells[t].append(data[-num_nodes_per_elem:])
-
-                    # data[2] gives the number of tags. The gmsh manual
-                    # <http://gmsh.info/doc/texinfo/gmsh.html#MSH-ASCII-file-format>
-                    # says:
-                    # >>>
-                    # By default, the first tag is the number of the physical
-                    # entity to which the element belongs; the second is the
-                    # number of the elementary geometrical entity to which the
-                    # element belongs; the third is the number of mesh
-                    # partitions to which the element belongs, followed by the
-                    # partition ids (negative partition ids indicate ghost
-                    # cells). A zero tag is equivalent to no tag. Gmsh and most
-                    # codes using the MSH 2 format require at least the first
-                    # two tags (physical and elementary tags).
-                    # <<<
-                    num_tags = data[2]
-                    if t not in cell_data:
-                        cell_data[t] = []
-                    cell_data[t].append(data[3 : 3 + num_tags])
-
-                # convert to numpy arrays
-                for key in cells:
-                    cells[key] = numpy.array(cells[key], dtype=int)
-                for key in cell_data:
-                    cell_data[key] = numpy.array(cell_data[key], dtype=int)
-            else:
-                # binary
-                num_elems = 0
-                while num_elems < total_num_cells:
-                    # read element header
-                    elem_type = struct.unpack("i", f.read(int_size))[0]
-                    t = _gmsh_to_meshio_type[elem_type]
-                    num_nodes_per_elem = num_nodes_per_cell[t]
-                    num_elems0 = struct.unpack("i", f.read(int_size))[0]
-                    num_tags = struct.unpack("i", f.read(int_size))[0]
-                    # assert num_tags >= 2
-
-                    # read element data
-                    num_bytes = 4 * (num_elems0 * (1 + num_tags + num_nodes_per_elem))
-                    shape = (num_elems0, 1 + num_tags + num_nodes_per_elem)
-                    b = f.read(num_bytes)
-                    # frombuffer gives a read-only view; the vstack below
-                    # allocates before anything mutates these.
-                    data = numpy.frombuffer(b, dtype=numpy.int32).reshape(shape)
-
-                    if t not in cells:
-                        cells[t] = []
-                    cells[t].append(data[:, -num_nodes_per_elem:])
-
-                    if t not in cell_data:
-                        cell_data[t] = []
-                    cell_data[t].append(data[:, 1 : num_tags + 1])
-
-                    num_elems += num_elems0
-
-                # collect cells
-                for key in cells:
-                    cells[key] = numpy.vstack(cells[key])
-
-                # collect cell data
-                for key in cell_data:
-                    cell_data[key] = numpy.vstack(cell_data[key])
-
+            for _ in range(total_num_cells):
                 line = f.readline()
-                assert line == "\n"
+                data = [int(k) for k in filter(None, line.split())]
+                t = _gmsh_to_meshio_type[data[1]]
+                num_nodes_per_elem = num_nodes_per_cell[t]
+
+                if t not in cells:
+                    cells[t] = []
+                cells[t].append(data[-num_nodes_per_elem:])
+
+                # data[2] gives the number of tags. The gmsh manual
+                # <http://gmsh.info/doc/texinfo/gmsh.html#MSH-ASCII-file-format>
+                # says:
+                # >>>
+                # By default, the first tag is the number of the physical
+                # entity to which the element belongs; the second is the
+                # number of the elementary geometrical entity to which the
+                # element belongs; the third is the number of mesh
+                # partitions to which the element belongs, followed by the
+                # partition ids (negative partition ids indicate ghost
+                # cells). A zero tag is equivalent to no tag. Gmsh and most
+                # codes using the MSH 2 format require at least the first
+                # two tags (physical and elementary tags).
+                # <<<
+                num_tags = data[2]
+                if t not in cell_data:
+                    cell_data[t] = []
+                cell_data[t].append(data[3 : 3 + num_tags])
+
+            # convert to numpy arrays
+            for key in cells:
+                cells[key] = numpy.array(cells[key], dtype=int)
+            for key in cell_data:
+                cell_data[key] = numpy.array(cell_data[key], dtype=int)
 
             line = f.readline()
             assert line.strip() == "$EndElements"
@@ -491,10 +426,22 @@ def read_gmsh(filename: str) -> tuple[np.ndarray, dict, dict, dict, dict]:
                     output_cell_data[key]["geometrical"] = cell_data[key][:, 1]
             cell_data = output_cell_data
 
+    from . import TriaMesh
+
+    f.close()
+
     if has_additional_tag_data:
         logger.warning("The file contains tag data that couldn't be processed.")
 
-    return points, cells, point_data, cell_data, field_data
+    if "triangle" not in cells:
+        msg = (
+            "[no triangles found, mesh holds "
+            f"{sorted(cells) if cells else 'no cells'}] --> FAILED\n"
+        )
+        logger.error(msg)
+        raise ValueError(msg)
+
+    return TriaMesh(points, cells["triangle"])
 
 
 def read_gifti(filename: str) -> "TriaMesh":

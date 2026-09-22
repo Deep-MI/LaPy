@@ -258,6 +258,8 @@ def read_gmsh(filename: str) -> "TriaMesh":
     """
     import numpy
 
+    from . import TriaMesh
+
     num_nodes_per_cell = {
         "vertex": 1,
         "line": 2,
@@ -300,7 +302,18 @@ def read_gmsh(filename: str) -> "TriaMesh":
         26: "line4",
         36: "quad16",
     }
-    _meshio_to_gmsh_type = {v: k for k, v in _gmsh_to_meshio_type.items()}  # noqa: F841
+
+    def _expect(line, keyword):
+        """Fail on a malformed file.
+
+        Not an assert: these validate untrusted file content, and assert is
+        stripped under ``python -O``, which would let a truncated file through
+        and only surface much later as a wrong mesh.
+        """
+        if line.strip() != keyword:
+            msg = f"[{keyword} keyword not found] --> FAILED\n"
+            logger.error(msg)
+            raise ValueError(msg)
 
     logger.debug("--> GMSH format         ... ")
 
@@ -317,118 +330,115 @@ def read_gmsh(filename: str) -> "TriaMesh":
     cell_data = {}
 
     has_additional_tag_data = False
-    while True:
-        line = f.readline()
-        if not line:
-            # EOF
-            break
-        assert line[0] == "$"
-        environ = line[1:].strip()
-        if environ == "MeshFormat":
+    with f:
+        while True:
             line = f.readline()
-            # Split the line
-            # 2.2 0 8
-            # into its components.
-            str_list = list(filter(None, line.split()))
-            if str_list[0][0] != "2":
-                msg = f"[need mesh format 2, found {str_list[0]}] --> FAILED\n"
+            if not line:
+                # EOF
+                break
+            if not line.startswith("$"):
+                msg = f"[section keyword expected, found '{line.strip()}'] --> FAILED\n"
                 logger.error(msg)
-                f.close()
                 raise ValueError(msg)
-            if str_list[1] != "0":
-                # The file is opened in text mode, so the binary layout cannot
-                # be read from this handle at all.
-                msg = "[binary format not implemented] --> FAILED\n"
+            environ = line[1:].strip()
+            if environ == "MeshFormat":
+                line = f.readline()
+                # Split the line
+                # 2.2 0 8
+                # into its components.
+                str_list = list(filter(None, line.split()))
+                if str_list[0][0] != "2":
+                    msg = f"[need mesh format 2, found {str_list[0]}] --> FAILED\n"
+                    logger.error(msg)
+                    raise ValueError(msg)
+                if str_list[1] != "0":
+                    # The file is opened in text mode, so the binary layout
+                    # cannot be read from this handle at all.
+                    msg = "[binary format not implemented] --> FAILED\n"
+                    logger.error(msg)
+                    raise ValueError(msg)
+                _expect(f.readline(), "$EndMeshFormat")
+            elif environ == "PhysicalNames":
+                line = f.readline()
+                num_phys_names = int(line)
+                for _ in range(num_phys_names):
+                    line = f.readline()
+                    key = line.split(" ")[2].replace('"', "").replace("\n", "")
+                    phys_group = int(line.split(" ")[1])
+                    field_data[key] = phys_group
+                _expect(f.readline(), "$EndPhysicalNames")
+            elif environ == "Nodes":
+                # The first line is the number of nodes
+                line = f.readline()
+                num_nodes = int(line)
+                points = numpy.fromfile(f, count=num_nodes * 4, sep=" ").reshape(
+                    (num_nodes, 4)
+                )
+                # The first number is the index
+                points = points[:, 1:]
+
+                _expect(f.readline(), "$EndNodes")
+            elif environ == "Elements":
+                # The first line is the number of elements
+                line = f.readline()
+                total_num_cells = int(line)
+                for _ in range(total_num_cells):
+                    line = f.readline()
+                    data = [int(k) for k in filter(None, line.split())]
+                    t = _gmsh_to_meshio_type[data[1]]
+                    num_nodes_per_elem = num_nodes_per_cell[t]
+
+                    if t not in cells:
+                        cells[t] = []
+                    cells[t].append(data[-num_nodes_per_elem:])
+
+                    # data[2] gives the number of tags. The gmsh manual
+                    # <http://gmsh.info/doc/texinfo/gmsh.html#MSH-ASCII-file-format>
+                    # says:
+                    # >>>
+                    # By default, the first tag is the number of the physical
+                    # entity to which the element belongs; the second is the
+                    # number of the elementary geometrical entity to which the
+                    # element belongs; the third is the number of mesh
+                    # partitions to which the element belongs, followed by the
+                    # partition ids (negative partition ids indicate ghost
+                    # cells). A zero tag is equivalent to no tag. Gmsh and most
+                    # codes using the MSH 2 format require at least the first
+                    # two tags (physical and elementary tags).
+                    # <<<
+                    num_tags = data[2]
+                    if t not in cell_data:
+                        cell_data[t] = []
+                    cell_data[t].append(data[3 : 3 + num_tags])
+
+                # convert to numpy arrays
+                for key in cells:
+                    cells[key] = numpy.array(cells[key], dtype=int)
+                for key in cell_data:
+                    cell_data[key] = numpy.array(cell_data[key], dtype=int)
+
+                _expect(f.readline(), "$EndElements")
+
+                # Subtract one to account for the fact that python indices are
+                # 0-based.
+                for key in cells:
+                    cells[key] -= 1
+
+                # restrict to the standard two data items
+                output_cell_data = {}
+                for key in cell_data:
+                    if cell_data[key].shape[1] > 2:
+                        has_additional_tag_data = True
+                    output_cell_data[key] = {}
+                    if cell_data[key].shape[1] > 0:
+                        output_cell_data[key]["physical"] = cell_data[key][:, 0]
+                    if cell_data[key].shape[1] > 1:
+                        output_cell_data[key]["geometrical"] = cell_data[key][:, 1]
+                cell_data = output_cell_data
+            else:
+                msg = f"[unknown section '{environ}'] --> FAILED\n"
                 logger.error(msg)
-                f.close()
                 raise ValueError(msg)
-            line = f.readline()
-            assert line.strip() == "$EndMeshFormat"
-        elif environ == "PhysicalNames":
-            line = f.readline()
-            num_phys_names = int(line)
-            for _ in range(num_phys_names):
-                line = f.readline()
-                key = line.split(" ")[2].replace('"', "").replace("\n", "")
-                phys_group = int(line.split(" ")[1])
-                field_data[key] = phys_group
-            line = f.readline()
-            assert line.strip() == "$EndPhysicalNames"
-        elif environ == "Nodes":
-            # The first line is the number of nodes
-            line = f.readline()
-            num_nodes = int(line)
-            points = numpy.fromfile(f, count=num_nodes * 4, sep=" ").reshape(
-                (num_nodes, 4)
-            )
-            # The first number is the index
-            points = points[:, 1:]
-
-            line = f.readline()
-            assert line.strip() == "$EndNodes"
-        else:
-            assert environ == "Elements", f"Unknown environment '{environ}'."
-            # The first line is the number of elements
-            line = f.readline()
-            total_num_cells = int(line)
-            for _ in range(total_num_cells):
-                line = f.readline()
-                data = [int(k) for k in filter(None, line.split())]
-                t = _gmsh_to_meshio_type[data[1]]
-                num_nodes_per_elem = num_nodes_per_cell[t]
-
-                if t not in cells:
-                    cells[t] = []
-                cells[t].append(data[-num_nodes_per_elem:])
-
-                # data[2] gives the number of tags. The gmsh manual
-                # <http://gmsh.info/doc/texinfo/gmsh.html#MSH-ASCII-file-format>
-                # says:
-                # >>>
-                # By default, the first tag is the number of the physical
-                # entity to which the element belongs; the second is the
-                # number of the elementary geometrical entity to which the
-                # element belongs; the third is the number of mesh
-                # partitions to which the element belongs, followed by the
-                # partition ids (negative partition ids indicate ghost
-                # cells). A zero tag is equivalent to no tag. Gmsh and most
-                # codes using the MSH 2 format require at least the first
-                # two tags (physical and elementary tags).
-                # <<<
-                num_tags = data[2]
-                if t not in cell_data:
-                    cell_data[t] = []
-                cell_data[t].append(data[3 : 3 + num_tags])
-
-            # convert to numpy arrays
-            for key in cells:
-                cells[key] = numpy.array(cells[key], dtype=int)
-            for key in cell_data:
-                cell_data[key] = numpy.array(cell_data[key], dtype=int)
-
-            line = f.readline()
-            assert line.strip() == "$EndElements"
-
-            # Subtract one to account for the fact that python indices are
-            # 0-based.
-            for key in cells:
-                cells[key] -= 1
-
-            # restrict to the standard two data items
-            output_cell_data = {}
-            for key in cell_data:
-                if cell_data[key].shape[1] > 2:
-                    has_additional_tag_data = True
-                output_cell_data[key] = {}
-                if cell_data[key].shape[1] > 0:
-                    output_cell_data[key]["physical"] = cell_data[key][:, 0]
-                if cell_data[key].shape[1] > 1:
-                    output_cell_data[key]["geometrical"] = cell_data[key][:, 1]
-            cell_data = output_cell_data
-
-    from . import TriaMesh
-
-    f.close()
 
     if has_additional_tag_data:
         logger.warning("The file contains tag data that couldn't be processed.")

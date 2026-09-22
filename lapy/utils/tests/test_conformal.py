@@ -94,6 +94,37 @@ def test_spherical_conformal_map_lands_on_unit_sphere(sphere):
     )
 
 
+def test_spherical_conformal_map_distributes_area(sphere):
+    """The south pole chart must be built from the rescaled map.
+
+    Reusing the denominator computed before the rescale scales every vertex by
+    the wrong factor and collapses almost the whole sphere into a small patch;
+    the area ratio was then five orders of magnitude instead of a handful.
+    """
+    areas = TriaMesh(spherical_conformal_map(sphere), sphere.t).tria_areas()
+
+    assert areas.max() / areas.min() < 10.0
+
+
+def test_small_radius_is_not_a_degeneracy():
+    """A vertex close to the origin must not abort the parameterisation.
+
+    ``1 + S[:, 2]`` is ``2 |z|^2 / (1 + |z|^2)``, so it is quadratically small
+    near the origin: on this mesh ``min |z|`` is about 5e-5 while that
+    denominator reaches 5e-9, which an absolute zero test rejects even though
+    nothing is degenerate.
+    """
+    tria = TriaMesh.read_off("data/icosahedron.off")
+    tria.refine_(it=5)
+    tria.normalize_()
+
+    mapping = spherical_conformal_map(tria)
+
+    np.testing.assert_allclose(
+        np.linalg.norm(mapping, axis=1), 1.0, rtol=1e-8, atol=1e-10
+    )
+
+
 def test_cholmod_matches_lu(sphere):
     """The Cholesky and the LU backend must agree."""
     pytest.importorskip("sksparse.cholmod")

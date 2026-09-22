@@ -111,7 +111,7 @@ def _dirichlet_eliminate(
         Constrained matrix of shape (n, n), still symmetric.
     """
     n = A.shape[0]
-    idx = np.unique(np.asarray(idx))
+    idx = np.unique(np.asarray(idx, dtype=np.intp))
     keep = np.ones(n, dtype=A.dtype)
     keep[idx] = 0
     mask = sparse.diags(keep)
@@ -147,6 +147,7 @@ def _dirichlet_rhs(
     np.ndarray
         Right hand side of shape (n,) or (n, n_rhs), matching ``target``.
     """
+    idx = np.asarray(idx, dtype=np.intp)
     target = np.asarray(target)
     rhs = -np.asarray(A[:, idx] @ target)
     rhs[idx] = target
@@ -381,7 +382,7 @@ def _spherical_tutte_z(
     # Assemble as D - W rather than W - D so the matrix is positive semidefinite
     # like lapy's stiffness and a Cholesky backend can factorise it. Flipping
     # the sign of the whole system leaves the solution unchanged.
-    m = sparse.diags(np.asarray(w.sum(axis=1)).ravel()) - w
+    m = (sparse.diags(np.asarray(w.sum(axis=1)).ravel()) - w).tocsc()
 
     # Pin the big triangle to the three cube roots of unity
     fixed = t[bigtri, :]
@@ -737,6 +738,11 @@ def _sparse_symmetric_solve(
         If ``A`` or ``b`` is complex.
     ImportError
         If use_cholmod is True but scikit-sparse is not installed.
+    RuntimeError
+        Propagated from ``splu`` when ``A`` is singular.
+    sksparse.cholmod.CholmodNotPositiveDefiniteError
+        Propagated from CHOLMOD when ``A`` is not positive definite and
+        use_cholmod is True.
     """
     if np.iscomplexobj(A) or np.iscomplexobj(b):
         raise ValueError(

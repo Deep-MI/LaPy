@@ -188,6 +188,12 @@ def test_spherical_tutte_map_is_an_oriented_sphere(sphere):
     assert _signed_volume(mapping, sphere.t) > 0
 
 
+def test_spherical_tutte_map_rejects_non_genus_zero(square):
+    """The Tutte map promises a genus-0 closed surface, so it must check."""
+    with pytest.raises(ValueError, match="genus-0"):
+        spherical_tutte_map(square)
+
+
 @pytest.mark.parametrize("mode", ["nan", "raise"])
 def test_falls_back_to_tutte_map(sphere, monkeypatch, caplog, mode):
     """A harmonic map that degenerates must fall back instead of raising.

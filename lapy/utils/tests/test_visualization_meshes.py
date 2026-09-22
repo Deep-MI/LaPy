@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 
@@ -35,7 +34,7 @@ def loaded_data():
     return expected_outcomes
 
 
-def test_visualization_triangle_mesh(load_tria_mesh, loaded_data):
+def test_visualization_triangle_mesh(load_tria_mesh, loaded_data, tmp_path):
     """
     Test visualization of a triangle mesh using expected outcomes.
 
@@ -58,8 +57,8 @@ def test_visualization_triangle_mesh(load_tria_mesh, loaded_data):
     evDict["NumEW"] = 3
     evDict["Eigenvalues"] = evals
     evDict["Eigenvectors"] = evecs
-    write_ev("data/cubeTria.ev", evDict)
-    output_file = Path("data/cubeTria.ev")
+    output_file = tmp_path / "cubeTria.ev"
+    write_ev(str(output_file), evDict)
     assert output_file.exists()  # Check if the output file exists
     expected_elements = loaded_data["expected_outcomes"][
         "test_visualization_triangle_mesh"
@@ -78,7 +77,7 @@ def test_visualization_triangle_mesh(load_tria_mesh, loaded_data):
     assert evecs.shape == expected_evec_shape
 
 
-def test_visualization_tetrahedral_mesh(load_tet_mesh, loaded_data):
+def test_visualization_tetrahedral_mesh(load_tet_mesh, loaded_data, tmp_path):
     """
     Test visualization of a tetrahedral mesh using expected outcomes.
 
@@ -101,8 +100,8 @@ def test_visualization_tetrahedral_mesh(load_tet_mesh, loaded_data):
     evDict["NumEW"] = 3
     evDict["Eigenvalues"] = evals
     evDict["Eigenvectors"] = evecs
-    write_ev("data/cubeTetra.ev", evDict)
-    output_file = Path("data/cubeTetra.ev")
+    output_file = tmp_path / "cubeTetra.ev"
+    write_ev(str(output_file), evDict)
     assert output_file.exists()  # Check if the output file exists
     expected_elements = loaded_data["expected_outcomes"][
         "test_visualization_tetrahedral_mesh"

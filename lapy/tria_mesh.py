@@ -355,6 +355,22 @@ class TriaMesh:
         return io.read_vtk(filename)
 
     @classmethod
+    def read_gmsh(cls, filename: str) -> "TriaMesh":
+        """Load triangle mesh from GMSH file, MSH 2 ASCII format.
+
+        Parameters
+        ----------
+        filename : str
+            Filename to load.
+
+        Returns
+        -------
+        TriaMesh
+            Loaded triangle mesh.
+        """
+        return io.read_gmsh(filename)
+
+    @classmethod
     def read_gifti(cls, filename: str) -> "TriaMesh":
         """Load triangle mesh from a GIFTI surface file.
 

@@ -4,7 +4,6 @@ Should be called via the TetMesh member functions.
 """
 
 import logging
-import os.path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 def read_gmsh(filename: str) -> "TetMesh":
-    """Load GMSH tetrahedron mesh.
+    """Load GMSH tetrahedron mesh, MSH 2 ASCII format.
 
     Parameters
     ----------
@@ -32,101 +31,17 @@ def read_gmsh(filename: str) -> "TetMesh":
     OSError
         If file is not found or not readable.
     ValueError
-        If file format is invalid or binary format is encountered.
+        If the extension is not ``.msh``, the file is binary or not version 2,
+        a section is malformed, or the file holds no tetrahedra.
     """
-    extension = os.path.splitext(filename)[1]
-    verbose = 1
-    if verbose > 0:
-        logger.info("--> GMSH format         ... ")
-    if extension != ".msh":
-        msg = "[no .msh file] --> FAILED\n"
-        logger.error(msg)
-        raise ValueError(msg)
-    try:
-        f = open(filename)
-    except OSError:
-        logger.error("[file not found or not readable]")
-        raise
-    line = f.readline()
-    if not line.startswith("$MeshFormat"):
-        msg = "[$MeshFormat keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    line = f.readline()
-    larr = line.split()
-    ver = float(larr[0])
-    ftype = int(larr[1])
-    datatype = int(larr[2])
-    logger.debug(
-        "Msh file ver %s, ftype %s, datatype %s",
-        ver,
-        ftype,
-        datatype,
-    )
-    if ftype != 0:
-        msg = "[binary format not implemented] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    line = f.readline()
-    if not line.startswith("$EndMeshFormat"):
-        msg = "[$EndMeshFormat keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    line = f.readline()
-    if not line.startswith("$Nodes"):
-        msg = "[$Nodes keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    pnum = int(f.readline())
-    # read (nodes X 4) matrix as chunk
-    # drop first column
-    v = np.fromfile(f, "float32", 4 * pnum, " ")
-    v = v.reshape(pnum, 4)
-    v = np.delete(v, 0, 1)
-    line = f.readline()
-    if not line.startswith("$EndNodes"):
-        msg = "[$EndNodes keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    line = f.readline()
-    if not line.startswith("$Elements"):
-        msg = "[$Elements keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    tnum = int(f.readline())
-    pos = f.tell()
-    line = f.readline()
-    f.seek(pos)
-    larr = line.split()
-    if int(larr[1]) != 4:
-        logger.debug("larr: %s", larr)
-        msg = "[can only read tetras] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    # read (nodes X ?) matrix
-    t = np.fromfile(f, "int", tnum * len(larr), " ")
-    t = t.reshape(tnum, len(larr))
-    t = np.delete(t, np.s_[0 : len(larr) - 4], 1)
-    line = f.readline()
-    if not line.startswith("$EndElements"):
-        logger.debug("Line: %s", line)
-        msg = "[$EndElements keyword not found] --> FAILED\n"
-        logger.error(msg)
-        f.close()
-        raise ValueError(msg)
-    f.close()
-    logger.info(" --> DONE ( V: %d , T: %d )", v.shape[0], t.shape[0])
     from . import TetMesh
+    from ._gmsh_io import read_gmsh as _read
 
-    return TetMesh(v, t)
-
+    points, cells = _read(filename, want="tetra")
+    logger.info(
+        " --> DONE ( V: %d , T: %d )", points.shape[0], cells["tetra"].shape[0]
+    )
+    return TetMesh(points, cells["tetra"])
 
 def read_vtk(filename: str) -> "TetMesh":
     """Load VTK tetrahedron mesh.

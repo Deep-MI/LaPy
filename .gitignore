@@ -95,12 +95,20 @@ celerybeat-schedule
 
 # Environments
 .env
-.venv
+.venv*
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Agent tooling and scratch space
+.agentbridge/
+.agent-work/
+scratch/
+
+# Eigenvalue files written by the test suite and the example notebooks
+*.ev
 
 # Spyder project settings
 .spyderproject

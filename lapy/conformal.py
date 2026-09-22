@@ -314,7 +314,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
             mapping = P  # use the old result
 
     # inverse south pole stereographic projection
-    mapping = inverse_stereographic(mapping)
+    mapping = _inverse_stereographic_south(mapping)
     return mapping
 
 
@@ -697,4 +697,32 @@ def inverse_stereographic(u: np.ndarray) -> np.ndarray:
         y = u[:, 1]
     z = 1 + x**2 + y**2
     v = np.column_stack((2*x / z, 2*y / z, (-1 + x**2 + y**2) / z))
+    return v
+
+
+def _inverse_stereographic_south(u: np.ndarray) -> np.ndarray:
+    """Map the complex plane back to the sphere through the *south* pole.
+
+    :func:`inverse_stereographic` inverts the projection from the north pole,
+    the one :func:`stereographic` performs. The chart used for the south pole
+    step of :func:`spherical_conformal_map` is ``w = z / |z|^2`` instead, and
+    its inverse differs by the sign of the third coordinate: ``|w| = 1 / |z|``,
+    so ``(|w|^2 - 1) / (|w|^2 + 1) = -(|z|^2 - 1) / (|z|^2 + 1)``. Inverting
+    with the northern formula would return the sphere mirrored in ``z``, an
+    orientation-reversing parameterisation.
+
+    Parameters
+    ----------
+    u : np.ndarray
+        Input points in the complex plane. Can be:
+        - Array of shape (n_points, 2), representing real and imaginary parts.
+        - Array of complex numbers of shape (n_points,).
+
+    Returns
+    -------
+    np.ndarray
+        Mapped points on the sphere as (x, y, z) coordinates, shape (n_points, 3).
+    """
+    v = inverse_stereographic(u)
+    v[:, 2] = -v[:, 2]
     return v

@@ -84,74 +84,74 @@ def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:
     if np.any(np.isclose(values, 0.0)):
         raise ValueError(f"{name} contains zero entries and cannot be used as a denominator")
 
-def _dirichlet_eliminate(
-        A: sparse.spmatrix,
-        idx: np.ndarray
-) -> sparse.csc_matrix:
-    """Impose Dirichlet conditions on ``idx`` while keeping ``A`` symmetric.
-
-    Zeros both the rows *and* the columns of the constrained vertices and puts
-    1 on their diagonal. The assembled matrix is symmetric and must stay that
-    way: a Cholesky solver reads only the lower triangular part of its input,
-    so a matrix whose rows alone were eliminated would be factorised as if the
-    columns had been eliminated too, giving a different solution than ``splu``.
-    Callers must move the known columns to the right hand side before calling
-    this (see ``_dirichlet_rhs``).
-
-    Parameters
-    ----------
-    A : sparse.spmatrix
-        Symmetric coefficient matrix of shape (n, n).
-    idx : np.ndarray
-        Indices of the constrained vertices.
-
-    Returns
-    -------
-    sparse.csc_matrix
-        Constrained matrix of shape (n, n), still symmetric.
-    """
-    n = A.shape[0]
-    idx = np.unique(np.asarray(idx, dtype=np.intp))
-    keep = np.ones(n, dtype=A.dtype)
-    keep[idx] = 0
-    mask = sparse.diags(keep)
-    ones = sparse.csc_matrix(
-        (np.ones(len(idx), dtype=A.dtype), (idx, idx)), shape=(n, n)
-    )
-    out = (mask @ A @ mask + ones).tocsc()
-    out.eliminate_zeros()
-    return out
-
-def _dirichlet_rhs(
+def _dirichlet_system(
         A: sparse.spmatrix,
         idx: np.ndarray,
         target: np.ndarray
-) -> np.ndarray:
-    """Build the right hand side matching :func:`_dirichlet_eliminate`.
+) -> tuple[sparse.csc_matrix, np.ndarray]:
+    """Impose Dirichlet conditions on ``idx`` while keeping ``A`` symmetric.
 
-    The contribution of the constrained columns is moved to the right hand
-    side, and the constrained rows are set to the prescribed values so that
-    they reproduce them through the unit diagonal.
+    Zeros both the rows *and* the columns of the constrained vertices, puts 1
+    on their diagonal, and moves the contribution of the removed columns to the
+    right hand side. The assembled matrix is symmetric and must stay that way:
+    a Cholesky solver reads only the lower triangular part of its input, so a
+    matrix whose rows alone were eliminated would be factorised as if the
+    columns had been eliminated too, giving a different solution than ``splu``.
+
+    The matrix and the right hand side are built together because they have to
+    agree: the right hand side has to be formed from the *unconstrained* matrix,
+    before the columns are dropped.
+
+    The unconstrained right hand side is assumed to be zero, which holds for
+    every system in this module.
 
     Parameters
     ----------
     A : sparse.spmatrix
         Unconstrained symmetric matrix of shape (n, n).
     idx : np.ndarray
-        Indices of the constrained vertices, shape (n_fixed,).
+        Indices of the constrained vertices, shape (n_fixed,). Must be unique,
+        since each one prescribes the value in the matching row of ``target``.
     target : np.ndarray
         Prescribed values, shape (n_fixed,) or (n_fixed, n_rhs).
 
     Returns
     -------
+    sparse.csc_matrix
+        Constrained matrix of shape (n, n), still symmetric.
     np.ndarray
-        Right hand side of shape (n,) or (n, n_rhs), matching ``target``.
+        Matching right hand side, shape (n,) or (n, n_rhs) following ``target``.
+
+    Raises
+    ------
+    ValueError
+        If ``idx`` contains a repeated index.
     """
+    n = A.shape[0]
     idx = np.asarray(idx, dtype=np.intp)
+    if np.unique(idx).size != idx.size:
+        # A repeated index prescribes two values for one vertex. It would also
+        # subtract that vertex's column twice while only one of the two values
+        # survives in the right hand side, so the free block would be solved
+        # against a load no boundary condition corresponds to.
+        raise ValueError(
+            "constrained indices must be unique; a repeated index prescribes "
+            "two values for the same vertex"
+        )
     target = np.asarray(target)
+
     rhs = -np.asarray(A[:, idx] @ target)
     rhs[idx] = target
-    return rhs
+
+    keep = np.ones(n, dtype=A.dtype)
+    keep[idx] = 0
+    mask = sparse.diags(keep)
+    ones = sparse.csc_matrix(
+        (np.ones(idx.size, dtype=A.dtype), (idx, idx)), shape=(n, n)
+    )
+    out = (mask @ A @ mask + ones).tocsc()
+    out.eliminate_zeros()
+    return out, rhs
 
 def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.ndarray:
     """Linear method for computing spherical conformal map of a genus-0 closed surface.
@@ -229,8 +229,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # coordinates are two real right hand side columns; packing them into one
     # complex column would only double the work of a real solve.
     target = np.array([[x0, y0], [x1, y1], [x2, y2]], dtype=np.float64)
-    rhs = _dirichlet_rhs(M, fixed, target)
-    M = _dirichlet_eliminate(M, fixed)
+    M, rhs = _dirichlet_system(M, fixed, target)
 
     z = _sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
     z = z[:, 0] + 1j * z[:, 1]
@@ -388,8 +387,7 @@ def _spherical_tutte_z(
     fixed = t[bigtri, :]
     angles = 2.0 * np.pi * np.arange(3) / 3.0
     target = np.column_stack((np.cos(angles), np.sin(angles)))
-    rhs = _dirichlet_rhs(m, fixed, target)
-    m = _dirichlet_eliminate(m, fixed)
+    m, rhs = _dirichlet_system(m, fixed, target)
 
     z = _sparse_symmetric_solve(m, rhs, use_cholmod=use_cholmod)
     z = z[:, 0] + 1j * z[:, 1]
@@ -693,8 +691,7 @@ def linear_beltrami_solver(
 
     # Impose the landmark positions, keeping A symmetric. The two target
     # coordinates are two real right hand side columns.
-    b = _dirichlet_rhs(A, landmark, target[:, :2])
-    A = _dirichlet_eliminate(A, landmark)
+    A, b = _dirichlet_system(A, landmark, target[:, :2])
 
     # Solve the sparse linear system
     mapping = _sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
@@ -714,8 +711,8 @@ def _sparse_symmetric_solve(
 
     ``A`` has to be genuinely symmetric for the two branches to agree: the
     Cholesky solver reads only the lower triangular part of ``A``, whereas
-    ``splu`` reads all of it. Use :func:`_dirichlet_eliminate` to impose
-    boundary conditions without destroying the symmetry.
+    ``splu`` reads all of it. Use :func:`_dirichlet_system` to impose boundary
+    conditions without destroying the symmetry.
 
     Parameters
     ----------

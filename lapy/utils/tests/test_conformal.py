@@ -8,6 +8,7 @@ from scipy import sparse
 
 from ... import conformal
 from ...conformal import (
+    _dirichlet_system,
     _inverse_stereographic_south,
     _sparse_symmetric_solve,
     linear_beltrami_solver,
@@ -75,6 +76,20 @@ def test_sparse_symmetric_solve_rejects_complex():
         _sparse_symmetric_solve(A, np.ones(3, dtype=complex))
     with pytest.raises(ValueError, match="real-valued"):
         _sparse_symmetric_solve(A.astype(complex), np.ones(3))
+
+
+def test_dirichlet_system_rejects_duplicate_indices():
+    """A repeated index prescribes two values for one vertex.
+
+    Accepting it would drop that vertex's column twice while only one of the two
+    values survives in the right hand side, so the free block would be solved
+    against a load no boundary condition corresponds to.
+    """
+    A = sparse.eye(4, format="csc")
+    target = np.array([[1.0, 0.0], [9.0, 9.0], [0.0, 1.0]])
+
+    with pytest.raises(ValueError, match="unique"):
+        _dirichlet_system(A, np.array([1, 1, 3]), target)
 
 
 def test_linear_beltrami_solver_recovers_identity(square):

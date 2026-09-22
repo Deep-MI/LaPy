@@ -23,7 +23,6 @@ from typing import Any
 import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
-from scipy.sparse import csr_matrix
 
 from . import Solver, TriaMesh
 from .utils._imports import import_optional_dependency
@@ -85,6 +84,74 @@ def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:
     if np.any(np.isclose(values, 0.0)):
         raise ValueError(f"{name} contains zero entries and cannot be used as a denominator")
 
+def _dirichlet_eliminate(
+        A: sparse.spmatrix,
+        idx: np.ndarray
+) -> sparse.csc_matrix:
+    """Impose Dirichlet conditions on ``idx`` while keeping ``A`` symmetric.
+
+    Zeros both the rows *and* the columns of the constrained vertices and puts
+    1 on their diagonal. The assembled matrix is symmetric and must stay that
+    way: a Cholesky solver reads only the lower triangular part of its input,
+    so a matrix whose rows alone were eliminated would be factorised as if the
+    columns had been eliminated too, giving a different solution than ``splu``.
+    Callers must move the known columns to the right hand side before calling
+    this (see ``_dirichlet_rhs``).
+
+    Parameters
+    ----------
+    A : sparse.spmatrix
+        Symmetric coefficient matrix of shape (n, n).
+    idx : np.ndarray
+        Indices of the constrained vertices.
+
+    Returns
+    -------
+    sparse.csc_matrix
+        Constrained matrix of shape (n, n), still symmetric.
+    """
+    n = A.shape[0]
+    idx = np.unique(np.asarray(idx))
+    keep = np.ones(n, dtype=A.dtype)
+    keep[idx] = 0
+    mask = sparse.diags(keep)
+    ones = sparse.csc_matrix(
+        (np.ones(len(idx), dtype=A.dtype), (idx, idx)), shape=(n, n)
+    )
+    out = (mask @ A @ mask + ones).tocsc()
+    out.eliminate_zeros()
+    return out
+
+def _dirichlet_rhs(
+        A: sparse.spmatrix,
+        idx: np.ndarray,
+        target: np.ndarray
+) -> np.ndarray:
+    """Build the right hand side matching :func:`_dirichlet_eliminate`.
+
+    The contribution of the constrained columns is moved to the right hand
+    side, and the constrained rows are set to the prescribed values so that
+    they reproduce them through the unit diagonal.
+
+    Parameters
+    ----------
+    A : sparse.spmatrix
+        Unconstrained symmetric matrix of shape (n, n).
+    idx : np.ndarray
+        Indices of the constrained vertices, shape (n_fixed,).
+    target : np.ndarray
+        Prescribed values, shape (n_fixed,) or (n_fixed, n_rhs).
+
+    Returns
+    -------
+    np.ndarray
+        Right hand side of shape (n,) or (n, n_rhs), matching ``target``.
+    """
+    target = np.asarray(target)
+    rhs = -np.asarray(A[:, idx] @ target)
+    rhs[idx] = target
+    return rhs
+
 def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.ndarray:
     """Linear method for computing spherical conformal map of a genus-0 closed surface.
 
@@ -130,11 +197,6 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     p0, p1, p2 = tria.t[bigtri, :]
     fixed = tria.t[bigtri, :]
 
-    # Make rows/columns of fixed indices zero, and set the diagonal to 1
-    mrow, mcol, mval = sparse.find(M[fixed, :])
-    M = M - sparse.csc_matrix((mval, (fixed[mrow], mcol)), shape=(nv, nv)) \
-        + sparse.csc_matrix(((1, 1, 1), (fixed, fixed)), shape=(nv, nv))
-
     # Compute the local coordinates for the big triangle
     # arbitrarily set first two points
     x0, y0, x1, y1 = 0, 0, 1, 0
@@ -161,14 +223,11 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     x2 = np.sqrt(x2_square)
     # should be around (0.5, sqrt(3)/2) if we found an equilateral bigtri
 
-    # Solve Laplace's equation to compute the harmonic map
-    c = np.zeros((nv, 1))
-    c[p0], c[p1], c[p2] = x0, x1, x2
-    d = np.zeros((nv, 1))
-    d[p0], d[p1], d[p2] = y0, y1, y2
-    rhs = np.empty(c.shape[:-1], dtype=complex)
-    rhs.real = c.flatten()
-    rhs.imag = d.flatten()
+    # Solve Laplace's equation to compute the harmonic map, pinning the three
+    # vertices of the big triangle to their planar positions.
+    target = np.array([x0 + 1j * y0, x1 + 1j * y1, x2 + 1j * y2])
+    rhs = _dirichlet_rhs(M, fixed, target)
+    M = _dirichlet_eliminate(M, fixed)
 
     z = _sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
     z = np.squeeze(np.array(z))
@@ -507,22 +566,10 @@ def linear_beltrami_solver(
     nv = tria.v.shape[0]
     A = sparse.csc_matrix((dat, (i, j)), shape=(nv, nv), dtype=complex)
 
-    # Convert target to complex and set up the b vector
+    # Impose the landmark positions, keeping A symmetric
     targetc = target[:, 0] + 1j * target[:, 1]
-    b = -A[:, landmark] * targetc
-    b[landmark] = targetc
-
-    # Modify A matrix to incorporate alignment with landmarks
-    mrow, mcol, mval = sparse.find(A[landmark, :])
-    Azero = sparse.csc_matrix((mval, (landmark[mrow], mcol)), shape=(nv, nv))
-    A = A - Azero
-    mrow, mcol, mval = sparse.find(A[:, landmark])
-    Azero = sparse.csc_matrix((mval, (mrow, landmark[mcol])), shape=(nv, nv))
-    Aones = sparse.csr_matrix(
-        (np.ones(landmark.shape[0]), (landmark, landmark)), shape=(nv, nv)
-    )
-    A = A - Azero + Aones
-    A.eliminate_zeros()
+    b = _dirichlet_rhs(A, landmark, targetc)
+    A = _dirichlet_eliminate(A, landmark)
 
     # Solve the sparse linear system
     x = _sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
@@ -534,8 +581,8 @@ def linear_beltrami_solver(
 
 
 def _sparse_symmetric_solve(
-        A: csr_matrix,
-        b: np.ndarray | csr_matrix,
+        A: sparse.spmatrix,
+        b: np.ndarray,
         use_cholmod: bool = False
 ) -> np.ndarray:
     """Solve a sparse symmetric linear system of equations Ax = b.
@@ -544,12 +591,17 @@ def _sparse_symmetric_solve(
     - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
     - LU decomposition (via SciPy) if scikit-sparse is not available.
 
+    ``A`` has to be genuinely symmetric for the two branches to agree: the
+    Cholesky solver reads only the lower triangular part of ``A``, whereas
+    ``splu`` reads all of it. Use :func:`_dirichlet_eliminate` to impose
+    boundary conditions without destroying the symmetry.
+
     Parameters
     ----------
-    A : csr_matrix
-        Sparse, symmetric coefficient matrix of shape (n, n) in CSR format.
-    b : np.ndarray or csr_matrix
-        Right-hand-side vector or matrix.
+    A : sparse.spmatrix
+        Sparse, symmetric coefficient matrix of shape (n, n).
+    b : np.ndarray
+        Right hand side of shape (n,) or (n, n_rhs).
     use_cholmod : bool, default=False
         Which solver to use. If True, use Cholesky decomposition from
         scikit-sparse cholmod. If False, use spsolve (LU decomposition).
@@ -557,7 +609,7 @@ def _sparse_symmetric_solve(
     Returns
     -------
     np.ndarray
-        Solution vector x for the system Ax = b.
+        Solution ``x`` with the same shape as ``b``.
 
     Raises
     ------
@@ -568,12 +620,12 @@ def _sparse_symmetric_solve(
         sksparse = import_optional_dependency("sksparse", raise_error=True)
         importlib.import_module(".cholmod", sksparse.__name__)
         logger.info("Solver: Cholesky decomposition (scikit-sparse cholmod)")
-        chol = sksparse.cholmod.cholesky(A)
+        chol = sksparse.cholmod.cholesky(sparse.csc_matrix(A))
         x = chol(b)
     else:
         from scipy.sparse.linalg import splu
         logger.info("Solver: LU decomposition (spsolve)")
-        lu = splu(A)
+        lu = splu(sparse.csc_matrix(A))
         x = lu.solve(b)
     return x
 

@@ -191,7 +191,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # Solve the Laplace equation on the big triangle
     nv = tria.v.shape[0]
     S = Solver(tria)
-    M = S.stiffness.astype(complex)
+    M = S.stiffness.tocsc()
 
     # Fixed vertices of the big triangle
     p0, p1, p2 = tria.t[bigtri, :]
@@ -224,13 +224,15 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # should be around (0.5, sqrt(3)/2) if we found an equilateral bigtri
 
     # Solve Laplace's equation to compute the harmonic map, pinning the three
-    # vertices of the big triangle to their planar positions.
-    target = np.array([x0 + 1j * y0, x1 + 1j * y1, x2 + 1j * y2])
+    # vertices of the big triangle to their planar positions. The two planar
+    # coordinates are two real right hand side columns; packing them into one
+    # complex column would only double the work of a real solve.
+    target = np.array([[x0, y0], [x1, y1], [x2, y2]], dtype=np.float64)
     rhs = _dirichlet_rhs(M, fixed, target)
     M = _dirichlet_eliminate(M, fixed)
 
     z = _sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
-    z = np.squeeze(np.array(z))
+    z = z[:, 0] + 1j * z[:, 1]
     z = z - np.mean(z, axis=0)
 
     # Apply inverse stereographic projection
@@ -559,24 +561,21 @@ def linear_beltrami_solver(
         af * uxv0 * uxv2 + bf * uxv0 * uyv2 + bf * uxv2 * uyv0 + gf * uyv0 * uyv2
     ) / area2
 
-    # Create a symmetric sparse matrix A
+    # Create a symmetric sparse matrix A. af, bf and gf are built from the real
+    # and imaginary parts of mu, so every entry of A is real.
     i = np.column_stack((t0, t1, t2, t0, t1, t1, t2, t2, t0)).reshape(-1)
     j = np.column_stack((t0, t1, t2, t1, t0, t2, t1, t0, t2)).reshape(-1)
     dat = np.column_stack((v00, v11, v22, v01, v01, v12, v12, v20, v20)).reshape(-1)
     nv = tria.v.shape[0]
-    A = sparse.csc_matrix((dat, (i, j)), shape=(nv, nv), dtype=complex)
+    A = sparse.csc_matrix((dat, (i, j)), shape=(nv, nv))
 
-    # Impose the landmark positions, keeping A symmetric
-    targetc = target[:, 0] + 1j * target[:, 1]
-    b = _dirichlet_rhs(A, landmark, targetc)
+    # Impose the landmark positions, keeping A symmetric. The two target
+    # coordinates are two real right hand side columns.
+    b = _dirichlet_rhs(A, landmark, target[:, :2])
     A = _dirichlet_eliminate(A, landmark)
 
     # Solve the sparse linear system
-    x = _sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
-
-    # Extract the mapping as real and imaginary components
-    mapping = np.squeeze(np.array(x))
-    mapping = np.column_stack((np.real(mapping), np.imag(mapping)))
+    mapping = _sparse_symmetric_solve(A, b, use_cholmod=use_cholmod)
     return mapping
 
 
@@ -585,7 +584,7 @@ def _sparse_symmetric_solve(
         b: np.ndarray,
         use_cholmod: bool = False
 ) -> np.ndarray:
-    """Solve a sparse symmetric linear system of equations Ax = b.
+    """Solve the real sparse symmetric linear system of equations Ax = b.
 
     Depending on the availability of the `scikit-sparse` package, it uses either:
     - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
@@ -599,9 +598,9 @@ def _sparse_symmetric_solve(
     Parameters
     ----------
     A : sparse.spmatrix
-        Sparse, symmetric coefficient matrix of shape (n, n).
+        Real, sparse, symmetric coefficient matrix of shape (n, n).
     b : np.ndarray
-        Right hand side of shape (n,) or (n, n_rhs).
+        Real right hand side of shape (n,) or (n, n_rhs).
     use_cholmod : bool, default=False
         Which solver to use. If True, use Cholesky decomposition from
         scikit-sparse cholmod. If False, use spsolve (LU decomposition).
@@ -613,9 +612,18 @@ def _sparse_symmetric_solve(
 
     Raises
     ------
+    ValueError
+        If ``A`` or ``b`` is complex.
     ImportError
         If use_cholmod is True but scikit-sparse is not installed.
     """
+    if np.iscomplexobj(A) or np.iscomplexobj(b):
+        raise ValueError(
+            "_sparse_symmetric_solve is real-valued; pass the two planar "
+            "coordinates as two right hand side columns instead of as one "
+            "complex column"
+        )
+    b = np.ascontiguousarray(b, dtype=np.float64)
     if use_cholmod:
         sksparse = import_optional_dependency("sksparse", raise_error=True)
         importlib.import_module(".cholmod", sksparse.__name__)
@@ -627,7 +635,7 @@ def _sparse_symmetric_solve(
         logger.info("Solver: LU decomposition (spsolve)")
         lu = splu(sparse.csc_matrix(A))
         x = lu.solve(b)
-    return x
+    return np.asarray(x).reshape(b.shape)
 
 
 def stereographic(u: np.ndarray) -> np.ndarray:

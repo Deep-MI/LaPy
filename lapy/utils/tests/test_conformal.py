@@ -1,4 +1,6 @@
-"""Tests for lapy.conformal — symmetric constraints and solver agreement."""
+"""Tests for lapy.conformal: symmetric constraints and solver agreement."""
+
+import logging
 
 import numpy as np
 import pytest
@@ -10,6 +12,7 @@ from ...conformal import (
     _sparse_symmetric_solve,
     linear_beltrami_solver,
     spherical_conformal_map,
+    spherical_tutte_map,
 )
 from ...tria_mesh import TriaMesh
 
@@ -156,6 +159,41 @@ def test_spherical_conformal_map_preserves_orientation(sphere):
 
     assert _signed_volume(mapping, sphere.t) > 0
     assert _signed_volume(sphere.v, sphere.t) > 0
+
+
+def test_spherical_tutte_map_is_an_oriented_sphere(sphere):
+    """The Tutte map needs only the connectivity and must still give a sphere."""
+    mapping = spherical_tutte_map(sphere)
+
+    assert mapping.shape == sphere.v.shape
+    assert not np.isnan(mapping).any()
+    np.testing.assert_allclose(
+        np.linalg.norm(mapping, axis=1), 1.0, rtol=1e-8, atol=1e-10
+    )
+    assert _signed_volume(mapping, sphere.t) > 0
+
+
+def test_falls_back_to_tutte_map_on_nan(sphere, monkeypatch, caplog):
+    """A harmonic map that degenerates must fall back instead of raising."""
+    original = conformal._rescale_polar_triangles
+    calls = []
+
+    def poisoned(z, tria, bigtri):
+        calls.append(1)
+        if len(calls) == 1:  # the harmonic map
+            return np.full_like(z, np.nan)
+        return original(z, tria, bigtri)
+
+    monkeypatch.setattr(conformal, "_rescale_polar_triangles", poisoned)
+
+    with caplog.at_level(logging.WARNING, logger="lapy.conformal"):
+        mapping = spherical_conformal_map(sphere)
+
+    assert "Tutte" in caplog.text
+    assert not np.isnan(mapping).any()
+    np.testing.assert_allclose(
+        np.linalg.norm(mapping, axis=1), 1.0, rtol=1e-8, atol=1e-10
+    )
 
 
 def test_cholmod_matches_lu(sphere):

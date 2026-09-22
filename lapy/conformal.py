@@ -235,38 +235,21 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     z = z[:, 0] + 1j * z[:, 1]
     z = z - np.mean(z, axis=0)
 
-    # Find the index of the southernmost triangle
-    absz = np.abs(z)
-    index = np.argsort(absz[tria.t[:, 0]] +
-                       absz[tria.t[:, 1]] +
-                       absz[tria.t[:, 2]])
-    inner = index[0]
-    if inner == bigtri:
-        inner = index[1]
-
-    # Compute side lengths of northernmost and southernmost triangles. The
-    # southern one is measured in the south pole chart w = z / |z|^2, where
-    # |w_a - w_b| = |z_a - z_b| / (|z_a| |z_b|), so it follows from z without
-    # projecting onto the sphere and dividing by 1 + S[:, 2] = 2 |z|^2 /
-    # (1 + |z|^2), which is quadratically small near the origin.
-    NorthTriSide = (np.abs(z[tria.t[bigtri, 0]] - z[tria.t[bigtri, 1]]) +
-                    np.abs(z[tria.t[bigtri, 1]] - z[tria.t[bigtri, 2]]) +
-                    np.abs(z[tria.t[bigtri, 2]] - z[tria.t[bigtri, 0]])) / 3.0
-
-    i0, i1, i2 = tria.t[inner, :]
-    _ensure_nonzero_array(absz[[i0, i1, i2]], "southernmost triangle radius")
-    SouthTriSide = (np.abs(z[i0] - z[i1]) / (absz[i0] * absz[i1]) +
-                    np.abs(z[i1] - z[i2]) / (absz[i1] * absz[i2]) +
-                    np.abs(z[i2] - z[i0]) / (absz[i2] * absz[i0])) / 3.0
-
-    # rescale to get the best distribution
-    z = z * np.sqrt(NorthTriSide * SouthTriSide) / NorthTriSide
+    z = _rescale_polar_triangles(z, tria, bigtri)
 
     # Final inverse stereographic projection
     S = inverse_stereographic(z)
     if np.isnan(np.sum(S)):
-        raise ValueError("Projection contains NaN values!")
-        # could revert to spherical tutte map here
+        # The harmonic map can fail on very bad triangulations. The Tutte map
+        # only uses the connectivity, so it still yields a valid sphere.
+        logger.warning(
+            "Harmonic map contains NaN values; falling back to the spherical "
+            "Tutte map."
+        )
+        z = _spherical_tutte_z(tria, bigtri, use_cholmod=use_cholmod)
+        S = inverse_stereographic(z)
+        if np.isnan(np.sum(S)):
+            raise ValueError("Projection contains NaN values!")
 
     # Fix near the south pole to reduce distortion
     idx = np.argsort(S[:, 2])
@@ -316,6 +299,140 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # inverse south pole stereographic projection
     mapping = _inverse_stereographic_south(mapping)
     return mapping
+
+
+def _rescale_polar_triangles(
+        z: np.ndarray,
+        tria: TriaMesh,
+        bigtri: int
+) -> np.ndarray:
+    """Rescale a planar map so both polar triangles end up a similar size.
+
+    The big triangle ends up at the north pole and the triangle closest to the
+    origin at the south pole; scaling ``z`` by the geometric mean of their side
+    lengths balances the two.
+
+    Parameters
+    ----------
+    z : np.ndarray
+        Planar map as complex numbers, shape (n_vertices,).
+    tria : TriaMesh
+        The mesh ``z`` was computed on.
+    bigtri : int
+        Index of the triangle pinned at the north pole.
+
+    Returns
+    -------
+    np.ndarray
+        Rescaled planar map, shape (n_vertices,).
+    """
+    # Find the index of the southernmost triangle
+    absz = np.abs(z)
+    index = np.argsort(absz[tria.t[:, 0]] +
+                       absz[tria.t[:, 1]] +
+                       absz[tria.t[:, 2]])
+    inner = index[0]
+    if inner == bigtri:
+        inner = index[1]
+
+    # Compute side lengths of northernmost and southernmost triangles. The
+    # southern one is measured in the south pole chart w = z / |z|^2, where
+    # |w_a - w_b| = |z_a - z_b| / (|z_a| |z_b|), so it follows from z without
+    # projecting onto the sphere and dividing by 1 + S[:, 2] = 2 |z|^2 /
+    # (1 + |z|^2), which is quadratically small near the origin.
+    NorthTriSide = (np.abs(z[tria.t[bigtri, 0]] - z[tria.t[bigtri, 1]]) +
+                    np.abs(z[tria.t[bigtri, 1]] - z[tria.t[bigtri, 2]]) +
+                    np.abs(z[tria.t[bigtri, 2]] - z[tria.t[bigtri, 0]])) / 3.0
+
+    i0, i1, i2 = tria.t[inner, :]
+    _ensure_nonzero_array(absz[[i0, i1, i2]], "southernmost triangle radius")
+    SouthTriSide = (np.abs(z[i0] - z[i1]) / (absz[i0] * absz[i1]) +
+                    np.abs(z[i1] - z[i2]) / (absz[i1] * absz[i2]) +
+                    np.abs(z[i2] - z[i0]) / (absz[i2] * absz[i0])) / 3.0
+
+    # rescale to get the best distribution
+    return z * np.sqrt(NorthTriSide * SouthTriSide) / NorthTriSide
+
+
+def _spherical_tutte_z(
+        tria: TriaMesh,
+        bigtri: int = 0,
+        use_cholmod: bool = False
+) -> np.ndarray:
+    """Compute the planar Tutte map, rescaled like the harmonic one.
+
+    See :func:`spherical_tutte_map` for the parameters; this returns the map on
+    the complex plane rather than on the sphere, which is what the south pole
+    step of :func:`spherical_conformal_map` needs.
+    """
+    nv = tria.v.shape[0]
+    t = tria.t
+
+    # Tutte (uniform weight) Laplacian. Each directed half edge contributes 1/2
+    # in both directions, so every edge of the closed mesh carries weight 1.
+    i = np.concatenate((t[:, 0], t[:, 1], t[:, 2]))
+    j = np.concatenate((t[:, 1], t[:, 2], t[:, 0]))
+    half = np.full(i.shape[0], 0.5)
+    w = sparse.csc_matrix(
+        (np.concatenate((half, half)),
+         (np.concatenate((i, j)), np.concatenate((j, i)))),
+        shape=(nv, nv),
+    )
+    # Assemble as D - W rather than W - D so the matrix is positive semidefinite
+    # like lapy's stiffness and a Cholesky backend can factorise it. Flipping
+    # the sign of the whole system leaves the solution unchanged.
+    m = sparse.diags(np.asarray(w.sum(axis=1)).ravel()) - w
+
+    # Pin the big triangle to the three cube roots of unity
+    fixed = t[bigtri, :]
+    angles = 2.0 * np.pi * np.arange(3) / 3.0
+    target = np.column_stack((np.cos(angles), np.sin(angles)))
+    rhs = _dirichlet_rhs(m, fixed, target)
+    m = _dirichlet_eliminate(m, fixed)
+
+    z = _sparse_symmetric_solve(m, rhs, use_cholmod=use_cholmod)
+    z = z[:, 0] + 1j * z[:, 1]
+    z = z - np.mean(z)
+
+    return _rescale_polar_triangles(z, tria, bigtri)
+
+
+def spherical_tutte_map(
+        tria: TriaMesh,
+        bigtri: int = 0,
+        use_cholmod: bool = False
+) -> np.ndarray:
+    """Compute the spherical Tutte map of a genus-0 closed surface.
+
+    Same construction as :func:`spherical_conformal_map`, with the cotangent
+    Laplacian replaced by the Tutte Laplacian. It ignores the vertex positions
+    and uses only the connectivity, so it still produces a valid sphere where
+    the harmonic map breaks down on a badly shaped triangulation.
+    :func:`spherical_conformal_map` falls back to it for exactly that reason.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        A triangular mesh object representing a genus-0 closed surface.
+    bigtri : int, default=0
+        Index of the triangle to pin at the north pole.
+    use_cholmod : bool, default=False
+        Which solver to use. If True, use Cholesky decomposition from
+        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+
+    Returns
+    -------
+    np.ndarray
+        Vertex coordinates of shape (n_vertices, 3) on the unit sphere.
+
+    Raises
+    ------
+    ImportError
+        If use_cholmod is True but scikit-sparse is not installed.
+    """
+    return inverse_stereographic(
+        _spherical_tutte_z(tria, bigtri, use_cholmod=use_cholmod)
+    )
 
 
 def mobius_area_correction_spherical(

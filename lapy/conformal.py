@@ -235,32 +235,29 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     z = z[:, 0] + 1j * z[:, 1]
     z = z - np.mean(z, axis=0)
 
-    # Apply inverse stereographic projection
-    S = inverse_stereographic(z)
-
-    # Rescale the mapping for better area distribution
-    w = np.empty(S.shape[:-1], dtype=complex)
-    denom_north = 1 + S[:, 2]
-    _ensure_nonzero_array(denom_north, "northern stereographic denominator")
-    w.real = (S[:, 0] / denom_north).flatten()
-    w.imag = (S[:, 1] / denom_north).flatten()
-
     # Find the index of the southernmost triangle
-    index = np.argsort(np.abs(z[tria.t[:, 0]]) +
-                       np.abs(z[tria.t[:, 1]]) +
-                       np.abs(z[tria.t[:, 2]]))
+    absz = np.abs(z)
+    index = np.argsort(absz[tria.t[:, 0]] +
+                       absz[tria.t[:, 1]] +
+                       absz[tria.t[:, 2]])
     inner = index[0]
     if inner == bigtri:
         inner = index[1]
 
-    # Compute side lengths of northernmost and southernmost triangles
+    # Compute side lengths of northernmost and southernmost triangles. The
+    # southern one is measured in the south pole chart w = z / |z|^2, where
+    # |w_a - w_b| = |z_a - z_b| / (|z_a| |z_b|), so it follows from z without
+    # projecting onto the sphere and dividing by 1 + S[:, 2] = 2 |z|^2 /
+    # (1 + |z|^2), which is quadratically small near the origin.
     NorthTriSide = (np.abs(z[tria.t[bigtri, 0]] - z[tria.t[bigtri, 1]]) +
                     np.abs(z[tria.t[bigtri, 1]] - z[tria.t[bigtri, 2]]) +
                     np.abs(z[tria.t[bigtri, 2]] - z[tria.t[bigtri, 0]])) / 3.0
 
-    SouthTriSide = (np.abs(w[tria.t[inner, 0]] - w[tria.t[inner, 1]]) +
-                    np.abs(w[tria.t[inner, 1]] - w[tria.t[inner, 2]]) +
-                    np.abs(w[tria.t[inner, 2]] - w[tria.t[inner, 0]])) / 3.0
+    i0, i1, i2 = tria.t[inner, :]
+    _ensure_nonzero_array(absz[[i0, i1, i2]], "southernmost triangle radius")
+    SouthTriSide = (np.abs(z[i0] - z[i1]) / (absz[i0] * absz[i1]) +
+                    np.abs(z[i1] - z[i2]) / (absz[i1] * absz[i2]) +
+                    np.abs(z[i2] - z[i0]) / (absz[i2] * absz[i0])) / 3.0
 
     # rescale to get the best distribution
     z = z * np.sqrt(NorthTriSide * SouthTriSide) / NorthTriSide
@@ -281,8 +278,15 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     fixnum = np.maximum(round(nv / 10), 3)
     fixed = idx[: np.minimum(nv, fixnum)]
 
-    # South pole stereographic projection
-    P = np.column_stack((S[:, 0] / denom_north, S[:, 1] / denom_north, np.zeros(nv)))
+    # South pole stereographic projection, w = z / |z|^2. This has to be built
+    # from the rescaled z: the denominator 1 + S[:, 2] computed before the
+    # rescale belongs to a different sphere and scales every vertex by the
+    # wrong factor.
+    absz = np.abs(z)
+    _ensure_nonzero_array(absz, "south pole stereographic radius")
+    P = np.column_stack(
+        (z.real / absz ** 2, z.imag / absz ** 2, np.zeros(nv))
+    )
 
     # Compute Beltrami coefficients for the current parameterization (value per triangle)
     triasouth = TriaMesh(P, tria.t)

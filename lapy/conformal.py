@@ -84,6 +84,23 @@ def _ensure_nonzero_array(values: np.ndarray, name: str) -> None:
     if np.any(np.isclose(values, 0.0)):
         raise ValueError(f"{name} contains zero entries and cannot be used as a denominator")
 
+def _ensure_genus_zero(tria: TriaMesh) -> None:
+    """Ensure the mesh is a genus-0 closed surface.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Triangle mesh to check.
+
+    Raises
+    ------
+    ValueError
+        If the Euler characteristic is not 2.
+    """
+    if tria.euler() != 2:
+        logger.error("The mesh is not a genus-0 closed surface.")
+        raise ValueError("Invalid input: Mesh must be genus-0.")
+
 def _dirichlet_system(
         A: sparse.spmatrix,
         idx: np.ndarray,
@@ -180,9 +197,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
         If use_cholmod is True but scikit-sparse is not installed.
     """
     # Ensure the input mesh has genus-0 topology
-    if tria.euler() != 2:
-        logger.error("The mesh is not a genus-0 closed surface.")
-        raise ValueError("Invalid input: Mesh must be genus-0.")
+    _ensure_genus_zero(tria)
 
     # Find the "big triangle" by selecting the most regularly shaped triangle
     bigtri = np.argmax(tria.tria_qualities())
@@ -194,9 +209,9 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     S = Solver(tria)
     M = S.stiffness.tocsc()
 
-    # Fixed vertices of the big triangle
+    # Fixed vertices of the big triangle, which ends up at the north pole
     p0, p1, p2 = tria.t[bigtri, :]
-    fixed = tria.t[bigtri, :]
+    north_fixed = tria.t[bigtri, :]
 
     # Compute the local coordinates for the big triangle
     # arbitrarily set first two points
@@ -229,7 +244,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     # coordinates are two real right hand side columns; packing them into one
     # complex column would only double the work of a real solve.
     target = np.array([[x0, y0], [x1, y1], [x2, y2]], dtype=np.float64)
-    M, rhs = _dirichlet_system(M, fixed, target)
+    M, rhs = _dirichlet_system(M, north_fixed, target)
 
     z = _sparse_symmetric_solve(M, rhs, use_cholmod=use_cholmod)
     z = z[:, 0] + 1j * z[:, 1]
@@ -257,14 +272,14 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
             raise ValueError("Projection contains NaN values!")
 
     # Fix near the south pole to reduce distortion
-    idx = np.argsort(S[:, 2])
+    order = np.argsort(S[:, 2])
 
     # number of points near the south pole to be fixed
     # simply set it to be 1/10 of the total number of vertices (can be changed)
     # In case the spherical parameterization is not good, change 10 to
     # something smaller (e.g. 2)
     fixnum = np.maximum(round(nv / 10), 3)
-    fixed = idx[: np.minimum(nv, fixnum)]
+    south_fixed = order[: np.minimum(nv, fixnum)]
 
     # South pole stereographic projection, w = z / |z|^2. This has to be built
     # from the rescaled z: the denominator 1 + S[:, 2] computed before the
@@ -282,7 +297,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
 
     # compose the map with another quasi-conformal map to cancel the distortion
     mapping = linear_beltrami_solver(
-        triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+        triasouth, mu, south_fixed, P[south_fixed, :], use_cholmod=use_cholmod
     )
 
     if np.isnan(np.sum(mapping)):
@@ -293,9 +308,9 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
             "South pole composed map contains NaN values; retrying with more fixed vertices."
         )
         fixnum *= 5  # again, this number can be changed
-        fixed = idx[: np.minimum(nv, fixnum)]
+        south_fixed = order[: np.minimum(nv, fixnum)]
         mapping = linear_beltrami_solver(
-            triasouth, mu, fixed, P[fixed, :], use_cholmod=use_cholmod
+            triasouth, mu, south_fixed, P[south_fixed, :], use_cholmod=use_cholmod
         )
         if np.isnan(np.sum(mapping)):
             logger.warning("Retry still contains NaNs; falling back to stereographic result.")
@@ -431,9 +446,12 @@ def spherical_tutte_map(
 
     Raises
     ------
+    ValueError
+        If mesh is not genus-0 (Euler characteristic != 2).
     ImportError
         If use_cholmod is True but scikit-sparse is not installed.
     """
+    _ensure_genus_zero(tria)
     return inverse_stereographic(
         _spherical_tutte_z(tria, bigtri, use_cholmod=use_cholmod)
     )

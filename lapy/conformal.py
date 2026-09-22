@@ -582,8 +582,9 @@ def beltrami_coefficient(tria: TriaMesh, mapping: np.ndarray) -> np.ndarray:
     e1 = v0 - v2
     e2 = v1 - v0
 
-    # Compute double areas of triangles
-    areas2 = np.cross(e0, e1)  # Returns the z-component of the cross product (scalar)
+    # Compute double areas of triangles: the z component of the cross product
+    # of two planar edges. np.cross stopped accepting 2-vectors in NumPy 2.
+    areas2 = e0[:, 0] * e1[:, 1] - e0[:, 1] * e1[:, 0]
 
     # Create Dx and Dy sparse matrices (summing area-normalized edge coordinates)
     nf = tria.t.shape[0]  # Number of triangles

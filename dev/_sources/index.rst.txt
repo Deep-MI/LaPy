@@ -8,7 +8,6 @@
 
    api/index
    tutorials/index
-   changes/index
 
 LaPy is an `open-source Python package <project github_>`_ for differential
 geometry on triangle and tetrahedra meshes. It includes an FEM solver to

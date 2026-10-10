@@ -6,6 +6,3 @@
 .. autoclass:: TriaMesh
    :members:
    :inherited-members:
-
-.. minigallery:: lapy.TriaMesh
-    :add-heading:

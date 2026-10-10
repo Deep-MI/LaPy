@@ -6,6 +6,3 @@
 .. autoclass:: TetMesh
    :members:
    :inherited-members:
-
-.. minigallery:: lapy.TetMesh
-    :add-heading:

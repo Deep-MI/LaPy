@@ -6,6 +6,3 @@
 .. autoclass:: Polygon
    :members:
    :inherited-members:
-
-.. minigallery:: lapy.Polygon
-    :add-heading:

@@ -51,13 +51,16 @@ class CholeskyFactor:
             )
         self.dtype = np.dtype(np.float32) if a.dtype == np.float32 else np.dtype(np.float64)
         solver = cholespy.CholeskySolverF if self.dtype == np.float32 else cholespy.CholeskySolverD
+        # Passed as CSR, which for a symmetric matrix holds the same arrays as CSC.
+        # cholespy reallocates the arrays of a CSC input in place, which corrupts the
+        # heap when NumPy owns them (it crashes on Windows), but copies a CSR input.
         try:
             self._solver = solver(
                 n,
                 a.indptr.astype(np.int32),
                 a.indices.astype(np.int32),
                 a.data.astype(self.dtype),
-                cholespy.MatrixType.CSC,
+                cholespy.MatrixType.CSR,
             )
         except ValueError as err:
             if "positive definite" not in str(err):

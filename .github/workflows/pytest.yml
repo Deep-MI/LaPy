@@ -45,7 +45,7 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --progress-bar off --upgrade pip setuptools wheel
-          python -m pip install --progress-bar off .[test]
+          python -m pip install --progress-bar off .[chol,test]
       - name: Display system information
         run: lapy-sys_info --developer
       - name: Run pytest
@@ -81,7 +81,7 @@ jobs:
         run: |
           python -m pip install --progress-bar off uv
           uv pip install --system pytest pytest-timeout
-          uv pip install --system --resolution lowest-direct .
+          uv pip install --system --resolution lowest-direct ".[chol]"
       - name: Display system information
         run: lapy-sys_info --developer
       - name: Run pytest

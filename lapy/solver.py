@@ -1,4 +1,3 @@
-import importlib
 import inspect
 import logging
 import sys
@@ -7,9 +6,9 @@ import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import eigsh as _eigsh
 
+from ._cholmod import CholeskyFactor, require_cholmod
 from .tet_mesh import TetMesh
 from .tria_mesh import TriaMesh
-from .utils._imports import import_optional_dependency
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +40,10 @@ class Solver:
     aniso_smooth : int | None
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default: False
-        If True, attempts to use the Cholesky decomposition for improved execution
-        speed. Requires the ``scikit-sparse`` library. If it can not be found, an error
-        will be thrown.
-        If False, will use slower LU decomposition.
+        If True, use the sparse Cholesky decomposition of CHOLMOD for improved
+        execution speed. Requires the ``cholespy`` package; if it is not installed,
+        an ImportError is raised.
+        If False, use the slower LU decomposition.
     dtype : numpy.dtype, default=np.float64
         Data type for the stiffness and mass matrices. Defaults to ``np.float64``
         for numerical stability. Use ``np.float32`` explicitly if memory is constrained
@@ -66,10 +65,7 @@ class Solver:
         dtype: np.dtype = np.float64,
     ) -> None:
         if use_cholmod:
-            self.sksparse = import_optional_dependency("sksparse", raise_error=True)
-            importlib.import_module(".cholmod", self.sksparse.__name__)
-        else:
-            self.sksparse = None
+            require_cholmod()
 
         # Ensure dtype is a numpy dtype object
         dtype = np.dtype(dtype)
@@ -746,10 +742,10 @@ class Solver:
             start_kwargs = {"v0": v0}
 
         if self.use_cholmod:
-            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-            chol = self.sksparse.cholmod.cholesky(self.stiffness - sigma * self.mass)
+            logger.info("Solver: Cholesky decomposition (CHOLMOD) ...")
+            chol = CholeskyFactor(self.stiffness - sigma * self.mass)
             op_inv = LinearOperator(
-                matvec=chol,
+                matvec=chol.solve,
                 shape=self.stiffness.shape,
                 dtype=self.stiffness.dtype,
             )
@@ -936,12 +932,11 @@ class Solver:
                 raise ValueError("A matrix needs to be sparse CSC or CSR")
         else:
             a = self.stiffness
-        # solve A x = b  (both splu.solve and cholmod accept 2-D b natively)
+        # solve A x = b  (both splu.solve and the Cholesky factor accept 2-D b)
         logger.debug("Matrix format now: %s", a.getformat())
         if self.use_cholmod:
-            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod ...")
-            chol = self.sksparse.cholmod.cholesky(a)
-            x = chol(b.astype(dtype))
+            logger.info("Solver: Cholesky decomposition (CHOLMOD) ...")
+            x = CholeskyFactor(a).solve(b)
         else:
             from scipy.sparse.linalg import splu
 

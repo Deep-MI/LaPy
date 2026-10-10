@@ -122,9 +122,9 @@ def compute_shapedna(
         Number of smoothing iterations for curvature computation on vertices.
         See `lapy.Solver` class.
     use_cholmod : bool, default=False
-        If True, attempts to use the Cholesky decomposition for improved
-        execution speed. Requires the ``scikit-sparse`` library. If it cannot
-        be found, an error will be thrown. If False, will use slower LU
+        If True, use the sparse Cholesky decomposition of CHOLMOD for improved
+        execution speed. Requires the ``cholespy`` package; if it is not
+        installed, an ImportError is raised. If False, use the slower LU
         decomposition.
 
     Returns

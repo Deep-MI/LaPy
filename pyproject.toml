@@ -53,7 +53,7 @@ build = [
     'twine',
 ]
 chol = [
-    'scikit-sparse>=0.4.16',
+    'cholespy>=2.0',
 ]
 doc = [
     'furo!=2023.8.17',

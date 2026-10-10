@@ -62,8 +62,7 @@ python3 -m pip install --user --src /my/preferred/location --editable git+https:
 
 ### Dependencies and optional backends
 - Core: Python 3, NumPy, SciPy.
-- Optional (recommended): scikit-sparse (for CHOLMOD) to accelerate Cholesky sparse solves.
-Note: CHOLMOD (via scikit-sparse) is not currently installable via plain `pip` on all platforms; use `conda` when possible. If `use_cholmod=True` is requested, LaPy attempts to import CHOLMOD and will raise if it is unavailable. Install ordering: install `numpy` and `scipy` first, then `scikit-sparse`.
+- Optional: cholespy (for CHOLMOD) to accelerate sparse solves with the Cholesky decomposition. Install it with `pip install lapy[chol]`. If `use_cholmod=True` is requested without cholespy, LaPy raises an ImportError.
 
 ## Solver backends
 - Default: SciPy sparse LU/QR routines.

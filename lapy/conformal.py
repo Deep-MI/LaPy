@@ -16,7 +16,6 @@ If you use this code in your own work, please cite the following paper:
 Closed Brain Surfaces."
 SIAM Journal on Imaging Sciences, vol. 8, no. 1, pp. 67-94, 2015.
 """
-import importlib
 import logging
 from typing import Any
 
@@ -25,7 +24,7 @@ from scipy import sparse
 from scipy.optimize import minimize
 
 from . import Solver, TriaMesh
-from .utils._imports import import_optional_dependency
+from ._cholmod import CholeskyFactor
 
 logger = logging.getLogger(__name__)
 
@@ -178,8 +177,8 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
     tria : TriaMesh
         A triangular mesh object representing a genus-0 closed surface.
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -194,7 +193,7 @@ def spherical_conformal_map(tria: TriaMesh, use_cholmod: bool = False) -> np.nda
         If edge lengths are degenerate.
         If projection contains NaN values.
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
     """
     # Ensure the input mesh has genus-0 topology
     _ensure_genus_zero(tria)
@@ -436,8 +435,8 @@ def spherical_tutte_map(
     bigtri : int, default=0
         Index of the triangle to pin at the north pole.
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -449,7 +448,7 @@ def spherical_tutte_map(
     ValueError
         If mesh is not genus-0 (Euler characteristic != 2).
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
     """
     _ensure_genus_zero(tria)
     return inverse_stereographic(
@@ -644,8 +643,8 @@ def linear_beltrami_solver(
     target : np.ndarray
         2D target positions for the landmark vertices, shape (n_landmarks, 2).
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -660,7 +659,7 @@ def linear_beltrami_solver(
         If triangle areas are degenerate.
         If Beltrami denominator is close to zero.
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
     """
     # Ensure the triangulation is planar
     _ensure_planar_mesh(tria, "Linear Beltrami solver")
@@ -732,9 +731,8 @@ def _sparse_symmetric_solve(
 ) -> np.ndarray:
     """Solve the real sparse symmetric linear system of equations Ax = b.
 
-    Depending on the availability of the `scikit-sparse` package, it uses either:
-    - Cholesky decomposition (via scikit-sparse) for performance-optimal solving.
-    - LU decomposition (via SciPy) if scikit-sparse is not available.
+    Uses the sparse Cholesky decomposition of CHOLMOD (via ``cholespy``) if
+    ``use_cholmod`` is True, and the LU decomposition of SciPy otherwise.
 
     ``A`` has to be genuinely symmetric for the two branches to agree: the
     Cholesky solver reads only the lower triangular part of ``A``, whereas
@@ -748,8 +746,8 @@ def _sparse_symmetric_solve(
     b : np.ndarray
         Real right hand side of shape (n,) or (n, n_rhs).
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -761,12 +759,11 @@ def _sparse_symmetric_solve(
     ValueError
         If ``A`` or ``b`` is complex.
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
     RuntimeError
         Propagated from ``splu`` when ``A`` is singular.
-    sksparse.cholmod.CholmodNotPositiveDefiniteError
-        Propagated from CHOLMOD when ``A`` is not positive definite and
-        use_cholmod is True.
+    ValueError
+        If use_cholmod is True and ``A`` is not positive definite.
     """
     if np.iscomplexobj(A) or np.iscomplexobj(b):
         raise ValueError(
@@ -776,11 +773,8 @@ def _sparse_symmetric_solve(
         )
     b = np.ascontiguousarray(b, dtype=np.float64)
     if use_cholmod:
-        sksparse = import_optional_dependency("sksparse", raise_error=True)
-        importlib.import_module(".cholmod", sksparse.__name__)
-        logger.info("Solver: Cholesky decomposition (scikit-sparse cholmod)")
-        chol = sksparse.cholmod.cholesky(sparse.csc_matrix(A))
-        x = chol(b)
+        logger.info("Solver: Cholesky decomposition (CHOLMOD)")
+        x = CholeskyFactor(A).solve(b)
     else:
         from scipy.sparse.linalg import splu
         logger.info("Solver: LU decomposition (spsolve)")

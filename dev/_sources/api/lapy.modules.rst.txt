@@ -12,4 +12,5 @@ Modules
     diffgeo
     conformal
     intersect
+    remesh
     plot

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="lapy.plot" href="lapy.plot.html"><link rel="prev" title="lapy.conformal" href="lapy.conformal.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="lapy.remesh" href="lapy.remesh.html"><link rel="prev" title="lapy.conformal" href="lapy.conformal.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>lapy.intersect - LaPy</title>
@@ -212,6 +212,7 @@
 <li class="toctree-l3"><a class="reference internal" href="lapy.diffgeo.html">lapy.diffgeo</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lapy.conformal.html">lapy.conformal</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">lapy.intersect</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lapy.remesh.html">lapy.remesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lapy.plot.html">lapy.plot</a></li>
 </ul>
 </li>
@@ -272,7 +273,7 @@ and each candidate pair is tested exactly with the interval test of Moeller
 (1997). Everything is vectorized over the candidate pairs.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.intersect.self_intersections">
-<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">self_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L148-L170"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.self_intersections" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">self_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L153-L175"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.self_intersections" title="Link to this definition">¶</a></dt>
 <dd><p>Find pairs of triangles that intersect and do not share a vertex.</p>
 <p>Triangles that share a vertex or an edge are never reported, and
 neither are triangles that only touch in a point or lie in a common
@@ -309,9 +310,9 @@ triangles, sorted within each row and lexicographically.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.intersect.triangles_intersect">
-<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">triangles_intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L46-L99"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.triangles_intersect" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">triangles_intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L46-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.triangles_intersect" title="Link to this definition">¶</a></dt>
 <dd><p>Test pairs of triangles for intersection.</p>
-<p>Uses the interval test of Moeller (1997). Pairs that only touch in a
+<p>Uses the interval test of Moeller <a class="reference internal" href="#rcb2b944ef0c9-1" id="id1">[1]</a>. Pairs that only touch in a
 single point and coplanar pairs are reported as not intersecting.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -342,11 +343,19 @@ longest edge of the pair count as zero.</p>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="rcb2b944ef0c9-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>T. Moeller. A fast triangle-triangle intersection test. Journal of
+Graphics Tools, 2(2):25-30, 1997. doi:10.1080/10867651.1997.10487472</p>
+</div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.intersect.undo_intersections">
-<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">undo_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L173-L233"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.undo_intersections" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.intersect.</span></span><span class="sig-name descname"><span class="pre">undo_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/intersect.py#L178-L238"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.intersect.undo_intersections" title="Link to this definition">¶</a></dt>
 <dd><p>Move vertices back where new positions make the surface intersect itself.</p>
 <p>Useful after smoothing or another change of vertex positions on a
 surface that did not intersect itself before. Starting from the
@@ -405,12 +414,12 @@ triangle.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="lapy.plot.html">
+          <a class="next-page" href="lapy.remesh.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">lapy.plot</div>
+                <div class="title">lapy.remesh</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

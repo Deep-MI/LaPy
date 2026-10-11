@@ -17,8 +17,9 @@ class CholeskyFactor:
     """Cholesky factorization of a sparse symmetric positive definite matrix.
 
     CHOLMOD reads only one triangle of the matrix, so the matrix has to be
-    genuinely symmetric. A ``float32`` matrix is factorized in single
-    precision, anything else in double precision.
+    genuinely symmetric. The factorization and the solves run in double
+    precision; solutions are returned in ``float32`` for a ``float32`` matrix
+    and in ``float64`` otherwise.
 
     Parameters
     ----------
@@ -49,17 +50,17 @@ class CholeskyFactor:
             raise ValueError(
                 f"Matrix with {n} rows and {a.nnz} non-zeros is too large for CHOLMOD's 32-bit indices."
             )
+        # output precision; cholespy factorizes in double precision on the CPU either way
         self.dtype = np.dtype(np.float32) if a.dtype == np.float32 else np.dtype(np.float64)
-        solver = cholespy.CholeskySolverF if self.dtype == np.float32 else cholespy.CholeskySolverD
         # Passed as CSR, which for a symmetric matrix holds the same arrays as CSC.
         # cholespy reallocates the arrays of a CSC input in place, which corrupts the
         # heap when NumPy owns them (it crashes on Windows), but copies a CSR input.
         try:
-            self._solver = solver(
+            self._solver = cholespy.CholeskySolverD(
                 n,
                 a.indptr.astype(np.int32),
                 a.indices.astype(np.int32),
-                a.data.astype(self.dtype),
+                a.data.astype(np.float64),
                 cholespy.MatrixType.CSR,
             )
         except ValueError as err:
@@ -83,7 +84,8 @@ class CholeskyFactor:
         Returns
         -------
         np.ndarray
-            Solution of the same shape as ``b``, in the precision of the factor.
+            Solution of the same shape as ``b``, ``float32`` for a ``float32``
+            matrix and ``float64`` otherwise.
 
         Raises
         ------
@@ -92,9 +94,9 @@ class CholeskyFactor:
         """
         if sparse.issparse(b):
             b = b.toarray()
-        b = np.ascontiguousarray(np.asarray(b), dtype=self.dtype)
+        b = np.ascontiguousarray(np.asarray(b), dtype=np.float64)
         if b.ndim not in (1, 2) or b.shape[0] != self.shape[0]:
             raise ValueError(f"Right hand side of shape {b.shape} does not match a matrix of shape {self.shape}.")
         x = np.empty_like(b)
         self._solver.solve(b, x)
-        return x
+        return x.astype(self.dtype, copy=False)

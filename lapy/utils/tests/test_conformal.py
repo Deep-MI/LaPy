@@ -238,7 +238,7 @@ def test_falls_back_to_tutte_map(sphere, monkeypatch, caplog, mode):
 
 def test_cholmod_matches_lu(sphere):
     """The Cholesky and the LU backend must agree."""
-    pytest.importorskip("sksparse.cholmod")
+    pytest.importorskip("cholespy")
 
     lu = spherical_conformal_map(sphere, use_cholmod=False)
     chol = spherical_conformal_map(sphere, use_cholmod=True)

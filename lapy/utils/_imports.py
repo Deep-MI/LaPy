@@ -7,9 +7,7 @@ import importlib
 
 # A mapping from import name to package name (on PyPI) when the package name
 # is different.
-INSTALL_MAPPING = {
-    "sksparse": "scikit-sparse",
-}
+INSTALL_MAPPING: dict[str, str] = {}
 
 
 def import_optional_dependency(

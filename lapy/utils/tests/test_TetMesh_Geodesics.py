@@ -121,26 +121,15 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     X = np.nan_to_num(X)
     divx = compute_divergence(T, X)
 
-    useCholmod = True
-    try:
-        from sksparse.cholmod import cholesky
-    except ImportError:
-        useCholmod = False
-
     fem = Solver(T, lump=True)
     A, B = fem.stiffness, fem.mass
 
     H = A
     b0 = -divx
 
-    if useCholmod:
-        print("Solver: cholesky decomp - performance optimal ...")
-        chol = cholesky(H)
-        x = chol(b0)
-    else:
-        print("Solver: spsolve (LU decomp) - performance not optimal ...")
-        lu = splu(H)
-        x = lu.solve(b0)
+    # H is singular without boundary conditions, so a Cholesky factorization
+    # does not apply
+    x = splu(H).solve(b0)
 
     x = x - np.min(x)
 
@@ -156,7 +145,6 @@ def test_tetMesh_Geodesics_format(load_tet_mesh, loaded_data):
     ]
     assert H.getformat() == expected_matrix_format
     assert np.shape(x) == (9261,)
-    assert not useCholmod, "Solver: cholesky decomp - performance optimal ..."
     expected_max_x = loaded_data["expected_outcomes"]["test_TetMesh_Geodesics"][
         "max_distance"
     ]

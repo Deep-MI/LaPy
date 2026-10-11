@@ -7,7 +7,6 @@ Note, the interface is not yet final, some functions are split into
 tet and tria versions.
 """
 
-import importlib
 import logging
 from typing import TYPE_CHECKING, Union
 
@@ -15,7 +14,7 @@ import numpy as np
 from scipy import sparse
 
 from . import Solver, TriaMesh
-from .utils._imports import import_optional_dependency
+from ._cholmod import CholeskyFactor, require_cholmod
 
 if TYPE_CHECKING:
     from .tet_mesh import TetMesh
@@ -132,8 +131,8 @@ def compute_geodesic_f(
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
     use_cholmod : bool, default=False
-        If True, use Cholesky decomposition from scikit-sparse cholmod for the
-        linear solve. If False, use spsolve (LU decomposition).
+        If True, use the sparse Cholesky decomposition of CHOLMOD (requires
+        ``cholespy``) for the linear solve. If False, use the LU decomposition.
 
     Returns
     -------
@@ -185,8 +184,8 @@ def tria_compute_geodesic_f(
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
     use_cholmod : bool, default=False
-        If True, use Cholesky decomposition from scikit-sparse cholmod for the
-        linear solve. If False, use spsolve (LU decomposition).
+        If True, use the sparse Cholesky decomposition of CHOLMOD (requires
+        ``cholespy``) for the linear solve. If False, use the LU decomposition.
 
     Returns
     -------
@@ -488,8 +487,8 @@ def tria_compute_rotated_f(
         Scalar function at vertices, shape ``(n_vertices,)`` or
         ``(n_vertices, n_functions)``.
     use_cholmod : bool, default=False
-        If True, use Cholesky decomposition from scikit-sparse cholmod for the
-        linear solve. If False, use spsolve (LU decomposition).
+        If True, use the sparse Cholesky decomposition of CHOLMOD (requires
+        ``cholespy``) for the linear solve. If False, use the LU decomposition.
 
     Returns
     -------
@@ -549,8 +548,8 @@ def tria_mean_curvature_flow(
     step : float, default=1.0
         Euler step size.
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -560,17 +559,14 @@ def tria_mean_curvature_flow(
     Raises
     ------
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
 
     Notes
     -----
     Numexpr could speed up this functions if necessary.
     """
     if use_cholmod:
-        sksparse = import_optional_dependency("sksparse", raise_error=True)
-        importlib.import_module(".cholmod", sksparse.__name__)
-    else:
-        sksparse = None
+        require_cholmod()
     # pre-normalize
     trianorm = TriaMesh(tria.v, tria.t)
     trianorm.normalize_()
@@ -586,12 +582,9 @@ def tria_mean_curvature_flow(
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
         if use_cholmod:
-            logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod")
-            factor = sksparse.cholmod.cholesky(mass + step * a_mat)
-            trianorm.v = factor(mass_v)
+            logger.info("Solver: Cholesky decomposition (CHOLMOD)")
+            trianorm.v = CholeskyFactor(mass + step * a_mat).solve(mass_v)
         else:
-            # Note, it would be better to do sparse Cholesky (CHOLMOD)
-            # as it can be 5-6 times faster
             from scipy.sparse.linalg import spsolve
 
             logger.info("Solver: spsolve (LU decomposition)")

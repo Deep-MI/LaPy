@@ -141,28 +141,14 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
     divx = compute_divergence(T, X)
     # compute distance
 
-    useCholmod = True
-    try:
-        from sksparse.cholmod import cholesky
-    except ImportError:
-        useCholmod = False
-
     fem = Solver(T, lump=True)
     A, B = fem.stiffness, fem.mass
     H = -A
     b0 = divx
 
-    # solve H x = b0
-    # we don't need the B matrix here, as divx is the integrated divergence
-    print("Matrix Format now: " + H.getformat())
-    if useCholmod:
-        print("Solver: cholesky decomp - performance optimal ...")
-        chol = cholesky(H)
-        x = chol(b0)
-    else:
-        print("Solver: spsolve (LU decomp) - performance not optimal ...")
-        lu = splu(H)
-        x = lu.solve(b0)
+    # solve H x = b0; H is singular without boundary conditions, so a Cholesky
+    # factorization does not apply, and B is not needed as divx is integrated
+    x = splu(H).solve(b0)
 
     # remove shift
     x = x - min(x)
@@ -175,7 +161,6 @@ def test_Geodesics_format(loaded_data, load_square_mesh):
         "expected_matrix_format"
     ]
     assert H.getformat() == expected_matrix_format
-    assert not useCholmod, "Solver: cholesky decomp - performance optimal ..."
     expected_max_x = loaded_data["expected_outcomes"]["test_Geodesics_format"][
         "max_distance"
     ]

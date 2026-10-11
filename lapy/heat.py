@@ -6,12 +6,11 @@ mesh geometries (tet or tria mesh) for heat diffusion.
 
 from __future__ import annotations
 
-import importlib
 import logging
 
 import numpy as np
 
-from .utils._imports import import_optional_dependency
+from ._cholmod import CholeskyFactor, require_cholmod
 
 logger = logging.getLogger(__name__)
 
@@ -158,8 +157,8 @@ def diffusion(
     aniso : int, default=None
         Number of smoothing iterations for curvature computation on vertices.
     use_cholmod : bool, default=False
-        Which solver to use. If True, use Cholesky decomposition from
-        scikit-sparse cholmod. If False, use spsolve (LU decomposition).
+        Which solver to use. If True, use the sparse Cholesky decomposition of
+        CHOLMOD (requires ``cholespy``). If False, use the LU decomposition.
 
     Returns
     -------
@@ -172,13 +171,10 @@ def diffusion(
     ValueError
         If vids contains out-of-range vertex indices.
     ImportError
-        If use_cholmod is True but scikit-sparse is not installed.
+        If use_cholmod is True but cholespy is not installed.
     """
     if use_cholmod:
-        sksparse = import_optional_dependency("sksparse", raise_error=True)
-        importlib.import_module(".cholmod", sksparse.__name__)
-    else:
-        sksparse = None
+        require_cholmod()
     from . import Solver
 
     nv = len(geometry.v)
@@ -213,12 +209,11 @@ def diffusion(
     for k, v in enumerate(vids_list):
         b0[v, k] = 1.0
 
-    # Solve — both splu.solve and cholmod accept 2-D rhs natively
+    # Solve — both splu.solve and the Cholesky factor accept 2-D rhs
     logger.debug("Matrix Format: %s", hmat.getformat())
     if use_cholmod:
-        logger.info("Solver: Cholesky decomposition from scikit-sparse cholmod")
-        chol = sksparse.cholmod.cholesky(hmat)
-        vfunc = chol(b0)
+        logger.info("Solver: Cholesky decomposition (CHOLMOD)")
+        vfunc = CholeskyFactor(hmat).solve(b0)
     else:
         from scipy.sparse.linalg import splu
 

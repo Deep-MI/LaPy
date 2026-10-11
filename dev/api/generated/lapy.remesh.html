@@ -275,7 +275,7 @@ neighborhoods do not overlap, so a round is a few array operations instead of
 a loop over the mesh.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.remesh.closest_points">
-<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">closest_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L106-L136"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.closest_points" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">closest_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.remesh.closest_points" title="Link to this definition">¶</a></dt>
 <dd><p>Find the closest point on a triangle mesh for each query point.</p>
 <p>Only the <code class="docutils literal notranslate"><span class="pre">k</span></code> triangles with the nearest centroids are tested, so a
 point must be close to the surface compared with the triangle size.</p>
@@ -319,7 +319,7 @@ point must be close to the surface compared with the triangle size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.remesh.remesh">
-<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">remesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L19-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.remesh" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">remesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lapy.remesh.remesh" title="Link to this definition">¶</a></dt>
 <dd><p>Remesh a triangle mesh to near-equilateral triangles of a given edge length.</p>
 <p>This follows the remeshing approach of Botsch and Kobbelt <a class="reference internal" href="#rc99e37d15a31-1" id="id1">[1]</a>. Edges
 longer than 4/3 of the target are split at their midpoint, and edges
@@ -465,7 +465,7 @@ preserving edge contraction. Publications de l’Institut Mathematique
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=cd9de7ed"></script>
+</div><script src="../../_static/documentation_options.js?v=030dc6f6"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

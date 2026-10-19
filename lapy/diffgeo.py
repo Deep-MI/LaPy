@@ -601,11 +601,14 @@ def tria_mean_curvature_flow(
             new_v = solve(mass_v)
         else:
             new_v = np.empty_like(mass_v)
+            direct_solve = None
             for j in range(mass_v.shape[1]):
                 new_v[:, j], info = cg(system, mass_v[:, j], x0=vlast[:, j], rtol=1e-10, M=precond)
                 if info != 0:
                     logger.debug("Step %d: conjugate gradients did not converge, solving directly", x + 1)
-                    new_v[:, j] = factorize(system)(mass_v[:, j])
+                    if direct_solve is None:
+                        direct_solve = factorize(system)
+                    new_v[:, j] = direct_solve(mass_v[:, j])
         trianorm.v = new_v
         # normalize updated mesh
         trianorm.normalize_()

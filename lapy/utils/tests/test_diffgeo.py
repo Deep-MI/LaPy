@@ -23,6 +23,7 @@ from ...diffgeo import (
     tria_compute_geodesic_f,
     tria_compute_gradient,
     tria_compute_rotated_f,
+    tria_mean_curvature_flow,
 )
 from ...solver import Solver
 from ...tet_mesh import TetMesh
@@ -225,4 +226,26 @@ def test_tet_compute_divergence_multi_vs_single(tet_mesh):
             rtol=1e-12, atol=1e-14,
             err_msg=f"Tet divergence mismatch at column {k}",
         )
+
+
+# ---------------------------------------------------------------------------
+# TriaMesh mean curvature flow
+# ---------------------------------------------------------------------------
+
+
+def test_tria_mean_curvature_flow_matches_direct_solves():
+    """Steps solved by preconditioned CG match solving every step directly."""
+    from scipy.sparse.linalg import spsolve
+
+    T = TriaMesh.read_vtk("data/cubeTria.vtk")
+    ref = TriaMesh(T.v, T.t)
+    ref.normalize_()
+    a_mat = Solver(ref, lump=True).stiffness
+    for _ in range(8):
+        mass = Solver.fem_tria_mass(ref, True)
+        ref.v = spsolve((mass + a_mat).tocsc(), mass @ ref.v)
+        ref.normalize_()
+
+    flowed = tria_mean_curvature_flow(T, max_iter=8, stop_eps=0.0)
+    np.testing.assert_allclose(flowed.v, ref.v, atol=1e-9)
 

@@ -563,8 +563,12 @@ def tria_mean_curvature_flow(
 
     Notes
     -----
-    Numexpr could speed up this functions if necessary.
+    Only the system matrix of the first step is factorized. It changes little
+    between steps, so later steps are solved with conjugate gradients
+    preconditioned by that factorization, with a direct solve as fallback.
     """
+    from scipy.sparse.linalg import LinearOperator, cg, splu
+
     if use_cholmod:
         require_cholmod()
     # pre-normalize
@@ -574,6 +578,15 @@ def tria_mean_curvature_flow(
     lump = True  # for computation here and inside loop
     fem = Solver(trianorm, lump)
     a_mat = fem.stiffness
+
+    def factorize(mat):
+        if use_cholmod:
+            logger.info("Solver: Cholesky decomposition (CHOLMOD)")
+            return CholeskyFactor(mat).solve
+        logger.info("Solver: LU decomposition")
+        return splu(mat.tocsc()).solve
+
+    precond = None
     for x in range(max_iter):
         # store last position (for delta computation below)
         vlast = trianorm.v
@@ -581,14 +594,19 @@ def tria_mean_curvature_flow(
         mass = Solver.fem_tria_mass(trianorm, lump)
         mass_v = mass.dot(trianorm.v)
         # solve (M + step*A) * v = Mv and update vertices
-        if use_cholmod:
-            logger.info("Solver: Cholesky decomposition (CHOLMOD)")
-            trianorm.v = CholeskyFactor(mass + step * a_mat).solve(mass_v)
+        system = (mass + step * a_mat).tocsr()
+        if precond is None:
+            solve = factorize(system)
+            precond = LinearOperator(system.shape, matvec=solve, dtype=system.dtype)
+            new_v = solve(mass_v)
         else:
-            from scipy.sparse.linalg import spsolve
-
-            logger.info("Solver: spsolve (LU decomposition)")
-            trianorm.v = spsolve(mass + step * a_mat, mass_v)
+            new_v = np.empty_like(mass_v)
+            for j in range(mass_v.shape[1]):
+                new_v[:, j], info = cg(system, mass_v[:, j], x0=vlast[:, j], rtol=1e-10, M=precond)
+                if info != 0:
+                    logger.debug("Step %d: conjugate gradients did not converge, solving directly", x + 1)
+                    new_v[:, j] = factorize(system)(mass_v[:, j])
+        trianorm.v = new_v
         # normalize updated mesh
         trianorm.normalize_()
         # compute difference

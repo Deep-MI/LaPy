@@ -68,7 +68,7 @@ doc = [
     'ipykernel',
 ]
 style = [
-    'bibclean',
+    'bibclean>=1.0',
     'codespell',
     'ruff',
 ]

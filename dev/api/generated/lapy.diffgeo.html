@@ -432,8 +432,91 @@ multiple functions.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="lapy.diffgeo.flipped_triangles">
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">flipped_triangles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sphere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L668-L689"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.flipped_triangles" title="Link to this definition">¶</a></dt>
+<dd><p>Find the triangles of a map onto a sphere that face its centre.</p>
+<p>For a map of a closed surface onto a sphere centred at the origin, whose triangles keep the
+orientation of the surface, these are the triangles where the map folds over.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>sphere</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Vertex positions on a sphere centred at the origin, shape (n_vertices, 3).</p>
+</dd>
+<dt><strong>t</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></span></dt><dd><p>Triangle array of shape (n_triangles, 3).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Boolean mask of shape (n_triangles,), True for triangles whose normal points towards the
+centre.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sphere</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lapy.diffgeo.spherical_spectral_map">
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">spherical_spectral_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L692-L734"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.spherical_spectral_map" title="Link to this definition">¶</a></dt>
+<dd><p>Map a closed surface onto the unit sphere with its first three eigenfunctions.</p>
+<p>The first three non-constant Laplace-Beltrami eigenfunctions, each scaled to [-1, 1], serve
+as coordinates. A few steps of mean curvature flow make this embedding more convex, and every
+vertex is then projected radially onto the unit sphere. The map is mirrored if needed so that
+most triangles keep their orientation; triangles where it folds over can be found with
+<a class="reference internal" href="#lapy.diffgeo.flipped_triangles" title="lapy.diffgeo.flipped_triangles"><code class="xref py py-func docutils literal notranslate"><span class="pre">flipped_triangles()</span></code></a>. Unlike <a class="reference internal" href="#lapy.diffgeo.tria_spherical_project" title="lapy.diffgeo.tria_spherical_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">tria_spherical_project()</span></code></a>, it assumes no particular
+orientation of the surface in space and does not reject maps that fold.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>tria</strong><span class="classifier"><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.TriaMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriaMesh</span></code></a></span></dt><dd><p>Closed triangle mesh.</p>
+</dd>
+<dt><strong>flow_iter</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=3</span></dt><dd><p>Mean curvature flow steps on the embedding.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1e-6</span></dt><dd><p>Relative accuracy of the eigenvalues; the map needs far less than machine precision.</p>
+</dd>
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, use the sparse Cholesky decomposition of CHOLMOD (requires <code class="docutils literal notranslate"><span class="pre">cholespy</span></code>).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></dt><dd><p>Positions on the unit sphere, shape (n_vertices, 3).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a></dt><dd><p>If the mesh is not closed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
+<li><p><strong>flow_iter</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tet_compute_divergence">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L940-L1021"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_divergence" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L1003-L1084"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Compute integrated divergence of a 3D tetra function f (for each vertex).</p>
 <p>Divergence is the flux density leaving or entering a point.
 It can be measured by summing the dot product of the vector
@@ -473,7 +556,7 @@ with <span class="math notranslate nohighlight">\(B^{-1}\)</span> to get back th
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tet_compute_gradient">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L861-L937"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_gradient" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tet_compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vfunc</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L924-L1000"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tet_compute_gradient" title="Link to this definition">¶</a></dt>
 <dd><p>Compute gradient of a vertex function f (for each tetrahedron).</p>
 <p>For a tetrahedron <span class="math notranslate nohighlight">\((v_i, v_j, v_k, v_h)\)</span> with volume V we have:</p>
 <div class="math-wrapper docutils container">
@@ -783,7 +866,7 @@ preconditioned by that factorization, with a direct solve as fallback.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.diffgeo.tria_spherical_project">
-<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_spherical_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L649-L858"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_spherical_project" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.diffgeo.</span></span><span class="sig-name descname"><span class="pre">tria_spherical_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cholmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/diffgeo.py#L737-L921"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.diffgeo.tria_spherical_project" title="Link to this definition">¶</a></dt>
 <dd><p>Compute first 3 non-constant eigenfunctions and project spectral embedding onto sphere.</p>
 <p>Computes the first three non-constant eigenfunctions
 and then projects the spectral embedding onto a sphere. This works
@@ -800,6 +883,10 @@ case of brain surfaces in FreeSurfer coordinates.</p>
 <dt><strong>flow_iter</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=3</span></dt><dd><p>Mean curvature flow iterations (3 should be enough).</p>
 </dd>
 <dt><strong>debug</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, writes debug eigenvalue file.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1e-6</span></dt><dd><p>Relative accuracy of the eigenvalues; <code class="docutils literal notranslate"><span class="pre">0</span></code> means machine precision.</p>
+</dd>
+<dt><strong>use_cholmod</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If True, use the sparse Cholesky decomposition of CHOLMOD (requires <code class="docutils literal notranslate"><span class="pre">cholespy</span></code>).</p>
 </dd>
 </dl>
 </dd>
@@ -825,14 +912,21 @@ If spatial volume (orthogonality) is below 0.6.</p>
 <li><p><strong>tria</strong> (<a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a>)</p></li>
 <li><p><strong>flow_iter</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
 <li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>use_cholmod</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="lapy.TriaMesh.html#lapy.TriaMesh" title="lapy.tria_mesh.TriaMesh"><em>TriaMesh</em></a></p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>Numexpr could speed up this functions if necessary.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#lapy.diffgeo.spherical_spectral_map" title="lapy.diffgeo.spherical_spectral_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spherical_spectral_map</span></code></a></dt><dd><p>The same map without the orientation for brain surfaces and checks.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 </section>
@@ -904,6 +998,8 @@ If spatial volume (orthogonality) is below 0.6.</p>
 <li><a class="reference internal" href="#lapy.diffgeo.compute_geodesic_f"><code class="docutils literal notranslate"><span class="pre">compute_geodesic_f()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.diffgeo.compute_gradient"><code class="docutils literal notranslate"><span class="pre">compute_gradient()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.diffgeo.compute_rotated_f"><code class="docutils literal notranslate"><span class="pre">compute_rotated_f()</span></code></a></li>
+<li><a class="reference internal" href="#lapy.diffgeo.flipped_triangles"><code class="docutils literal notranslate"><span class="pre">flipped_triangles()</span></code></a></li>
+<li><a class="reference internal" href="#lapy.diffgeo.spherical_spectral_map"><code class="docutils literal notranslate"><span class="pre">spherical_spectral_map()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.diffgeo.tet_compute_divergence"><code class="docutils literal notranslate"><span class="pre">tet_compute_divergence()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.diffgeo.tet_compute_gradient"><code class="docutils literal notranslate"><span class="pre">tet_compute_gradient()</span></code></a></li>
 <li><a class="reference internal" href="#lapy.diffgeo.tria_compute_divergence"><code class="docutils literal notranslate"><span class="pre">tria_compute_divergence()</span></code></a></li>

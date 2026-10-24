@@ -646,8 +646,95 @@ def _unit_vector(v: np.ndarray, name: str) -> np.ndarray:
         raise ValueError(f"{name} is degenerate (zero length)")
     return v / norm
 
+
+def _low_eigenpairs(tria: TriaMesh, tol: float, use_cholmod: bool) -> tuple[np.ndarray, np.ndarray]:
+    """Lowest Laplace-Beltrami eigenpairs, enough for the first three non-constant ones."""
+    fem = Solver(tria, lump=False, use_cholmod=use_cholmod)
+    # more eigenpairs than needed, so that a loose tolerance cannot miss one copy of a repeated
+    # eigenvalue; the fixed start vector makes the result reproducible
+    return fem.eigs(k=6, tol=tol, rng=0)
+
+
+def _scale_halves(e: np.ndarray) -> np.ndarray:
+    """Scale each column to [-1, 1], positive and negative parts separately, keeping the zero level."""
+    return np.where(e < 0, e / -e.min(axis=0), e / e.max(axis=0))
+
+
+def flipped_triangles(sphere: np.ndarray, t: np.ndarray) -> np.ndarray:
+    """Find the triangles of a map onto a sphere that face its centre.
+
+    For a map of a closed surface onto a sphere centred at the origin, whose triangles keep the
+    orientation of the surface, these are the triangles where the map folds over.
+
+    Parameters
+    ----------
+    sphere : np.ndarray
+        Vertex positions on a sphere centred at the origin, shape (n_vertices, 3).
+    t : np.ndarray
+        Triangle array of shape (n_triangles, 3).
+
+    Returns
+    -------
+    np.ndarray
+        Boolean mask of shape (n_triangles,), True for triangles whose normal points towards the
+        centre.
+    """
+    p = np.asarray(sphere)[np.asarray(t)]
+    normals = np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])
+    return np.einsum("ij,ij->i", p[:, 0], normals) < 0
+
+
+def spherical_spectral_map(
+    tria: TriaMesh, flow_iter: int = 3, tol: float = 1e-6, use_cholmod: bool = False
+) -> np.ndarray:
+    """Map a closed surface onto the unit sphere with its first three eigenfunctions.
+
+    The first three non-constant Laplace-Beltrami eigenfunctions, each scaled to [-1, 1], serve
+    as coordinates. A few steps of mean curvature flow make this embedding more convex, and every
+    vertex is then projected radially onto the unit sphere. The map is mirrored if needed so that
+    most triangles keep their orientation; triangles where it folds over can be found with
+    :func:`flipped_triangles`. Unlike :func:`tria_spherical_project`, it assumes no particular
+    orientation of the surface in space and does not reject maps that fold.
+
+    Parameters
+    ----------
+    tria : TriaMesh
+        Closed triangle mesh.
+    flow_iter : int, default=3
+        Mean curvature flow steps on the embedding.
+    tol : float, default=1e-6
+        Relative accuracy of the eigenvalues; the map needs far less than machine precision.
+    use_cholmod : bool, default=False
+        If True, use the sparse Cholesky decomposition of CHOLMOD (requires ``cholespy``).
+
+    Returns
+    -------
+    np.ndarray
+        Positions on the unit sphere, shape (n_vertices, 3).
+
+    Raises
+    ------
+    ValueError
+        If the mesh is not closed.
+    """
+    if not tria.is_closed():
+        raise ValueError("Can only map closed meshes onto the sphere.")
+    _, evecs = _low_eigenpairs(tria, tol, use_cholmod)
+    e = _scale_halves(evecs[:, 1:4])
+    if flow_iter > 0:
+        e = tria_mean_curvature_flow(TriaMesh(e, tria.t), max_iter=flow_iter, use_cholmod=use_cholmod).v
+    sphere = e / np.linalg.norm(e, axis=1, keepdims=True)
+    if flipped_triangles(sphere, tria.t).mean() > 0.5:
+        sphere[:, 0] *= -1
+    return sphere
+
+
 def tria_spherical_project(
-    tria: TriaMesh, flow_iter: int = 3, debug: bool = False
+    tria: TriaMesh,
+    flow_iter: int = 3,
+    debug: bool = False,
+    tol: float = 1e-6,
+    use_cholmod: bool = False,
 ) -> TriaMesh:
     """Compute first 3 non-constant eigenfunctions and project spectral embedding onto sphere.
 
@@ -667,6 +754,10 @@ def tria_spherical_project(
         Mean curvature flow iterations (3 should be enough).
     debug : bool, default=False
         If True, writes debug eigenvalue file.
+    tol : float, default=1e-6
+        Relative accuracy of the eigenvalues; ``0`` means machine precision.
+    use_cholmod : bool, default=False
+        If True, use the sparse Cholesky decomposition of CHOLMOD (requires ``cholespy``).
 
     Returns
     -------
@@ -683,31 +774,17 @@ def tria_spherical_project(
         If flipped area fraction is above 0.0008.
         If spatial volume (orthogonality) is below 0.6.
 
-    Notes
-    -----
-    Numexpr could speed up this functions if necessary.
+    See Also
+    --------
+    spherical_spectral_map : The same map without the orientation for brain surfaces and checks.
     """
     import math
 
     if not tria.is_closed():
         raise ValueError("Error: Can only project closed meshes!")
 
-    # sub-function to compute flipped area of trias where normal
-    # points towards origin, meaningful for the sphere, centered at zero
-    def get_flipped_area(triax):
-        vx1 = triax.v[triax.t[:, 0], :]
-        vx2 = triax.v[triax.t[:, 1], :]
-        vx3 = triax.v[triax.t[:, 2], :]
-        v2mv1 = vx2 - vx1
-        v3mv1 = vx3 - vx1
-        cr = np.cross(v2mv1, v3mv1)
-        spatvolx = np.sum(vx1 * cr, axis=1)
-        areasx = 0.5 * np.sqrt(np.sum(cr * cr, axis=1))
-        areax = np.sum(areasx[np.where(spatvolx < 0)])
-        return areax
-
-    fem = Solver(tria, lump=False)
-    evals, evecs = fem.eigs(k=4)
+    evals, evecs = _low_eigenpairs(tria, tol, use_cholmod)
+    evals, evecs = evals[:4], evecs[:, :4]
 
     if debug:
         data = dict()
@@ -795,34 +872,14 @@ def tria_spherical_project(
     logger.info("box %g, %g, %g volume: %g", l1, l2, l3, bvol)
     logger.info("box coverage: %g", bvol / mvol)
 
-    # we map evN to -1..0..+1 (keep zero level fixed)
-    # I have the feeling that this helps a little with the stretching
-    # at the poles, but who knows...
-    ev1min = np.amin(ev1)
-    ev1max = np.amax(ev1)
-    ev1[ev1 < 0] /= -ev1min
-    ev1[ev1 > 0] /= ev1max
-
-    ev2min = np.amin(ev2)
-    ev2max = np.amax(ev2)
-    ev2[ev2 < 0] /= -ev2min
-    ev2[ev2 > 0] /= ev2max
-
-    ev3min = np.amin(ev3)
-    ev3max = np.amax(ev3)
-    ev3[ev3 < 0] /= -ev3min
-    ev3[ev3 > 0] /= ev3max
-
-    # set evec as new coordinates (spectral embedding)
-    vn = np.empty(tria.v.shape)
-    vn[:, 0] = ev3
-    vn[:, 1] = ev1
-    vn[:, 2] = ev2
+    # set evec as new coordinates (spectral embedding), each mapped to -1..0..+1 (keep zero
+    # level fixed), which seems to help a little with the stretching at the poles
+    vn = _scale_halves(np.column_stack([ev3, ev1, ev2]))
 
     # do a few mean curvature flow euler steps to make more convex
     # three should be sufficient
     if flow_iter > 0:
-        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter)
+        tflow = tria_mean_curvature_flow(TriaMesh(vn, tria.t), max_iter=flow_iter, use_cholmod=use_cholmod)
         vn = tflow.v
 
     # project to sphere and scaled to have the same scale/origin as FS:
@@ -833,7 +890,8 @@ def tria_spherical_project(
     svol = trianew.area() / (4.0 * math.pi * 10000)
     logger.info("sphere area fraction: %g", svol)
 
-    flippedarea = get_flipped_area(trianew) / (4.0 * math.pi * 10000)
+    areas = trianew.tria_areas()
+    flippedarea = areas[flipped_triangles(trianew.v, trianew.t)].sum() / (4.0 * math.pi * 10000)
     if flippedarea > 0.95:
         logger.error("global normal flip detected: %g", flippedarea)
         raise ValueError("global normal flip")

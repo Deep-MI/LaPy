@@ -673,6 +673,7 @@ class Solver:
         v0: np.ndarray | None = None,
         mode: str = "normal",
         rng: int | np.random.Generator | None = None,
+        tol: float = 0.0,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the linear finite-element method Laplace-Beltrami spectrum.
 
@@ -713,6 +714,12 @@ class Solver:
             locally: ``numpy.random.default_rng(rng)`` is used to generate a
             starting vector with ``uniform(-1, 1)`` (matching scipy's own
             initialisation); ``rng`` is ignored when ``v0`` is provided.
+        tol : float, default=0.0
+            Relative accuracy of the eigenvalues, passed to ARPACK. ``0`` means
+            machine precision. A looser value such as ``1e-6`` is often enough
+            for eigenfunctions used as coordinates and can halve the runtime.
+            With a loose tolerance, ask for a few more eigenpairs than needed, as
+            ARPACK may otherwise miss one copy of a repeated eigenvalue.
 
         Returns
         -------
@@ -768,6 +775,7 @@ class Solver:
             which=which,
             mode=mode,
             OPinv=op_inv,
+            tol=tol,
             **start_kwargs,
         )
         # eigsh with shift-invert does not guarantee sorted output (especially

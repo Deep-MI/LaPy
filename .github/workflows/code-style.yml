@@ -29,4 +29,4 @@ jobs:
       - name: Run codespell
         uses: codespell-project/actions-codespell@master
       - name: Run bibclean
-        run: bibclean-check doc/references.bib
+        run: bibclean check doc/references.bib

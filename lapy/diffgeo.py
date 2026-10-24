@@ -650,6 +650,11 @@ def _unit_vector(v: np.ndarray, name: str) -> np.ndarray:
 def _low_eigenpairs(tria: TriaMesh, tol: float, use_cholmod: bool) -> tuple[np.ndarray, np.ndarray]:
     """Lowest Laplace-Beltrami eigenpairs, enough for the first three non-constant ones."""
     fem = Solver(tria, lump=False, use_cholmod=use_cholmod)
+    if fem.stiffness.shape[0] <= 6:
+        # the sparse solver needs fewer eigenpairs than vertices; solve tiny meshes densely
+        from scipy.linalg import eigh
+
+        return eigh(fem.stiffness.toarray(), fem.mass.toarray())
     # more eigenpairs than needed, so that a loose tolerance cannot miss one copy of a repeated
     # eigenvalue; the fixed start vector makes the result reproducible
     return fem.eigs(k=6, tol=tol, rng=0)

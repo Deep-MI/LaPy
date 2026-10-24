@@ -50,6 +50,26 @@ def test_repeated_eigenvalue_does_not_fold():
     assert not flipped_triangles(sphere, box.t).any()
 
 
+@pytest.mark.parametrize(
+    "v, t",
+    [
+        ([[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]], [[0, 1, 2], [0, 3, 1], [0, 2, 3], [1, 3, 2]]),
+        (
+            [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]],
+            [[0, 2, 4], [2, 1, 4], [1, 3, 4], [3, 0, 4], [2, 0, 5], [1, 2, 5], [3, 1, 5], [0, 3, 5]],
+        ),
+    ],
+    ids=["tetrahedron", "octahedron"],
+)
+def test_tiny_meshes_map_without_folds(v, t):
+    """Meshes with fewer vertices than the sparse solver needs are mapped too."""
+    tria = TriaMesh(np.array(v, dtype=float), np.array(t))
+    tria.orient_()
+    sphere = spherical_spectral_map(tria)
+    np.testing.assert_allclose(np.linalg.norm(sphere, axis=1), 1.0)
+    assert not flipped_triangles(sphere, tria.t).any()
+
+
 def test_map_does_not_depend_on_position(unit_sphere):
     """The map is intrinsic: a rigidly moved ellipsoid maps to the same sphere up to an orthogonal transform."""
     ellipsoid = TriaMesh(unit_sphere.v * np.array([3.0, 2.0, 1.0]), unit_sphere.t)

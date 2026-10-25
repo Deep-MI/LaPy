@@ -28,6 +28,7 @@ Key design goals:
 - `conformal`: conformal mapping methods for genus-0 surfaces.
 - `intersect`: self-intersection tests for triangle meshes, and undoing vertex moves that create intersections.
 - `remesh`: isotropic remeshing to near-equilateral triangles that keeps the topology, and closest points on a surface.
+- `topology`: non-trivial loops, handle detection and surgery, to correct closed surfaces to genus 0.
 - `io`: read/write vertex functions and eigenvector files.
 - `plot`: lightweight Plotly wrappers for interactive visualization.
 

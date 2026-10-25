@@ -5,32 +5,7 @@ import pytest
 
 from ...diffgeo import flipped_triangles, spherical_spectral_map, tria_spherical_project
 from ...tria_mesh import TriaMesh
-
-
-def _box_surface(nx, ny, nz):
-    """Boundary of an nx x ny x nz block of unit voxels, two triangles per voxel face."""
-    m = np.zeros((nx + 2, ny + 2, nz + 2), dtype=np.int8)
-    m[1:-1, 1:-1, 1:-1] = 1
-    square = np.array([[0, 0], [1, 0], [1, 1], [0, 1]])
-    corner_shape = np.array(m.shape) + 1
-    quads = []
-    for axis in range(3):
-        b, c = (axis + 1) % 3, (axis + 2) % 3
-        step = np.diff(m, axis=axis)
-        for sign in (1, -1):
-            base = np.argwhere(step == sign)
-            base[:, axis] += 1
-            corners = np.repeat(base[:, None, :], 4, axis=1)
-            corners[:, :, b] += square[:, 0]
-            corners[:, :, c] += square[:, 1]
-            if sign == 1:
-                corners = corners[:, ::-1]
-            quads.append(np.ravel_multi_index(corners.reshape(-1, 3).T, corner_shape).reshape(-1, 4))
-    used, inv = np.unique(np.concatenate(quads), return_inverse=True)
-    quads = inv.reshape(-1, 4)
-    t = np.concatenate([quads[:, [0, 1, 2]], quads[:, [0, 2, 3]]])
-    v = np.column_stack(np.unravel_index(used, corner_shape)).astype(float)
-    return TriaMesh(v, t)
+from ._shapes import box
 
 
 @pytest.fixture
@@ -44,10 +19,10 @@ def unit_sphere():
 
 def test_repeated_eigenvalue_does_not_fold():
     """A square slab has a double eigenvalue; missing one copy would fold half of the map."""
-    box = _box_surface(20, 20, 6)
-    sphere = spherical_spectral_map(box)
+    slab = box(20, 20, 6)
+    sphere = spherical_spectral_map(slab)
     np.testing.assert_allclose(np.linalg.norm(sphere, axis=1), 1.0)
-    assert not flipped_triangles(sphere, box.t).any()
+    assert not flipped_triangles(sphere, slab.t).any()
 
 
 @pytest.mark.parametrize(

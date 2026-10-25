@@ -210,8 +210,17 @@ def _tree_cotree_loops(v, t, root, w):
     return [loops[i] for i in order], lengths[order]
 
 
+def _root_vertex(t, root):
+    """Return the given root vertex, or the lowest vertex index used by a triangle."""
+    if root is None:
+        return int(np.min(t))
+    if not np.any(t == root):
+        raise ValueError("Root vertex is not used by any triangle.")
+    return int(root)
+
+
 def tree_cotree_loops(
-    tria: TriaMesh, root: int = 0, vertex_weights: np.ndarray | None = None
+    tria: TriaMesh, root: int | None = None, vertex_weights: np.ndarray | None = None
 ) -> tuple[list, np.ndarray]:
     """Compute a greedy system of non-trivial loops through a root vertex.
 
@@ -226,8 +235,9 @@ def tree_cotree_loops(
     ----------
     tria : TriaMesh
         Closed, connected, edge-manifold triangle mesh of genus g.
-    root : int, default=0
-        Root vertex of the shortest-path tree.
+    root : int or None, default=None
+        Root vertex of the shortest-path tree; by default the lowest vertex index used by a
+        triangle.
     vertex_weights : np.ndarray or None, default=None
         Cost multiplier per vertex, shape (n_vertices,). An edge costs its length times the larger
         weight of its two vertices, so large weights keep loops away from a vertex.
@@ -242,12 +252,13 @@ def tree_cotree_loops(
     Raises
     ------
     ValueError
-        If the mesh is not closed, edge-manifold and connected.
+        If the mesh is not closed, edge-manifold and connected, or the root is not used by a
+        triangle.
     """
     v = np.asarray(tria.v, dtype=float)
     t = np.asarray(tria.t, dtype=np.int64)
     edges, _ = _unique_edges(t)
-    return _tree_cotree_loops(v, t, root, _edge_weights(v, edges, vertex_weights))
+    return _tree_cotree_loops(v, t, _root_vertex(t, root), _edge_weights(v, edges, vertex_weights))
 
 
 def _shortest_crossing_loop(v, t, loop, vertex_weights=None, graph=None, radius=None):
@@ -257,12 +268,13 @@ def _shortest_crossing_loop(v, t, loop, vertex_weights=None, graph=None, radius=
         graph = _edge_graph(len(v), edges, _edge_weights(v, edges, vertex_weights))
     if radius is None:
         radius = 8.0 * np.median(graph.data)
-    on_loop = np.zeros(len(v), dtype=bool)
-    on_loop[loop] = True
-    star = np.any(on_loop[t], axis=1)
+    elif not radius > 0:
+        raise ValueError("Search radius must be positive.")
     while True:
         dist = csgraph.dijkstra(graph, indices=loop, min_only=True, limit=radius)
-        keep = np.all(dist[t] <= radius, axis=1) | star
+        # triangles with any vertex in reach keep every edge between two vertices in reach,
+        # which all edges of a crossing loop no longer than twice the radius are
+        keep = np.any(dist[t] <= radius, axis=1)
         whole = bool(np.all(keep))
         used = np.unique(t[keep])
         remap = np.full(len(v), -1, dtype=np.int64)
@@ -618,7 +630,9 @@ class Handle:
     length_b: float
 
 
-def find_handles(tria: TriaMesh, root: int = 0, max_rounds: int = 10, cap_weight: float = 1e3) -> list:
+def find_handles(
+    tria: TriaMesh, root: int | None = None, max_rounds: int = 10, cap_weight: float = 1e3
+) -> list:
     """Find one pair of short crossing loops per handle.
 
     Repeatedly takes the shortest tree-cotree loop, shortens it together with its crossing loop
@@ -631,8 +645,8 @@ def find_handles(tria: TriaMesh, root: int = 0, max_rounds: int = 10, cap_weight
     ----------
     tria : TriaMesh
         Closed, connected, oriented manifold triangle mesh.
-    root : int, default=0
-        Root vertex for the tree-cotree loops.
+    root : int or None, default=None
+        Root vertex for the tree-cotree loops, see :func:`tree_cotree_loops`.
     max_rounds : int, default=10
         Maximum number of refinement rounds per handle.
     cap_weight : float, default=1e3
@@ -646,13 +660,15 @@ def find_handles(tria: TriaMesh, root: int = 0, max_rounds: int = 10, cap_weight
     Raises
     ------
     ValueError
-        If the mesh is not a closed, connected, oriented manifold.
+        If the mesh is not a closed, connected, oriented manifold, or the root is not used by a
+        triangle.
     RuntimeError
         If a loop runs through the centre of an earlier closure.
     """
     _check_closed_surface(tria)
     v0 = np.asarray(tria.v, dtype=float)
     cv, ct = v0, np.asarray(tria.t, dtype=np.int64)
+    root = _root_vertex(ct, root)
     origin = np.arange(len(v0))
     weights = np.ones(len(v0))
     handles = []
@@ -840,7 +856,7 @@ def fix_topology(
     surgeries = []
     for _ in range(tria.genus()):
         edges, _ = _unique_edges(ct)
-        loops, _ = _tree_cotree_loops(cv, ct, 0, _edge_weights(cv, edges))
+        loops, _ = _tree_cotree_loops(cv, ct, _root_vertex(ct, None), _edge_weights(cv, edges))
         a, b, la, lb = _refine_loop_pair(cv, ct, loops[0], max_rounds=max_rounds)
         pair, lengths = (a, b), (la, lb)
         scores = None if classify is None else (classify(cv, ct, a), classify(cv, ct, b))

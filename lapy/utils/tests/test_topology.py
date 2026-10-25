@@ -97,6 +97,20 @@ def test_vertex_weights_route_loops_around_a_region():
     assert length == pytest.approx(60 * 2 * 6.0 * np.sin(np.pi / 60))
 
 
+def test_crossing_loop_search_keeps_edges_next_to_expensive_vertices():
+    """The inner equator stays optimal when both rings next to it are expensive.
+
+    Each edge of the equator lies in triangles whose third vertex is out of reach of a small
+    search radius, so the search must keep triangles with any vertex in reach.
+    """
+    tria = torus(60, 12, 6.0, 1.0)
+    ring = np.arange(len(tria.v)) % 12
+    weights = np.where(np.isin(ring, [5, 7]), 50.0, 1.0)
+    crossing, length = shortest_crossing_loop(tria, np.arange(12), vertex_weights=weights)
+    assert length == pytest.approx(60 * 2 * 5.0 * np.sin(np.pi / 60))
+    assert np.all(ring[crossing] == 6)
+
+
 def test_crossing_loop_rejects_separating_loop():
     tria = box(3, 3, 3)
     # the block spans corners 1 to 4; this ring of side vertices separates top from bottom
@@ -202,6 +216,16 @@ def test_fix_topology_gives_a_clean_sphere(tria):
         moved[s.loop] = True
     assert np.array_equal(out.v[: len(tria.v)][~moved], tria.v[~moved])
     assert np.array_equal(origin[: len(tria.v)], np.arange(len(tria.v)))
+
+
+def test_fix_topology_ignores_unused_vertices():
+    """An unused vertex at index 0 must not become the root of the loop search."""
+    ring = torus()
+    tria = TriaMesh(np.vstack([[10.0, 10.0, 10.0], ring.v]), ring.t + 1)
+    out, origin, surgeries = fix_topology(tria)
+    assert out.genus() == 0
+    assert len(surgeries) == 1
+    assert origin[0] == 0
 
 
 def test_choice_decides_between_cut_and_fill():

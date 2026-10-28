@@ -6,6 +6,7 @@ import pytest
 from ...intersect import self_intersections
 from ...solver import Solver
 from ...topology import (
+    _nudge,
     capped_surgery,
     disk_cap,
     essential_saddles,
@@ -195,6 +196,32 @@ def test_capped_surgery_lowers_genus_and_keeps_other_vertices(g):
     assert np.array_equal(out.v[off_loop], tria.v[off_loop])
 
 
+def test_disk_cap_leaves_out_triangles_without_area():
+    """Unevenly sampled boundary points on a line need no zero-area triangles."""
+    boundary = np.array([[0, 0, 0], [0.001, 0, 0], [0.002, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], dtype=float)
+    inner, tris = disk_cap(boundary, 2.0, iterations=0)
+    p = np.vstack([boundary, inner])[tris]
+    signed = 0.5 * np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])[:, 2]
+    assert np.all(signed > 0)
+    assert signed.sum() == pytest.approx(1.0)
+
+
+def test_nudging_cut_sides_does_not_flip_skinny_triangles():
+    """Each side of a cut moves only as far as its triangles stay unflipped."""
+    v = np.array([[0, 1, 0], [0, 0, 0], [-1, 0, 0], [-1, 2, 0], [1, 2, 0], [1, 0, 0], [-0.001, 0.001, 0]], dtype=float)
+    # a flat fan around vertex 0, with vertex 6 just beside the corner at vertex 1
+    t = np.array([[0, 1, 6], [0, 6, 2], [6, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 5], [0, 5, 1]])
+    copies = np.array([1, 2, 5])
+    moved = _nudge(v, t, copies, 0.2)
+
+    def signed(p):
+        return np.cross(p[t][:, 1] - p[t][:, 0], p[t][:, 2] - p[t][:, 0])[:, 2]
+
+    assert np.all(np.sign(signed(moved)) == np.sign(signed(v)))
+    # the vertex away from the skinny triangle still moves by the full gap
+    assert np.linalg.norm(moved[5] - v[5]) == pytest.approx(0.2)
+
+
 def test_capped_surgery_separates_a_loop_through_every_vertex():
     """On a 3 x 3 torus, a loop can visit all vertices, leaving the cut copies no neighbours off it."""
     tria = torus(3, 3)
@@ -315,6 +342,14 @@ def test_two_essential_saddles_per_handle(tria):
     saddles = essential_saddles(tria, _first_eigenfunction(tria))
     assert saddles.min() >= 0
     assert saddles.sum() == 2 * tria.genus()
+
+
+def test_essential_saddles_reject_pinch_vertices():
+    """Two tetrahedra sharing a vertex would give a negative saddle count there."""
+    v = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]], dtype=float)
+    t = np.array([[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3], [0, 4, 5], [0, 6, 4], [0, 5, 6], [4, 6, 5]])
+    with pytest.raises(ValueError):
+        essential_saddles(TriaMesh(v, t), np.array([0.0, -1, 1, 2, -1, 1, 2]))
 
 
 def test_separate_holes_form_separate_clusters():

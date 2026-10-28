@@ -439,14 +439,15 @@ def _fan_surgery(v, t, loop):
     return np.vstack([vc, centre, centre]), np.vstack([tc, caps]), source
 
 
-def _min_area_triangulation(points):
+def _min_area_triangulation(points, allow_degenerate=False):
     """Triangulate a closed polygon without new vertices, with the least total area.
 
     Dynamic programming over all triangulations, as in the first step of Liepa (2003). For a
     planar polygon, convex or not, every triangle outside it adds area, so the result lies
-    inside it. Only among triangulations of the same area, up to rounding, nearly degenerate
-    triangles are avoided and short diagonals preferred. Triangle ``(i, m, j)`` contains the
-    directed sides ``i -> m``, ``m -> j`` and ``j -> i``.
+    inside it. Triangles without area, with three points on a line, are left out unless the
+    polygon has no triangulation without them. Only among triangulations of the same area, up
+    to rounding, nearly degenerate triangles are avoided and short diagonals preferred.
+    Triangle ``(i, m, j)`` contains the directed sides ``i -> m``, ``m -> j`` and ``j -> i``.
     """
     k = len(points)
     perimeter = np.linalg.norm(np.roll(points, -1, axis=0) - points, axis=1).sum()
@@ -462,14 +463,18 @@ def _min_area_triangulation(points):
         area = 0.5 * np.linalg.norm(np.cross(b - a, c - a), axis=2)
         squares = np.sum((b - a) ** 2, axis=2) + np.sum((c - b) ** 2, axis=2) + np.sum((c - a) ** 2, axis=2)
         total = cost[i[:, None], m] + cost[m, j[:, None]] + area
+        if not allow_degenerate:
+            total = np.where(area > 1e-12 * squares, total, np.inf)
         quality = tie[i[:, None], m] + tie[m, j[:, None]] + squares * (1.0 + 1e3 * (area < 1e-3 * squares))
         # least area first; the quality term only decides between equal areas
-        quality = np.where(total <= total.min(axis=1, keepdims=True) + tol, quality, np.inf)
+        quality = np.where(np.isfinite(total) & (total <= total.min(axis=1, keepdims=True) + tol), quality, np.inf)
         pick = np.argmin(quality, axis=1)
         rows = np.arange(len(i))
         cost[i, j] = total[rows, pick]
         tie[i, j] = quality[rows, pick]
         best[i, j] = m[rows, pick]
+    if k > 2 and not np.isfinite(cost[0, k - 1]):
+        return _min_area_triangulation(points, allow_degenerate=True)
     tris = []
     stack = [(0, k - 1)]
     while stack:
@@ -590,7 +595,7 @@ def _nudge(v, t, copies, gap):
     """Move each copy of a cut loop by ``gap`` towards the mean of its neighbours off the loop.
 
     A copy without such neighbours moves towards the mean centroid of its triangles, which all
-    lie on its own side of the cut.
+    lie on its own side of the cut. Moves that would flip a triangle are shortened.
     """
     n = len(v)
     edges, _ = _unique_edges(t)
@@ -614,9 +619,21 @@ def _nudge(v, t, copies, gap):
     step = np.minimum(gap, 0.5 * dist)
     with np.errstate(invalid="ignore", divide="ignore"):
         move = np.where(dist[:, None] > 0, d * (step / dist)[:, None], 0.0)
-    v = v.copy()
-    v[copies] += move
-    return v
+    # halve the moves of copies whose triangles would flip, until none does
+    near = t[np.any(np.isin(t, copies), axis=1)]
+    p = v[near]
+    before = np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])
+    scale = np.ones(len(copies))
+    for attempt in range(21):
+        moved = v.copy()
+        moved[copies] += scale[:, None] * move
+        p = moved[near]
+        flipped = np.einsum("ij,ij->i", before, np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])) < 0
+        if not flipped.any():
+            return moved
+        culprit = np.isin(copies, near[flipped])
+        scale[culprit] = 0.0 if attempt == 19 else 0.5 * scale[culprit]
+    return moved
 
 
 def _capped_surgery(v, t, loop, gap=0.2):
@@ -985,7 +1002,7 @@ def essential_saddles(tria: TriaMesh, f: np.ndarray) -> np.ndarray:
     Parameters
     ----------
     tria : TriaMesh
-        Closed, edge-manifold triangle mesh.
+        Closed manifold triangle mesh.
     f : np.ndarray
         Function value per vertex, shape (n_vertices,).
 
@@ -993,7 +1010,15 @@ def essential_saddles(tria: TriaMesh, f: np.ndarray) -> np.ndarray:
     -------
     np.ndarray
         Number of essential saddle units per vertex, shape (n_vertices,).
+
+    Raises
+    ------
+    ValueError
+        If the mesh is not closed or not manifold. At a pinch vertex the link is not a single
+        circle, so saddles cannot be counted from its sign changes.
     """
+    if not (tria.is_closed() and tria.is_manifold()):
+        raise ValueError("Need a closed manifold mesh.")
     t = np.asarray(tria.t, dtype=np.int64)
     n = len(f)
     order = np.argsort(f, kind="stable")

@@ -139,6 +139,28 @@ def test_boundary_stays_in_place_and_2d_stays_2d():
     assert np.isclose(new.area(), 100.0)
 
 
+def test_unsplit_boundary_keeps_its_vertices():
+    """
+    Without splitting boundary edges, the boundary keeps exactly its
+    vertices, also with edges far longer than the target, where the
+    triangles along them are left coarse rather than cut into slivers.
+    """
+    i, j = np.meshgrid(np.arange(5), np.arange(5), indexing="ij")
+    v = np.column_stack([i.ravel(), j.ravel(), np.zeros(25)]).astype(float)
+    a = (i[:-1, :-1] * 5 + j[:-1, :-1]).ravel()
+    t = np.concatenate([np.column_stack([a, a + 5, a + 6]), np.column_stack([a, a + 6, a + 1])])
+    mesh = TriaMesh(v, t)
+    on_boundary = np.flatnonzero((i.ravel() % 4 == 0) | (j.ravel() % 4 == 0))
+    for h in (0.5, 0.05):
+        new = remesh(mesh, target_length=h, split_boundary=False)
+        assert new.is_manifold() and new.is_oriented()
+        loop = new.boundary_loops()[0]
+        assert sorted(map(tuple, new.v[loop])) == sorted(map(tuple, v[on_boundary]))
+        assert np.isclose(new.area(), 16.0)
+        # no more vertices than a mesh of equilateral triangles of the target size has triangles
+        assert len(new.v) < 16.0 / (np.sqrt(3) / 4 * h**2)
+
+
 def test_remesh_rejects_unoriented_and_nonmanifold_meshes():
     """
     Remeshing needs consistent orientation and a manifold mesh.

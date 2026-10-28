@@ -141,6 +141,38 @@ def test_disk_cap_spans_a_circle():
     assert np.allclose(inner[:, 2], 0.0)
 
 
+def test_disk_cap_fills_a_concave_polygon_without_folds():
+    """An L-shaped boundary, whose centroid lies outside it, is filled flat and without folds."""
+    corners = np.array([[0, 0], [3, 0], [3, 1], [1, 1], [1, 3], [0, 3], [0, 0]], dtype=float)
+    sides = zip(corners[:-1], corners[1:], strict=True)
+    pts = [np.linspace(a, b, int(np.linalg.norm(b - a) / 0.25), endpoint=False) for a, b in sides]
+    boundary = np.column_stack([np.concatenate(pts), np.zeros(sum(len(p) for p in pts))])
+    inner, tris = disk_cap(boundary, 0.25)
+    disk = TriaMesh(np.vstack([boundary, inner]), tris)
+    assert len(inner) > 0
+    assert disk.euler() == 1 and disk.is_oriented()
+    assert np.allclose(inner[:, 2], 0.0)
+    # every triangle faces up, the way the boundary runs, and together they cover the L exactly
+    normals = disk.tria_normals()
+    assert np.all(normals[:, 2] > 0)
+    assert disk.area() == pytest.approx(5.0)
+
+
+def test_disk_cap_is_close_to_a_minimal_surface():
+    """A saddle-shaped boundary gets a disk with almost no mean curvature, smaller than the cone over its centroid."""
+    k = 40
+    a = 2 * np.pi * np.arange(k) / k
+    boundary = np.column_stack([np.cos(a), np.sin(a), np.cos(2 * a)])
+    inner, tris = disk_cap(boundary, 2 * np.pi / k)
+    disk = TriaMesh(np.vstack([boundary, inner]), tris)
+    fem = Solver(disk, lump=True)
+    curvature = np.linalg.norm((fem.stiffness @ disk.v)[k:], axis=1) / fem.mass.diagonal()[k:]
+    assert np.median(curvature) < 0.02
+    centre = boundary.mean(axis=0)
+    cone = 0.5 * np.linalg.norm(np.cross(boundary - centre, np.roll(boundary, -1, axis=0) - centre), axis=1).sum()
+    assert disk.area() < 0.95 * cone
+
+
 @pytest.mark.parametrize("g", [1, 2])
 def test_capped_surgery_lowers_genus_and_keeps_other_vertices(g):
     tria = block_with_holes(g)

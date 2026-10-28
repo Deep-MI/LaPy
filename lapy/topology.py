@@ -19,6 +19,8 @@ from scipy import sparse
 from scipy.sparse import csgraph
 
 from .intersect import self_intersections
+from .remesh import remesh
+from .solver import Solver
 from .tria_mesh import TriaMesh
 
 # ---------------------------------------------------------------------------
@@ -437,29 +439,95 @@ def _fan_surgery(v, t, loop):
     return np.vstack([vc, centre, centre]), np.vstack([tc, caps]), source
 
 
-def _zip_rings(outer, inner, p_outer, p_inner):
-    """Triangulate the band between two cyclic rings with parameters in [0, 1)."""
-    n_o, n_i = len(outer), len(inner)
-    po = np.append(p_outer, 1.0)
-    pi = np.append(p_inner, 1.0)
+def _min_area_triangulation(points):
+    """Triangulate a closed polygon without new vertices, with the least total area.
+
+    Dynamic programming over all triangulations, as in the first step of Liepa (2003). For a
+    planar polygon, convex or not, every triangle outside it adds area, so the result lies
+    inside it. Nearly degenerate triangles are avoided where possible, and among triangulations
+    of equal area short diagonals are preferred. Triangle ``(i, m, j)`` contains the directed
+    sides ``i -> m``, ``m -> j`` and ``j -> i``.
+    """
+    k = len(points)
+    cost = np.zeros((k, k))
+    best = np.zeros((k, k), dtype=np.int64)
+    for d in range(2, k):
+        i = np.arange(k - d)
+        j = i + d
+        m = i[:, None] + np.arange(1, d)[None, :]
+        a, b, c = points[i][:, None], points[m], points[j][:, None]
+        area = 0.5 * np.linalg.norm(np.cross(b - a, c - a), axis=2)
+        squares = np.sum((b - a) ** 2, axis=2) + np.sum((c - b) ** 2, axis=2) + np.sum((c - a) ** 2, axis=2)
+        sliver = area < 1e-3 * squares
+        total = cost[i[:, None], m] + cost[m, j[:, None]] + area + 1e-3 * squares + 1e3 * squares * sliver
+        pick = np.argmin(total, axis=1)
+        rows = np.arange(len(i))
+        cost[i, j] = total[rows, pick]
+        best[i, j] = m[rows, pick]
     tris = []
-    i = j = 0
-    while i < n_o or j < n_i:
-        if j == n_i or (i < n_o and po[i + 1] <= pi[j + 1]):
-            tris.append((outer[i], outer[(i + 1) % n_o], inner[j % n_i]))
-            i += 1
-        else:
-            tris.append((outer[i % n_o], inner[(j + 1) % n_i], inner[j]))
-            j += 1
-    return tris
+    stack = [(0, k - 1)]
+    while stack:
+        i, j = stack.pop()
+        if j - i < 2:
+            continue
+        m = best[i, j]
+        tris.append((i, m, j))
+        stack += [(i, m), (m, j)]
+    return np.array(tris, dtype=np.int64)
 
 
-def disk_cap(points: np.ndarray, edge_length: float, smooth_steps: int = 30) -> tuple[np.ndarray, np.ndarray]:
-    """Triangulate a disk that spans a closed boundary polygon.
+def _split_chords(v, t, k):
+    """Split each edge between two boundary vertices that is not a boundary edge at its midpoint.
 
-    Rings of decreasing size are placed between the boundary and its centroid, about one edge
-    length apart, neighbouring rings are joined by a strip of triangles, and the inner vertices
-    are smoothed towards the average of their neighbours with the boundary fixed.
+    The first ``k`` vertices form the boundary. Without such chords, no edge of the disk can
+    duplicate an edge of the mesh whose hole it closes.
+    """
+    v, t = v.copy(), t.copy()
+    while True:
+        edges, tria_edges = _unique_edges(t)
+        count = np.bincount(tria_edges.ravel(), minlength=len(edges))
+        chords = np.flatnonzero((edges[:, 1] < k) & (count == 2))
+        if len(chords) == 0:
+            return v, t
+        a, b = edges[chords[0]]
+        m = len(v)
+        v = np.vstack([v, 0.5 * (v[a] + v[b])])
+        rows, sides = np.nonzero(tria_edges == chords[0])
+        new = []
+        for r, s in zip(rows, sides, strict=True):
+            p, q, o = t[r, s], t[r, (s + 1) % 3], t[r, (s + 2) % 3]
+            t[r] = (p, m, o)
+            new.append((m, q, o))
+        t = np.vstack([t, new])
+
+
+def _minimal_surface_step(v, t, k):
+    """Move the inner vertices to the harmonic positions for the current cotangent weights.
+
+    One iteration of Pinkall and Polthier (1993); repeated, it converges to a discrete minimal
+    surface. The first ``k`` vertices form the fixed boundary. A flat mesh stays as it is.
+    """
+    from scipy.sparse.linalg import splu
+
+    if len(v) == k:
+        return v
+    a = Solver(TriaMesh(v, t), lump=False).stiffness.tocsr()
+    inner = a[k:]
+    v = v.copy()
+    v[k:] = splu(inner[:, k:].tocsc()).solve(-(inner[:, :k] @ v[:k]))
+    return v
+
+
+def disk_cap(points: np.ndarray, edge_length: float, iterations: int = 3) -> tuple[np.ndarray, np.ndarray]:
+    """Triangulate a disk that spans a closed boundary polygon, close to a minimal surface.
+
+    The polygon is first triangulated with the least area and no new vertices (Liepa 2003),
+    which is free of folds for a planar polygon, convex or not, and edges between two boundary
+    vertices are split, so that the disk can close a hole without duplicating an edge of the
+    mesh around it. Then, ``iterations`` times, the disk is remeshed to the target edge length
+    with the boundary kept as it is, see :func:`lapy.remesh.remesh`, and its inner vertices are
+    moved to the harmonic positions for the current cotangent weights (Pinkall and Polthier
+    1993), which pulls the disk towards a minimal surface.
 
     Parameters
     ----------
@@ -467,8 +535,8 @@ def disk_cap(points: np.ndarray, edge_length: float, smooth_steps: int = 30) -> 
         Boundary polygon of shape (k, 3), in order.
     edge_length : float
         Target edge length inside the disk.
-    smooth_steps : int, default=30
-        Iterations of umbrella smoothing of the inner vertices.
+    iterations : int, default=3
+        Rounds of remeshing and minimal surface steps.
 
     Returns
     -------
@@ -482,50 +550,14 @@ def disk_cap(points: np.ndarray, edge_length: float, smooth_steps: int = 30) -> 
     """
     points = np.asarray(points, dtype=float)
     k = len(points)
-    centre = points.mean(axis=0)
-    seg = np.linalg.norm(np.roll(points, -1, axis=0) - points, axis=1)
-    param = np.concatenate([[0.0], np.cumsum(seg)[:-1]]) / seg.sum()
-    radius = np.linalg.norm(points - centre, axis=1).mean()
-    n_rings = max(0, int(radius / edge_length) - 1)
-
-    rings, params, pos = [np.arange(k)], [param], []
-    next_id = k
-    for r in range(1, n_rings + 1):
-        s = 1.0 - r / (n_rings + 1)
-        n_r = max(3, int(round(k * s)))
-        if n_r >= len(rings[-1]):
-            n_r = len(rings[-1]) - 1
-        if n_r < 3:
-            break
-        p = np.arange(n_r) / n_r
-        # resample the boundary at p and shrink towards the centre
-        closed_param = np.append(param, 1.0)
-        q = np.column_stack(
-            [np.interp(p, closed_param, np.append(points[:, d], points[0, d])) for d in range(3)]
-        )
-        pos.append(centre + s * (q - centre))
-        rings.append(np.arange(next_id, next_id + n_r))
-        params.append(p)
-        next_id += n_r
-    tris = []
-    for a in range(len(rings) - 1):
-        tris += _zip_rings(rings[a], rings[a + 1], params[a], params[a + 1])
-    last = rings[-1]
-    tris += [(last[i], last[(i + 1) % len(last)], next_id) for i in range(len(last))]
-    pos.append(centre[None])
-    inner = np.concatenate(pos)
-    tris = np.array(tris, dtype=np.int64)
-
-    # umbrella smoothing of the inner vertices, boundary fixed
-    allpos = np.vstack([points, inner])
-    n = len(allpos)
-    e = np.concatenate([tris[:, [0, 1]], tris[:, [1, 2]], tris[:, [2, 0]]])
-    adj = sparse.csr_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n))
-    adj = ((adj + adj.T) > 0).astype(float)
-    deg = np.asarray(adj.sum(axis=1)).ravel()
-    for _ in range(smooth_steps):
-        allpos[k:] = (adj @ allpos)[k:] / deg[k:, None]
-    return allpos[k:], tris
+    v, t = _split_chords(points, _min_area_triangulation(points), k)
+    for _ in range(iterations):
+        mesh = remesh(TriaMesh(v, t), target_length=edge_length, iterations=3, split_boundary=False)
+        # the boundary keeps its vertices, and as the lowest indices also their numbers
+        v = np.asarray(mesh.v, dtype=float)
+        t = np.asarray(mesh.t, dtype=np.int64)
+        v = _minimal_surface_step(v, t, k)
+    return v[k:], t
 
 
 def _nudge(v, t, copies, gap):
@@ -551,7 +583,7 @@ def _nudge(v, t, copies, gap):
     return v
 
 
-def _capped_surgery(v, t, loop, gap=0.2, smooth_steps=30):
+def _capped_surgery(v, t, loop, gap=0.2):
     loop = np.asarray(loop, dtype=np.int64)
     vc, tc, source, left, right = _cut_along_loop(v, t, loop)
     h = _loop_length(v, loop) / len(loop)
@@ -560,7 +592,7 @@ def _capped_surgery(v, t, loop, gap=0.2, smooth_steps=30):
     new_v, new_t = [vc], [tc]
     n = len(vc)
     for side in (left, right):
-        inner, tris = disk_cap(vc[side], h, smooth_steps)
+        inner, tris = disk_cap(vc[side], h)
         cap = np.concatenate([side, n + np.arange(len(inner))])[tris]
         # the cap must run against the mesh along the shared boundary edges
         if _has_side(cap, side[0], side[1]) == _has_side(tc, side[0], side[1]):
@@ -571,14 +603,14 @@ def _capped_surgery(v, t, loop, gap=0.2, smooth_steps=30):
     return np.vstack(new_v), np.vstack(new_t), source
 
 
-def capped_surgery(
-    tria: TriaMesh, loop: np.ndarray, gap: float = 0.2, smooth_steps: int = 30
-) -> tuple[TriaMesh, np.ndarray]:
-    """Cut a closed mesh along a simple loop and close both openings with smooth disks.
+def capped_surgery(tria: TriaMesh, loop: np.ndarray, gap: float = 0.2) -> tuple[TriaMesh, np.ndarray]:
+    """Cut a closed mesh along a simple loop and close both openings with disks.
 
     For a non-separating loop this lowers the genus by one. The two copies of the loop are first
     moved apart, each by ``gap`` times the mean loop edge length towards its own side, so that
-    the disks do not touch. Vertices away from the loop keep their index and position.
+    the disks do not touch. The disks are close to minimal surfaces, with edges about as long as
+    those of the loop, see :func:`disk_cap`. Vertices away from the loop keep their index and
+    position.
 
     Parameters
     ----------
@@ -588,8 +620,6 @@ def capped_surgery(
         Vertex indices of a simple closed loop.
     gap : float, default=0.2
         Separation of each side from the loop, relative to the mean loop edge length.
-    smooth_steps : int, default=30
-        Smoothing iterations inside each disk, see :func:`disk_cap`.
 
     Returns
     -------
@@ -600,7 +630,7 @@ def capped_surgery(
     """
     v = np.asarray(tria.v, dtype=float)
     t = np.asarray(tria.t, dtype=np.int64)
-    nv, nt, source = _capped_surgery(v, t, loop, gap, smooth_steps)
+    nv, nt, source = _capped_surgery(v, t, loop, gap)
     return TriaMesh(nv, nt), source
 
 

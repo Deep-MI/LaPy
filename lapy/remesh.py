@@ -17,7 +17,11 @@ if TYPE_CHECKING:
 
 
 def remesh(
-    tria: "TriaMesh", target_length: float | None = None, iterations: int = 5, max_rounds: int = 10
+    tria: "TriaMesh",
+    target_length: float | None = None,
+    iterations: int = 5,
+    max_rounds: int = 10,
+    split_boundary: bool = True,
 ) -> "TriaMesh":
     """Remesh a triangle mesh to near-equilateral triangles of a given edge length.
 
@@ -43,6 +47,10 @@ def remesh(
     max_rounds : int, default=10
         Maximum number of rounds per operation and iteration. Later rounds
         do little, and what is left carries over to the next iteration.
+    split_boundary : bool, default=True
+        Whether long boundary edges are split. Without splitting, the
+        boundary keeps exactly its vertices and edges, for example to stitch
+        the mesh into a hole.
 
     Returns
     -------
@@ -82,7 +90,7 @@ def remesh(
     v, t = v0.copy(), t0.copy()
     for _ in range(iterations):
         for _ in range(max_rounds):
-            v, t, n = _split_round(v, t, hi)
+            v, t, n = _split_round(v, t, hi, split_boundary)
             if n == 0:
                 break
         for _ in range(max_rounds):
@@ -273,13 +281,20 @@ def _claim(
     return ~lost
 
 
-def _split_round(v: np.ndarray, t: np.ndarray, hi: float) -> tuple[np.ndarray, np.ndarray, int]:
+def _split_round(
+    v: np.ndarray, t: np.ndarray, hi: float, split_boundary: bool = True
+) -> tuple[np.ndarray, np.ndarray, int]:
     """Split long edges, at most one per triangle, the longest first."""
     edges, tria_edges, count = _sides(t)
     length = np.linalg.norm(v[edges[:, 1]] - v[edges[:, 0]], axis=1)
     side_len = np.where(length[tria_edges] > hi, length[tria_edges], -1.0)
     k = np.argmax(side_len, axis=1)
-    rows = np.flatnonzero(side_len[np.arange(len(t)), k] > 0)
+    longest = side_len[np.arange(len(t)), k] > 0
+    if not split_boundary:
+        # a triangle whose longest side stays unsplit is left as it is, as splitting its other
+        # sides would only cut it into slivers along that side
+        longest &= count[tria_edges[np.arange(len(t)), k]] != 1
+    rows = np.flatnonzero(longest)
     if len(rows) == 0:
         return v, t, 0
     wanted = tria_edges[rows, k[rows]]

@@ -444,12 +444,15 @@ def _min_area_triangulation(points):
 
     Dynamic programming over all triangulations, as in the first step of Liepa (2003). For a
     planar polygon, convex or not, every triangle outside it adds area, so the result lies
-    inside it. Nearly degenerate triangles are avoided where possible, and among triangulations
-    of equal area short diagonals are preferred. Triangle ``(i, m, j)`` contains the directed
-    sides ``i -> m``, ``m -> j`` and ``j -> i``.
+    inside it. Only among triangulations of the same area, up to rounding, nearly degenerate
+    triangles are avoided and short diagonals preferred. Triangle ``(i, m, j)`` contains the
+    directed sides ``i -> m``, ``m -> j`` and ``j -> i``.
     """
     k = len(points)
+    perimeter = np.linalg.norm(np.roll(points, -1, axis=0) - points, axis=1).sum()
+    tol = 1e-9 * perimeter**2
     cost = np.zeros((k, k))
+    tie = np.zeros((k, k))
     best = np.zeros((k, k), dtype=np.int64)
     for d in range(2, k):
         i = np.arange(k - d)
@@ -458,11 +461,14 @@ def _min_area_triangulation(points):
         a, b, c = points[i][:, None], points[m], points[j][:, None]
         area = 0.5 * np.linalg.norm(np.cross(b - a, c - a), axis=2)
         squares = np.sum((b - a) ** 2, axis=2) + np.sum((c - b) ** 2, axis=2) + np.sum((c - a) ** 2, axis=2)
-        sliver = area < 1e-3 * squares
-        total = cost[i[:, None], m] + cost[m, j[:, None]] + area + 1e-3 * squares + 1e3 * squares * sliver
-        pick = np.argmin(total, axis=1)
+        total = cost[i[:, None], m] + cost[m, j[:, None]] + area
+        quality = tie[i[:, None], m] + tie[m, j[:, None]] + squares * (1.0 + 1e3 * (area < 1e-3 * squares))
+        # least area first; the quality term only decides between equal areas
+        quality = np.where(total <= total.min(axis=1, keepdims=True) + tol, quality, np.inf)
+        pick = np.argmin(quality, axis=1)
         rows = np.arange(len(i))
         cost[i, j] = total[rows, pick]
+        tie[i, j] = quality[rows, pick]
         best[i, j] = m[rows, pick]
     tris = []
     stack = [(0, k - 1)]
@@ -501,6 +507,20 @@ def _split_chords(v, t, k):
         t = np.vstack([t, new])
 
 
+def _n_folded_edges(v, t):
+    """Count the interior edges whose two triangles face in opposite directions."""
+    edges, tria_edges = _unique_edges(t)
+    side = tria_edges.ravel()
+    count = np.bincount(side, minlength=len(edges))
+    order = np.argsort(side, kind="stable")
+    start = np.concatenate([[0], np.cumsum(count)[:-1]])
+    inner = np.flatnonzero(count == 2)
+    fa, fb = order[start[inner]] // 3, order[start[inner] + 1] // 3
+    p = v[t]
+    normal = np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])
+    return int(np.count_nonzero(np.einsum("ij,ij->i", normal[fa], normal[fb]) < 0))
+
+
 def _minimal_surface_step(v, t, k):
     """Move the inner vertices to the harmonic positions for the current cotangent weights.
 
@@ -527,7 +547,8 @@ def disk_cap(points: np.ndarray, edge_length: float, iterations: int = 3) -> tup
     mesh around it. Then, ``iterations`` times, the disk is remeshed to the target edge length
     with the boundary kept as it is, see :func:`lapy.remesh.remesh`, and its inner vertices are
     moved to the harmonic positions for the current cotangent weights (Pinkall and Polthier
-    1993), which pulls the disk towards a minimal surface.
+    1993), which pulls the disk towards a minimal surface. A round that would fold the disk
+    more, as smoothing can in thin concave parts, is not applied, and the disk stays as it was.
 
     Parameters
     ----------
@@ -551,17 +572,26 @@ def disk_cap(points: np.ndarray, edge_length: float, iterations: int = 3) -> tup
     points = np.asarray(points, dtype=float)
     k = len(points)
     v, t = _split_chords(points, _min_area_triangulation(points), k)
+    folds = _n_folded_edges(v, t)
     for _ in range(iterations):
         mesh = remesh(TriaMesh(v, t), target_length=edge_length, iterations=3, split_boundary=False)
         # the boundary keeps its vertices, and as the lowest indices also their numbers
-        v = np.asarray(mesh.v, dtype=float)
-        t = np.asarray(mesh.t, dtype=np.int64)
-        v = _minimal_surface_step(v, t, k)
+        v_new = _minimal_surface_step(np.asarray(mesh.v, dtype=float), np.asarray(mesh.t, dtype=np.int64), k)
+        folds_new = _n_folded_edges(v_new, mesh.t)
+        # in a thin concave part, smoothing can push vertices across the boundary; keep the
+        # last disk that did not fold more
+        if folds_new > folds:
+            break
+        v, t, folds = v_new, np.asarray(mesh.t, dtype=np.int64), folds_new
     return v[k:], t
 
 
 def _nudge(v, t, copies, gap):
-    """Move each copy of a cut loop by ``gap`` towards the mean of its neighbours off the loop."""
+    """Move each copy of a cut loop by ``gap`` towards the mean of its neighbours off the loop.
+
+    A copy without such neighbours moves towards the mean centroid of its triangles, which all
+    lie on its own side of the cut.
+    """
     n = len(v)
     edges, _ = _unique_edges(t)
     rows = np.r_[edges[:, 0], edges[:, 1]]
@@ -574,6 +604,12 @@ def _nudge(v, t, copies, gap):
     ok = cnt > 0
     d = np.zeros((len(copies), 3))
     d[ok] = nb[ok] / cnt[ok, None] - v[copies[ok]]
+    if not np.all(ok):
+        incident = sparse.csr_matrix(
+            (np.ones(t.size), (t.ravel(), np.repeat(np.arange(len(t)), 3))), shape=(n, len(t))
+        )[copies[~ok]]
+        centroid = (incident @ v[t].mean(axis=1)) / np.asarray(incident.sum(axis=1))
+        d[~ok] = centroid - v[copies[~ok]]
     dist = np.linalg.norm(d, axis=1)
     step = np.minimum(gap, 0.5 * dist)
     with np.errstate(invalid="ignore", divide="ignore"):

@@ -158,6 +158,16 @@ def test_disk_cap_fills_a_concave_polygon_without_folds():
     assert disk.area() == pytest.approx(5.0)
 
 
+def test_disk_cap_keeps_a_thin_concave_boundary_unfolded():
+    """Area decides the triangulation, and smoothing may not push vertices across a thin spike."""
+    boundary = np.array([[0, 0, 0], [1, 0, 0], [0.001, 0.001, 0], [0, 1, 0]], dtype=float)
+    inner, tris = disk_cap(boundary, 2.0)
+    p = np.vstack([boundary, inner])[tris]
+    signed = 0.5 * np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])[:, 2]
+    assert np.all(signed > 0)
+    assert signed.sum() == pytest.approx(0.001)
+
+
 def test_disk_cap_is_close_to_a_minimal_surface():
     """A saddle-shaped boundary gets a disk with almost no mean curvature, smaller than the cone over its centroid."""
     k = 40
@@ -183,6 +193,17 @@ def test_capped_surgery_lowers_genus_and_keeps_other_vertices(g):
     assert np.array_equal(np.sort(source), np.sort(loops[0]))
     off_loop = np.setdiff1d(np.arange(len(tria.v)), loops[0])
     assert np.array_equal(out.v[off_loop], tria.v[off_loop])
+
+
+def test_capped_surgery_separates_a_loop_through_every_vertex():
+    """On a 3 x 3 torus, a loop can visit all vertices, leaving the cut copies no neighbours off it."""
+    tria = torus(3, 3)
+    loop = np.arange(9)
+    out, source = capped_surgery(tria, loop)
+    assert out.is_closed() and out.is_manifold() and out.genus() == 0
+    # the copy of each loop vertex has moved away from the vertex itself
+    copy = 9 + np.argsort(source)
+    assert np.linalg.norm(out.v[loop] - out.v[copy], axis=1).min() > 0.1
 
 
 # ---------------------------------------------------------------------------

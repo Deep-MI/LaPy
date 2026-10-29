@@ -211,6 +211,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/generated/lapy.conformal.html">lapy.conformal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/lapy.intersect.html">lapy.intersect</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/lapy.remesh.html">lapy.remesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/lapy.topology.html">lapy.topology</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/lapy.plot.html">lapy.plot</a></li>
 </ul>
 </li>
@@ -304,6 +305,8 @@
   <h2>C</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.capped_surgery">capped_surgery() (in module lapy.topology)</a>
+</li>
         <li><a href="api/generated/lapy.Polygon.html#lapy.Polygon.centroid">centroid() (lapy.Polygon method)</a>
 
         <ul>
@@ -356,6 +359,8 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/generated/lapy.heat.html#lapy.heat.diffusion">diffusion() (in module lapy.heat)</a>
 </li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.disk_cap">disk_cap() (in module lapy.topology)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -370,6 +375,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.essential_saddles">essential_saddles() (in module lapy.topology)</a>
+</li>
         <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.euler">euler() (lapy.TriaMesh method)</a>
 </li>
         <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.extract_level_paths">extract_level_paths() (lapy.TriaMesh method)</a>
@@ -384,8 +391,12 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/generated/lapy.Solver.html#lapy.Solver.fem_tria_mass">fem_tria_mass() (lapy.Solver static method)</a>
 </li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.find_handles">find_handles() (in module lapy.topology)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.fix_topology">fix_topology() (in module lapy.topology)</a>
+</li>
         <li><a href="api/generated/lapy.diffgeo.html#lapy.diffgeo.flipped_triangles">flipped_triangles() (in module lapy.diffgeo)</a>
 </li>
     </ul></td>
@@ -412,6 +423,14 @@
   <h2>H</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.Handle">Handle (class in lapy.topology)</a>
+</li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.handle_clusters">handle_clusters() (in module lapy.topology)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.handle_patches">handle_patches() (in module lapy.topology)</a>
+</li>
         <li><a href="api/generated/lapy.TetMesh.html#lapy.TetMesh.has_free_vertices">has_free_vertices() (lapy.TetMesh method)</a>
 
         <ul>
@@ -511,8 +530,6 @@
           <li><a href="api/generated/lapy.io.html#module-lapy.io">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     lapy.plot
 
@@ -520,6 +537,8 @@
           <li><a href="api/generated/lapy.plot.html#module-lapy.plot">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     lapy.remesh
 
@@ -532,6 +551,13 @@
 
         <ul>
           <li><a href="api/generated/lapy.shapedna.html#module-lapy.shapedna">module</a>
+</li>
+        </ul></li>
+        <li>
+    lapy.topology
+
+        <ul>
+          <li><a href="api/generated/lapy.topology.html#module-lapy.topology">module</a>
 </li>
         </ul></li>
         <li><a href="api/generated/lapy.Polygon.html#lapy.Polygon.length">length() (lapy.Polygon method)</a>
@@ -575,6 +601,8 @@
           <li><a href="api/generated/lapy.remesh.html#module-lapy.remesh">lapy.remesh</a>
 </li>
           <li><a href="api/generated/lapy.shapedna.html#module-lapy.shapedna">lapy.shapedna</a>
+</li>
+          <li><a href="api/generated/lapy.topology.html#module-lapy.topology">lapy.topology</a>
 </li>
         </ul></li>
     </ul></td>
@@ -653,15 +681,17 @@
 </li>
         <li><a href="api/generated/lapy.io.html#lapy.io.read_vfunc">read_vfunc() (in module lapy.io)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/generated/lapy.TetMesh.html#lapy.TetMesh.read_vtk">read_vtk() (lapy.TetMesh class method)</a>
 
         <ul>
           <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.read_vtk">(lapy.TriaMesh class method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.refine_">refine_() (lapy.TriaMesh method)</a>
+</li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.refine_loop_pair">refine_loop_pair() (in module lapy.topology)</a>
 </li>
         <li><a href="api/generated/lapy.remesh.html#lapy.remesh.remesh">remesh() (in module lapy.remesh)</a>
 </li>
@@ -684,6 +714,10 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/generated/lapy.intersect.html#lapy.intersect.self_intersections">self_intersections() (in module lapy.intersect)</a>
+</li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.shorter_loop">shorter_loop() (in module lapy.topology)</a>
+</li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.shortest_crossing_loop">shortest_crossing_loop() (in module lapy.topology)</a>
 </li>
         <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.smooth_">smooth_() (lapy.TriaMesh method)</a>
 </li>
@@ -715,6 +749,8 @@
 </li>
         <li><a href="api/generated/lapy.conformal.html#lapy.conformal.stereographic">stereographic() (in module lapy.conformal)</a>
 </li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.Surgery">Surgery (class in lapy.topology)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -728,6 +764,8 @@
         <li><a href="api/generated/lapy.diffgeo.html#lapy.diffgeo.tet_compute_gradient">tet_compute_gradient() (in module lapy.diffgeo)</a>
 </li>
         <li><a href="api/generated/lapy.TetMesh.html#lapy.TetMesh">TetMesh (class in lapy)</a>
+</li>
+        <li><a href="api/generated/lapy.topology.html#lapy.topology.tree_cotree_loops">tree_cotree_loops() (in module lapy.topology)</a>
 </li>
         <li><a href="api/generated/lapy.TriaMesh.html#lapy.TriaMesh.tria_areas">tria_areas() (lapy.TriaMesh method)</a>
 </li>

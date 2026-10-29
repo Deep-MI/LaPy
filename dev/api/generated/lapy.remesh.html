@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="lapy.plot" href="lapy.plot.html"><link rel="prev" title="lapy.intersect" href="lapy.intersect.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="lapy.topology" href="lapy.topology.html"><link rel="prev" title="lapy.intersect" href="lapy.intersect.html">
 
     <!-- Generated with Sphinx 9.2.0 and Furo 2025.12.19 -->
         <title>lapy.remesh - LaPy</title>
@@ -213,6 +213,7 @@
 <li class="toctree-l3"><a class="reference internal" href="lapy.conformal.html">lapy.conformal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lapy.intersect.html">lapy.intersect</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">lapy.remesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lapy.topology.html">lapy.topology</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lapy.plot.html">lapy.plot</a></li>
 </ul>
 </li>
@@ -275,7 +276,7 @@ neighborhoods do not overlap, so a round is a few array operations instead of
 a loop over the mesh.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.remesh.closest_points">
-<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">closest_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L106-L136"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.closest_points" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">closest_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L114-L144"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.closest_points" title="Link to this definition">¶</a></dt>
 <dd><p>Find the closest point on a triangle mesh for each query point.</p>
 <p>Only the <code class="docutils literal notranslate"><span class="pre">k</span></code> triangles with the nearest centroids are tested, so a
 point must be close to the surface compared with the triangle size.</p>
@@ -319,7 +320,7 @@ point must be close to the surface compared with the triangle size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lapy.remesh.remesh">
-<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">remesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L19-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.remesh" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lapy.remesh.</span></span><span class="sig-name descname"><span class="pre">remesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Deep-MI/LaPy/blob/main/lapy/remesh.py#L19-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lapy.remesh.remesh" title="Link to this definition">¶</a></dt>
 <dd><p>Remesh a triangle mesh to near-equilateral triangles of a given edge length.</p>
 <p>This follows the remeshing approach of Botsch and Kobbelt <a class="reference internal" href="#rc99e37d15a31-1" id="id1">[1]</a>. Edges
 longer than 4/3 of the target are split at their midpoint, and edges
@@ -343,6 +344,10 @@ surface. Boundary vertices stay where they are.</p>
 <dt><strong>max_rounds</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=10</span></dt><dd><p>Maximum number of rounds per operation and iteration. Later rounds
 do little, and what is left carries over to the next iteration.</p>
 </dd>
+<dt><strong>split_boundary</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Whether long boundary edges are split. Without splitting, the
+boundary keeps exactly its vertices and edges, for example to stitch
+the mesh into a hole.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -364,6 +369,7 @@ is not a finite positive number.</p>
 <li><p><strong>target_length</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>iterations</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
 <li><p><strong>max_rounds</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>split_boundary</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -394,12 +400,12 @@ preserving edge contraction. Publications de l’Institut Mathematique
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="lapy.plot.html">
+          <a class="next-page" href="lapy.topology.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">lapy.plot</div>
+                <div class="title">lapy.topology</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

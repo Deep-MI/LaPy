@@ -13,4 +13,5 @@ Modules
     conformal
     intersect
     remesh
+    topology
     plot

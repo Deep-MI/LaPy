@@ -25,10 +25,9 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
+          cache-dependency-path: main/pyproject.toml
+      - name: Install pandoc
+        uses: pandoc/actions/setup@v1
       - name: Install package
         run: |
           python -m pip install --progress-bar off --upgrade pip setuptools wheel

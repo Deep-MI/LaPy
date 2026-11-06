@@ -5,7 +5,7 @@ build-backend = 'setuptools.build_meta'
 [project]
 name = 'lapy'
 version = '1.9.0.dev0'
-description = 'A package for differential geometry on meshes (Laplace, FEM)'
+description = 'Differential geometry and finite-element computations on triangle and tetrahedral meshes'
 readme = 'README.md'
 license = 'MIT'
 license-files = ['LICENSE']
@@ -86,8 +86,8 @@ all = [
 ]
 
 [project.urls]
-homepage = 'https://Deep-MI.github.io/LaPy/dev/index.html'
-documentation = 'https://Deep-MI.github.io/LaPy/dev/index.html'
+homepage = 'https://deep-mi.org/LaPy'
+documentation = 'https://deep-mi.org/LaPy'
 source = 'https://github.com/Deep-MI/LaPy'
 tracker = 'https://github.com/Deep-MI/LaPy/issues'
 

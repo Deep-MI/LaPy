@@ -554,6 +554,8 @@ def disk_cap(points: np.ndarray, edge_length: float, iterations: int = 3) -> tup
     moved to the harmonic positions for the current cotangent weights (Pinkall and Polthier
     1993), which pulls the disk towards a minimal surface. A round that would fold the disk
     more, as smoothing can in thin concave parts, is not applied, and the disk stays as it was.
+    So is a round whose harmonic positions are not defined, which happens when remeshing a
+    folded disk leaves inner vertices with only triangles without area.
 
     Parameters
     ----------
@@ -581,7 +583,13 @@ def disk_cap(points: np.ndarray, edge_length: float, iterations: int = 3) -> tup
     for _ in range(iterations):
         mesh = remesh(TriaMesh(v, t), target_length=edge_length, iterations=3, split_boundary=False)
         # the boundary keeps its vertices, and as the lowest indices also their numbers
-        v_new = _minimal_surface_step(np.asarray(mesh.v, dtype=float), np.asarray(mesh.t, dtype=np.int64), k)
+        try:
+            v_new = _minimal_surface_step(np.asarray(mesh.v, dtype=float), np.asarray(mesh.t, dtype=np.int64), k)
+        except RuntimeError:
+            # singular: an inner vertex has only triangles without area
+            break
+        if not np.isfinite(v_new).all():
+            break
         folds_new = _n_folded_edges(v_new, mesh.t)
         # in a thin concave part, smoothing can push vertices across the boundary; keep the
         # last disk that did not fold more

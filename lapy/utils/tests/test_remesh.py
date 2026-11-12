@@ -161,6 +161,20 @@ def test_unsplit_boundary_keeps_its_vertices():
         assert len(new.v) < 16.0 / (np.sqrt(3) / 4 * h**2)
 
 
+def test_vertex_whose_normals_cancel_stays_finite():
+    """
+    A vertex whose neighbours form a bowtie has a folded fan whose normals
+    sum to zero; smoothing leaves it in place instead of making it NaN.
+    """
+    v = np.array([[0, 0, 0.5], [1, 1, 0], [1, -1, 0], [-1, 1, 0], [-1, -1, 0]], dtype=float)
+    t = np.array([[0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1]])
+    new = remesh(TriaMesh(v, t), target_length=1.0, split_boundary=False)
+    assert np.isfinite(new.v).all()
+    assert new.is_manifold() and new.is_oriented()
+    loop = new.boundary_loops()[0]
+    assert sorted(map(tuple, new.v[loop])) == sorted(map(tuple, v[1:]))
+
+
 def test_remesh_rejects_unoriented_and_nonmanifold_meshes():
     """
     Remeshing needs consistent orientation and a manifold mesh.

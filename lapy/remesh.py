@@ -439,11 +439,15 @@ def _tangential_smooth(v: np.ndarray, t: np.ndarray, iterations: int = 2, step: 
         normal = np.zeros((n, 3))
         for k in range(3):
             np.add.at(normal, t[:, k], cross)
-        with np.errstate(divide="ignore", invalid="ignore"):
-            normal /= np.linalg.norm(normal, axis=1, keepdims=True)
-            centroid = (adj @ (area[:, None] * v)) / (adj @ area)[:, None]
+        length = np.linalg.norm(normal, axis=1)
+        weight = adj @ area
+        # in a folded neighbourhood the normals can cancel, and then there is no tangent plane
+        ok = (length > 0) & (weight > 0)
+        normal[ok] /= length[ok, None]
+        centroid = v.copy()
+        centroid[ok] = (adj @ (area[:, None] * v))[ok] / weight[ok, None]
         move = centroid - v
         move -= np.einsum("ij,ij->i", move, normal)[:, None] * normal
-        move[fixed] = 0.0
+        move[fixed | ~ok] = 0.0
         v += step * move
     return v

@@ -184,6 +184,22 @@ def test_disk_cap_is_close_to_a_minimal_surface():
     assert disk.area() < 0.95 * cone
 
 
+def test_disk_cap_spans_a_figure_eight():
+    """A figure eight has no vector area, so its least-area triangulation folds.
+
+    Remeshing that triangulation left a vertex whose normals cancel, and smoothing made it NaN.
+    """
+    k = 24
+    a = 2 * np.pi * np.arange(k) / k
+    boundary = np.column_stack([np.sin(a), np.sin(a) * np.cos(a), np.zeros(k)])
+    h = np.linalg.norm(np.roll(boundary, -1, axis=0) - boundary, axis=1).mean()
+    inner, tris = disk_cap(boundary, h)
+    assert np.isfinite(inner).all()
+    disk = TriaMesh(np.vstack([boundary, inner]), tris)
+    assert disk.euler() == 1 and disk.is_oriented()
+    assert np.count_nonzero(disk.adj_sym.data == 1) // 2 == k
+
+
 @pytest.mark.parametrize("g", [1, 2])
 def test_capped_surgery_lowers_genus_and_keeps_other_vertices(g):
     tria = block_with_holes(g)
